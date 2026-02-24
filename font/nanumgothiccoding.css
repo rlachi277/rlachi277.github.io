@@ -1,0 +1,13 @@
+@font-face {
+	font-family: 'Nanum Gothic Coding';
+	src: url('./file/NanumGothicCoding.ttf') format('truetype');
+	font-weight: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Nanum Gothic Coding';
+	src: url('./file/NanumGothicCoding-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-display: swap;
+}

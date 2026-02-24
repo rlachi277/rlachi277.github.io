@@ -1,4 +1,11 @@
+@import "font/pretendardvariable-gov.css";
+
+:root {
+	--font: "Pretendard GOV Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+}
+
 body {
+	font-family: var(--font);
 	padding-inline: max(4%, 1.34rem);
 	margin-block: 1.34rem;
 }
