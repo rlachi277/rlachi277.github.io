@@ -134,22 +134,26 @@ a.color:active { color: var(--ca); }
 	--bg: transparent; --bgh: transparent; --bga: transparent;
 	--bd: currentColor; --bdh: currentColor; --bda: currentColor;
 	--c: currentColor; --ch: currentColor; --ca: currentColor;
+	font-family: var(--font);
+	font-size: 1em;
+	line-height: inherit;
+	padding-block: 0;
 	border-radius: 0.2em;
+	border: none;
 	background-color: var(--bg);
 	--cbd: var(--bd);
 	box-shadow: inset 0 0 0 1px var(--cbd);
 	color: var(--c);
-	line-height: 0.5;
 	padding-inline: 0.25em;
 	text-indent: 0;
 	text-decoration-color: var(--c);
 }
-a.colorbox:hover, a.colorbox:focus-visible {
+:is(a, button).colorbox:hover, :is(a, button).colorbox:focus-visible {
 	background-color: var(--bgh); --cbd: var(--bdh); color: var(--ch);
 	text-decoration: none;
 	cursor: pointer;
 }
-a.colorbox:active { background-color: var(--bga); --cbd: var(--bda); color: var(--ca); text-decoration: none; }
+:is(a, button).colorbox:active { background-color: var(--bga); --cbd: var(--bda); color: var(--ca); text-decoration: none; }
 .colorbox.c0 { --bg: var(--c-0-bg); --bd: var(--c-0-bd); --c: var(--c-0-bc);
 	--bgh: var(--c-0-bgh); --bdh: var(--c-0-bdh); --ch: var(--c-0-bch);
 	--bga: var(--c-0-bga); --bda: var(--c-0-bda); --ca: var(--c-0-bca); }
@@ -196,4 +200,13 @@ sub {
 	vertical-align: baseline;
 	font-size: 0.7em;
 	font-weight: 550;
+}
+
+ins {
+	background-color: var(--c-1-bg);
+	color: var(--c-1);
+}
+
+del {
+	color: var(--c-0--2);
 }
