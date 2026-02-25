@@ -28,70 +28,19 @@ hgroup p {
 
 p {
 	text-align: justify;
-	margin-block: 0.5em;
+	margin-block: 0.4lh;
 }
 
 p[lang=en] { hyphens: auto; }
 
-hr { color: inherit; border: none; border-block-start: 1px solid currentColor; }
-
-ol, ul { margin-block: 0.5em; }
-ul { padding-inline-start: 2ch; }
-ol { padding-inline-start: 3ch; }
-:is(dir, menu, ol, ul) ol {
-	padding-inline-start: 2ch;
-	list-style-type: lower-alpha;
-}
-:is(dir, menu, ol, ul) :is(dir, menu, ol, ul) ol {
-	list-style-type: lower-roman;
-}
-
-li > p { margin-block: 0; } /* use p to justify text inside li */
-li > img { vertical-align: text-top; }
-
-li:has( > details) { list-style: none; }
-li > details > summary { list-style-position: outside; }
-
-fieldset {
-	margin-inline: 0;
-	border: 1px solid currentColor;
-}
-
-fieldset legend + p { margin-block-start: 0; }
-fieldset p:last-child { margin-block-end: 0; }
-
-:is(img, video) {
-	max-inline-size: 100%;
-	max-block-size: 320px;
-}
-:is(img, video).small { max-block-size: 160px; }
-:is(img, video).large { max-block-size: 480px; }
-:is(img, video).full { inline-size: 100%; max-block-size: none; }
-
-figure {
-	text-align: center;
-	break-inside: avoid-column;
-	margin-inline: 1em;
-}
-
-figure.float-right, figure.float-left {
-	margin-block-start: 0;
-	padding: 0.5em;
-	border: 1px solid currentColor;
-}
-figure.float-right { float: inline-end; }
-figure.float-left { float: inline-start; }
+hr { color: inherit; border: none; margin-block: 0.5lh; }
 
 .columns {
 	columns: 20em;
 }
 
-fieldset > .columns {
-	column-rule: thin solid;
-}
-
 .columns:has( > :is(p, figure):first-child) {
-	margin-block-start: 0.5em;
+	margin-block-start: 0.4lh;
 }
 .columns:has( > h1:first-child) { margin-block-start: 3em; }
 .columns:has( > h2:first-child) { margin-block-start: 2em; }
@@ -112,6 +61,57 @@ fieldset > .columns {
 .columns > :is(h1, h2, h3, h4, h5, h6) {
 	break-after: avoid-column;
 }
+
+fieldset {
+	margin-inline: 0;
+	border: 1px solid currentColor;
+}
+fieldset:not(:has( > legend)) { padding-block-start: 0.625em; }
+
+fieldset legend + :is(h1, h2, h3, h4, h5, h6, p, .columns), fieldset :is(h1, h2, h3, h4, h5, h6, p, .columns):first-child { margin-block-start: 0; }
+fieldset p:last-child { margin-block-end: 0; }
+fieldset > .columns { column-rule: thin solid; }
+fieldset hr { margin-block: calc(0.5lh - 0.5px); border-block-start: 1px solid currentColor; }
+
+ol, ul { margin-block: 0.4lh; }
+ul { padding-inline-start: 2ch; }
+ol { padding-inline-start: 3ch; }
+:is(dir, menu, ol, ul) ol {
+	padding-inline-start: 2ch;
+	list-style-type: lower-alpha;
+}
+:is(dir, menu, ol, ul) :is(dir, menu, ol, ul) ol {
+	list-style-type: lower-roman;
+}
+
+li > p { margin-block: 0; } /* use p to justify text inside li */
+
+li:has( > details) { list-style: none; }
+li > details > summary { list-style-position: outside; }
+
+:is(img, video) {
+	max-inline-size: 100%;
+	max-block-size: 320px;
+	vertical-align: text-top;
+}
+:is(img, video).small { max-block-size: 160px; }
+:is(img, video).large { max-block-size: 480px; }
+:is(img, video).full { inline-size: 100%; max-block-size: none; }
+
+figure {
+	text-align: center;
+	break-inside: avoid-column;
+	margin-inline: 1em;
+	margin-block: 0.4lh;
+}
+
+figure.float-right, figure.float-left {
+	margin-block-start: 0;
+	padding: 0.4lh;
+	border: 1px solid currentColor;
+}
+figure.float-right { float: inline-end; }
+figure.float-left { float: inline-start; }
 
 a { color: var(--c-link); text-decoration: none; }
 a:hover, a:focus-visible { color: var(--c-linkh); text-decoration: underline; }
