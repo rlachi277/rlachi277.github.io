@@ -24,7 +24,6 @@ hgroup :is(h1, h2, h3, h4, h5, h6) {
 hgroup p {
 	font-weight: bold;
 	margin-block-start: 0.1em;
-	margin-block-end: 1em;
 }
 
 p {
@@ -36,6 +35,7 @@ p[lang=en] { hyphens: auto; }
 
 hr { color: inherit; border: none; border-block-start: 1px solid currentColor; }
 
+ol, ul { margin-block: 0.5em; }
 ul { padding-inline-start: 2ch; }
 ol { padding-inline-start: 3ch; }
 :is(dir, menu, ol, ul) ol {
@@ -60,12 +60,13 @@ fieldset {
 fieldset legend + p { margin-block-start: 0; }
 fieldset p:last-child { margin-block-end: 0; }
 
-img {
+:is(img, video) {
 	max-inline-size: 100%;
-	max-block-size: 20em;
+	max-block-size: 320px;
 }
-img.small { max-block-size: 10em; }
-img.large { max-block-size: 30em; }
+:is(img, video).small { max-block-size: 160px; }
+:is(img, video).large { max-block-size: 480px; }
+:is(img, video).full { inline-size: 100%; max-block-size: none; }
 
 figure {
 	text-align: center;
@@ -90,14 +91,21 @@ fieldset > .columns {
 }
 
 .columns:has( > :is(p, figure):first-child) {
-	margin-block-start: 1em;
+	margin-block-start: 0.5em;
 }
+.columns:has( > h1:first-child) { margin-block-start: 3em; }
+.columns:has( > h2:first-child) { margin-block-start: 2em; }
+.columns:has( > h3:first-child) { margin-block-start: 1.5em; }
+.columns:has( > h4:first-child) { margin-block-start: 1.33em; }
+.columns:has( > h5:first-child) { margin-block-start: 1.17em; }
+.columns:has( > h6:first-child) { margin-block-start: 1em; }
 
 .columns > :is(p, figure):first-child, .columns > :is(h1, h2, h3, h4, h5, h6) + :is(p, figure) {
 	margin-block-start: 0;
 }
 
 .columns > :is(h1, h2, h3, h4, h5, h6):first-child {
+	margin-block: 0;
 	column-span: all;
 }
 
