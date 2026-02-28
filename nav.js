@@ -3,7 +3,7 @@ let nav_details;
 function on_resize(init) {
 	if (init) {
 		mobile = false;
-		nav_details = document.querySelectorAll("nav details")
+		nav_details = document.querySelectorAll("nav details");
 	}
 	if (window.matchMedia("(max-width: 480px)").matches) {
 		if (!init || mobile) return;
@@ -20,7 +20,44 @@ on_resize(true);
 
 window.addEventListener('resize', () => on_resize());
 
-function fill_nav(nav, data) {
+function serialize_nav(nav) {
+	let menu = nav.querySelector("menu");
+	let result = [];
+
+	function serialize_li(el) {
+		let a = el.childNodes[0];
+		if (el.querySelector("ul") == null) {
+			if (a.childNodes.length < 2) {
+				if (a.childNodes.length == 0) return "";
+				if (a.childNodes[0].nodeType === Node.TEXT_NODE)
+					return a.childNodes[0].textContent;
+				return "";
+			}
+			return a.childNodes[1].textContent;
+		}
+		let result = {name: "", children: []};
+		setname: {
+			if (a.childNodes.length < 2) {
+				if (a.childNodes.length == 0) break setname;
+				if (a.childNodes[0].nodeType === Node.TEXT_NODE) {
+					result.name = a.childNodes[0].textContent;
+					break setname;
+				}
+				break setname;
+			}
+			if (a.childNodes[1].nodeType === Node.TEXT_NODE)
+				result.name = a.childNodes[1].textContent;
+		}
+		for (let e of el.querySelector("ul").children) {
+			result.children.push(serialize_li(e));
+		}
+		return result;
+	}
+	for (let e of menu.children) result.push(serialize_li(e));
+	return result;
+}
+
+function deserialize_nav(nav, data) {
 	let details = document.createElement("details");
 	details.setAttribute("open", "");
 	let summary = document.createElement("summary");
@@ -35,7 +72,12 @@ function fill_nav(nav, data) {
 			data = { name: data, children: [] };
 		}
 		let link = base + data.name;
-		a.textContent = a.href = link ? link : "./";
+		a.href = link ? link : "./";
+		let base_span = document.createElement("span");
+		base_span.classList.add("nav-base");
+		base_span.textContent = link ? base : "./";
+		if (!link || base) a.appendChild(base_span);
+		a.append(data.name);
 		let url = new URL(link ? link : "./", window.location.href).href;
 		if (window.location.href === url) a.classList.add("self");
 		else fetch(url,{method:'HEAD'}).then((res) => {

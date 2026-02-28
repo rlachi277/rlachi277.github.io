@@ -256,6 +256,8 @@ nav menu {
 	padding-inline-end: 0.4lh;
 }
 
+.nav-base { opacity: 0.7; }
+
 @media screen and (max-width: 480px) {
 	nav { float: none; }
 	nav summary { display: revert; }

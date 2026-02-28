@@ -1,4 +1,4 @@
-function serialize(el) {
+function serialize(el, force_body) {
 	if (el.nodeName === "#text") {
 		if (/^\n\s*$/.test(el.textContent)) return undefined;
 		return el.textContent;
@@ -11,151 +11,159 @@ function serialize(el) {
 	};
 	let type_unset = false;
 	let all_done = false;
-	switch (el.nodeName) {
-		case 'BODY':
-			result.type = "body";
-			break;
-		case 'SECTION':
-			result.type = "section";
-			break;
-		case 'ARTICLE':
-			result.type = "article";
-			result.variant = {float: null};
-			if (el.classList.contains('float-right')) result.variant.float = "right";
-			else if (el.classList.contains('float-left')) result.variant.float = "left";
-			break;
-		case 'HR': case 'BR':
-			all_done = true;
-		case 'HGROUP': case 'H1': case 'H2': case 'H3':
-		case 'H4': case 'H5': case 'H6':
-			result.type = el.nodeName.toLowerCase();
-			break;
-		case 'P':
-			result.type = "p";
-			result.variant = {lang: null};
-			if (el.getAttribute('lang') === "en") result.variant.lang = "en";
-			break;
-		case 'FIGURE':
-			result.type = "figure";
-			result.variant = {float: null};
-			if (el.classList.contains('float-right')) result.variant.float = "right";
-			else if (el.classList.contains('float-left')) result.variant.float = "left";
-			break;
-		case 'FIGCAPTION': result.type = "figcaption"; break;
-		case 'IMG':
-			result.type = "img";
-			result.variant = {
-				src: el.getAttribute('src'),
-				alt: el.getAttribute('alt'),
-				size: 'medium'
-			};
-			if (el.classList.contains('large')) result.variant.size = "large";
-			else if (el.classList.contains('small')) result.variant.size = "small";
-			if (el.classList.contains('full')) result.variant.size = "full";
-			all_done = true;
-			break;
-		case 'FIELDSET': case 'LEGEND':
-			result.type = el.nodeName.toLowerCase();
-			break;
-		case 'RUBY':
-			if (el.childNodes.length !== 2) { type_unset = true; break; }
-			let el1 = el.childNodes[0]; let el2 = el.childNodes[1];
-			if (el2.nodeName === "#text") {
-				el1 = el2; el2 = el.childNodes[0];
-			}
-			if (el1.nodeName !== "#text" || el2.nodeName !== "RT") {
-				type_unset = true; break;
-			}
-			result.type = "ruby";
-			result.variant = {complex: false, rt: el2.textContent};
-			result.children = [el1.textContent];
-			all_done = true;
-			break;
-		case 'OL':
-			result.variant = {start: el.getAttribute('start')};
-		case 'UL': case 'LI': case 'DETAILS': case 'SUMMARY':
-			result.type = el.nodeName.toLowerCase();
-			break;
-		case 'STRONG': case 'EM': case 'B': case 'I': case 'U':
-		case 'SUB': case 'SUP': case 'INS': case 'DEL':
-			result.type = el.nodeName.toLowerCase();
-			break;
-		case 'AUDIO':
-			result.type = "audio";
-			result.variant = {
-				src: el.getAttribute('src'),
-				controls: el.getAttribute('controls'),
-				crossorigin: el.getAttribute('crossorigin'),
-				loop: el.getAttribute('loop'),
-				muted: el.getAttribute('muted'),
-				preload: el.getAttribute('preload')
-			}
-			break;
-		case 'VIDEO':
-			result.type = "video";
-			result.variant = {
-				size: "medium",
-				src: el.getAttribute('src'),
-				autoplay: el.getAttribute('autoplay'),
-				controls: el.getAttribute('controls'),
-				crossorigin: el.getAttribute('crossorigin'),
-				loop: el.getAttribute('loop'),
-				muted: el.getAttribute('muted'),
-				poster: el.getAttribute('poster'),
-				preload: el.getAttribute('preload')
-			}
-			if (el.classList.contains('large')) result.variant.size = "large";
-			else if (el.classList.contains('small')) result.variant.size = "small";
-			if (el.classList.contains('full')) result.variant.size = "full";
-			break;
-		case 'TRACK':
-			result.type = "track";
-			result.variant = {
-				src: el.getAttribute('src'),
-				srclang: el.getAttribute('srclang'),
-				default: el.getAttribute('default'),
-				kind: el.getAttribute('kind'),
-				label: el.getAttribute('label')
-			}
-			break;
-		case 'SOURCE':
-			// currently <audio>, <video> only
-			result.type = "source";
-			result.variant = {
-				src: el.getAttribute('src'),
-				media: el.getAttribute('media')
-			}
-			break;
-		case 'A':
-			result.type = "a";
-			result.variant = {
-				href: el.getAttribute('href'),
-				target: el.getAttribute('target'),
-				download: el.getAttribute('download'),
-				rel: el.getAttribute('rel'),
-				shape: null
-			}
-			if (el.classList.contains("broken")) {
-				result.variant.shape = "broken";
-			} else if (el.classList.contains("color")) {
-				result.variant.shape = "color";
-				result.variant.color = getColor(el.classList);
-			} else if (el.classList.contains("colorbox")) {
-				result.variant.shape = "colorbox";
-				result.variant.color = getColor(el.classList);
-			}
-			break;
-		case 'BUTTON':
-			result.type = "button";
-			// todo: button attributes
-			result.variant = {};
-			if (el.classList.contains("colorbox")) {
-				result.variant.shape = "colorbox";
-				result.variant.color = getColor(el.classList);
-			}
-			break;
-		default:
-			type_unset = true;
+	if (force_body) {
+		result.type = "body";
+	} else {
+		switch (el.nodeName) {
+			case 'BODY':
+				result.type = "body";
+				break;
+			case 'NAV':
+				result.type = "nav";
+				result.variant = {data: serialize_nav(el)};
+				break;
+			case 'SECTION':
+				result.type = "section";
+				break;
+			case 'ARTICLE':
+				result.type = "article";
+				result.variant = {float: null};
+				if (el.classList.contains('float-right')) result.variant.float = "right";
+				else if (el.classList.contains('float-left')) result.variant.float = "left";
+				break;
+			case 'HR': case 'BR':
+				all_done = true;
+			case 'HGROUP': case 'H1': case 'H2': case 'H3':
+			case 'H4': case 'H5': case 'H6':
+				result.type = el.nodeName.toLowerCase();
+				break;
+			case 'P':
+				result.type = "p";
+				result.variant = {lang: null};
+				if (el.getAttribute('lang') === "en") result.variant.lang = "en";
+				break;
+			case 'FIGURE':
+				result.type = "figure";
+				result.variant = {float: null};
+				if (el.classList.contains('float-right')) result.variant.float = "right";
+				else if (el.classList.contains('float-left')) result.variant.float = "left";
+				break;
+			case 'FIGCAPTION': result.type = "figcaption"; break;
+			case 'IMG':
+				result.type = "img";
+				result.variant = {
+					src: el.getAttribute('src'),
+					alt: el.getAttribute('alt'),
+					size: 'medium'
+				};
+				if (el.classList.contains('large')) result.variant.size = "large";
+				else if (el.classList.contains('small')) result.variant.size = "small";
+				if (el.classList.contains('full')) result.variant.size = "full";
+				all_done = true;
+				break;
+			case 'FIELDSET': case 'LEGEND':
+				result.type = el.nodeName.toLowerCase();
+				break;
+			case 'RUBY':
+				if (el.childNodes.length !== 2) { type_unset = true; break; }
+				let el1 = el.childNodes[0]; let el2 = el.childNodes[1];
+				if (el2.nodeName === "#text") {
+					el1 = el2; el2 = el.childNodes[0];
+				}
+				if (el1.nodeName !== "#text" || el2.nodeName !== "RT") {
+					type_unset = true; break;
+				}
+				result.type = "ruby";
+				result.variant = {complex: false, rt: el2.textContent};
+				result.children = [el1.textContent];
+				all_done = true;
+				break;
+			case 'OL':
+				result.variant = {start: el.getAttribute('start')};
+			case 'UL': case 'LI': case 'DETAILS': case 'SUMMARY':
+				result.type = el.nodeName.toLowerCase();
+				break;
+			case 'STRONG': case 'EM': case 'B': case 'I': case 'U':
+			case 'SUB': case 'SUP': case 'INS': case 'DEL':
+				result.type = el.nodeName.toLowerCase();
+				break;
+			case 'AUDIO':
+				result.type = "audio";
+				result.variant = {
+					src: el.getAttribute('src'),
+					controls: el.getAttribute('controls'),
+					crossorigin: el.getAttribute('crossorigin'),
+					loop: el.getAttribute('loop'),
+					muted: el.getAttribute('muted'),
+					preload: el.getAttribute('preload')
+				}
+				break;
+			case 'VIDEO':
+				result.type = "video";
+				result.variant = {
+					size: "medium",
+					src: el.getAttribute('src'),
+					autoplay: el.getAttribute('autoplay'),
+					controls: el.getAttribute('controls'),
+					crossorigin: el.getAttribute('crossorigin'),
+					loop: el.getAttribute('loop'),
+					muted: el.getAttribute('muted'),
+					poster: el.getAttribute('poster'),
+					preload: el.getAttribute('preload')
+				}
+				if (el.classList.contains('large')) result.variant.size = "large";
+				else if (el.classList.contains('small')) result.variant.size = "small";
+				if (el.classList.contains('full')) result.variant.size = "full";
+				break;
+			case 'TRACK':
+				result.type = "track";
+				result.variant = {
+					src: el.getAttribute('src'),
+					srclang: el.getAttribute('srclang'),
+					default: el.getAttribute('default'),
+					kind: el.getAttribute('kind'),
+					label: el.getAttribute('label')
+				}
+				break;
+			case 'SOURCE':
+				// currently <audio>, <video> only
+				result.type = "source";
+				result.variant = {
+					src: el.getAttribute('src'),
+					media: el.getAttribute('media')
+				}
+				break;
+			case 'A':
+				result.type = "a";
+				result.variant = {
+					href: el.getAttribute('href'),
+					target: el.getAttribute('target'),
+					download: el.getAttribute('download'),
+					rel: el.getAttribute('rel'),
+					shape: null
+				}
+				if (el.classList.contains("broken")) {
+					result.variant.shape = "broken";
+				} else if (el.classList.contains("color")) {
+					result.variant.shape = "color";
+					result.variant.color = getColor(el.classList);
+				} else if (el.classList.contains("colorbox")) {
+					result.variant.shape = "colorbox";
+					result.variant.color = getColor(el.classList);
+				}
+				break;
+			case 'BUTTON':
+				result.type = "button";
+				// todo: button attributes
+				result.variant = {};
+				if (el.classList.contains("colorbox")) {
+					result.variant.shape = "colorbox";
+					result.variant.color = getColor(el.classList);
+				}
+				break;
+			default:
+				type_unset = true;
+		}
 	}
 	if (all_done) return result;
 	if (type_unset) {
@@ -192,6 +200,10 @@ function deserialize(obj) {
 		case 'body':
 			new_el = document.createElement('div');
 			new_el.classList.add("deserialized");
+			break;
+		case 'nav':
+			new_el = document.createElement('nav');
+			deserialize_nav(new_el, obj.variant.data);
 			break;
 		case 'section': case 'hr': case 'br':
 		case 'hgroup': case 'h1': case 'h2': case 'h3':
