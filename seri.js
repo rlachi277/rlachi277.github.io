@@ -191,6 +191,7 @@ function deserialize(obj) {
 	switch (obj.type) {
 		case 'body':
 			new_el = document.createElement('div');
+			new_el.classList.add("deserialized");
 			break;
 		case 'section': case 'hr': case 'br':
 		case 'hgroup': case 'h1': case 'h2': case 'h3':
@@ -255,7 +256,13 @@ function deserialize(obj) {
 			if (obj.variant.muted != null) new_el.setAttribute("muted", obj.variant.muted);
 			if (obj.variant.poster != null) new_el.setAttribute("poster", obj.variant.poster);
 			if (obj.variant.preload != null) new_el.setAttribute("preload", obj.variant.preload);
-			if (obj.variant.autoplay != null) new_el.play(); // play() fails if the user "didn't interact with the document".
+			if (obj.variant.autoplay != null) new_el.play().catch(() => {
+				if (!new_el.paused) return;
+				new_el.addEventListener("click", () => {
+					new_el.play();
+				}, {once: true});
+				console.log("click event listener added to autoplay <video>")
+			})
 			switch (obj.variant.size) {
 				case 'large': new_el.classList.add("large"); break;
 				case 'small': new_el.classList.add("small"); break;
