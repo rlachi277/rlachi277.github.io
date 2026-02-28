@@ -8,6 +8,7 @@
 	<link rel="stylesheet" href="/colors.css">
 	<link rel="stylesheet" href="/style.css">
 	<script src="/seri.js" defer></script>
+	<script src="test_seri.js" defer></script>
 </head>
 <body>
 	<h1>cycweb</h1>
@@ -268,10 +269,5 @@
 		</article>
 		<p>Donec et pellentesque felis. Vestibulum dolor eros, luctus lacinia justo eget, auctor malesuada est. Ut consequat, est vitae interdum egestas, lacus mi placerat leo, ac consequat magna purus a lacus. Nam non eleifend purus, convallis tempor felis. Donec fermentum luctus elit, in placerat leo aliquam vitae. Fusce at neque massa. Praesent molestie purus sodales ante pulvinar, non porttitor massa imperdiet. Nunc eget lorem nec enim volutpat pharetra a at ipsum. Mauris vehicula, est at tempus blandit, ante nibh tincidunt massa, non tincidunt justo diam sed metus. In pretium mollis lorem, quis gravida ante vestibulum sed. Phasellus malesuada dolor et eros interdum, vel ullamcorper eros porttitor. Etiam non lorem eu risus tincidunt euismod. Duis viverra blandit orci sit amet semper. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Proin semper, dui nec pretium laoreet, massa elit malesuada felis, ut gravida nisi lorem eu leo.</p>
 	</section>
-	<script>
-		let s = JSON.stringify(serialize(document.querySelector("body")));
-		console.log(s);
-		document.querySelector("body").appendChild(deserialize(JSON.parse(s)));
-	</script>
 </body>
 </html>
