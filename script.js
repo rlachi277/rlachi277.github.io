@@ -180,6 +180,9 @@ function serialize(el, init) {
 let editing = null, edit_id = null;
 let edit_data = null;
 let edit_map = null;
+let original_map = null;
+
+let edit_cur = [];
 
 function deserialize(el, data, edit) {
 	let new_el = null;
@@ -196,6 +199,7 @@ function deserialize(el, data, edit) {
 			if (editing != null && editing !== el) stop_edit();
 			editing = el; edit_id = 0;
 			edit_map = new Map();
+			original_map = new Map();
 		}
 		editable = false;
 		break;
@@ -347,24 +351,36 @@ function deserialize(el, data, edit) {
 	default:
 		return null;
 	}
-	let edit_result = null;
+	let edit_result = null, edit_curi = 0;
 	if (edit) {
-		edit_map.set(edit_id, new_el);
-		new_el.setAttribute("data-id", edit_id);
 		edit_result = {
 			type: data.type,
 			variant: data.variant,
-			id: edit_id++,
 			children: []
 		};
-		if (editable) new_el.contentEditable = "plaintext-only";
+		if (editable && !el.classList.contains("editable")) {
+			edit_map.set(edit_id, {pos: Array.from(edit_cur), el: new_el});
+			new_el.setAttribute("data-id", edit_id);
+			edit_result.id = edit_id++;
+			new_el.classList.add("editable");
+			new_el.setAttribute("contenteditable", "plaintext-only");
+			new_el.addEventListener("keydown", on_editable_keydown);
+			new_el.addEventListener("input", on_editable_input);
+			new_el.addEventListener("blur", on_editable_blur);
+		}
 	}
 	data.children.forEach((e) => {
+		edit_cur.push(edit_curi);
 		let d = deserialize(new_el, e, edit);
-		if (edit && d != null) edit_result.children.push(d);
+		if (edit && d != null) {
+			edit_result.children.push(d);
+			edit_curi++;
+		}
+		edit_cur.pop();
 	});
 	if (new_el === el) edit_data = edit_result;
 	else el.appendChild(new_el);
+	original_map.set(new_el, JSON.stringify(data));
 	return edit_result;
 }
 
@@ -485,6 +501,40 @@ on_resize(true);
 window.addEventListener('resize', () => on_resize());
 
 function stop_edit() {
-	// 지금은 할 거 없음
-	editing = edit_id = edit_data = edit_map = null;
+	submit_changes();
+	document.querySelectorAll(".editable").forEach((e) => {
+		e.removeAttribute("data-id");
+		e.removeAttribute("contenteditable");
+		e.classList.remove("editable");
+		e.removeEventListener("keydown", on_editable_keydown);
+		e.removeEventListener("input", on_editable_input);
+		e.removeEventListener("blur", on_editable_blur);
+	});
+	editing = edit_id = edit_data = edit_map = original_map = null;
+}
+
+function on_editable_keydown(e) {
+	// e.preventDefault();
+}
+
+function on_editable_input(e) {
+	e.target.classList.add("edited");
+}
+
+function on_editable_blur(e) {
+	e.target.normalize();
+	if (JSON.stringify(serialize(e.target)) === original_map.get(e.target))
+		e.target.classList.remove("edited");
+}
+
+function submit_changes() {
+	document.activeElement.blur();
+	document.querySelectorAll(".edited").forEach((e) => {
+		let pos = edit_map.get(parseInt(e.getAttribute("data-id"))).pos;
+		let new_data = serialize(e);
+		// TODO: actually send to server
+		alert(`PUT / pos: ${pos} / new_data: ${JSON.stringify(new_data)}`);
+		original_map.set(e, JSON.stringify(new_data));
+		e.classList.remove("edited");
+	});
 }

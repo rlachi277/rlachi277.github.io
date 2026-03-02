@@ -263,3 +263,17 @@ nav menu {
 	nav summary { display: revert; }
 	nav menu > li:first-child { margin-block-start: 0; }
 }
+
+.editable { border-radius: 8px; }
+.editable:hover, .editable:focus-visible {
+	background-color: var(--c-3-bg);
+	box-shadow: 0 0 0 8px var(--c-3-bg);
+}
+.editable.edited {
+	color: var(--c-3);
+	text-decoration: rgb(from currentColor r g b / 70%) dotted underline;
+}
+.editable:is(:empty, :has( > br:only-child)):before {
+	content: '### 비어 있음! ###';
+	opacity: 0.8;
+}
