@@ -184,7 +184,7 @@ let original_map = null;
 
 let edit_cur = [];
 
-function deserialize(el, data, edit) {
+function deserialize(el, data, edit, init) {
 	let new_el = null;
 	if (typeof data === 'string' || data instanceof String) {
 		new_el = document.createTextNode(data);
@@ -192,7 +192,7 @@ function deserialize(el, data, edit) {
 		return data;
 	}
 	let editable = true;
-	switch (data.type) {
+	switch (init ? 'body' : data.type) {
 	case 'body':
 		new_el = el;
 		if (edit) {
@@ -501,7 +501,7 @@ on_resize(true);
 window.addEventListener('resize', () => on_resize());
 
 function stop_edit() {
-	submit_changes();
+	submit_all();
 	document.querySelectorAll(".editable").forEach((e) => {
 		e.removeAttribute("data-id");
 		e.removeAttribute("contenteditable");
@@ -513,8 +513,45 @@ function stop_edit() {
 	editing = edit_id = edit_data = edit_map = original_map = null;
 }
 
+let key_flag = 0;
 function on_editable_keydown(e) {
-	// e.preventDefault();
+	if (e.key === "Enter" && !e.shiftKey) {
+		e.preventDefault();
+		if (key_flag != 1) {
+			if (key_flag != 0) {
+				document.querySelectorAll(".will-cancel").forEach((e) => {
+					e.classList.remove("will-cancel");
+				});
+				key_flag = 0;
+				return;
+			}
+			if (!e.target.classList.contains("edited")) return;
+			key_flag = 1;
+			e.target.classList.add("will-submit");
+			return;
+		}
+		submit_changes(e.target);
+		key_flag = 0;
+	} else if (e.key === "Escape") {
+		e.preventDefault();
+		if (key_flag != 2) {
+			if (key_flag != 0) {
+				document.querySelectorAll(".will-submit").forEach((e) => {
+					e.classList.remove("will-submit");
+				});
+				key_flag = 0;
+				return;
+			}
+			if (!e.target.classList.contains("edited")) return;
+			key_flag = 2;
+			e.target.classList.add("will-cancel");
+			return;
+		}
+		e.target.textContent = '';
+		deserialize(e.target, JSON.parse(original_map.get(e.target)), false, true);
+		e.target.blur();
+		key_flag = 0;
+	}
 }
 
 function on_editable_input(e) {
@@ -522,19 +559,29 @@ function on_editable_input(e) {
 }
 
 function on_editable_blur(e) {
+	key_flag = 0;
+	document.querySelectorAll(".will-submit").forEach((e) => {
+		e.classList.remove("will-submit");
+	});
+	document.querySelectorAll(".will-cancel").forEach((e) => {
+		e.classList.remove("will-cancel");
+	});
 	e.target.normalize();
 	if (JSON.stringify(serialize(e.target)) === original_map.get(e.target))
 		e.target.classList.remove("edited");
 }
 
-function submit_changes() {
+function submit_changes(el) {
 	document.activeElement.blur();
-	document.querySelectorAll(".edited").forEach((e) => {
-		let pos = edit_map.get(parseInt(e.getAttribute("data-id"))).pos;
-		let new_data = serialize(e);
-		// TODO: actually send to server
-		alert(`PUT / pos: ${pos} / new_data: ${JSON.stringify(new_data)}`);
-		original_map.set(e, JSON.stringify(new_data));
-		e.classList.remove("edited");
-	});
+	let pos = edit_map.get(parseInt(el.getAttribute("data-id"))).pos;
+	let new_data = serialize(el);
+	// TODO: actually send to server
+	alert(`PUT / pos: ${pos} / new_data: ${JSON.stringify(new_data)}`);
+	original_map.set(el, JSON.stringify(new_data));
+	el.classList.remove("edited");
+}
+
+function submit_all() {
+	document.activeElement.blur();
+	document.querySelectorAll(".edited").forEach((e) => submit_changes(e));
 }

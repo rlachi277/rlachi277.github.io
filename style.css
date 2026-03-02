@@ -266,8 +266,9 @@ nav menu {
 
 .editable { border-radius: 8px; }
 .editable:hover, .editable:focus-visible {
-	background-color: var(--c-3-bg);
-	box-shadow: 0 0 0 8px var(--c-3-bg);
+	--bg: var(--c-3-bg);
+	background-color: var(--bg);
+	box-shadow: 0 0 0 8px var(--bg);
 }
 .editable.edited {
 	color: var(--c-3);
@@ -277,3 +278,5 @@ nav menu {
 	content: '### 비어 있음! ###';
 	opacity: 0.8;
 }
+.editable.will-submit { color: var(--c-5); --bg: var(--c-5-bg); }
+.editable.will-cancel { color: var(--c-2); --bg: var(--c-2-bg); }
