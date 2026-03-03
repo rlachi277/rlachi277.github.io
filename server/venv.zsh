@@ -1,1 +1,0 @@
-source _back/bin/activate
