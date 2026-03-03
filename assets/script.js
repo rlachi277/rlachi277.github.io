@@ -368,6 +368,7 @@ function deserialize(el, data, edit, init) {
 			new_el.addEventListener("input", on_editable_input);
 			new_el.addEventListener("blur", on_editable_blur);
 		}
+		original_map.set(new_el, JSON.stringify(data));
 	}
 	data.children.forEach((e) => {
 		edit_cur.push(edit_curi);
@@ -380,7 +381,6 @@ function deserialize(el, data, edit, init) {
 	});
 	if (new_el === el) edit_data = edit_result;
 	else el.appendChild(new_el);
-	original_map.set(new_el, JSON.stringify(data));
 	return edit_result;
 }
 

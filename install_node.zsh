@@ -1,4 +1,5 @@
-# 맥 말고 다른 환경에선 안 먹힐 가능성이 매우 높음
+# 맥 이외의 환경에선 안 먹힐 가능성이 매우 높음
+# 알 게 뭐야
 
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
 
