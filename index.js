@@ -2,13 +2,13 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import Database from 'better-sqlite3';
-import { render } from './render.js';
+import { render, file_exists } from './render.js';
 export const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 const port = 8080;
 
-const db = new Database('db/test.db');
+const db = new Database('db/posts.db');
 db.pragma('journal_mode = WAL');
 
 db.prepare(`
@@ -29,7 +29,8 @@ app.use(express.text());
 app.use(express.json());
 
 app.get('/rawposts/*path', (req, res) => {
-	const path = req.params.path.join('/');
+	let path = req.params.path.join('/');
+	if (path.endsWith("/")) path += "index.html";
 	const db_res = db.prepare('SELECT data FROM posts WHERE path = ?').get(path);
 	if (db_res === undefined) {
 		res.sendStatus(404); return;
@@ -52,7 +53,8 @@ const template = `
 </html>
 `.replaceAll(/\n|\t/g, "");
 app.get('/posts/*path', (req, res) => {
-	const path = req.params.path.join('/');
+	let path = req.params.path.join('/');
+	if (path.endsWith("/")) path += "index.html";
 	const db_res = db.prepare('SELECT data FROM posts WHERE path = ?').get(path);
 	if (db_res === undefined) {
 		res.sendStatus(404); return;
@@ -65,6 +67,7 @@ app.get('/posts/*path', (req, res) => {
 
 app.put('/posts/*path', (req, res) => {
 	const path = req.params.path.join('/');
+	if (path.endsWith("/")) path += "index.html";
 	db.prepare(`
 		INSERT INTO posts (path, data)
 		VALUES (?, ?)
@@ -76,6 +79,7 @@ app.put('/posts/*path', (req, res) => {
 
 app.delete('/posts/*path', (req, res) => {
 	const path = req.params.path.join('/');
+	if (path.endsWith("/")) path += "index.html";
 	const info = db.prepare('DELETE FROM posts WHERE path = ?').run(path);
 	if (info.changes === 0) {
 		res.sendStatus(404); return;
@@ -84,7 +88,8 @@ app.delete('/posts/*path', (req, res) => {
 });
 
 app.patch('/posts/*path', (req, res) => {
-	const path = req.params.path;
+	const path = req.params.path.join('/');
+	if (path.endsWith("/")) path += "index.html";
 	const db_res = db.prepare('SELECT data FROM posts WHERE path = ?').get(path)?.data;
 	if (db_res === undefined) {
 		res.sendStatus(404); return;
@@ -127,11 +132,8 @@ app.listen(port, () => {
 	console.log(`Server running at http://localhost:${port}`);
 });
 
-app.get('/exists/posts/*path', (req, res) => {
-	const path = req.params.path.join('/');
+export function post_exists(path) {
 	const db_res = db.prepare('SELECT data FROM posts WHERE path = ?').get(path);
-	if (db_res === undefined) {
-		res.status(200).send(''); return;
-	}
-	res.status(200).send('1');
-});
+	if (db_res === undefined) return false;
+	return true;
+}

@@ -1,5 +1,6 @@
-import { __dirname } from './index.js';
+import { __dirname, post_exists } from './index.js';
 import path from 'path';
+import { fileURLToPath, pathToFileURL } from 'url';
 import fs from 'fs';
 
 export function render(data, cur) {
@@ -160,7 +161,7 @@ function sani(s) {
 
 function assets(src, cur) {
 	if (src.startsWith("/")) return src;
-	let url = new URL(src, `file://${cur.replace(/\/posts\//, "/assets/")}`);
+	let url = new URL(src, `file://${cur.replace(/^\/posts\//, "/assets/")}`);
 	return url.pathname;
 }
 
@@ -197,11 +198,11 @@ function simulate_link(cur, p) {
 	return pathname;
 }
 
-function file_exists(cur, p) {
-	// for testing purposes
-	const base = __dirname + path.sep;
+export function file_exists(cur, p) {
 	let resolved = simulate_link(cur, p);
 	if (!resolved) return false;
-	if (!resolved.startsWith(base)) return false;
-	return fs.existsSync(resolved);
+	if (resolved.startsWith("/posts/")) return post_exists(resolved.replace(/^\/posts\//, ""));
+	return fs.existsSync(fileURLToPath(new URL(
+		resolved.slice(1), pathToFileURL(__dirname+path.sep)
+	).href));
 }
