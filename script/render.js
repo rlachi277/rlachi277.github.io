@@ -55,10 +55,12 @@ export function render(data, cur, init) {
 			if (data.variant?.src != null) eldata += ` src="${sani(assets(data.variant?.src, cur))}"`;
 			if (data.variant?.alt != null) ` alt="${sani(data.variant?.alt)}"`;
 			switch (data.variant?.size) {
-				case 'large': eldata += ` class="large"`; break;
-				case 'small': eldata += ` class="small"`; break;
-				case 'full': eldata += ` class="full"`; break;
+				case 'large': eldata += ` class="loading large"`; break;
+				case 'small': eldata += ` class="loading small"`; break;
+				case 'full': eldata += ` class="loading full"`; break;
+				default: eldata += ` class="loading"`;
 			}
+			eldata += ` onload="this.classList.remove('loading');"`
 			break;
 		case 'ol':
 			eltype = "ol";
@@ -85,10 +87,12 @@ export function render(data, cur, init) {
 			if (data.variant?.preload != null) eldata += ` preload="${sani(data.variant?.preload)}"`;
 			if (data.variant?.autoplay != null) eldata += ` autoplay="${sani(data.variant?.autoplay)}"`;
 			switch (data.variant?.size) {
-				case 'large': eldata += ` class="large"`; break;
-				case 'small': eldata += ` class="small"`; break;
-				case 'full': eldata += ` class="full"`; break;
+				case 'large': eldata += ` class="loading large"`; break;
+				case 'small': eldata += ` class="loading small"`; break;
+				case 'full': eldata += ` class="loading full"`; break;
+				default: eldata += `class="loading"`;
 			}
+			eldata += ` onload="this.classList.remove('loading');"`
 			break;
 		case 'track':
 			eltype = "track";

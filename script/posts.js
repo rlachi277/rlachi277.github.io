@@ -32,7 +32,10 @@ router.get('/*path', (req, res) => {
 		const rendered = render(get_post_json(path), `/posts/${path}`);
 		res.setHeader('Content-Type', 'text/html');
 		res.send(template.replace("###여기까지가 템플릿임###", rendered));
-	} catch { res.sendStatus(404); }
+	} catch (e) {
+		if (e === 404) res.sendStatus(404);
+		throw e;
+	}
 });
 
 router.put('/*path', (req, res) => {

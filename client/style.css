@@ -106,6 +106,7 @@ li > details > summary { list-style-position: outside; }
 :is(img, video).small { max-block-size: 160px; }
 :is(img, video).large { max-block-size: 480px; }
 :is(img, video).full { inline-size: 100%; max-block-size: none; }
+:is(img, video):not(.full).loading { block-size: 480px; }
 
 figure {
 	break-inside: avoid-column;
