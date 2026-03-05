@@ -315,6 +315,7 @@ function start_edit(el) {
 }
 
 function on_editable_keydown(e) {
+	if (e.isComposing) return;
 	if (e.key === "Enter" && !e.shiftKey) {
 		e.preventDefault();
 		if (!manage_confirm(e.target, "will-submit", "will-cancel")) return;
