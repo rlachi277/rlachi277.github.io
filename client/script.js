@@ -263,7 +263,7 @@ function serialize_nav(nav) {
 }
 
 async function deserialize(el, data, init) {
-	let res = await fetch('/deserialize/', { method: 'POST', headers: {
+	let res = await fetch('/putils/deserialize/', { method: 'POST', headers: {
 		'Content-type': 'application/json'
 	}, body: JSON.stringify({
 		data: data, init: init?'true':'false', cur: window.location.pathname

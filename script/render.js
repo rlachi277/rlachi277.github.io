@@ -1,4 +1,5 @@
-import { __dirname, post_exists } from '../index.js';
+import __dirname from '../dirname.js';
+import { get_post_raw } from './posts.js';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import fs from 'fs';
@@ -207,7 +208,7 @@ function simulate_link(cur, p) {
 export function file_exists(cur, p) {
 	let resolved = simulate_link(cur, p);
 	if (!resolved) return false;
-	if (resolved.startsWith("/posts/")) return post_exists(resolved.replace(/^\/posts\//, ""));
+	if (resolved.startsWith("/posts/")) return get_post_raw(resolved.replace(/^\/posts\//, ""))!=undefined;
 	return fs.existsSync(fileURLToPath(new URL(
 		resolved.slice(1), pathToFileURL(__dirname+path.sep)
 	).href));
