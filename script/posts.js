@@ -28,9 +28,11 @@ fs.readFile(path.join(__dirname, 'client', 'index.html'), 'utf8', (err, data) =>
 router.get('/*path', (req, res) => {
 	let path = req.params.path.join('/');
 	if (path.endsWith("/")) path += "index.html";
-	const rendered = render(get_post_json(path), `/posts/${path}`);
-	res.setHeader('Content-Type', 'text/html');
-	res.send(template.replace("###여기까지가 템플릿임###", rendered));
+	try {
+		const rendered = render(get_post_json(path), `/posts/${path}`);
+		res.setHeader('Content-Type', 'text/html');
+		res.send(template.replace("###여기까지가 템플릿임###", rendered));
+	} catch { res.sendStatus(404); }
 });
 
 router.put('/*path', (req, res) => {
