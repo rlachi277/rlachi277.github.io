@@ -322,12 +322,14 @@ function on_editable_keydown(e) {
 		e.preventDefault();
 		if (!manage_confirm(e.target, "will-submit", "will-cancel")) return;
 		submit_changes(e.target);
+		return;
 	} else if (e.key === "Escape") {
 		e.preventDefault();
 		if (!manage_confirm(e.target, "will-cancel", "will-submit")) return;
 		deserialize(e.target, JSON.parse(original_map.get(e.target)), true).then(() => {
 			e.target.blur();
 		});
+		return;
 	}
 }
 
@@ -351,6 +353,10 @@ function manage_confirm(el, confirm_class, stop_class) {
 
 function on_editable_input(e) {
 	e.target.classList.add("edited");
+	e.target.querySelectorAll("br").forEach((ee) => {
+		ee.outerHTML = '\n';
+	});
+	if (e.target.innerHTML === '\n') e.target.innerHTML = '';
 }
 
 function on_editable_blur(e) {
