@@ -1,9 +1,9 @@
-import { __dirname, post_exists } from './index.js';
+import { __dirname, post_exists } from '../index.js';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import fs from 'fs';
 
-export function render(data, cur) {
+export function render(data, cur, init) {
 	let eltype = null;
 	let void_element = false;
 	let eldata = "";
@@ -15,13 +15,13 @@ export function render(data, cur) {
 		let d = render(e, cur);
 		if (d != null) elmiddle += d;
 	});
-	if (data.type === 'body') {
+	if (init || data.type === 'body') {
 		return elmiddle;
 	} else {
 		switch (data.type) {
 		case 'nav':
-			return render_nav(data.variant.data, cur);
-		case 'hr': case 'br':
+			return render_nav(data.variant?.data, cur);
+		case 'br':
 			void_element = true;
 		case 'section': case 'hgroup':
 		case 'fieldset': case 'ul': case 'details':
@@ -33,23 +33,27 @@ export function render(data, cur) {
 		case 'sub': case 'sup': case 'ins': case 'del':
 			eltype = data.type;
 			break;
+		case 'hr':
+			eltype = "hr";
+			if (data.variant?.rule) eldata = ` class="rule"`;
+			break;
 		case 'article': case 'figure':
 			eltype = data.type;
-			switch (data.variant.float) {
+			switch (data.variant?.float) {
 				case 'right': eldata = ` class="float-right"`; break;
 				case 'left': eldata = ` class="float-left"`; break;
 			}
 			break;
 		case 'p':
 			eltype = "p";
-			if (data.variant.lang != null) eldata = ` lang="${sani(data.variant.lang)}"`;
+			if (data.variant?.lang != null) eldata = ` lang="${sani(data.variant?.lang)}"`;
 			break;
 		case 'img':
 			eltype = "img";
 			void_element = true;
-			if (data.variant.src != null) eldata += ` src="${sani(assets(data.variant.src, cur))}"`;
-			if (data.variant.alt != null) ` alt="${sani(data.variant.alt)}"`;
-			switch (data.variant.size) {
+			if (data.variant?.src != null) eldata += ` src="${sani(assets(data.variant?.src, cur))}"`;
+			if (data.variant?.alt != null) ` alt="${sani(data.variant?.alt)}"`;
+			switch (data.variant?.size) {
 				case 'large': eldata += ` class="large"`; break;
 				case 'small': eldata += ` class="small"`; break;
 				case 'full': eldata += ` class="full"`; break;
@@ -57,29 +61,29 @@ export function render(data, cur) {
 			break;
 		case 'ol':
 			eltype = "ol";
-			if (data.variant.start != null) eldata = ` start="${sani(data.variant.start)}"`;
+			if (data.variant?.start != null) eldata = ` start="${sani(data.variant?.start)}"`;
 			break;
 		case 'audio':
 			eltype = "audio";
-			if (data.variant.src != null) eldata += ` src="${sani(assets(data.variant.src, cur))}"`;
-			if (data.variant.controls != null) eldata += ` controls="${sani(data.variant.controls)}"`;
-			if (data.variant.crossorigin != null) eldata += ` crossorigin="${sani(data.variant.crossorigin)}"`;
-			if (data.variant.loop != null) eldata += ` loop="${sani(data.variant.loop)}"`;
-			if (data.variant.muted != null) eldata += ` muted="${sani(data.variant.muted)}"`;
-			if (data.variant.preload != null) eldata += ` preload="${sani(data.variant.preload)}"`;
+			if (data.variant?.src != null) eldata += ` src="${sani(assets(data.variant?.src, cur))}"`;
+			if (data.variant?.controls != null) eldata += ` controls="${sani(data.variant?.controls)}"`;
+			if (data.variant?.crossorigin != null) eldata += ` crossorigin="${sani(data.variant?.crossorigin)}"`;
+			if (data.variant?.loop != null) eldata += ` loop="${sani(data.variant?.loop)}"`;
+			if (data.variant?.muted != null) eldata += ` muted="${sani(data.variant?.muted)}"`;
+			if (data.variant?.preload != null) eldata += ` preload="${sani(data.variant?.preload)}"`;
 			break;
 		case 'video':
 			eltype = "video";
-			if (data.variant.src != null) eldata += ` src="${sani(assets(data.variant.src, cur))}"`;
-			if (data.variant.autoplay != null) eldata += ` autoplay="${sani(data.variant.autoplay)}"`;
-			if (data.variant.controls != null) eldata += ` controls="${sani(data.variant.controls)}"`;
-			if (data.variant.crossorigin != null) eldata += ` crossorigin="${sani(data.variant.crossorigin)}"`;
-			if (data.variant.loop != null) eldata += ` loop="${sani(data.variant.loop)}"`;
-			if (data.variant.muted != null) eldata += ` muted="${sani(data.variant.muted)}"`;
-			if (data.variant.poster != null) eldata += ` poster="${sani(assets(data.variant.poster, cur))}"`;
-			if (data.variant.preload != null) eldata += ` preload="${sani(data.variant.preload)}"`;
-			if (data.variant.autoplay != null) eldata += ` autoplay="${sani(data.variant.autoplay)}"`;
-			switch (data.variant.size) {
+			if (data.variant?.src != null) eldata += ` src="${sani(assets(data.variant?.src, cur))}"`;
+			if (data.variant?.autoplay != null) eldata += ` autoplay="${sani(data.variant?.autoplay)}"`;
+			if (data.variant?.controls != null) eldata += ` controls="${sani(data.variant?.controls)}"`;
+			if (data.variant?.crossorigin != null) eldata += ` crossorigin="${sani(data.variant?.crossorigin)}"`;
+			if (data.variant?.loop != null) eldata += ` loop="${sani(data.variant?.loop)}"`;
+			if (data.variant?.muted != null) eldata += ` muted="${sani(data.variant?.muted)}"`;
+			if (data.variant?.poster != null) eldata += ` poster="${sani(assets(data.variant?.poster, cur))}"`;
+			if (data.variant?.preload != null) eldata += ` preload="${sani(data.variant?.preload)}"`;
+			if (data.variant?.autoplay != null) eldata += ` autoplay="${sani(data.variant?.autoplay)}"`;
+			switch (data.variant?.size) {
 				case 'large': eldata += ` class="large"`; break;
 				case 'small': eldata += ` class="small"`; break;
 				case 'full': eldata += ` class="full"`; break;
@@ -87,45 +91,45 @@ export function render(data, cur) {
 			break;
 		case 'track':
 			eltype = "track";
-			if (data.variant.src != null) eldata += ` src="${sani(assets(data.variant.src, cur))}"`;
-			if (data.variant.srclang != null) eldata += ` srclang="${sani(data.variant.srclang)}"`;
-			if (data.variant.default != null) eldata += ` default="${sani(data.variant.default)}"`;
-			if (data.variant.kind != null) eldata += ` kind="${sani(data.variant.kind)}"`;
-			if (data.variant.label != null) eldata += ` label="${sani(data.variant.label)}"`;
+			if (data.variant?.src != null) eldata += ` src="${sani(assets(data.variant?.src, cur))}"`;
+			if (data.variant?.srclang != null) eldata += ` srclang="${sani(data.variant?.srclang)}"`;
+			if (data.variant?.default != null) eldata += ` default="${sani(data.variant?.default)}"`;
+			if (data.variant?.kind != null) eldata += ` kind="${sani(data.variant?.kind)}"`;
+			if (data.variant?.label != null) eldata += ` label="${sani(data.variant?.label)}"`;
 			break;
 		case 'source':
 			// currently <audio>, <video> only
 			eltype = "source";
-			if (data.variant.src != null) eldata += ` src="${sani(assets(data.variant.src, cur))}"`;
-			if (data.variant.media != null) eldata += ` media="${sani(data.variant.media)}"`;
+			if (data.variant?.src != null) eldata += ` src="${sani(assets(data.variant?.src, cur))}"`;
+			if (data.variant?.media != null) eldata += ` media="${sani(data.variant?.media)}"`;
 			break;
 		case 'a':
 			eltype = "a";
-			if (data.variant.href != null) eldata += ` href="${sani(data.variant.href)}"`;
-			if (data.variant.target != null) eldata += ` target="${sani(data.variant.target)}"`;
-			if (data.variant.download != null) eldata += ` download="${sani(data.variant.download)}"`;
-			if (data.variant.rel != null) eldata += ` rel="${sani(data.variant.rel)}"`;
-			switch (data.variant.shape) {
+			if (data.variant?.href != null) eldata += ` href="${sani(data.variant?.href)}"`;
+			if (data.variant?.target != null) eldata += ` target="${sani(data.variant?.target)}"`;
+			if (data.variant?.download != null) eldata += ` download="${sani(data.variant?.download)}"`;
+			if (data.variant?.rel != null) eldata += ` rel="${sani(data.variant?.rel)}"`;
+			switch (data.variant?.shape) {
 				case 'broken':
 					eldata += ` class="broken"`;
 					break;
 				case 'color':
-					eldata += ` class="color c${data.variant.color}"`;
+					eldata += ` class="color c${data.variant?.color}"`;
 					break;
 				case 'colorbox':
-					eldata += ` class="colorbox c${data.variant.color}"`;
+					eldata += ` class="colorbox c${data.variant?.color}"`;
 					break;
 			}
 			break;
 		case 'button':
 			eltype = "button";
 			// todo: button attributes
-			switch (data.variant.shape) {
+			switch (data.variant?.shape) {
 				case 'color':
-					eldata += ` class="color c${data.variant.color}"`;
+					eldata += ` class="color c${data.variant?.color}"`;
 					break;
 				case 'colorbox':
-					eldata += ` class="colorbox c${data.variant.color}"`;
+					eldata += ` class="colorbox c${data.variant?.color}"`;
 					break;
 			}
 			break;
@@ -135,11 +139,11 @@ export function render(data, cur) {
 			break;
 		case 'color':
 			eltype = "span";
-			eldata = ` class="color${data.variant.click?" click":""} c${data.variant.color}"`;
+			eldata = ` class="color${data.variant?.click?" click":""} c${data.variant?.color}"`;
 			break;
 		case 'colorbox':
 			eltype = "span";
-			eldata = ` class="colorbox${data.variant.click?" click":""} c${data.variant.color}"`;
+			eldata = ` class="colorbox${data.variant?.click?" click":""} c${data.variant?.color}"`;
 			break;
 		default:
 			return null;
@@ -189,7 +193,7 @@ function render_nav(data, cur) {
 	}
 	let middle = "";
 	for (let e of data) middle += make_li("", e);
-	return `<nav><details open><summary>NAV</summary><menu>${middle}</menu></details></nav>`;
+	return `<nav><details open><summary>둘러보기</summary><menu>${middle}</menu></details></nav>`;
 }
 
 function simulate_link(cur, p) {

@@ -1,8 +1,9 @@
 import express from 'express';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import Database from 'better-sqlite3';
-import { render, file_exists } from './render.js';
+import { render } from './script/render.js';
 export const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
@@ -24,6 +25,7 @@ app.get('/index.html', (_, res) => { res.sendFile(path.join(__dirname, 'index.ht
 app.get('/README.md', (_, res) => { res.sendFile(path.join(__dirname, 'README.md')); });
 app.use('/client', express.static(path.join(__dirname, 'client')));
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
+app.use('/script', express.static(path.join(__dirname, 'script')));
 
 app.use(express.text());
 app.use(express.json());
@@ -38,20 +40,12 @@ app.get('/rawposts/*path', (req, res) => {
 	res.send(JSON.parse(db_res.data));
 });
 
-const template = `
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-	<title>cycweb post</title>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="/client/font/pretendardvariable-gov.css">
-	<link rel="stylesheet" href="/client/colors.css">
-	<link rel="stylesheet" href="/client/style.css">
-</head>
-<body>###REPLACEMARK###</body>
-</html>
-`.replaceAll(/\n|\t/g, "");
+let template = 'wkatlaksdy...';
+fs.readFile(path.join(__dirname, 'client', 'index.html'), 'utf8', (err, data) => {
+	if (err) throw err;
+	template = data.replaceAll(/\n|\t/g, '');
+});
+
 app.get('/posts/*path', (req, res) => {
 	let path = req.params.path.join('/');
 	if (path.endsWith("/")) path += "index.html";
@@ -60,9 +54,8 @@ app.get('/posts/*path', (req, res) => {
 		res.sendStatus(404); return;
 	}
 	const rendered = render(JSON.parse(db_res.data), `/posts/${path}`);
-	console.log(template);
 	res.setHeader('Content-Type', 'text/html');
-	res.send(template.replace("###REPLACEMARK###", rendered));
+	res.send(template.replace("###여기까지가 템플릿임###", rendered));
 });
 
 app.put('/posts/*path', (req, res) => {
@@ -126,6 +119,11 @@ app.patch('/posts/*path', (req, res) => {
 		WHERE path = ?;
 	`).run(JSON.stringify(old_data), path);
 	res.status(200).send(old_data);
+});
+
+app.post('/deserialize/', (req, res) => {
+	const { data, cur, init } = req.body;
+	res.send(render(data, cur, init));
 });
 
 app.listen(port, () => {
