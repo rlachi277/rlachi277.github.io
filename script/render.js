@@ -11,7 +11,7 @@ export function render(data, cur, init) {
 		return sani(data);
 	}
 	let elmiddle = "";
-	data.children.forEach((e) => {
+	data.children?.forEach((e) => {
 		let d = render(e, cur);
 		if (d != null) elmiddle += d;
 	});
@@ -145,6 +145,8 @@ export function render(data, cur, init) {
 			eltype = "span";
 			eldata = ` class="colorbox${data.variant?.click?" click":""} c${data.variant?.color}"`;
 			break;
+		case 'freehtml':
+			return `<div class="freehtml">${data.variant?.html}</div>`;
 		default:
 			return null;
 		}

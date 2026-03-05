@@ -43,6 +43,7 @@ function serialize(el, edit, init) {
 		result.variant = {rule: null};
 		if (el.classList.contains('rule')) result.variant.rule = true;
 	case 'BR':
+		result.children = null;
 	case 'H1': case 'H2': case 'H3':
 	case 'H4': case 'H5': case 'H6':
 		editable = true;
@@ -75,6 +76,7 @@ function serialize(el, edit, init) {
 		if (el.classList.contains('large')) result.variant.size = "large";
 		else if (el.classList.contains('small')) result.variant.size = "small";
 		if (el.classList.contains('full')) result.variant.size = "full";
+		result.children = null;
 		break;
 	case 'LEGEND':
 		editable = true;
@@ -184,6 +186,10 @@ function serialize(el, edit, init) {
 			result.type = "colorbox";
 			result.variant = {color: getColor(el.classList), click: el.classList.contains("click")};
 			editable = true;
+		} else if (el.classList.contains("freehtml")) {
+			result.type = "freehtml";
+			result.variant = {html: el.innerHTML.replaceAll(/\n|\t/g, "")};
+			result.children = null;
 		} else {
 			return undefined;
 		}
@@ -198,7 +204,7 @@ function serialize(el, edit, init) {
 		edit_cur.push(edit_curi);
 		let c = serialize(e, edit);
 		if (c != undefined) {
-			result.children.push(c);
+			result.children?.push(c);
 			if (edit) edit_curi++;
 		}
 		edit_cur.pop();
@@ -289,7 +295,6 @@ function on_resize(init) {
 	}
 	if (window.matchMedia("(max-width: 480px)").matches) {
 		if (!init || mobile) return;
-		console.log("3");
 		mobile = true;
 		nav_details.forEach((e) => { e.removeAttribute("open"); });
 	} else {
@@ -408,4 +413,9 @@ if (window.location.pathname === '/client/test/seri.html') {
 		// console.log(edit_map);
 		// console.log(original_map);
 	})();
+} else if (window.location.pathname === '/client/test/colors.html') {
+	let s = JSON.stringify(serialize(document.querySelector("body"), false, true));
+	console.log(s);
+	deserialize(document.querySelector("body"), JSON.parse(s));
+	fetch("/posts/test/colors.html",{method:"PUT",body:s}).then((res)=>{return res.text();}).then((t)=>console.log(t));
 }
