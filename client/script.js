@@ -83,12 +83,14 @@ function serialize(el, edit, init) {
 	case 'FIELDSET':
 		result.type = el.nodeName.toLowerCase();
 		break;
-	case 'OL':
-		result.variant = {start: el.getAttribute('start')};
 	case 'LI':
 		editable = true;
 	case 'UL': case 'DETAILS': case 'SUMMARY':
 		result.type = el.nodeName.toLowerCase();
+		break;
+	case 'OL':
+		result.type = 'ol';
+		result.variant = {start: el.getAttribute('start')};
 		break;
 	case 'STRONG': case 'EM': case 'B': case 'I': case 'U':
 	case 'RUBY': case 'RT': case 'RP':
