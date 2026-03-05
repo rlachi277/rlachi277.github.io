@@ -396,26 +396,3 @@ function stop_edit() {
 
 const params = new URLSearchParams(window.location.search);
 if (params.get("edit") === 't') serialize(document.querySelector('body'), true, true);
-
-// test code
-if (window.location.pathname === '/client/test/seri.html') {
-	let s = JSON.stringify(serialize(document.getElementById("body"), false, true));
-	console.log(s);
-	deserialize(document.querySelector("body"), JSON.parse(s));
-} else if (window.location.pathname === '/client/test/edit.html') {
-	(async () => {
-		let res = await fetch("/rawposts/test/edit.html");
-		let text = await res.text();
-		await deserialize(document.querySelector('body'), JSON.parse(text), true);
-		serialize(document.querySelector('body'), true, true);
-		// console.log(editing);
-		// console.log(edit_data);
-		// console.log(edit_map);
-		// console.log(original_map);
-	})();
-} else if (window.location.pathname === '/client/test/colors.html') {
-	let s = JSON.stringify(serialize(document.querySelector("body"), false, true));
-	console.log(s);
-	deserialize(document.querySelector("body"), JSON.parse(s));
-	fetch("/posts/test/colors.html",{method:"PUT",body:s}).then((res)=>{return res.text();}).then((t)=>console.log(t));
-}
