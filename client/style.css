@@ -1,12 +1,10 @@
 :root {
-	--font: "Pretendard GOV Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
 	color-scheme: light dark;
 	background-color: var(--c-bg);
 	color: var(--c-text);
 }
 
 body {
-	font-family: var(--font);
 	padding-inline: max(4%, 1.34rem);
 	margin-block: 3rem;
 }
@@ -162,7 +160,6 @@ a.self:active { color: var(--c-linksa); }
 	--bg: transparent; --bgh: var(--c-0-5); --bga: var(--c-0-4);
 	--bd: currentColor; --bdh: currentColor; --bda: currentColor;
 	--c: currentColor; --ch: currentColor; --ca: currentColor;
-	font-family: var(--font);
 	font-size: 1em;
 	line-height: inherit;
 	padding-block: 0;
