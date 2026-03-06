@@ -39,15 +39,17 @@ function serialize(el, edit, init) {
 		if (el.classList.contains('float-right')) result.variant.float = "right";
 		else if (el.classList.contains('float-left')) result.variant.float = "left";
 		break;
+	case 'H1': case 'H2': case 'H3':
+	case 'H4': case 'H5': case 'H6':
+		editable = true;
+	case 'HGROUP':
+		result.type = el.nodeName.toLowerCase();
+		break;
 	case 'HR':
 		result.variant = {rule: null};
 		if (el.classList.contains('rule')) result.variant.rule = true;
 	case 'BR':
 		result.children = null;
-	case 'H1': case 'H2': case 'H3':
-	case 'H4': case 'H5': case 'H6':
-		editable = true;
-	case 'HGROUP':
 		result.type = el.nodeName.toLowerCase();
 		break;
 	case 'P':
