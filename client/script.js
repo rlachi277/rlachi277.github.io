@@ -190,10 +190,6 @@ function serialize(el, edit, init) {
 			result.type = "colorbox";
 			result.variant = {color: getColor(el.classList), click: el.classList.contains("click")};
 			editable = true;
-		} else if (el.classList.contains("freehtml")) {
-			result.type = "freehtml";
-			result.variant = {html: el.innerHTML.replaceAll(/\n|\t/g, "")};
-			result.children = null;
 		} else {
 			return undefined;
 		}
@@ -290,6 +286,12 @@ function getColor(classList) {
 	if (classList.contains("c10")) return 10;
 }
 
+function refresh_data() {
+	let s = serialize(document.querySelector('body'));
+	fetch(window.location.pathname, { method: "PUT", body: JSON.stringify(s) });
+}
+window.refresh_data = refresh_data;
+
 let mobile = false;
 let nav_details;
 function on_resize(init) {
@@ -377,12 +379,12 @@ function submit_changes(el) {
 	document.activeElement.blur();
 	let pos = edit_map.get(parseInt(el.getAttribute("data-id"))).pos;
 	let new_data = serialize(el);
-	fetch(window.location.pathname.replace(/^\/client\//, "/posts/"), { method: "PATCH", headers: {
+	fetch(window.location.pathname, { method: "PATCH", headers: {
 		'Content-type': 'application/json'
 	}, body: JSON.stringify({
 		pos: pos,
 		data: new_data
-	})})
+	})});
 	original_map.set(el, JSON.stringify(new_data));
 	el.classList.remove("edited");
 }

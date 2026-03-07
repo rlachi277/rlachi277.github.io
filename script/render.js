@@ -150,8 +150,6 @@ export function render(data, cur, init) {
 			eltype = "span";
 			eldata = ` class="colorbox${data.variant?.click?" click":""} c${data.variant?.color}"`;
 			break;
-		case 'freehtml':
-			return `<div class="freehtml">${data.variant?.html}</div>`;
 		default:
 			return null;
 		}
