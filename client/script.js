@@ -29,6 +29,7 @@ function serialize(el, edit, init) {
 	case 'NAV':
 		result.type = "nav";
 		result.variant = {data: serialize_nav(el)};
+		result.children = null;
 		break;
 	case 'SECTION':
 		result.type = "section";
@@ -71,8 +72,8 @@ function serialize(el, edit, init) {
 	case 'IMG':
 		result.type = "img";
 		result.variant = {
-			src: el.getAttribute('src'),
-			alt: el.getAttribute('alt'),
+			src: no_lf(el.getAttribute('src')),
+			alt: no_lf(el.getAttribute('alt')),
 			size: 'medium'
 		};
 		if (el.classList.contains('large')) result.variant.size = "large";
@@ -92,7 +93,7 @@ function serialize(el, edit, init) {
 		break;
 	case 'OL':
 		result.type = 'ol';
-		result.variant = {start: el.getAttribute('start')};
+		result.variant = {start: no_lf(el.getAttribute('start'))};
 		break;
 	case 'STRONG': case 'EM': case 'B': case 'I': case 'U':
 	case 'RUBY': case 'RT': case 'RP':
@@ -103,26 +104,26 @@ function serialize(el, edit, init) {
 	case 'AUDIO':
 		result.type = "audio";
 		result.variant = {
-			src: el.getAttribute('src'),
-			controls: el.getAttribute('controls'),
-			crossorigin: el.getAttribute('crossorigin'),
-			loop: el.getAttribute('loop'),
-			muted: el.getAttribute('muted'),
-			preload: el.getAttribute('preload')
+			src: no_lf(el.getAttribute('src')),
+			controls: no_lf(el.getAttribute('controls')),
+			crossorigin: no_lf(el.getAttribute('crossorigin')),
+			loop: no_lf(el.getAttribute('loop')),
+			muted: no_lf(el.getAttribute('muted')),
+			preload: no_lf(el.getAttribute('preload'))
 		}
 		break;
 	case 'VIDEO':
 		result.type = "video";
 		result.variant = {
 			size: "medium",
-			src: el.getAttribute('src'),
-			autoplay: el.getAttribute('autoplay'),
-			controls: el.getAttribute('controls'),
-			crossorigin: el.getAttribute('crossorigin'),
-			loop: el.getAttribute('loop'),
-			muted: el.getAttribute('muted'),
-			poster: el.getAttribute('poster'),
-			preload: el.getAttribute('preload')
+			src: no_lf(el.getAttribute('src')),
+			autoplay: no_lf(el.getAttribute('autoplay')),
+			controls: no_lf(el.getAttribute('controls')),
+			crossorigin: no_lf(el.getAttribute('crossorigin')),
+			loop: no_lf(el.getAttribute('loop')),
+			muted: no_lf(el.getAttribute('muted')),
+			poster: no_lf(el.getAttribute('poster')),
+			preload: no_lf(el.getAttribute('preload'))
 		}
 		if (el.classList.contains('large')) result.variant.size = "large";
 		else if (el.classList.contains('small')) result.variant.size = "small";
@@ -131,28 +132,28 @@ function serialize(el, edit, init) {
 	case 'TRACK':
 		result.type = "track";
 		result.variant = {
-			src: el.getAttribute('src'),
-			srclang: el.getAttribute('srclang'),
-			default: el.getAttribute('default'),
-			kind: el.getAttribute('kind'),
-			label: el.getAttribute('label')
+			src: no_lf(el.getAttribute('src')),
+			srclang: no_lf(el.getAttribute('srclang')),
+			default: no_lf(el.getAttribute('default')),
+			kind: no_lf(el.getAttribute('kind')),
+			label: no_lf(el.getAttribute('label'))
 		}
 		break;
 	case 'SOURCE':
 		// currently <audio>, <video> only
 		result.type = "source";
 		result.variant = {
-			src: el.getAttribute('src'),
-			media: el.getAttribute('media')
+			src: no_lf(el.getAttribute('src')),
+			media: no_lf(el.getAttribute('media'))
 		}
 		break;
 	case 'A':
 		result.type = "a";
 		result.variant = {
-			href: el.getAttribute('href'),
-			target: el.getAttribute('target'),
-			download: el.getAttribute('download'),
-			rel: el.getAttribute('rel'),
+			href: no_lf(el.getAttribute('href')),
+			target: no_lf(el.getAttribute('target')),
+			download: no_lf(el.getAttribute('download')),
+			rel: no_lf(el.getAttribute('rel')),
 			shape: null
 		}
 		if (el.classList.contains("broken")) {
@@ -195,7 +196,7 @@ function serialize(el, edit, init) {
 		}
 	}
 
-	if (edit && editable && !el.parentElement.classList.contains("editable")) {
+	if (edit && editable && !el.closest(".editable")) {
 		el.classList.add("editable");
 	}
 
@@ -235,10 +236,10 @@ function serialize_nav(nav) {
 			if (a.childNodes.length < 2) {
 				if (a.childNodes.length == 0) return "";
 				if (a.childNodes[0].nodeType === Node.TEXT_NODE)
-					return a.childNodes[0].textContent;
+					return no_lf(a.childNodes[0].textContent);
 				return "";
 			}
-			return a.childNodes[1].textContent;
+			return no_lf(a.childNodes[1].textContent);
 		}
 		let result = {name: "", children: []};
 		setname: {
@@ -286,11 +287,14 @@ function getColor(classList) {
 	if (classList.contains("c10")) return 10;
 }
 
+function no_lf(s) {
+	return s?.replaceAll("\n","") ?? null;
+}
+
 function refresh_data() {
 	let s = serialize(document.querySelector('body'));
 	fetch(window.location.pathname, { method: "PUT", body: JSON.stringify(s) });
 }
-window.refresh_data = refresh_data;
 
 let mobile = false;
 let nav_details;
@@ -357,10 +361,7 @@ function manage_confirm(el, confirm_class, stop_class) {
 
 function on_editable_input(e) {
 	e.target.classList.add("edited");
-	e.target.querySelectorAll("br").forEach((ee) => {
-		ee.outerHTML = '\n';
-	});
-	if (e.target.innerHTML === '\n') e.target.innerHTML = '';
+	if (e.target.innerHTML === '<br>' || e.target.innerHTML === '\n') e.target.innerHTML = '';
 }
 
 function on_editable_blur(e) {
@@ -376,6 +377,7 @@ function on_editable_blur(e) {
 }
 
 function submit_changes(el) {
+	el.innerHTML.replaceAll("\n","<br>");
 	document.activeElement.blur();
 	let pos = edit_map.get(parseInt(el.getAttribute("data-id"))).pos;
 	let new_data = serialize(el);
@@ -408,4 +410,5 @@ function stop_edit() {
 }
 
 const params = new URLSearchParams(window.location.search);
+refresh_data();
 if (params.get("edit") === 't') serialize(document.querySelector('body'), true, true);
