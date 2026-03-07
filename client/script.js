@@ -1,13 +1,6 @@
 import { deseri } from "../script/deseri.js";
 
-let editing = null, edit_id = null;
-let edit_data = null;
-let edit_map = null;
-let original_map = null;
-
-let edit_cur = [];
-
-function serialize(el, edit, init) {
+function serialize(el, init) {
 	if (el.nodeName === "#text") {
 		if (/^\n\s*$/.test(el.textContent)) return undefined;
 		return el.textContent.replace(/\n\s*$/, "");
@@ -19,14 +12,9 @@ function serialize(el, edit, init) {
 		children: []
 	};
 	let type_unset = false;
-	let editable = false;
 	switch (init ? 'BODY' : el.nodeName) {
 	case 'BODY':
 		result.type = "body";
-		if (edit) {
-			if (editing != null && editing !== el) stop_edit();
-			start_edit(el);
-		}
 		break;
 	case 'NAV':
 		result.type = "nav";
@@ -44,7 +32,6 @@ function serialize(el, edit, init) {
 		break;
 	case 'H1': case 'H2': case 'H3':
 	case 'H4': case 'H5': case 'H6':
-		editable = true;
 	case 'HGROUP':
 		result.type = el.nodeName.toLowerCase();
 		break;
@@ -59,7 +46,6 @@ function serialize(el, edit, init) {
 		result.type = "p";
 		result.variant = {lang: null};
 		if (el.getAttribute('lang') === "en") result.variant.lang = "en";
-		editable = true;
 		break;
 	case 'FIGURE':
 		result.type = "figure";
@@ -69,7 +55,6 @@ function serialize(el, edit, init) {
 		break;
 	case 'FIGCAPTION':
 		result.type = "figcaption";
-		editable = true;
 		break;
 	case 'IMG':
 		result.type = "img";
@@ -84,12 +69,10 @@ function serialize(el, edit, init) {
 		result.children = null;
 		break;
 	case 'LEGEND':
-		editable = true;
 	case 'FIELDSET':
 		result.type = el.nodeName.toLowerCase();
 		break;
 	case 'LI':
-		editable = true;
 	case 'UL': case 'DETAILS': case 'SUMMARY':
 		result.type = el.nodeName.toLowerCase();
 		break;
@@ -101,7 +84,6 @@ function serialize(el, edit, init) {
 	case 'RUBY': case 'RT': case 'RP':
 	case 'SUB': case 'SUP': case 'INS': case 'DEL':
 		result.type = el.nodeName.toLowerCase();
-		editable = true;
 		break;
 	case 'AUDIO':
 		result.type = "audio";
@@ -167,7 +149,6 @@ function serialize(el, edit, init) {
 			result.variant.shape = "colorbox";
 			result.variant.color = getColor(el.classList);
 		}
-		editable = true;
 		break;
 	case 'BUTTON':
 		result.type = "button";
@@ -177,7 +158,6 @@ function serialize(el, edit, init) {
 			result.variant.shape = "colorbox";
 			result.variant.color = getColor(el.classList);
 		}
-		editable = true;
 		break;
 	default:
 		type_unset = true;
@@ -188,43 +168,19 @@ function serialize(el, edit, init) {
 		} else if (el.classList.contains("color")) {
 			result.type = "color";
 			result.variant = {color: getColor(el.classList), click: el.classList.contains("click")};
-			editable = true;
 		} else if (el.classList.contains("colorbox")) {
 			result.type = "colorbox";
 			result.variant = {color: getColor(el.classList), click: el.classList.contains("click")};
-			editable = true;
 		} else {
 			return undefined;
 		}
 	}
 
-	if (edit && editable && !el.closest(".editable")) {
-		el.classList.add("editable");
-	}
-
-	let edit_curi = 0;
 	el.childNodes.forEach((e) => {
-		edit_cur.push(edit_curi);
-		let c = serialize(e, edit);
-		if (c != undefined) {
-			result.children?.push(c);
-			if (edit) edit_curi++;
-		}
-		edit_cur.pop();
+		let c = serialize(e);
+		if (c != undefined) result.children?.push(c);
 	});
 
-	if (edit && el.classList.contains("editable")) {
-		original_map.set(el, JSON.stringify(result));
-		edit_map.set(edit_id, {pos: Array.from(edit_cur), el: el});
-		el.setAttribute("data-id", edit_id);
-		result.id = edit_id++;
-		el.setAttribute("contenteditable", "plaintext-only");
-		el.addEventListener("keydown", on_editable_keydown);
-		el.addEventListener("input", on_editable_input);
-		el.addEventListener("blur", on_editable_blur);
-	}
-
-	if (edit && init) edit_data = result;
 	return result;
 }
 
@@ -314,11 +270,74 @@ on_resize(true);
 window.addEventListener('resize', () => on_resize());
 
 
+let editing = null, edit_id = null;
+let edit_map = null;
+let original_map = null;
 
-function start_edit(el) {
-	editing = el; edit_id = 0;
-	edit_map = new Map();
-	original_map = new Map();
+let edit_cur = [];
+
+function start_edit(el, init) {
+	if (el.nodeName === "#text") {
+		if (/^\n\s*$/.test(el.textContent)) return undefined;
+		return false;
+	}
+	if (el.nodeName.startsWith("#")) return undefined;
+	let type_unset = false, editable = false, void_element = false;
+	switch (init ? 'BODY' : el.nodeName) {
+	case 'BODY':
+		if (editing != null && editing !== el) stop_edit();
+		editing = el; edit_id = 0;
+		edit_map = new Map();
+		original_map = new Map();
+		break;
+	case 'NAV': case 'HR': case 'BR': case 'IMG':
+		void_element = true;
+	case 'SECTION': case 'ARTICLE': case 'HGROUP':
+	case 'FIGURE': case 'FIELDSET':
+	case 'UL': case 'OL': case 'DETAILS': case 'SUMMARY':
+	case 'AUDIO': case 'VIDEO': case 'TRACK': case 'SOURCE':
+		break;
+	case 'H1': case 'H2': case 'H3':
+	case 'H4': case 'H5': case 'H6':
+	case 'P': case 'FIGCAPTION': case 'LEGEND': case 'LI':
+	case 'STRONG': case 'EM': case 'B': case 'I': case 'U':
+	case 'RUBY': case 'RT': case 'RP':
+	case 'SUB': case 'SUP': case 'INS': case 'DEL':
+	case 'A': case 'BUTTON':
+		editable = true;
+		break;
+	default:
+		type_unset = true;
+	}
+	if (type_unset) {
+		if (el.classList.contains("columns")) {
+			editable = false;
+		} else if (el.classList.contains("color") || el.classList.contains("colorbox")) {
+			editable = true;
+		} else return undefined;
+	}
+
+	if (editable && !el.closest(".editable")) el.classList.add("editable");
+	else editable = false;
+
+	let edit_curi = 0;
+	el.childNodes.forEach((e) => {
+		edit_cur.push(edit_curi);
+		let c = start_edit(e);
+		if (c != undefined) edit_curi++;
+		edit_cur.pop();
+	});
+
+	if (editable) {
+		original_map.set(el, JSON.stringify(serialize(el)));
+		edit_map.set(edit_id, {pos: Array.from(edit_cur), el: el});
+		el.setAttribute("data-id", edit_id++);
+		el.setAttribute("contenteditable", "plaintext-only");
+		el.addEventListener("keydown", on_editable_keydown);
+		el.addEventListener("input", on_editable_input);
+		el.addEventListener("blur", on_editable_blur);
+	}
+	return true;
 }
 
 function on_editable_keydown(e) {
@@ -403,9 +422,9 @@ function stop_edit() {
 		e.removeEventListener("blur", on_editable_blur);
 		e.classList.remove("editable");
 	});
-	editing = edit_id = edit_data = edit_map = original_map = null;
+	editing = edit_id = edit_map = original_map = null;
 }
 
 const params = new URLSearchParams(window.location.search);
 refresh_data();
-if (params.get("edit") === 't') serialize(document.querySelector('body'), true, true);
+if (params.get("edit") === 't') start_edit(document.querySelector('body'), true);
