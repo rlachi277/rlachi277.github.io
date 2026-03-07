@@ -378,6 +378,7 @@ function on_editable_blur(e) {
 
 function submit_changes(el) {
 	el.innerHTML = el.innerHTML.replaceAll("\n","<br>");
+	if (el.lastChild.nodeName === "BR") el.removeChild(el.lastChild);
 	document.activeElement.blur();
 	let pos = edit_map.get(parseInt(el.getAttribute("data-id"))).pos;
 	let new_data = serialize(el);
