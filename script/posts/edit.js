@@ -1,3 +1,4 @@
+import { q$, $ } from "../jquery.js";
 import { seri, deseri } from "./seri.js";
 
 export let editing = null;
@@ -72,16 +73,12 @@ export function start_edit(el, init) {
 
 function manage_confirm(el, confirm_class, stop_class) {
 	if (!el.classList.contains(confirm_class)) {
-		if (document.querySelectorAll(`.${stop_class}`).length !== 0) {
-			document.querySelectorAll(`.${stop_class}`).forEach((e) => {
-				e.classList.remove(stop_class);
-			});
+		if ($(`.${stop_class}`).length !== 0) {
+			$(`.${stop_class}`).removeClass(stop_class)
 			return false;
 		}
 		if (!el.classList.contains("edited")) return false;
-		document.querySelectorAll(`.${confirm_class}`).forEach((e) => {
-			e.classList.remove(confirm_class);
-		});
+		$(`.${confirm_class}`).removeClass(confirm_class);
 		el.classList.add(confirm_class);
 		return false;
 	}
@@ -110,12 +107,8 @@ function on_editable_input(e) {
 }
 
 function on_editable_blur(e) {
-	document.querySelectorAll(".will-submit").forEach((e) => {
-		e.classList.remove("will-submit");
-	});
-	document.querySelectorAll(".will-cancel").forEach((e) => {
-		e.classList.remove("will-cancel");
-	});
+	$(".will-submit").removeClass(".will-submit");
+	$(".will-cancel").removeClass(".will-cancel");
 	e.target.normalize();
 	if (JSON.stringify(seri(e.target)) === original_map.get(e.target))
 		e.target.classList.remove("edited");
@@ -139,12 +132,12 @@ function submit_changes(el) {
 
 export function submit_all() {
 	document.activeElement.blur();
-	document.querySelectorAll(".edited").forEach((e) => submit_changes(e));
+	q$(".edited").forEach((e) => submit_changes(e));
 }
 
 export function stop_edit() {
 	submit_all();
-	document.querySelectorAll(".editable").forEach((e) => {
+	q$(".editable").forEach((e) => {
 		e.removeAttribute("data-id");
 		e.removeAttribute("contenteditable");
 		e.removeEventListener("keydown", on_editable_keydown);

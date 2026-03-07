@@ -1,3 +1,4 @@
+import { $ } from "../script/jquery.js";
 import { start_edit } from "../script/posts/edit.js";
 import { seri, no_lf } from "../script/posts/seri.js";
 
@@ -46,7 +47,7 @@ function serialize_nav(nav) {
 }
 
 function refresh_data() {
-	let s = serialize(document.querySelector('body'));
+	let s = serialize($("body").get(0));
 	fetch(window.location.pathname, { method: "PUT", body: JSON.stringify(s) });
 }
 
@@ -55,16 +56,16 @@ let nav_details;
 function on_resize(init) {
 	if (init) {
 		mobile = false;
-		nav_details = document.querySelectorAll("nav details");
+		nav_details = $("nav details");
 	}
 	if (window.matchMedia("(max-width: 480px)").matches) {
 		if (!init || mobile) return;
 		mobile = true;
-		nav_details.forEach((e) => { e.removeAttribute("open"); });
+		nav_details.removeAttr("open");
 	} else {
 		if (!mobile) return;
 		mobile = false;
-		nav_details.forEach((e) => { e.setAttribute("open", ""); });
+		nav_details.attr("open", "");
 	}
 }
 on_resize(true);
@@ -72,4 +73,4 @@ window.addEventListener('resize', () => on_resize());
 
 const params = new URLSearchParams(window.location.search);
 refresh_data();
-if (params.get("edit") === 't') start_edit(document.querySelector('body'), true);
+if (params.get("edit") === 't') start_edit($("body").get(0), true);
