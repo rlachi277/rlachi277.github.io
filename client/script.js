@@ -377,7 +377,7 @@ function on_editable_blur(e) {
 }
 
 function submit_changes(el) {
-	el.innerHTML.replaceAll("\n","<br>");
+	el.innerHTML = el.innerHTML.replaceAll("\n","<br>");
 	document.activeElement.blur();
 	let pos = edit_map.get(parseInt(el.getAttribute("data-id"))).pos;
 	let new_data = serialize(el);
