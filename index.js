@@ -1,7 +1,6 @@
 import express from 'express';
 import path from 'path';
-import posts from './script/posts.js';
-import putils from './script/putils.js';
+import posts from './script/posts/posts.js';
 import __dirname from './dirname.js';
 
 const app = express();
@@ -17,7 +16,6 @@ app.use('/script', express.static(path.join(__dirname, 'script')));
 app.use(express.text());
 app.use(express.json());
 app.use('/posts', posts);
-app.use('/putils', putils);
 
 app.listen(port, () => {
 	console.log(`Server running at http://localhost:${port}`);

@@ -2,7 +2,7 @@ import express from "express";
 import fs from 'fs';
 import path from 'path';
 import Database from 'better-sqlite3';
-import __dirname from '../dirname.js';
+import __dirname from '../../dirname.js';
 import { render } from './render.js';
 
 const router = express.Router();
@@ -24,6 +24,17 @@ fs.readFile(path.join(__dirname, 'client', 'index.html'), 'utf8', (err, data) =>
 	if (err) throw err;
 	template = data.replaceAll(/\n|\t/g, '');
 });
+
+router.get('/raw/*path', (req, res) => {
+	let path = req.params.path.join('/');
+	if (path.endsWith("/")) path += "index.html";
+	try {
+		res.send(get_post_json(path));
+	} catch (e) {
+		if (e === 404) res.sendStatus(404);
+		throw e;
+	}
+}); // PUTing at /raw/* will make a secret post only accessible as raw by /raw/raw/*
 
 router.get('/*path', (req, res) => {
 	let path = req.params.path.join('/');
@@ -101,15 +112,15 @@ router.delete('/*path', (req, res) => {
 	res.sendStatus(204);
 });
 
-export function get_post_json(path) {
+export function get_post_raw(path) {
+	const db_res = db.prepare('SELECT data FROM posts WHERE path = ?').get(path);
+	return db_res;
+}
+
+function get_post_json(path) {
 	const db_res = get_post_raw(path);
 	if (db_res === undefined) {
 		throw 404;
 	}
 	return JSON.parse(db_res.data);
-}
-
-export function get_post_raw(path) {
-	const db_res = db.prepare('SELECT data FROM posts WHERE path = ?').get(path);
-	return db_res;
 }
