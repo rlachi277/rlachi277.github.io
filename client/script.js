@@ -1,3 +1,5 @@
+import { deseri } from "../script/deseri.js";
+
 let editing = null, edit_id = null;
 let edit_data = null;
 let edit_map = null;
@@ -263,16 +265,6 @@ function serialize_nav(nav) {
 	return result;
 }
 
-async function deserialize(el, data, init) {
-	let res = await fetch('/putils/deserialize/', { method: 'POST', headers: {
-		'Content-type': 'application/json'
-	}, body: JSON.stringify({
-		data: data, init: init?'true':'false', cur: window.location.pathname
-	})});
-	let text = await res.text();
-	el.innerHTML = text;
-}
-
 function getColor(classList) {
 	if (classList.contains("c0")) return 0;
 	if (classList.contains("c1")) return 1;
@@ -289,6 +281,11 @@ function getColor(classList) {
 
 function no_lf(s) {
 	return s?.replaceAll("\n","") ?? null;
+}
+
+function deserialize(el, data, init) {
+	let text = deseri(data, window.location.pathname, init);
+	el.innerHTML = text;
 }
 
 function refresh_data() {
@@ -334,9 +331,8 @@ function on_editable_keydown(e) {
 	} else if (e.key === "Escape") {
 		e.preventDefault();
 		if (!manage_confirm(e.target, "will-cancel", "will-submit")) return;
-		deserialize(e.target, JSON.parse(original_map.get(e.target)), true).then(() => {
-			e.target.blur();
-		});
+		deserialize(e.target, JSON.parse(original_map.get(e.target)), true);
+		e.target.blur();
 		return;
 	}
 }

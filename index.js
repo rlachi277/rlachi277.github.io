@@ -12,6 +12,7 @@ app.get('/index.html', (_, res) => { res.sendFile(path.join(__dirname, 'index.ht
 app.get('/README.md', (_, res) => { res.sendFile(path.join(__dirname, 'README.md')); });
 app.use('/client', express.static(path.join(__dirname, 'client')));
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
+app.use('/script', express.static(path.join(__dirname, 'script')));
 
 app.use(express.text());
 app.use(express.json());
