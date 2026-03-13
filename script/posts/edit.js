@@ -164,7 +164,6 @@ function run_command(e) {
 	let command = null;
 	if (e.key === "b") command = "strong";
 	else if (e.key === "u") command = "em";
-	else if (e.key === "x" && e.shiftKey) command = "s";
 	else if (e.key === ".") command = "sup";
 	else if (e.key === ",") command = "sub";
 	else if (e.key === "d") command = "del";
@@ -357,7 +356,7 @@ function to_command(n) {
 		}
 		return 'keep';
 	}
-	const sub_editable = ['STRONG', 'EM', 'S', 'SUP', 'SUB', 'INS', 'DEL'];
+	const sub_editable = ['STRONG', 'EM', 'SUP', 'SUB', 'INS', 'DEL'];
 	if (!sub_editable.includes(n.tagName)) return 'keep';
 	return n.tagName.toLowerCase();
 }
