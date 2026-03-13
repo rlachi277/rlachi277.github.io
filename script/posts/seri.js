@@ -73,7 +73,7 @@ export function seri(el, init, recur=seri) {
 		result.type = 'ol';
 		result.variant = {start: no_lf(el.getAttribute('start'))};
 		break;
-	case 'STRONG': case 'EM': case 'B': case 'I': case 'U':
+	case 'STRONG': case 'EM': case 'B': case 'I': case 'U': case 'S':
 	case 'RUBY': case 'RT': case 'RP':
 	case 'SUB': case 'SUP': case 'INS': case 'DEL':
 		result.type = el.nodeName.toLowerCase();
@@ -194,7 +194,7 @@ export function deseri(data, cur, init, recur=deseri) {
 	case 'h1': case 'h2': case 'h3': case 'h4': case 'h5': case 'h6':
 	case 'figcaption': case 'legend':
 	case 'li': case 'summary':
-	case 'strong': case 'em': case 'b': case 'i': case 'u':
+	case 'strong': case 'em': case 'b': case 'i': case 'u': case 's':
 	case 'ruby': case 'rt': case 'rp':
 	case 'sub': case 'sup': case 'ins': case 'del':
 		eltype = data.type;
