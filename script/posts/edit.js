@@ -99,6 +99,12 @@ function on_editable_keydown(e) {
 		e.target.blur();
 		return;
 	}
+	if (e.ctrlKey || e.metaKey) {
+		run_command(e);
+		return;
+	}
+	undo_buffer = [];
+	redo_buffer = [];
 }
 
 function on_editable_input(e) {
@@ -107,9 +113,12 @@ function on_editable_input(e) {
 }
 
 function on_editable_blur(e) {
-	$(".will-submit").removeClass(".will-submit");
-	$(".will-cancel").removeClass(".will-cancel");
-	e.target.normalize();
+	$(".will-submit").removeClass("will-submit");
+	$(".will-cancel").removeClass("will-cancel");
+	$(e.target).find('.select-marker').remove();
+	normalize_editable(e.target);
+	undo_buffer = [];
+	redo_buffer = [];
 	if (JSON.stringify(seri(e.target)) === original_map.get(e.target))
 		e.target.classList.remove("edited");
 }
@@ -146,4 +155,192 @@ export function stop_edit() {
 		e.classList.remove("editable");
 	});
 	editing = edit_id = edit_map = original_map = null;
+}
+
+const s = window.getSelection();
+let undo_buffer = [];
+let redo_buffer = [];
+function run_command(e) {
+	let command = null;
+	if (e.key === "b") command = "strong";
+	else if (e.key === "u") command = "em";
+	else if (e.key === "x" && e.shiftKey) command = "s";
+	else if (e.key === ".") command = "sup";
+	else if (e.key === ",") command = "sub";
+	else if (e.key === "d") command = "del";
+	else if (e.key === "e") command = "ins";
+	else if (e.key === "z" && e.shiftKey) command = "redo";
+	else if (e.key === "z") command = "undo";
+	if (command == null) return;
+	
+	if (command === "undo") {
+		if (undo_buffer.length === 0) return;
+		redo_buffer.push(seri(e.target));
+		e.target.innerHTML = deseri(undo_buffer.pop(), window.location.pathname, true);
+		e.preventDefault();
+		return;
+	} else if (command === "redo") {
+		if (redo_buffer.length === 0) return;
+		undo_buffer.push(seri(e.target));
+		e.target.innerHTML = deseri(redo_buffer.pop(), window.location.pathname, true);
+		e.preventDefault();
+		return;
+	}
+
+	const r = s.getRangeAt(0);
+	if (r.collapsed) return;
+
+	e.preventDefault();
+	undo_buffer.push(seri(e.target));
+
+	let affected = [], cur = null;
+	if (r.startContainer.nodeType === Node.TEXT_NODE) {
+		cur = r.startContainer;
+		affected.push({node: cur, start_offset: r.startOffset});
+	} else {
+		cur = to_text_node(r.startContainer, r.startOffset);
+		affected.push({node: cur});
+	}
+	cur = to_text_node(next_node(cur));
+	while (cur != null && r.intersectsNode(cur)) {
+		affected.push({node: cur});
+		cur = to_text_node(next_node(cur));
+	}
+	if (r.endContainer.nodeType === Node.TEXT_NODE) {
+		let start_offset = affected.pop()?.start_offset;
+		if (start_offset) {
+			affected.push({node: r.endContainer, start_offset: start_offset, end_offset: r.endOffset});
+		} else affected.push({node: r.endContainer, end_offset: r.endOffset});
+	}
+
+	let all_on = true;
+	for (let ee of affected) {
+		let n = ee.node.parentNode;
+		if (n.nodeType !== Node.ELEMENT_NODE) ee.on = false;
+		else ee.on = (n.closest(command) != null);
+		if (!ee.on) all_on = false;
+		ee.formats = [];
+		while (n != e.target) {
+			ee.formats.push(n.tagName.toLowerCase()); // TODO: color 반영
+			n = n.parentElement;
+		}
+	}
+
+	let range = document.createRange();
+	let first = affected[0];
+	let last = affected[affected.length-1];
+
+	if (last.end_offset != undefined) range.setStart(last.node, last.end_offset);
+	else range.setStartAfter(last.node);
+	range.setEndAfter(e.target.lastChild);
+	let r_ext = range.extractContents();
+
+	// TODO: color끼리 상충 구현
+	let els = document.createDocumentFragment();
+	for (let ee of affected) {
+		let el = ee.node.textContent.substring(ee.start_offset ?? 0, ee.end_offset);
+		for (let eee of ee.formats) {
+			if (all_on && ee.on && eee === command) continue;
+			if (command === 'ins' && eee === 'del' || command === 'del' && eee === 'ins' ||
+				command === 'sup' && eee === 'sub' || command === 'sub' && eee === 'sup') continue;
+			let new_el = document.createElement(eee);
+			new_el.append(el);
+			el = new_el;
+		}
+		if (!all_on && !ee.on) {
+			let new_el = document.createElement(command);
+			new_el.append(el);
+			el = new_el;
+		}
+		els.append(el);
+	}
+
+	if (first.start_offset != undefined) range.setStart(first.node, first.start_offset);
+	else range.setStartBefore(first.node);
+	if (last.end_offset != undefined) range.setEnd(last.node, last.end_offset);
+	else range.setEndAfter(last.node);
+	range.deleteContents();
+
+	$(e.target).find('.select-marker').remove();
+	let marker_start = document.createElement("span");
+	let marker_end = document.createElement("span");
+	marker_start.classList.add("select-marker");
+	marker_end.classList.add("select-marker");
+	els.prepend(marker_start); els.append(marker_end);
+	e.target.append(els);
+	range.setStartAfter(marker_start);
+	range.setEndBefore(marker_end);
+	s.removeAllRanges();
+	s.addRange(range);
+	e.target.append(r_ext);
+
+	normalize_editable(e.target);
+	on_editable_input(e);
+	return;
+	// todo: color 만들기
+}
+
+function next_node(n) {
+	if (n == null) return null;
+	return n.nextSibling ?? next_node(n.parentNode);
+}
+
+function to_text_node(n, o) {
+	if (n == null) return null;
+	if (o != undefined) {
+		if (n.childNodes[o] == undefined) n = next_node(n);
+		n = n.childNodes[o];
+	}
+	while (n.nodeType !== Node.TEXT_NODE) {
+		if (n.firstChild == null) n = next_node(n);
+		if (n == null) return null;
+		if (n.firstChild != null) n = n.firstChild;
+	}
+	return n;
+}
+
+function normalize_editable(el) {
+	if (el.classList.contains("select-marker")) return;
+
+	const sub_editable = ['STRONG', 'EM', 'S', 'SUP', 'SUB', 'INS', 'DEL']; // TODO: color 반영
+	let cur = el.firstChild;
+
+	function remove_node(n) {
+		let next = n.nextSibling;
+		el.removeChild(n);
+		return next;
+	}
+
+	while (cur != null) {
+		if (cur.nodeType === Node.TEXT_NODE) {
+			if (cur.textContent === '') {
+				cur = remove_node(cur);
+				continue;
+			}
+			let prev = cur.previousSibling;
+			if (prev != null && prev.nodeType === Node.TEXT_NODE) {
+				prev.textContent += cur.textContent;
+				cur = remove_node(cur);
+				continue;
+			}
+			cur = cur.nextSibling;
+			continue;
+		}
+		if (cur.nodeType !== Node.ELEMENT_NODE || !sub_editable.includes(cur.tagName)) {
+			cur = cur.nextSibling;
+			continue;
+		}
+		normalize_editable(cur);
+		let prev = cur.previousSibling;
+		if (prev != null && prev.nodeType === Node.ELEMENT_NODE && prev.tagName === cur.tagName) {
+			while (cur.firstChild) prev.appendChild(cur.firstChild);
+		}
+		if (cur.firstChild == null) {
+			cur = remove_node(cur);
+			continue;
+		}
+		cur = cur.nextSibling;
+	}
+
+	el.normalize();
 }
