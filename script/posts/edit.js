@@ -316,7 +316,7 @@ function normalize_editable(el) {
 
 	while (cur != null) {
 		if (cur.nodeType === Node.TEXT_NODE) {
-			if (cur.textContent === '') {
+			if (cur.textContent === '' || (cur.textContent === '\n' && cur.previousSibling == null && cur.nextSibling == null)) {
 				cur = remove_node(cur);
 				continue;
 			}
