@@ -322,7 +322,7 @@ export function deseri(data, cur, init, recur=deseri) {
 	return `<${eltype}${eldata}>${elmiddle}</${eltype}>`;
 }
 
-function getColor(classList) {
+export function getColor(classList) {
 	if (classList.contains("c0")) return 0;
 	if (classList.contains("c1")) return 1;
 	if (classList.contains("c2")) return 2;

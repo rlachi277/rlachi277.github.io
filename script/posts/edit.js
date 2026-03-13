@@ -1,5 +1,5 @@
 import { q$, $ } from "../jquery.js";
-import { seri, deseri } from "./seri.js";
+import { seri, deseri, getColor } from "./seri.js";
 
 export let editing = null;
 let edit_id = null;
@@ -171,6 +171,7 @@ function run_command(e) {
 	else if (e.key === "e") command = "ins";
 	else if (e.key === "z" && e.shiftKey) command = "redo";
 	else if (e.key === "z") command = "undo";
+	else if ("0" <= e.key && e.key <= "9") command = `color${e.key}`;
 	if (command == null) return;
 	
 	if (command === "undo") {
@@ -216,14 +217,16 @@ function run_command(e) {
 	let all_on = true;
 	for (let ee of affected) {
 		let n = ee.node.parentNode;
-		if (n.nodeType !== Node.ELEMENT_NODE) ee.on = false;
-		else ee.on = (n.closest(command) != null);
-		if (!ee.on) all_on = false;
+		ee.on = false;
+		if (n.nodeType !== Node.ELEMENT_NODE) continue;
 		ee.formats = [];
 		while (n != e.target) {
-			ee.formats.push(n.tagName.toLowerCase()); // TODO: color 반영
+			let cmd = to_command(n);
+			if (command === cmd) ee.on = true;
+			ee.formats.push(cmd);
 			n = n.parentElement;
 		}
+		if (!ee.on) all_on = false;
 	}
 
 	let range = document.createRange();
@@ -242,13 +245,15 @@ function run_command(e) {
 		for (let eee of ee.formats) {
 			if (all_on && ee.on && eee === command) continue;
 			if (command === 'ins' && eee === 'del' || command === 'del' && eee === 'ins' ||
-				command === 'sup' && eee === 'sub' || command === 'sub' && eee === 'sup') continue;
-			let new_el = document.createElement(eee);
+			command === 'sup' && eee === 'sub' || command === 'sub' && eee === 'sup' ||
+			command.startsWith('color') && eee.startsWith('color') ||
+			command.startsWith('colorbox') && eee.startsWith('colorbox')) continue;
+			let new_el = to_element(eee);
 			new_el.append(el);
 			el = new_el;
 		}
 		if (!all_on && !ee.on) {
-			let new_el = document.createElement(command);
+			let new_el = to_element(command);
 			new_el.append(el);
 			el = new_el;
 		}
@@ -277,7 +282,6 @@ function run_command(e) {
 	normalize_editable(e.target);
 	on_editable_input(e);
 	return;
-	// todo: color 만들기
 }
 
 function next_node(n) {
@@ -302,7 +306,6 @@ function to_text_node(n, o) {
 function normalize_editable(el) {
 	if (el.classList.contains("select-marker")) return;
 
-	const sub_editable = ['STRONG', 'EM', 'S', 'SUP', 'SUB', 'INS', 'DEL']; // TODO: color 반영
 	let cur = el.firstChild;
 
 	function remove_node(n) {
@@ -326,13 +329,13 @@ function normalize_editable(el) {
 			cur = cur.nextSibling;
 			continue;
 		}
-		if (cur.nodeType !== Node.ELEMENT_NODE || !sub_editable.includes(cur.tagName)) {
+		if (cur.nodeType !== Node.ELEMENT_NODE || to_command(cur) === 'keep') {
 			cur = cur.nextSibling;
 			continue;
 		}
 		normalize_editable(cur);
 		let prev = cur.previousSibling;
-		if (prev != null && prev.nodeType === Node.ELEMENT_NODE && prev.tagName === cur.tagName) {
+		if (prev != null && prev.nodeType === Node.ELEMENT_NODE && to_command(prev) === to_command(cur)) {
 			while (cur.firstChild) prev.appendChild(cur.firstChild);
 		}
 		if (cur.firstChild == null) {
@@ -343,4 +346,35 @@ function normalize_editable(el) {
 	}
 
 	el.normalize();
+}
+
+function to_command(n) {
+	if (n.tagName === "SPAN") {
+		if (n.classList.contains('color')) {
+			return `color${getColor(n.classList)}`;
+		} else if (n.classList.contains('colorbox')) {
+			return `colorbox${getColor(n.classList)}`;
+		}
+		return 'keep';
+	}
+	const sub_editable = ['STRONG', 'EM', 'S', 'SUP', 'SUB', 'INS', 'DEL'];
+	if (!sub_editable.includes(n.tagName)) return 'keep';
+	return n.tagName.toLowerCase();
+}
+
+function to_element(cmd) {
+	if (cmd === 'keep') throw -1; // TODO
+	if (cmd.startsWith('color')) {
+		let el = document.createElement('span');
+		el.classList.add("color");
+		el.classList.add(`c${cmd.substring(5)}`);
+		return el;
+	}
+	if (cmd.startsWith('colorbox')) {
+		let el = document.createElement('span');
+		el.classList.add("colorbox");
+		el.classList.add(`c${cmd.substring(8)}`);
+		return el;
+	}
+	return document.createElement(cmd);
 }

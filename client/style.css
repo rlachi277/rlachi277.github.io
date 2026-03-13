@@ -269,12 +269,11 @@ nav menu {
 	box-shadow: 0 0 0 8px var(--bg);
 }
 .editable.edited {
-	color: var(--c-3);
-	text-decoration: rgb(from currentColor r g b / 70%) dotted underline;
+	text-decoration: rgb(from currentColor r g b / 75%) dotted underline;
 }
 .editable:empty:before {
 	content: '### 비어 있음 :O ###';
 	opacity: 0.8;
 }
-.editable.will-submit { color: var(--c-5); --bg: var(--c-5-bg); }
-.editable.will-cancel { color: var(--c-2); --bg: var(--c-2-bg); }
+.editable.will-submit { --bg: var(--c-5-bg); }
+.editable.will-cancel { --bg: var(--c-2-bg); }
