@@ -100,7 +100,36 @@ function on_editable_keydown(e) {
 		return;
 	}
 	if (e.ctrlKey || e.metaKey) {
-		run_command(e);
+		let command = null;
+		if (e.key === "b") command = "strong";
+		else if (e.key === "u") command = "em";
+		else if (e.key === ".") command = "sup";
+		else if (e.key === ",") command = "sub";
+		else if (e.key === "d") command = "del";
+		else if (e.key === "e") command = "ins";
+		else if (e.key === "z" && e.shiftKey) command = "redo";
+		else if (e.key === "z") command = "undo";
+		else if ("0" <= e.key && e.key <= "9") command = `color${e.key}`;
+		if (command == null) return;
+		
+		if (command === "undo") {
+			if (undo_buffer.length === 0) return;
+			redo_buffer.push(seri(e.target));
+			e.target.innerHTML = deseri(undo_buffer.pop(), window.location.pathname, true);
+			e.preventDefault();
+			return;
+		} else if (command === "redo") {
+			if (redo_buffer.length === 0) return;
+			undo_buffer.push(seri(e.target));
+			e.target.innerHTML = deseri(redo_buffer.pop(), window.location.pathname, true);
+			e.preventDefault();
+			return;
+		}
+		run_command(e, command);
+		return;
+	}
+	if (e.key === "Tab") {
+		tab_command(e);
 		return;
 	}
 	undo_buffer = [];
@@ -160,39 +189,14 @@ export function stop_edit() {
 const s = window.getSelection();
 let undo_buffer = [];
 let redo_buffer = [];
-function run_command(e) {
-	let command = null;
-	if (e.key === "b") command = "strong";
-	else if (e.key === "u") command = "em";
-	else if (e.key === ".") command = "sup";
-	else if (e.key === ",") command = "sub";
-	else if (e.key === "d") command = "del";
-	else if (e.key === "e") command = "ins";
-	else if (e.key === "z" && e.shiftKey) command = "redo";
-	else if (e.key === "z") command = "undo";
-	else if ("0" <= e.key && e.key <= "9") command = `color${e.key}`;
-	if (command == null) return;
-	
-	if (command === "undo") {
-		if (undo_buffer.length === 0) return;
-		redo_buffer.push(seri(e.target));
-		e.target.innerHTML = deseri(undo_buffer.pop(), window.location.pathname, true);
-		e.preventDefault();
-		return;
-	} else if (command === "redo") {
-		if (redo_buffer.length === 0) return;
-		undo_buffer.push(seri(e.target));
-		e.target.innerHTML = deseri(redo_buffer.pop(), window.location.pathname, true);
-		e.preventDefault();
-		return;
-	}
-
+function run_command(e, command) {
 	const r = s.getRangeAt(0);
 	if (r.collapsed) return;
 
 	e.preventDefault();
 	undo_buffer.push(seri(e.target));
 
+	$(e.target).find('.select-marker').remove();
 	let affected = [], cur = null;
 	if (r.startContainer.nodeType === Node.TEXT_NODE) {
 		cur = r.startContainer;
@@ -213,7 +217,7 @@ function run_command(e) {
 	}
 	cur = to_text_node(next_node(cur));
 	while (cur != null && r.intersectsNode(cur)) {
-		if (to_command(cur) === 'keep') affected.push({node: cur, keep: true});
+		if (to_command(cur) === 'keep') affected.push({node: cur});
 		else affected.push({node: cur});
 		cur = to_text_node(next_node(cur));
 	}
@@ -228,15 +232,25 @@ function run_command(e) {
 	while (n != e.target && n.parentElement) {
 		if (to_command(n) === 'keep') {
 			if (!forgive) throw -1;
-			affected[affected.length-1] = {node: n, keep: true};
+			affected[affected.length-1] = {node: n};
 			break;
 		};
 		n = n.parentElement;
 	}
-	console.log(affected);
 
 	let all_on = true;
 	for (let ee of affected) {
+		if (ee.node.nodeType === Node.TEXT_NODE) {
+			if (ee.start_offset === ee.node.textContent.length || ee.end_offset === 0) {
+				ee.zero = true;
+				continue;
+			}
+		} else {
+			if (ee.start_offset === ee.childNodes.length || ee.end_offset === 0) {
+				ee.zero = true;
+				continue;
+			}
+		}
 		let n = ee.node.parentNode;
 		ee.on = false;
 		if (n.nodeType !== Node.ELEMENT_NODE) continue;
@@ -261,6 +275,7 @@ function run_command(e) {
 
 	let els = document.createDocumentFragment();
 	for (let ee of affected) {
+		if (ee.zero) continue;
 		let el = ee.node;
 		if (ee.start_offset) {
 			el = document.createTextNode(ee.node.textContent.substring(ee.start_offset));
@@ -284,7 +299,6 @@ function run_command(e) {
 		els.append(el);
 	}
 
-	$(e.target).find('.select-marker').remove();
 	let marker_start = document.createElement("span");
 	let marker_end = document.createElement("span");
 	marker_start.classList.add("select-marker");
@@ -300,6 +314,71 @@ function run_command(e) {
 	normalize_editable(e.target);
 	on_editable_input(e);
 	return;
+}
+
+function tab_command(e) {
+	e.preventDefault();
+	if (!s.isCollapsed) {
+		s.collapseToEnd();
+		return;
+	}
+	let last_text = s.anchorNode, first_text = last_text;
+	let cmd = null, flag = 0;
+	if (last_text.nodeType !== Node.TEXT_NODE) {
+		last_text = to_text_node_prev(last_text, s.anchorOffset);
+	} else if (s.anchorOffset === 0) {
+		last_text = to_text_node_prev(prev_node(last_text));
+	} else {
+		if (s.anchorOffset === 1) return;
+		let t = last_text.textContent.substring(0, s.anchorOffset);
+		if (t[t.length - 2] !== "]") return;
+		cmd = k2e(t[t.length - 1]);
+		first_text = last_text;
+		flag = 2;
+	}
+	while (!flag && last_text) {
+		let t = last_text.textContent;
+		if (t.length === 0) {
+			last_text = to_text_node_prev(prev_node(last_text));
+			continue;
+		}
+		if (t.length === 1) return;
+		if (t[t.length - 2] !== "]") return;
+		cmd = k2e(t[t.length - 1]);
+		first_text = last_text;
+		flag = 1;
+	}
+	if (cmd == null) throw -1;
+	while (first_text) {
+		if (first_text.textContent.includes("[")) break;
+		first_text = to_text_node_prev(prev_node(first_text));
+	}
+	if (!first_text || !first_text.textContent.includes("[")) return;
+
+	let command = null;
+	if (cmd === "b") command = "strong";
+	else if (cmd === "u") command = "em";
+	else if (cmd === ".") command = "sup";
+	else if (cmd === ",") command = "sub";
+	else if (cmd === "d") command = "del";
+	else if (cmd === "e") command = "ins";
+	else if ("0" <= cmd && cmd <= "9") command = `color${cmd}`;
+	if (command == null) return;
+	
+	let open_idx = first_text.textContent.lastIndexOf("[");
+	let close_idx = (flag === 2) ? s.anchorOffset - 2 : last_text.textContent.length - 2;
+	let ft = first_text.textContent;
+	first_text.textContent = ft.substring(0, open_idx) + ft.substring(open_idx+1);
+	if (first_text === last_text) close_idx--;
+	let lt = last_text.textContent;
+	last_text.textContent = lt.substring(0, close_idx) + lt.substring(close_idx+2);
+	let range = document.createRange();
+	range.setStart(first_text, open_idx);
+	range.setEnd(last_text, close_idx);
+	s.removeAllRanges();
+	s.addRange(range);
+	run_command(e, command);
+	s.collapseToEnd();
 }
 
 function next_node(n) {
@@ -318,6 +397,26 @@ function to_text_node(n, o) {
 		if (n.firstChild == null) n = next_node(n);
 		if (n == null) return null;
 		if (n.firstChild != null) n = n.firstChild;
+	}
+	return n;
+}
+
+function prev_node(n) {
+	if (n == null) return null;
+	return n.previousSibling ?? prev_node(n.parentNode);
+}
+
+function to_text_node_prev(n, o) {
+	if (n == null) return null;
+	if (o != undefined) {
+		if (o === 0 || n.childNodes[o-1] == undefined) n = prev_node(n);
+		n = n.childNodes[o-1];
+	}
+	while (n.nodeType !== Node.TEXT_NODE) {
+		if (to_command(n) === 'keep') return n;
+		if (n.lastChild == null) n = prev_node(n);
+		if (n == null) return null;
+		if (n.lastChild != null) n = n.lastChild;
 	}
 	return n;
 }
@@ -397,4 +496,34 @@ function to_element(cmd) {
 		return el;
 	}
 	return document.createElement(cmd);
+}
+
+const chcode = ['r','R','s','e','E','f','a','q','Q','t','T','d','w','W','c','z','x','v','g']
+const jucode = ['k','o','i','O','j','p','u','P','h','hk','ho','hl','y','n','nj','np','nl','b','m','ml','l']
+const jocode = ['','r','R','rt','s','sw','sg','e','f','fr','fa','fq','ft','fx','fv','fg','a','q','qt','t','T','d','w','c','z','x','v','g']
+const cscode = ['','r','R','rt','s','sw','sg','e','E','f','fr','fa','fq','ft','fx','fv','fg','a','q','Q','qt','t','T','d','w','W','c','z','x','v','g']
+function k2e(str) {
+	if (!str) return null;
+	let res = ''
+	for (let ch of str) {
+		let c = ch.charCodeAt(0)
+		if (0x1100 <= c && c <= 0x1112) { res += chcode[c - 0x1100]; continue; }
+		if (0x1161 <= c && c <= 0x1175) { res += jucode[c - 0x1161]; continue; }
+		if (0x11a8 <= c && c <= 0x11c2) { res += jocode[c - 0x11a7]; continue; }
+		if (0x3131 <= c && c <= 0x314e) { res += cscode[c - 0x3130]; continue; }
+		if (0x314f <= c && c <= 0x3163) { res += jucode[c - 0x314f]; continue; }
+		if (0xac00 <= c && c <= 0xd7a3) {
+			c -= 0xac00
+			let chidx = Math.floor(c / 588)
+			let juidx = Math.floor((c%588) / 28)
+			let joidx = c%28
+			res += chcode[chidx]
+			res += jucode[juidx]
+			if (joidx===0) continue;
+			res += jocode[joidx]
+			continue;
+		}
+		res += ch
+	}
+	return res;
 }
