@@ -201,9 +201,20 @@ function run_command(e) {
 		cur = to_text_node(r.startContainer, r.startOffset);
 		affected.push({node: cur});
 	}
+	let n = cur, forgive = r.startContainer.nodeType !== Node.TEXT_NODE || r.startOffset === 0;
+	while (n != e.target && n.parentElement) {
+		if (to_command(n) === 'keep') {
+			if (!forgive) throw -1;
+			affected[0] = {node: n, keep: true};
+			break;
+		};
+		if (n.previousSibling) forgive = false;
+		n = n.parentElement;
+	}
 	cur = to_text_node(next_node(cur));
 	while (cur != null && r.intersectsNode(cur)) {
-		affected.push({node: cur});
+		if (to_command(cur) === 'keep') affected.push({node: cur, keep: true});
+		else affected.push({node: cur});
 		cur = to_text_node(next_node(cur));
 	}
 	if (r.endContainer.nodeType === Node.TEXT_NODE) {
@@ -212,6 +223,17 @@ function run_command(e) {
 			affected.push({node: r.endContainer, start_offset: start_offset, end_offset: r.endOffset});
 		} else affected.push({node: r.endContainer, end_offset: r.endOffset});
 	}
+	n = affected[affected.length-1].node;
+	forgive = r.endContainer.nodeType !== Node.TEXT_NODE || r.endOffset === r.endContainer.textContent.length;
+	while (n != e.target && n.parentElement) {
+		if (to_command(n) === 'keep') {
+			if (!forgive) throw -1;
+			affected[affected.length-1] = {node: n, keep: true};
+			break;
+		};
+		n = n.parentElement;
+	}
+	console.log(affected);
 
 	let all_on = true;
 	for (let ee of affected) {
@@ -225,11 +247,11 @@ function run_command(e) {
 			ee.formats.push(cmd);
 			n = n.parentElement;
 		}
+		if (n.nextSibling) forgive = false;
 		if (!ee.on) all_on = false;
 	}
 
 	let range = document.createRange();
-	let first = affected[0];
 	let last = affected[affected.length-1];
 
 	if (last.end_offset != undefined) range.setStart(last.node, last.end_offset);
@@ -237,10 +259,13 @@ function run_command(e) {
 	range.setEndAfter(e.target.lastChild);
 	let r_ext = range.extractContents();
 
-	// TODO: color끼리 상충 구현
 	let els = document.createDocumentFragment();
 	for (let ee of affected) {
-		let el = ee.node.textContent.substring(ee.start_offset ?? 0, ee.end_offset);
+		let el = ee.node;
+		if (ee.start_offset) {
+			el = document.createTextNode(ee.node.textContent.substring(ee.start_offset));
+			ee.node.textContent = ee.node.textContent.substring(0, ee.start_offset);
+		}
 		for (let eee of ee.formats) {
 			if (all_on && ee.on && eee === command) continue;
 			if (command === 'ins' && eee === 'del' || command === 'del' && eee === 'ins' ||
@@ -258,12 +283,6 @@ function run_command(e) {
 		}
 		els.append(el);
 	}
-
-	if (first.start_offset != undefined) range.setStart(first.node, first.start_offset);
-	else range.setStartBefore(first.node);
-	if (last.end_offset != undefined) range.setEnd(last.node, last.end_offset);
-	else range.setEndAfter(last.node);
-	range.deleteContents();
 
 	$(e.target).find('.select-marker').remove();
 	let marker_start = document.createElement("span");
@@ -295,6 +314,7 @@ function to_text_node(n, o) {
 		n = n.childNodes[o];
 	}
 	while (n.nodeType !== Node.TEXT_NODE) {
+		if (to_command(n) === 'keep') return n;
 		if (n.firstChild == null) n = next_node(n);
 		if (n == null) return null;
 		if (n.firstChild != null) n = n.firstChild;
@@ -348,6 +368,7 @@ function normalize_editable(el) {
 }
 
 function to_command(n) {
+	if (n.nodeType === Node.TEXT_NODE) return 'text';
 	if (n.tagName === "SPAN") {
 		if (n.classList.contains('color')) {
 			return `color${getColor(n.classList)}`;
