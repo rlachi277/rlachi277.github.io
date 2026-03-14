@@ -332,7 +332,7 @@ function tab_command(e) {
 		if (s.anchorOffset === 1) return;
 		let t = last_text.textContent.substring(0, s.anchorOffset);
 		if (t[t.length - 2] !== "]") return;
-		cmd = k2e(t[t.length - 1]);
+		cmd = k2e(t[t.length - 1]).toLowerCase();
 		first_text = last_text;
 		flag = 2;
 	}
