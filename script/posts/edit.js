@@ -282,16 +282,16 @@ function run_command(e, command) {
 			ee.node.textContent = ee.node.textContent.substring(0, ee.start_offset);
 		}
 		for (let eee of ee.formats) {
-			if (all_on && ee.on && eee === command) continue;
+			if (ee.on && eee === command) continue;
 			if (command === 'ins' && eee === 'del' || command === 'del' && eee === 'ins' ||
 			command === 'sup' && eee === 'sub' || command === 'sub' && eee === 'sup' ||
-			command.startsWith('color') && eee.startsWith('color') ||
-			command.startsWith('colorbox') && eee.startsWith('colorbox')) continue;
+			command !== eee && (command.startsWith('color') && eee.startsWith('color') ||
+			command.startsWith('colorbox') && eee.startsWith('colorbox'))) continue;
 			let new_el = to_element(eee);
 			new_el.append(el);
 			el = new_el;
 		}
-		if (!all_on && !ee.on) {
+		if (!all_on) {
 			let new_el = to_element(command);
 			new_el.append(el);
 			el = new_el;
@@ -364,7 +364,7 @@ function tab_command(e) {
 	else if (cmd === "e") command = "ins";
 	else if ("0" <= cmd && cmd <= "9") command = `color${cmd}`;
 	if (command == null) return;
-	
+
 	let open_idx = first_text.textContent.lastIndexOf("[");
 	let close_idx = (flag === 2) ? s.anchorOffset - 2 : last_text.textContent.length - 2;
 	let ft = first_text.textContent;
