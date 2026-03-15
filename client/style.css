@@ -269,7 +269,7 @@ nav menu {
 	box-shadow: 0 0 0 8px var(--bg);
 }
 .editable.edited {
-	text-decoration: rgb(from currentColor r g b / 75%) dotted underline;
+	text-decoration: var(--c-3) dotted underline;
 }
 .editable:empty:before {
 	content: '### 비어 있음 :O ###';
