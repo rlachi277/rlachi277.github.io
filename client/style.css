@@ -275,5 +275,6 @@ nav menu {
 	content: '### 비어 있음 :O ###';
 	opacity: 0.8;
 }
-.editable.will-submit { --bg: var(--c-5-bg); }
-.editable.will-cancel { --bg: var(--c-2-bg); }
+
+.editable.will-cancel { --bg: var(--c-2-bg); color: var(--c-2); text-decoration-color: var(--c-2); }
+.edited.will-submit { color: var(--c-3); }
