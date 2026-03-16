@@ -86,7 +86,6 @@ ol, ul { margin-block: 0.4lh; }
 ul { padding-inline-start: 2ch; }
 ol { padding-inline-start: 3ch; }
 :is(dir, menu, ol, ul) ol {
-	padding-inline-start: 2ch;
 	list-style-type: lower-alpha;
 }
 :is(dir, menu, ol, ul) :is(dir, menu, ol, ul) ol {
@@ -262,11 +261,10 @@ nav menu {
 	nav menu > li:first-child { margin-block-start: 0; }
 }
 
-.editable { border-radius: 8px; }
 .editable:hover, .editable:focus-visible {
 	--bg: var(--c-3-bg);
 	background-color: var(--bg);
-	box-shadow: 0 0 0 8px var(--bg);
+	box-shadow: 0 0 0 4px var(--bg);
 }
 .editable.edited {
 	text-decoration: var(--c-3) dotted underline;

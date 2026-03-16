@@ -14,7 +14,8 @@ export function start_edit(el, init) {
 		return false;
 	}
 	if (el.nodeName.startsWith("#")) return undefined;
-	let type_unset = false, editable = false;
+	const LIST = 5, LI = 4, EDITABLE = 3, CONTAINER = 2, UNIT = 1, NONE = 0;
+	let type_unset = false, type = NONE;
 	switch (init ? 'BODY' : el.nodeName) {
 	case 'BODY':
 		if (editing != null && editing !== el) stop_edit();
@@ -22,34 +23,55 @@ export function start_edit(el, init) {
 		edit_map = new Map();
 		original_map = new Map();
 		break;
-	case 'NAV': case 'HR': case 'BR': case 'IMG':
-	case 'SECTION': case 'ARTICLE': case 'HGROUP':
-	case 'FIGURE': case 'FIELDSET':
-	case 'UL': case 'OL': case 'DETAILS': case 'SUMMARY':
-	case 'AUDIO': case 'VIDEO': case 'TRACK': case 'SOURCE':
+	case 'UL': case 'OL':
+		type = LIST;
+		break;
+	case 'LI':
+		type = LI;
 		break;
 	case 'H1': case 'H2': case 'H3':
 	case 'H4': case 'H5': case 'H6':
-	case 'P': case 'FIGCAPTION': case 'LEGEND': case 'LI':
+	case 'P': case 'FIGCAPTION': case 'LEGEND':
 	case 'STRONG': case 'EM': case 'B': case 'I': case 'U':
 	case 'RUBY': case 'RT': case 'RP':
 	case 'SUB': case 'SUP': case 'INS': case 'DEL':
 	case 'A': case 'BUTTON':
-		editable = true;
+		type = EDITABLE;
+		break;
+	case 'SECTION': case 'ARTICLE':
+	case 'FIELDSET': case 'DETAILS':
+		type = CONTAINER;
+		break;
+	case 'HGROUP': case 'IMG': case 'AUDIO': case 'VIDEO':
+	case 'FIGURE':
+	case 'NAV':
+	case 'HR': case 'BR':
+	case 'SUMMARY':
+	case 'TRACK': case 'SOURCE':
+		type = UNIT;
 		break;
 	default:
 		type_unset = true;
 	}
 	if (type_unset) {
 		if (el.classList.contains("columns")) {
-			editable = false;
+			type = CONTAINER;
 		} else if (el.classList.contains("color") || el.classList.contains("colorbox")) {
-			editable = true;
+			type = EDITABLE;
 		} else return undefined;
 	}
 
-	if (editable && !el.closest(".editable")) el.classList.add("editable");
-	else editable = false;
+	if (type === LIST) el.classList.add("container");
+	else if (type === LI) el.classList.add("unit");
+	else {
+		if (el.closest(".editable")) type = NONE;
+		if (type === EDITABLE) {
+			el.classList.add("editable");
+			if (!el.closest(".unit")) el.classList.add("unit");
+		}
+		else if (type === CONTAINER) el.classList.add("container");
+		else if (type === UNIT && !el.closest(".unit")) el.classList.add("unit");
+	}
 
 	let edit_curi = 0;
 	el.childNodes.forEach((e) => {
@@ -59,7 +81,7 @@ export function start_edit(el, init) {
 		edit_cur.pop();
 	});
 
-	if (editable) {
+	if (type === EDITABLE) {
 		original_map.set(el, JSON.stringify(seri(el)));
 		edit_map.set(edit_id, {pos: Array.from(edit_cur), el: el});
 		el.setAttribute("data-id", edit_id++);
