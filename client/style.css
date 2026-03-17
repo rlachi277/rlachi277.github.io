@@ -270,7 +270,7 @@ nav menu {
 	--barbg: var(--c-0-3); --barbgh: var(--c-0-2); --barbga: var(--c-0-1);
 	--midbg: var(--c-0-5);
 }
-body:not(.targeting) :is(.container-bar, .middle-bar) { display: none; }
+:where(body:not(.targeting)) :is(.container-bar, .middle-bar) { display: none; }
 .container-bar, .middle-bar {
 	content: '';
 	position: absolute;
@@ -297,20 +297,20 @@ fieldset.container > :is(.container-bar, .middle-bar) {
 	inset-inline-start: calc(-0.45lh - 1px);
 }
 
-body.targeting .unit:is(:hover, :focus-visible):not(:has(:is(.container, .unit):is(:hover, :focus-visible))),
-body.targeting .container:has(> .last-bar:is(:hover, :focus-visible)) { --bg: var(--c-6-bg); }
-body.targeting .container:has(> .first-bar:is(:hover, :focus-visible)) { --bg: var(--c-7-bg); }
+:where(body.targeting) .unit:is(:hover, :focus-visible):where(:not(:has(:is(.container, .unit):is(:hover, :focus-visible)))),
+:where(body.targeting) .container:has(> :where(.last-bar):is(:hover, :focus-visible)) { --bg: var(--c-6-bg); }
+:where(body.targeting) .container:has(> :where(.first-bar):is(:hover, :focus-visible)) { --bg: var(--c-7-bg); }
 
-body:not(.targeting) .editable:is(:hover, :focus-visible) { --bg: var(--c-3-bg); }
+:where(body:not(.targeting)) .editable:is(:hover, :focus-visible) { --bg: var(--c-3-bg); }
 .editable:empty:before {
 	content: '### 비어 있음 :O ###';
 	opacity: 0.8;
 }
 
-.edited { text-decoration: var(--c-3) dotted underline; }
-.added { --bg: var(--c-4-bg); text-decoration: var(--c-4) dotted underline; }
-.deleted { --bg: var(--c-1-bg); text-decoration: var(--c-1) dotted underline; }
-.will-cancel.will-cancel.will-cancel.will-cancel { --bg: var(--c-2-bg); color: var(--c-2); text-decoration-color: var(--c-2); }
+.edited.edited { text-decoration: var(--c-3) dotted underline; }
+.added.added { --bg: var(--c-4-bg); text-decoration: var(--c-4) dotted underline; }
+.deleted.deleted { --bg: var(--c-1-bg); text-decoration: var(--c-1) dotted underline; }
+.will-cancel.will-cancel { --bg: var(--c-2-bg); color: var(--c-2); text-decoration-color: var(--c-2); }
 .edited.will-submit { color: var(--c-3); }
 .added.will-submit { color: var(--c-4); }
 .deleted.will-submit { color: var(--c-1); }
