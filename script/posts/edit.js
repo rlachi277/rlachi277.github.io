@@ -14,7 +14,7 @@ export function start_edit(el, init) {
 		return false;
 	}
 	if (el.nodeName.startsWith("#")) return undefined;
-	const LIST = 5, LI = 4, EDITABLE = 3, CONTAINER = 2, UNIT = 1, NONE = 0;
+	const DETAILS = 6, LIST = 5, LI = 4, EDITABLE = 3, CONTAINER = 2, UNIT = 1, NONE = 0;
 	let type_unset = false, type = NONE;
 	switch (init ? 'BODY' : el.nodeName) {
 	case 'BODY':
@@ -38,16 +38,19 @@ export function start_edit(el, init) {
 	case 'A': case 'BUTTON':
 		type = EDITABLE;
 		break;
+	case 'DETAILS':
+		type = DETAILS;
+		break;
 	case 'SECTION': case 'ARTICLE':
-	case 'FIELDSET': case 'DETAILS':
+	case 'FIELDSET':
 		type = CONTAINER;
 		break;
 	case 'HGROUP': case 'IMG': case 'AUDIO': case 'VIDEO':
 	case 'FIGURE':
-	case 'NAV':
 	case 'HR': case 'BR':
 	case 'SUMMARY':
 	case 'TRACK': case 'SOURCE':
+	case 'NAV':
 		type = UNIT;
 		break;
 	default:
@@ -61,15 +64,57 @@ export function start_edit(el, init) {
 		} else return undefined;
 	}
 
-	if (type === LIST) el.classList.add("container");
-	else if (type === LI) el.classList.add("unit");
-	else {
-		if (el.closest(".editable")) type = NONE;
+	if (type === DETAILS) {
+		if (!el.closest("li")) {
+			el.classList.add("container");
+			let bar3 = document.createElement("span");
+			bar3.classList.add("container-bar");
+			bar3.classList.add("last-bar");
+			el.prepend(bar3);
+			let bar1 = document.createElement("span");
+			bar1.classList.add("middle-bar");
+			el.prepend(bar1);
+		}
+	} else if (type === LIST) {
+		el.classList.add("container");
+		let bar2 = document.createElement("span");
+		bar2.classList.add("container-bar");
+		bar2.classList.add("first-bar");
+		el.prepend(bar2);
+		if (!el.parentElement?.closest("ul, ol, dir, menu")) {
+			let bar3 = document.createElement("span");
+			bar3.classList.add("container-bar");
+			bar3.classList.add("last-bar");
+			el.prepend(bar3);
+		}
+		let bar1 = document.createElement("span");
+		bar1.classList.add("middle-bar");
+		el.prepend(bar1);
+	}
+	else if (type === LI) {
+		if (!el.closest(".editable")) el.classList.add("editable");
+		if (el.childNodes.length === 1 && el.firstChild.nodeType === Node.TEXT_NODE) el.classList.add("unit");
+		if (el.childNodes.length === 1 && el.firstChild.nodeType === Node.ELEMENT_NODE && el.firstChild.tagName === "DETAILS") el.classList.add("unit");
+	} else {
+		if (el.closest(".editable") && type != CONTAINER) type = UNIT;
 		if (type === EDITABLE) {
 			el.classList.add("editable");
 			if (!el.closest(".unit")) el.classList.add("unit");
 		}
-		else if (type === CONTAINER) el.classList.add("container");
+		else if (type === CONTAINER) {
+			el.classList.add("container");
+			let bar2 = document.createElement("span");
+			bar2.classList.add("container-bar");
+			bar2.classList.add("first-bar");
+			el.prepend(bar2);
+			let bar3 = document.createElement("span");
+			bar3.classList.add("container-bar");
+			bar3.classList.add("last-bar");
+			el.prepend(bar3);
+			let bar1 = document.createElement("span");
+			bar1.classList.add("middle-bar");
+			el.prepend(bar1);
+		}
 		else if (type === UNIT && !el.closest(".unit")) el.classList.add("unit");
 	}
 

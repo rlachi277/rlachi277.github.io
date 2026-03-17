@@ -84,7 +84,7 @@ fieldset hr, hr.rule { margin-block: calc(0.5lh - 0.5px); border-block-start: 1p
 
 ol, ul { margin-block: 0.4lh; }
 ul { padding-inline-start: 2ch; }
-ol { padding-inline-start: 3ch; }
+ol { padding-inline-start: 2ch; }
 :is(dir, menu, ol, ul) ol {
 	list-style-type: lower-alpha;
 }
@@ -261,18 +261,56 @@ nav menu {
 	nav menu > li:first-child { margin-block-start: 0; }
 }
 
-.editable:hover, .editable:focus-visible {
-	--bg: var(--c-3-bg);
+.unit, .container, .editable {
 	background-color: var(--bg);
 	box-shadow: 0 0 0 4px var(--bg);
 }
-.editable.edited {
-	text-decoration: var(--c-3) dotted underline;
+.container {
+	position: relative;
+	--barbg: var(--c-0-3); --barbgh: var(--c-0-2); --barbga: var(--c-0-1);
+	--midbg: var(--c-0-5);
 }
+body:not(.targeting) :is(.container-bar, .middle-bar) { display: none; }
+.container-bar, .middle-bar {
+	content: '';
+	position: absolute;
+	inset-block-start: 0;
+	inset-block-end: 2px;
+	inset-inline-end: calc(100% + 0.05lh);
+	inset-inline-start: -0.45lh;
+	background-color: var(--barbg);
+}
+.middle-bar { background-color: var(--midbg); z-index: -1; }
+.container-bar.first-bar { inset-block-end: max(50% + 1px, 100% - 3lh); }
+.container-bar.last-bar { inset-block-start: max(50% + 1px, 100% - 3lh); }
+.container-bar:is(:hover, :focus-visible) { background-color: var(--barbgh); }
+.container-bar:active { background-color: var(--barbga); }
+
+section.container { --barbg: var(--c-7-3); --barbgh: var(--c-7-2); --barbga: var(--c-7-1); --midbg: var(--c-7-5); }
+article.container { --barbg: var(--c-6-3); --barbgh: var(--c-6-2); --barbga: var(--c-6-1); --midbg: var(--c-6-5); }
+:is(section, article).container > :is(.container-bar, .middle-bar) {
+	inset-inline-end: calc(100% + 0.45lh);
+	inset-inline-start: -0.85lh;
+}
+fieldset.container > :is(.container-bar, .middle-bar) {
+	inset-inline-end: calc(100% + 0.05lh + 1px);
+	inset-inline-start: calc(-0.45lh - 1px);
+}
+
+body.targeting .unit:is(:hover, :focus-visible):not(:has(:is(.container, .unit):is(:hover, :focus-visible))),
+body.targeting .container:has(> .last-bar:is(:hover, :focus-visible)) { --bg: var(--c-6-bg); }
+body.targeting .container:has(> .first-bar:is(:hover, :focus-visible)) { --bg: var(--c-7-bg); }
+
+body:not(.targeting) .editable:is(:hover, :focus-visible) { --bg: var(--c-3-bg); }
 .editable:empty:before {
 	content: '### 비어 있음 :O ###';
 	opacity: 0.8;
 }
 
-.editable.will-cancel { --bg: var(--c-2-bg); color: var(--c-2); text-decoration-color: var(--c-2); }
+.edited { text-decoration: var(--c-3) dotted underline; }
+.added { --bg: var(--c-4-bg); text-decoration: var(--c-4) dotted underline; }
+.deleted { --bg: var(--c-1-bg); text-decoration: var(--c-1) dotted underline; }
+.will-cancel.will-cancel.will-cancel.will-cancel { --bg: var(--c-2-bg); color: var(--c-2); text-decoration-color: var(--c-2); }
 .edited.will-submit { color: var(--c-3); }
+.added.will-submit { color: var(--c-4); }
+.deleted.will-submit { color: var(--c-1); }
