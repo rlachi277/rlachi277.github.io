@@ -261,6 +261,39 @@ nav menu {
 	nav menu > li:first-child { margin-block-start: 0; }
 }
 
+
+header menu {
+	position: fixed;
+	inset-block-start: 0;
+	inset-inline: 0;
+	margin: 0;
+	border-block-end: 1px solid currentColor;
+	background-color: var(--c-bg);
+	z-index: 1;
+	padding: 0;
+	display: flex;
+	list-style: none;
+}
+
+header menu li {
+	margin: 0;
+	border-inline-end: 1px solid currentColor;
+}
+header menu button {
+	font-family: inherit;
+	color: inherit;
+	display: block;
+	margin: 0;
+	padding: 0;
+	padding-block: 1.5px;
+	padding-inline: 0.5rem;
+	background: none;
+	border: none;
+}
+header menu button:is(:hover, :focus-visible) { background-color: var(--c-0-bgh); }
+header menu button:active { background-color: var(--c-0-bga); }
+
+
 .unit, .container, .editable {
 	background-color: var(--bg);
 	box-shadow: 0 0 0 4px var(--bg);
