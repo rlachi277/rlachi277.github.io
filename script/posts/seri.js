@@ -4,6 +4,8 @@ export function seri(el, init, recur=seri) {
 		return el.textContent.replace(/\n\s*$/, "");
 	}
 	if (el.nodeName.startsWith("#")) return undefined;
+	if (el.classList.contains("new")) return undefined;
+
 	let result = {
 		type: null,
 		variant: undefined,

@@ -50,7 +50,7 @@ router.get('/*path', (req, res) => {
 });
 
 router.put('/*path', (req, res) => {
-	const path = req.params.path.join('/');
+	let path = req.params.path.join('/');
 	if (path.endsWith("/")) path += "index.html";
 	db.prepare(`
 		INSERT INTO posts (path, data)
@@ -62,18 +62,21 @@ router.put('/*path', (req, res) => {
 });
 
 router.patch('/*path', (req, res) => {
-	const path = req.params.path.join('/');
+	let path = req.params.path.join('/');
 	if (path.endsWith("/")) path += "index.html";
 	const db_res = db.prepare('SELECT data FROM posts WHERE path = ?').get(path)?.data;
 	if (db_res === undefined) {
 		res.sendStatus(404); return;
 	}
-	const { pos, data } = req.body;
-	if (pos == undefined || data == undefined) {
-		res.status(400).send("pos and/or data absent"); return;
+	const { pos, data, splice } = req.body;
+	if (splice == undefined || pos == undefined) {
+		res.status(400).send("necessary arguments absent"); return;
 	}
-	if (!Array.isArray(pos)) {
-		res.status(400).send("pos is not array"); return;
+	if (!Number.isInteger(splice) || splice < 0 || !Array.isArray(pos)) {
+		res.status(400).send("format error"); return;
+	}
+	if (splice === 0 && data == undefined) {
+		res.status(400).send("data absent"); return;
 	}
 	let old_data = JSON.parse(db_res);
 	if (pos.length === 0) {
@@ -90,10 +93,14 @@ router.patch('/*path', (req, res) => {
 	while (pos.length > 1) {
 		cur_data = cur_data.children[pos.pop()];
 		if (cur_data == undefined) {
-			res.status(404).send("invalid pos"); return;
+			res.status(400).send("invalid pos"); return;
 		}
 	}
-	cur_data.children[pos[0]] = data;
+	if (cur_data.children.length < pos[0]) {
+		res.status(400).send("invalid pos"); return;
+	}
+	if (data != undefined) cur_data.children.splice(pos[0], splice, data);
+	else cur_data.children.splice(pos[0], splice);
 	db.prepare(`
 		UPDATE posts
 		SET data = ?
@@ -103,7 +110,7 @@ router.patch('/*path', (req, res) => {
 });
 
 router.delete('/*path', (req, res) => {
-	const path = req.params.path.join('/');
+	let path = req.params.path.join('/');
 	if (path.endsWith("/")) path += "index.html";
 	const info = db.prepare('DELETE FROM posts WHERE path = ?').run(path);
 	if (info.changes === 0) {

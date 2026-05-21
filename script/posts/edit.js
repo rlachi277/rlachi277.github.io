@@ -1,10 +1,10 @@
 import { q$, $ } from "../jquery.js";
 import { seri, deseri, getColor } from "./seri.js";
 
-export let editing = null;
+let editing = null;
 let edit_id = null;
-export let edit_map = null;
-export let original_map = null;
+let pos_map = null;
+let original_map = null;
 
 let edit_cur = [];
 
@@ -14,14 +14,17 @@ export function start_edit(el, init) {
 		return false;
 	}
 	if (el.nodeName.startsWith("#")) return undefined;
+	if (el.classList.contains("new")) return undefined;
 	const DETAILS = 6, LIST = 5, LI = 4, EDITABLE = 3, CONTAINER = 2, UNIT = 1, NONE = 0;
 	let type_unset = false, type = NONE;
-	switch (init ? 'BODY' : el.nodeName) {
+	switch (el.nodeName) {
 	case 'BODY':
-		if (editing != null && editing !== el) stop_edit();
-		editing = el; edit_id = 0;
-		edit_map = new Map();
-		original_map = new Map();
+		if (init) {
+			if (editing != null && editing !== el) stop_edit();
+			editing = el; edit_id = 0;
+			pos_map = new WeakMap();
+			original_map = new WeakMap();
+		}
 		break;
 	case 'UL': case 'OL':
 		type = LIST;
@@ -64,58 +67,61 @@ export function start_edit(el, init) {
 		} else return undefined;
 	}
 
-	if (type === DETAILS) {
-		if (!el.closest("li")) {
-			el.classList.add("container");
-			let bar3 = document.createElement("span");
-			bar3.classList.add("container-bar");
-			bar3.classList.add("last-bar");
-			el.prepend(bar3);
-			let bar1 = document.createElement("span");
-			bar1.classList.add("middle-bar");
-			el.prepend(bar1);
-		}
-	} else if (type === LIST) {
-		el.classList.add("container");
-		let bar2 = document.createElement("span");
-		bar2.classList.add("container-bar");
-		bar2.classList.add("first-bar");
-		el.prepend(bar2);
-		if (!el.parentElement?.closest("ul, ol, dir, menu")) {
-			let bar3 = document.createElement("span");
-			bar3.classList.add("container-bar");
-			bar3.classList.add("last-bar");
-			el.prepend(bar3);
-		}
-		let bar1 = document.createElement("span");
-		bar1.classList.add("middle-bar");
-		el.prepend(bar1);
-	}
-	else if (type === LI) {
-		if (!el.closest(".editable")) el.classList.add("editable");
-		if (el.childNodes.length === 1 && el.firstChild.nodeType === Node.TEXT_NODE) el.classList.add("unit");
-		if (el.childNodes.length === 1 && el.firstChild.nodeType === Node.ELEMENT_NODE && el.firstChild.tagName === "DETAILS") el.classList.add("unit");
-	} else {
-		if (el.closest(".editable") && type != CONTAINER) type = UNIT;
-		if (type === EDITABLE) {
-			el.classList.add("editable");
-			if (!el.closest(".unit")) el.classList.add("unit");
-		}
-		else if (type === CONTAINER) {
+	if (el.getAttribute("data-old") == null) {
+		if (type === DETAILS) {
+			if (!el.closest("li")) {
+				el.classList.add("container");
+				let bar3 = document.createElement("span");
+				bar3.classList.add("container-bar");
+				bar3.classList.add("last-bar");
+				el.prepend(bar3);
+				let bar1 = document.createElement("span");
+				bar1.classList.add("middle-bar");
+				el.prepend(bar1);
+			}
+		} else if (type === LIST) {
 			el.classList.add("container");
 			let bar2 = document.createElement("span");
 			bar2.classList.add("container-bar");
 			bar2.classList.add("first-bar");
 			el.prepend(bar2);
-			let bar3 = document.createElement("span");
-			bar3.classList.add("container-bar");
-			bar3.classList.add("last-bar");
-			el.prepend(bar3);
+			if (!el.parentElement?.closest("ul, ol, dir, menu")) {
+				let bar3 = document.createElement("span");
+				bar3.classList.add("container-bar");
+				bar3.classList.add("last-bar");
+				el.prepend(bar3);
+			}
 			let bar1 = document.createElement("span");
 			bar1.classList.add("middle-bar");
 			el.prepend(bar1);
 		}
-		else if (type === UNIT && !el.closest(".unit")) el.classList.add("unit");
+		else if (type === LI) {
+			if (!el.closest(".editable")) el.classList.add("editable");
+			if (el.childNodes.length === 1 && el.firstChild.nodeType === Node.TEXT_NODE) el.classList.add("unit");
+			if (el.childNodes.length === 1 && el.firstChild.nodeType === Node.ELEMENT_NODE && el.firstChild.tagName === "DETAILS") el.classList.add("unit");
+		} else {
+			if (el.closest(".editable") && type != CONTAINER) type = UNIT;
+			if (type === EDITABLE) {
+				el.classList.add("editable");
+				if (!el.closest(".unit")) el.classList.add("unit");
+			}
+			else if (type === CONTAINER) {
+				el.classList.add("container");
+				let bar2 = document.createElement("span");
+				bar2.classList.add("container-bar");
+				bar2.classList.add("first-bar");
+				el.prepend(bar2);
+				let bar3 = document.createElement("span");
+				bar3.classList.add("container-bar");
+				bar3.classList.add("last-bar");
+				el.prepend(bar3);
+				let bar1 = document.createElement("span");
+				bar1.classList.add("middle-bar");
+				el.prepend(bar1);
+			}
+			else if (type === UNIT && !el.closest(".unit")) el.classList.add("unit");
+		}
+		el.setAttribute("data-old", true);
 	}
 
 	let edit_curi = 0;
@@ -126,14 +132,18 @@ export function start_edit(el, init) {
 		edit_cur.pop();
 	});
 
+	pos_map.set(el, Array.from(edit_cur));
 	if (type === EDITABLE) {
-		original_map.set(el, JSON.stringify(seri(el)));
-		edit_map.set(edit_id, {pos: Array.from(edit_cur), el: el});
-		el.setAttribute("data-id", edit_id++);
-		el.setAttribute("contenteditable", "plaintext-only");
-		el.addEventListener("keydown", on_editable_keydown);
-		el.addEventListener("input", on_editable_input);
-		el.addEventListener("blur", on_editable_blur);
+		if (el.getAttribute("data-id") == null) {
+			original_map.set(el, JSON.stringify(seri(el)));
+			el.setAttribute("data-id", edit_id++);
+			el.setAttribute("contenteditable", "plaintext-only");
+			el.addEventListener("keydown", on_editable_keydown);
+			el.addEventListener("input", on_editable_input);
+			el.addEventListener("blur", on_editable_blur);
+		} else {
+			original_map.set(el, JSON.stringify(seri(el)));
+		}
 	}
 	return true;
 }
@@ -141,10 +151,10 @@ export function start_edit(el, init) {
 function manage_confirm(el, confirm_class, stop_class) {
 	if (!el.classList.contains(confirm_class)) {
 		if ($(`.${stop_class}`).length !== 0) {
-			$(`.${stop_class}`).removeClass(stop_class)
+			$(`.${stop_class}`).removeClass(stop_class);
 			return false;
 		}
-		if (!el.classList.contains("edited")) return false;
+		if (!el.classList.contains("edited") && !el.classList.contains("deleted")) return false;
 		$(`.${confirm_class}`).removeClass(confirm_class);
 		el.classList.add(confirm_class);
 		return false;
@@ -156,14 +166,53 @@ function on_editable_keydown(e) {
 	if (e.isComposing) return;
 	if (e.key === "Enter" && !e.shiftKey) {
 		e.preventDefault();
+		if (e.target.classList.contains("deleted")) {
+			submit_delete(e.target);
+			return;
+		} else if (e.target.classList.contains("new")) {
+			submit_new(e.target);
+			return;
+		}
 		if (!manage_confirm(e.target, "will-submit", "will-cancel")) return;
-		submit_changes(e.target);
+		else submit_changes(e.target);
 		return;
 	} else if (e.key === "Escape") {
 		e.preventDefault();
+		if (e.target.classList.contains("deleted")) {
+			e.target.classList.remove("deleted");
+			return;
+		} else if (e.target.classList.contains("new")) {
+			e.target.remove();
+			return;
+		}
 		if (!manage_confirm(e.target, "will-cancel", "will-submit")) return;
 		e.target.innerHTML = deseri(JSON.parse(original_map.get(e.target)), window.location.pathname, true);
 		e.target.blur();
+		return;
+	} else if ((e.ctrlKey || e.metaKey) && e.key == "Backspace") {
+		e.preventDefault();
+		e.target.classList.add("deleted");
+	} else if ((e.ctrlKey || e.metaKey) && e.key == "ArrowUp") {
+		e.preventDefault();
+		let new_el = document.createElement("p");
+		new_el.classList.add("editable");
+		new_el.classList.add("new");
+		new_el.setAttribute("contenteditable", "plaintext-only");
+		new_el.addEventListener("keydown", on_editable_keydown);
+		new_el.addEventListener("input", on_editable_input);
+		new_el.addEventListener("blur", on_editable_blur);
+		e.target.insertAdjacentElement("beforebegin", new_el);
+		return;
+	} else if ((e.ctrlKey || e.metaKey) && e.key == "ArrowDown") {
+		e.preventDefault();
+		let new_el = document.createElement("p");
+		new_el.classList.add("editable");
+		new_el.classList.add("new");
+		new_el.setAttribute("contenteditable", "plaintext-only");
+		new_el.addEventListener("keydown", on_editable_keydown);
+		new_el.addEventListener("input", on_editable_input);
+		new_el.addEventListener("blur", on_editable_blur);
+		e.target.insertAdjacentElement("afterend", new_el);
 		return;
 	}
 	if (e.ctrlKey || e.metaKey) {
@@ -215,24 +264,60 @@ function on_editable_blur(e) {
 	normalize_editable(e.target);
 	undo_buffer = [];
 	redo_buffer = [];
-	if (JSON.stringify(seri(e.target)) === original_map.get(e.target))
+	if (JSON.stringify(seri(e.target)) === original_map.get(e.target)) {
 		e.target.classList.remove("edited");
+	}
 }
 
 function submit_changes(el) {
 	el.innerHTML = el.innerHTML.replaceAll("\n","<br>");
-	if (el.lastChild.nodeName === "BR") el.removeChild(el.lastChild);
+	if (el.lastChild?.nodeName === "BR") el.removeChild(el.lastChild);
 	document.activeElement.blur();
-	let pos = edit_map.get(parseInt(el.getAttribute("data-id"))).pos;
+	let pos = pos_map.get(el);
 	let new_data = seri(el);
 	fetch(window.location.pathname, { method: "PATCH", headers: {
 		'Content-type': 'application/json'
 	}, body: JSON.stringify({
 		pos: pos,
-		data: new_data
+		data: new_data,
+		splice: 1
 	})});
 	original_map.set(el, JSON.stringify(new_data));
 	el.classList.remove("edited");
+}
+
+function submit_delete(el) {
+	document.activeElement.blur();
+	let pos = pos_map.get(el);
+	fetch(window.location.pathname, { method: "PATCH", headers: {
+		'Content-type': 'application/json'
+	}, body: JSON.stringify({
+		pos: pos,
+		data: undefined,
+		splice: 1
+	})});
+	let p = el.parentElement;
+	el.remove();
+	edit_cur = Array.from(pos_map.get(p));
+	start_edit(p);
+}
+
+function submit_new(el) {
+	document.activeElement.blur();
+	el.classList.remove("new");
+	edit_cur = Array.from(pos_map.get(el.parentElement));
+	start_edit(el.parentElement);
+	let pos = pos_map.get(el);
+	let new_data = seri(el);
+	console.log(pos);
+	fetch(window.location.pathname, { method: "PATCH", headers: {
+		'Content-type': 'application/json'
+	}, body: JSON.stringify({
+		pos: pos,
+		data: new_data,
+		splice: 0
+	})});
+	original_map.set(el, JSON.stringify(new_data));
 }
 
 export function submit_all() {
@@ -250,7 +335,7 @@ export function stop_edit() {
 		e.removeEventListener("blur", on_editable_blur);
 		e.classList.remove("editable");
 	});
-	editing = edit_id = edit_map = original_map = null;
+	editing = edit_id = pos_map = original_map = null;
 }
 
 const s = window.getSelection();
@@ -594,3 +679,97 @@ function k2e(str) {
 	}
 	return res;
 }
+
+let targeting_abort = null;
+
+function start_targeting(f) {
+	if (targeting_abort != null) stop_targeting();
+	document.body.classList.add("targeting");
+	targeting_abort = new AbortController();
+	for (let el of document.getElementsByClassName("unit")) {
+		if (el.classList.contains("editable")) {
+			el.removeAttribute("contenteditable");
+		}
+		el.addEventListener("click", (e) => {
+			e.preventDefault();
+			f(e.target);
+			stop_targeting();
+		}, {signal: targeting_abort.signal});
+	}
+	for (let el of document.getElementsByClassName("first-bar")) {
+		el.addEventListener("click", (e) => {
+			e.preventDefault();
+			f(e.target.parentElement, true);
+			stop_targeting();
+		}, {signal: targeting_abort.signal});
+	}
+	for (let el of document.getElementsByClassName("last-bar")) {
+		el.addEventListener("click", (e) => {
+			e.preventDefault();
+			f(e.target.parentElement);
+			stop_targeting();
+		}, {signal: targeting_abort.signal});
+	}
+
+	document.addEventListener("keydown", (e) => {
+		if (e.key == 'Escape') stop_targeting();
+	}, {signal: targeting_abort.signal});
+}
+
+function stop_targeting() {
+	document.body.classList.remove("targeting");
+	for (let el of document.getElementsByClassName("unit")) {
+		if (el.classList.contains("editable")) {
+			el.setAttribute("contenteditable", "plaintext-only");
+		}
+	}
+	targeting_abort.abort();
+	targeting_abort = null;
+}
+
+function insert_element(after, is_first) {
+	let new_el = document.createElement("section"); // testing
+
+	if (is_first) {
+		after.insertAdjacentElement("afterbegin", new_el);
+		edit_cur = Array.from(pos_map.get(after));
+		start_edit(after);
+	} else {
+		after.insertAdjacentElement("afterend", new_el);
+		let p = after.parentElement;
+		edit_cur = Array.from(pos_map.get(p));
+		start_edit(p);
+	}
+
+	let pos = pos_map.get(new_el);
+	let new_data = seri(new_el);
+	fetch(window.location.pathname, { method: "PATCH", headers: {
+		'Content-type': 'application/json'
+	}, body: JSON.stringify({
+		pos: pos,
+		data: new_data,
+		splice: 0
+	})});
+	original_map.set(document.body, JSON.stringify(new_data));
+}
+
+function delete_element(target, is_first) {
+	let p = target.parentElement;
+	let pos = pos_map.get(target);
+	fetch(window.location.pathname, { method: "PATCH", headers: {
+		'Content-type': 'application/json'
+	}, body: JSON.stringify({
+		pos: pos,
+		data: undefined,
+		splice: 1
+	})});
+	target.remove();
+	start_edit(p);
+}
+
+export function insert_test(e) { start_targeting(insert_element); }
+export function delete_test(e) { start_targeting(delete_element); }
+
+window.addEventListener("beforeunload", (e) => {
+	if ($(".edited").length != 0 || $(".new").length != 0) e.preventDefault();
+});

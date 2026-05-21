@@ -7,13 +7,14 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "nodemon index.js"
+    "test": "nodemon -e js,json,html,css index.js"
   },
   "dependencies": {
     "better-sqlite3": "^12.6.2",
     "express": "^5.2.1"
   },
   "devDependencies": {
+    "@types/express": "^5.0.6",
     "nodemon": "^3.1.14"
   }
 }
