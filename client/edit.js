@@ -1,5 +1,5 @@
-import { q$, $ } from "../jquery.js";
-import { seri, deseri, getColor } from "./seri.js";
+import { q$, $ } from "../script/jquery.js";
+import { seri, deseri, getColor } from "../script/posts/seri.js";
 
 let editing = null;
 let edit_id = null;
@@ -750,7 +750,7 @@ function insert_element(after, is_first) {
 		data: new_data,
 		splice: 0
 	})});
-	original_map.set(document.body, JSON.stringify(new_data));
+	original_map.set(new_el, JSON.stringify(new_data));
 }
 
 function delete_element(target, is_first) {

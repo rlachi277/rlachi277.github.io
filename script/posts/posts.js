@@ -58,7 +58,7 @@ router.put('/*path', (req, res) => {
 		ON CONFLICT(path)
 		DO UPDATE SET data = excluded.data;
 	`).run(path, req.body);
-	res.status(200).send(req.body);
+	res.status(204);
 });
 
 router.patch('/*path', (req, res) => {
@@ -106,7 +106,7 @@ router.patch('/*path', (req, res) => {
 		SET data = ?
 		WHERE path = ?;
 	`).run(JSON.stringify(old_data), path);
-	res.status(200).send(old_data);
+	res.status(204);
 });
 
 router.delete('/*path', (req, res) => {

@@ -1,6 +1,5 @@
-import { $ } from "../jquery.js";
-import { start_edit, insert_test, delete_test } from "./edit.js";
-import { seri, no_lf } from "./seri.js";
+import { $ } from "../script/jquery.js";
+import { seri, no_lf } from "../script/posts/seri.js";
 
 function serialize(el, init) {
 	if (el.nodeName === 'NAV') {
@@ -74,8 +73,10 @@ window.addEventListener('resize', () => on_resize());
 const params = new URLSearchParams(window.location.search);
 refresh_data();
 if (params.get("edit")) {
-	start_edit($("body").get(0), true);
-	$(".menu-edit").css("display", "revert");
-	$("#menu-inserttest").on("click", insert_test);
-	$("#menu-deletetest").on("click", delete_test);
+	import("./edit.js").then((edit) => {
+		edit.start_edit($("body").get(0), true);
+		$(".menu-edit").css("display", "revert");
+		$("#menu-inserttest").on("click", edit.insert_test);
+		$("#menu-deletetest").on("click", edit.delete_test);
+	});
 }

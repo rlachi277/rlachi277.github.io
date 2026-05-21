@@ -310,6 +310,8 @@ header menu button:is(:hover, :focus-visible) { background-color: var(--c-0-bgh)
 header menu button:active { background-color: var(--c-0-bga); }
 
 
+/* for edit */
+
 .unit, .container, .editable {
 	background-color: var(--bg);
 	box-shadow: 0 0 0 4px var(--bg);
