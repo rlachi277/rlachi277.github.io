@@ -1,54 +1,16 @@
 import { $ } from "../script/jquery.js";
 import { seri, no_lf } from "../script/posts/seri.js";
 
-function serialize(el, init) {
-	if (el.nodeName === 'NAV') {
-		return {type: "nav", variant: {data: serialize_nav(el)}, children: null};
-	}
+export function serialize(el, init) {
+	if (el.nodeName === 'NAV') return {type: "nav", children: null};
 	return seri(el, init, serialize);
 }
 
-function serialize_nav(nav) {
-	let menu = nav.querySelector("menu");
-	let result = [];
-
-	function serialize_li(el) {
-		let a = el.childNodes[0];
-		if (el.querySelector("ul") == null) {
-			if (a.childNodes.length < 2) {
-				if (a.childNodes.length == 0) return "";
-				if (a.childNodes[0].nodeType === Node.TEXT_NODE)
-					return no_lf(a.childNodes[0].textContent);
-				return "";
-			}
-			return no_lf(a.childNodes[1].textContent);
-		}
-		let result = {name: "", children: []};
-		setname: {
-			if (a.childNodes.length < 2) {
-				if (a.childNodes.length == 0) break setname;
-				if (a.childNodes[0].nodeType === Node.TEXT_NODE) {
-					result.name = a.childNodes[0].textContent;
-					break setname;
-				}
-				break setname;
-			}
-			if (a.childNodes[1].nodeType === Node.TEXT_NODE)
-				result.name = a.childNodes[1].textContent;
-		}
-		for (let e of el.querySelector("ul").children) {
-			result.children.push(serialize_li(e));
-		}
-		return result;
-	}
-	for (let e of menu.children) result.push(serialize_li(e));
-	return result;
-}
-
-function refresh_data() {
+function refresh_data() { // 테스트용
 	let s = serialize($("body").get(0));
 	fetch(window.location.pathname, { method: "PUT", body: JSON.stringify(s) });
 }
+refresh_data();
 
 let mobile = false;
 let nav_details;
@@ -70,13 +32,42 @@ function on_resize(init) {
 on_resize(true);
 window.addEventListener('resize', () => on_resize());
 
+$(".menu-action").on("click", (e) => {
+	let pp = e.target.parentElement.parentElement;
+	if (pp.matches(":popover-open")) pp.hidePopover();
+});
+
+$("#menu-export").on("click", () => {
+	try {
+		let s = serialize($("body").get(0));
+		let file = new Blob([JSON.stringify(s)], {type: "application/json"});
+		let a = document.createElement("a");
+		a.href = URL.createObjectURL(file);
+		a.download = "export.json";
+		a.click();
+		URL.revokeObjectURL(a.href);
+	} catch (e) {
+		alert(`오류: ${e}`);
+	}
+});
+
 const params = new URLSearchParams(window.location.search);
-refresh_data();
 if (params.get("edit")) {
 	import("./edit.js").then((edit) => {
 		edit.start_edit($("body").get(0), true);
 		$(".menu-edit").css("display", "revert");
-		$("#menu-inserttest").on("click", edit.insert_test);
+		$("nav a").each((i, e) => {
+			e.setAttribute("href", e.getAttribute("href") + "?edit=t");
+		});
+
+		$("#menu-new").on("click", edit.dialog_new_post);
+		$("#menu-duplicate").on("click", edit.dialog_duplicate_post);
+		$("#menu-delete").on("click", edit.dialog_delete_post);
+		$("#menu-load").on("click", edit.dialog_load);
+
+		$("#menu-inserttestp").on("click", edit.insert_test_p);
+		$("#menu-inserttests").on("click", edit.insert_test_s);
 		$("#menu-deletetest").on("click", edit.delete_test);
+		$("#menu-stoptargeting").on("click", edit.stop_targeting);
 	});
 }

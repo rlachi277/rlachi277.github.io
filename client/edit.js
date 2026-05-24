@@ -1,5 +1,6 @@
-import { q$, $ } from "../script/jquery.js";
+import { d$, q$, $ } from "../script/jquery.js";
 import { seri, deseri, getColor } from "../script/posts/seri.js";
+import { serialize } from "./script.js";
 
 let editing = null;
 let edit_id = null;
@@ -125,12 +126,14 @@ export function start_edit(el, init) {
 	}
 
 	let edit_curi = 0;
-	el.childNodes.forEach((e) => {
-		edit_cur.push(edit_curi);
-		let c = start_edit(e);
-		if (c != undefined) edit_curi++;
-		edit_cur.pop();
-	});
+	if (type !== UNIT) {
+		el.childNodes.forEach((e) => {
+			edit_cur.push(edit_curi);
+			let c = start_edit(e);
+			if (c != undefined) edit_curi++;
+			edit_cur.pop();
+		});
+	}
 
 	pos_map.set(el, Array.from(edit_cur));
 	if (type === EDITABLE) {
@@ -194,6 +197,7 @@ function on_editable_keydown(e) {
 		e.target.classList.add("deleted");
 	} else if ((e.ctrlKey || e.metaKey) && e.key == "ArrowUp") {
 		e.preventDefault();
+		if (!e.target.matches("p:not(hgroup p)")) return;
 		let new_el = document.createElement("p");
 		new_el.classList.add("editable");
 		new_el.classList.add("new");
@@ -205,6 +209,7 @@ function on_editable_keydown(e) {
 		return;
 	} else if ((e.ctrlKey || e.metaKey) && e.key == "ArrowDown") {
 		e.preventDefault();
+		if (!e.target.matches("p:not(hgroup p)")) return;
 		let new_el = document.createElement("p");
 		new_el.classList.add("editable");
 		new_el.classList.add("new");
@@ -309,7 +314,6 @@ function submit_new(el) {
 	start_edit(el.parentElement);
 	let pos = pos_map.get(el);
 	let new_data = seri(el);
-	console.log(pos);
 	fetch(window.location.pathname, { method: "PATCH", headers: {
 		'Content-type': 'application/json'
 	}, body: JSON.stringify({
@@ -716,7 +720,7 @@ function start_targeting(f) {
 	}, {signal: targeting_abort.signal});
 }
 
-function stop_targeting() {
+export function stop_targeting() {
 	document.body.classList.remove("targeting");
 	for (let el of document.getElementsByClassName("unit")) {
 		if (el.classList.contains("editable")) {
@@ -727,8 +731,11 @@ function stop_targeting() {
 	targeting_abort = null;
 }
 
+let new_el_name = null; // testing
 function insert_element(after, is_first) {
-	let new_el = document.createElement("section"); // testing
+	if (after.tagName === 'H1') after = after.nextSibling;
+	if (new_el_name == null) return;
+	let new_el = document.createElement(new_el_name); // testing
 
 	if (is_first) {
 		after.insertAdjacentElement("afterbegin", new_el);
@@ -754,6 +761,7 @@ function insert_element(after, is_first) {
 }
 
 function delete_element(target, is_first) {
+	if (target.tagName === 'H1' || target.tagName === 'NAV') return;
 	let p = target.parentElement;
 	let pos = pos_map.get(target);
 	fetch(window.location.pathname, { method: "PATCH", headers: {
@@ -767,9 +775,137 @@ function delete_element(target, is_first) {
 	start_edit(p);
 }
 
-export function insert_test(e) { start_targeting(insert_element); }
+export function insert_test_p(e) { new_el_name = "p"; start_targeting(insert_element); }
+export function insert_test_s(e) { new_el_name = "section"; start_targeting(insert_element); }
 export function delete_test(e) { start_targeting(delete_element); }
 
 window.addEventListener("beforeunload", (e) => {
 	if ($(".edited").length != 0 || $(".new").length != 0) e.preventDefault();
 });
+
+let dialog_function = null;
+d$("dialog-confirm").addEventListener("click", async function () {
+	if (dialog_function == null) return;
+	if (await dialog_function()) d$("dialog").close();
+});
+
+d$("dialog").addEventListener("close", function () {
+	d$("dialog-title").textContent = '';
+	d$("dialog-main").innerHTML = '';
+	d$("dialog-confirm").classList.remove("danger");
+})
+
+export function dialog_new_post() {
+	d$("dialog-title").textContent = "새 글";
+	d$("dialog-main").innerHTML = `
+		<label for="dialog-new-path">경로: </label>
+		<input id="dialog-new-path" placeholder="경로 입력">
+	`;
+	dialog_function = new_post;
+	d$("dialog").returnValue = "";
+	d$("dialog").showModal();
+}
+
+export function dialog_duplicate_post() {
+	d$("dialog-title").textContent = "이 글 복제";
+	d$("dialog-main").innerHTML = `
+		<label for="dialog-new-path">경로: </label>
+		<input id="dialog-new-path" placeholder="경로 입력">
+	`;
+	dialog_function = duplicate_post;
+	d$("dialog").returnValue = "";
+	d$("dialog").showModal();
+}
+
+export function dialog_delete_post() {
+	d$("dialog-title").textContent = "이 글 삭제";
+	d$("dialog-main").innerHTML = `
+		정말로 삭제하시겠습니까?<br>
+		이 작업은 되돌릴 수 없습니다.
+	`;
+	dialog_function = delete_post;
+	d$("dialog").returnValue = "";
+	d$("dialog").showModal();
+	d$("dialog-confirm").classList.add("danger");
+}
+
+export function dialog_load() {
+	d$("dialog-title").textContent = "JSON에서 불러오기";
+	d$("dialog-main").innerHTML = `
+		JSON 파일의 내용으로 <strong>이 글</strong>을 덮어씌웁니다.<br>
+		이 작업은 되돌릴 수 없습니다.<br><br>
+		<label for="dialog-json-file">파일: </label>
+		<input id="dialog-json-file" type="file" accept=".json">
+	`;
+	dialog_function = load_from_json;
+	d$("dialog").returnValue = "";
+	d$("dialog").showModal();
+	d$("dialog-confirm").classList.add("danger");
+}
+
+async function new_post() {
+	let path = d$("dialog-new-path").value;
+	let abs_path = new URL(path, `file://${window.location.pathname}`).pathname;
+	if (!abs_path || !abs_path.startsWith("/posts/")) {
+		// TODO: 경고
+		return false;
+	}
+	try {
+		let f = await fetch(abs_path, { method: "HEAD" });
+		if (f.status !== 404) {
+			if (f.status !== 200) throw f.status;
+			// TODO: 경고
+			return false;
+		}
+		let s = {type: "body",children:[{type: "h1",children: [abs_path]},{type: "nav",children: null},{type: "p",children: []}]};
+		fetch(abs_path, { method: "PUT", body: JSON.stringify(s) });
+		return true;
+	} catch (e) {
+		alert(`오류: ${e}`);
+		return false;
+	}
+}
+
+async function duplicate_post() {
+	let path = d$("dialog-new-path").value;
+	let abs_path = new URL(path, `file://${window.location.pathname}`).pathname;
+	if (!abs_path || !abs_path.startsWith("/posts/")) {
+		// TODO: 경고
+		return false;
+	}
+	try {
+		let f = await fetch(abs_path, { method: "HEAD" });
+		if (f.status !== 404) {
+			if (f.status !== 200) throw f.status;
+			// TODO: 경고
+			return false;
+		}
+		let s = serialize($("body").get(0));
+		fetch(abs_path, { method: "PUT", body: JSON.stringify(s) });
+		return true;
+	} catch (e) {
+		alert(`오류: ${e}`);
+		return false;
+	}
+}
+
+async function load_from_json() {
+	let path = window.location.pathname;
+	try {
+		fetch(path, { method: "PUT", headers: {'Content-Type': 'text/plain'}, body: d$("dialog-json-file").files[0] });
+		return true;
+	} catch (e) {
+		alert(`오류: ${e}`);
+		return false;
+	}
+}
+
+async function delete_post() {
+	try {
+		fetch(window.location.pathname, { method: "DELETE" });
+		return true;
+	} catch (e) {
+		alert(`오류: ${e}`);
+		return false;
+	}
+}

@@ -1,9 +1,10 @@
 import __dirname from '../../dirname.js';
-import { get_post_raw } from './posts.js';
+import { build_nav } from './nav.js';
+import { post_exists } from './posts.js';
 import { deseri, sani } from './seri.js';
 
 export function render(data, cur, init) {
-	if (data.type === 'nav') return render_nav(data.variant?.data, cur);
+	if (data.type === 'nav') return render_nav(build_nav(cur), cur);
 	return deseri(data, cur, init, render);
 }
 
@@ -44,5 +45,5 @@ function file_exists(cur, p) {
 	let resolved = simulate_link(cur, p);
 	if (!resolved) return false;
 	if (!resolved.startsWith("/posts/")) return false;
-	return get_post_raw(resolved.replace(/^\/posts\//, ""))!=undefined;
+	return post_exists(resolved.substring(7));
 }

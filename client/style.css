@@ -173,6 +173,7 @@ a.self:active { color: var(--c-linksa); }
 	--bg: transparent; --bgh: var(--c-0-5); --bga: var(--c-0-4);
 	--bd: currentColor; --bdh: currentColor; --bda: currentColor;
 	--c: currentColor; --ch: currentColor; --ca: currentColor;
+	font-family: inherit;
 	font-size: 1em;
 	line-height: inherit;
 	padding-block: 0;
@@ -276,6 +277,9 @@ nav menu {
 	nav menu > li:first-child { margin-block-start: 0; }
 }
 
+:where(body.targeting) header * {
+	color: var(--c-6);
+}
 
 header menu {
 	position: fixed;
@@ -284,19 +288,21 @@ header menu {
 	margin: 0;
 	border-block-end: 1px solid currentColor;
 	background-color: var(--c-bg);
-	z-index: 1;
+	z-index: 2;
 	padding: 0;
 	display: flex;
 	list-style: none;
 }
 
+header menu .menu-edit { display: none; }
+
 header menu > li {
 	margin: 0;
 	border-inline-end: 1px solid currentColor;
 }
-header menu > .menu-edit { display: none; }
 header menu > li > button {
 	font-family: inherit;
+	font-size: 1em;
 	color: inherit;
 	display: block;
 	margin: 0;
@@ -308,6 +314,70 @@ header menu > li > button {
 }
 header menu button:is(:hover, :focus-visible) { background-color: var(--c-0-bgh); }
 header menu button:active { background-color: var(--c-0-bga); }
+
+header menu ul {
+	margin: 0;
+	padding: 0;
+	inset: auto;
+	inset-block-start: anchor(outside);
+	inset-inline-start: calc(anchor(inside) - 1px);
+	border: 1px solid currentColor;
+	background-color: var(--c-bg);
+	list-style: none;
+}
+
+header menu ul > li { margin: 0; }
+header menu ul > li:not(:first-child) { border-block-start: 1px solid currentColor; }
+header menu ul > li > button {
+	font-family: inherit;
+	font-size: 1em;
+	color: inherit;
+	display: block;
+	margin: 0;
+	padding: 0;
+	padding-block: 1.5px;
+	padding-inline: 0.5rem;
+	background: none;
+	border: none;
+	width: 100%;
+	text-align: start;
+}
+
+dialog {
+	border: 2px solid currentColor;
+	background: var(--c-bg);
+}
+
+#dialog-title { margin: 0; margin-block-end: -2px; text-align: center; }
+
+#dialog-main { margin-block: 16px; }
+#dialog-main input {
+	border: none;
+	border-block-end: 1px solid currentColor;
+	background: var(--c-bg);
+	font-family: inherit;
+	font-size: 1em;
+}
+#dialog-main input::file-selector-button {
+	border: 1px solid currentColor;
+	border-block-end: none;
+	background: var(--c-bg);
+}
+#dialog-main input::file-selector-button:is(:hover, :focus-visible) { background-color: var(--c-0-bgh); }
+#dialog-main input::file-selector-button:active { background-color: var(--c-0-bga); }
+
+#dialog-buttons { text-align: center; }
+#dialog-buttons button {
+	border: 1px solid currentColor;
+	background: var(--c-bg);
+	margin-inline: 4px;
+}
+#dialog-buttons button:is(:hover, :focus-visible) { background-color: var(--c-0-bgh); }
+#dialog-buttons button.danger { border: 1px solid var(--c-1); color: var(--c-1); }
+#dialog-buttons button.danger:is(:hover, :focus, :focus-visible) { background-color: var(--c-1-bgh); }
+#dialog-buttons button:active { background-color: var(--c-0-bga); }
+#dialog-buttons button.danger:active { background-color: var(--c-1-bga); }
+
 
 
 /* for edit */

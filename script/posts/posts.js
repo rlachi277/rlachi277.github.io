@@ -4,6 +4,7 @@ import path from 'path';
 import Database from 'better-sqlite3';
 import __dirname from '../../dirname.js';
 import { render } from './render.js';
+import { add_post, remove_post } from "./nav.js";
 
 const router = express.Router();
 export default router;
@@ -16,6 +17,14 @@ db.prepare(`
 		id INTEGER PRIMARY KEY,
 		path TEXT NOT NULL UNIQUE,
 		data TEXT NOT NULL
+	)
+`).run();
+db.prepare(`
+	CREATE TABLE IF NOT EXISTS dir (
+		id INTEGER PRIMARY KEY,
+		path TEXT NOT NULL UNIQUE,
+		posts TEXT NOT NULL,
+		subdir TEXT NOT NULL
 	)
 `).run();
 
@@ -58,7 +67,8 @@ router.put('/*path', (req, res) => {
 		ON CONFLICT(path)
 		DO UPDATE SET data = excluded.data;
 	`).run(path, req.body);
-	res.status(204);
+	add_post(req.params.path);
+	res.sendStatus(204);
 });
 
 router.patch('/*path', (req, res) => {
@@ -106,7 +116,7 @@ router.patch('/*path', (req, res) => {
 		SET data = ?
 		WHERE path = ?;
 	`).run(JSON.stringify(old_data), path);
-	res.status(204);
+	res.sendStatus(204);
 });
 
 router.delete('/*path', (req, res) => {
@@ -116,6 +126,7 @@ router.delete('/*path', (req, res) => {
 	if (info.changes === 0) {
 		res.sendStatus(404); return;
 	}
+	remove_post(req.params.path);
 	res.sendStatus(204);
 });
 
@@ -130,4 +141,9 @@ function get_post_json(path) {
 		throw 404;
 	}
 	return JSON.parse(db_res.data);
+}
+
+export function post_exists(path) {
+	const db_res = db.prepare('SELECT COUNT(1) FROM posts WHERE path = ?').get(path);
+	return db_res['COUNT(1)'] == 1;
 }
