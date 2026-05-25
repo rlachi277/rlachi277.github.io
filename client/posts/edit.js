@@ -496,8 +496,9 @@ function tab_command(e) {
 	} else {
 		if (s.anchorOffset === 1) return;
 		let t = last_text.textContent.substring(0, s.anchorOffset);
-		if (t[t.length - 2] !== "]") return;
-		cmd = k2e(t[t.length - 1]).toLowerCase();
+		if (!t.includes("]")) return;
+		cmd = k2e(t.match(/\]([^\]]*)$/)[1]).toLowerCase();
+		if (cmd.length === 0) return;
 		first_text = last_text;
 		flag = 2;
 	}
@@ -507,16 +508,36 @@ function tab_command(e) {
 			last_text = to_text_node_prev(prev_node(last_text));
 			continue;
 		}
-		if (t.length === 1) return;
-		if (t[t.length - 2] !== "]") return;
-		cmd = k2e(t[t.length - 1]);
+		if (!t.includes("]")) return;
+		cmd = k2e(t.match(/\]([^\]]*)$/)[1]).toLowerCase();
+		if (cmd.length === 0) return;
 		first_text = last_text;
 		flag = 1;
 	}
 	if (cmd == null) throw -1;
+
+	if (cmd === "." || cmd === "st") {
+		let close_idx = (flag === 2) ? last_text.textContent.lastIndexOf("]", s.anchorOffset-1) : last_text.textContent.lastIndexOf("]");
+		let cursor_idx = (flag === 2) ? s.anchorOffset : last_text.textContent.length;
+		let range = document.createRange();
+		range.setStart(last_text, close_idx);
+		range.setEnd(last_text, cursor_idx);
+		range.deleteContents();
+		let sym = {".": "·", "st": "★"}
+		range.insertNode(document.createTextNode(sym[cmd]));
+		s.removeAllRanges();
+		s.addRange(range);
+		s.collapseToEnd();
+		normalize_editable(e.target);
+		return;
+	}
+
+	let flag2 = 1;
 	while (first_text) {
 		if (first_text.textContent.includes("[")) break;
 		first_text = to_text_node_prev(prev_node(first_text));
+		if (!e.target.contains(first_text)) return;
+		flag2 = 0;
 	}
 	if (!first_text || !first_text.textContent.includes("[")) return;
 
@@ -531,13 +552,14 @@ function tab_command(e) {
 	else if (cmd === "a") command = "a";
 	if (command == null) return;
 
-	let open_idx = first_text.textContent.lastIndexOf("[");
-	let close_idx = (flag === 2) ? s.anchorOffset - 2 : last_text.textContent.length - 2;
+	let open_idx = (flag2 === 1) ? first_text.textContent.lastIndexOf("[", s.anchorOffset-1) : first_text.textContent.lastIndexOf("[");
+	let close_idx = (flag === 2) ? last_text.textContent.lastIndexOf("]", s.anchorOffset-1) : last_text.textContent.lastIndexOf("]");
+	let cursor_idx = (flag === 2) ? s.anchorOffset : last_text.textContent.length;
 	let ft = first_text.textContent;
 	first_text.textContent = ft.substring(0, open_idx) + ft.substring(open_idx+1);
 	if (first_text === last_text) close_idx--;
 	let lt = last_text.textContent;
-	last_text.textContent = lt.substring(0, close_idx) + lt.substring(close_idx+2);
+	last_text.textContent = lt.substring(0, close_idx) + lt.substring(cursor_idx);
 	let range = document.createRange();
 	range.setStart(first_text, open_idx);
 	range.setEnd(last_text, close_idx);
