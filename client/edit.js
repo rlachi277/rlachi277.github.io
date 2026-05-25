@@ -40,6 +40,7 @@ export function start_edit(el, init) {
 	case 'RUBY': case 'RT': case 'RP':
 	case 'SUB': case 'SUP': case 'INS': case 'DEL':
 	case 'A': case 'BUTTON':
+	case 'SUMMARY':
 		type = EDITABLE;
 		break;
 	case 'DETAILS':
@@ -52,7 +53,6 @@ export function start_edit(el, init) {
 	case 'HGROUP': case 'IMG': case 'AUDIO': case 'VIDEO':
 	case 'FIGURE':
 	case 'HR': case 'BR':
-	case 'SUMMARY':
 	case 'TRACK': case 'SOURCE':
 	case 'NAV':
 		type = UNIT;
@@ -151,20 +151,6 @@ export function start_edit(el, init) {
 	return true;
 }
 
-function manage_confirm(el, confirm_class, stop_class) {
-	if (!el.classList.contains(confirm_class)) {
-		if ($(`.${stop_class}`).length !== 0) {
-			$(`.${stop_class}`).removeClass(stop_class);
-			return false;
-		}
-		if (!el.classList.contains("edited") && !el.classList.contains("deleted")) return false;
-		$(`.${confirm_class}`).removeClass(confirm_class);
-		el.classList.add(confirm_class);
-		return false;
-	}
-	return true;
-}
-
 function on_editable_keydown(e) {
 	if (e.isComposing) return;
 	if (e.key === "Enter" && !e.shiftKey) {
@@ -195,7 +181,7 @@ function on_editable_keydown(e) {
 	} else if ((e.ctrlKey || e.metaKey) && e.key == "Backspace") {
 		e.preventDefault();
 		e.target.classList.add("deleted");
-	} else if ((e.ctrlKey || e.metaKey) && e.key == "ArrowUp") {
+	} else if ((e.ctrlKey || e.metaKey) && (e.key == "ArrowUp" || e.key == "ArrowDown")) {
 		e.preventDefault();
 		if (!e.target.matches("p:not(hgroup p)")) return;
 		let new_el = document.createElement("p");
@@ -205,19 +191,8 @@ function on_editable_keydown(e) {
 		new_el.addEventListener("keydown", on_editable_keydown);
 		new_el.addEventListener("input", on_editable_input);
 		new_el.addEventListener("blur", on_editable_blur);
-		e.target.insertAdjacentElement("beforebegin", new_el);
-		return;
-	} else if ((e.ctrlKey || e.metaKey) && e.key == "ArrowDown") {
-		e.preventDefault();
-		if (!e.target.matches("p:not(hgroup p)")) return;
-		let new_el = document.createElement("p");
-		new_el.classList.add("editable");
-		new_el.classList.add("new");
-		new_el.setAttribute("contenteditable", "plaintext-only");
-		new_el.addEventListener("keydown", on_editable_keydown);
-		new_el.addEventListener("input", on_editable_input);
-		new_el.addEventListener("blur", on_editable_blur);
-		e.target.insertAdjacentElement("afterend", new_el);
+		let pos = (e.key == "ArrowUp") ? "beforebegin" : "afterend";
+		e.target.insertAdjacentElement(pos, new_el);
 		return;
 	}
 	if (e.ctrlKey || e.metaKey) {
@@ -228,6 +203,7 @@ function on_editable_keydown(e) {
 		else if (e.key === ",") command = "sub";
 		else if (e.key === "d") command = "del";
 		else if (e.key === "e") command = "ins";
+		else if (e.key === "k") command = "a";
 		else if (e.key === "z" && e.shiftKey) command = "redo";
 		else if (e.key === "z") command = "undo";
 		else if ("0" <= e.key && e.key <= "9") command = `color${e.key}`;
@@ -246,7 +222,11 @@ function on_editable_keydown(e) {
 			e.preventDefault();
 			return;
 		}
-		run_command(e, command);
+		try {
+			run_command(e, command);
+		} catch (e) {
+			if (e !== -1) throw e;
+		}
 		return;
 	}
 	if (e.key === "Tab") {
@@ -255,6 +235,20 @@ function on_editable_keydown(e) {
 	}
 	undo_buffer = [];
 	redo_buffer = [];
+}
+
+function manage_confirm(el, confirm_class, stop_class) {
+	if (!el.classList.contains(confirm_class)) {
+		if ($(`.${stop_class}`).length !== 0) {
+			$(`.${stop_class}`).removeClass(stop_class);
+			return false;
+		}
+		if (!el.classList.contains("edited") && !el.classList.contains("deleted")) return false;
+		$(`.${confirm_class}`).removeClass(confirm_class);
+		el.classList.add(confirm_class);
+		return false;
+	}
+	return true;
 }
 
 function on_editable_input(e) {
@@ -274,59 +268,48 @@ function on_editable_blur(e) {
 	}
 }
 
-function submit_changes(el) {
+function submit(el, data, splice) {
 	el.innerHTML = el.innerHTML.replaceAll("\n","<br>");
 	if (el.lastChild?.nodeName === "BR") el.removeChild(el.lastChild);
 	document.activeElement.blur();
 	let pos = pos_map.get(el);
-	let new_data = seri(el);
+	let new_data = undefined;
+	if (data) new_data = seri(el);
 	fetch(window.location.pathname, { method: "PATCH", headers: {
 		'Content-type': 'application/json'
 	}, body: JSON.stringify({
 		pos: pos,
 		data: new_data,
-		splice: 1
+		splice: splice
 	})});
 	original_map.set(el, JSON.stringify(new_data));
+}
+
+function submit_changes(el) {
+	submit(el, true, 1);
 	el.classList.remove("edited");
 }
 
 function submit_delete(el) {
-	document.activeElement.blur();
-	let pos = pos_map.get(el);
-	fetch(window.location.pathname, { method: "PATCH", headers: {
-		'Content-type': 'application/json'
-	}, body: JSON.stringify({
-		pos: pos,
-		data: undefined,
-		splice: 1
-	})});
+	submit(el, false, 1);
 	let p = el.parentElement;
-	el.remove();
 	edit_cur = Array.from(pos_map.get(p));
+	el.remove();
 	start_edit(p);
 }
 
 function submit_new(el) {
-	document.activeElement.blur();
 	el.classList.remove("new");
 	edit_cur = Array.from(pos_map.get(el.parentElement));
 	start_edit(el.parentElement);
-	let pos = pos_map.get(el);
-	let new_data = seri(el);
-	fetch(window.location.pathname, { method: "PATCH", headers: {
-		'Content-type': 'application/json'
-	}, body: JSON.stringify({
-		pos: pos,
-		data: new_data,
-		splice: 0
-	})});
-	original_map.set(el, JSON.stringify(new_data));
+	submit(el, true, 0);
 }
 
 export function submit_all() {
 	document.activeElement.blur();
 	q$(".edited").forEach((e) => submit_changes(e));
+	q$(".new").forEach((e) => submit_new(e));
+	q$(".deleted").forEach((e) => submit_delete(e));
 }
 
 export function stop_edit() {
@@ -341,6 +324,10 @@ export function stop_edit() {
 	});
 	editing = edit_id = pos_map = original_map = null;
 }
+
+window.addEventListener("beforeunload", (e) => {
+	if ($(".edited").length != 0 || $(".new").length != 0) e.preventDefault();
+});
 
 const s = window.getSelection();
 let undo_buffer = [];
@@ -365,13 +352,12 @@ function run_command(e, command) {
 	while (n != e.target && n.parentElement) {
 		if (to_command(n) === 'keep') {
 			if (!forgive) throw -1;
-			affected[0] = {node: n, keep: true};
-			break;
+			affected[0] = {node: n};
 		};
 		if (n.previousSibling) forgive = false;
 		n = n.parentElement;
 	}
-	cur = to_text_node(next_node(cur));
+	cur = to_text_node(next_node(affected[0].node));
 	while (cur != null && r.intersectsNode(cur)) {
 		if (to_command(cur) === 'keep') affected.push({node: cur});
 		else affected.push({node: cur});
@@ -389,23 +375,16 @@ function run_command(e, command) {
 		if (to_command(n) === 'keep') {
 			if (!forgive) throw -1;
 			affected[affected.length-1] = {node: n};
-			break;
 		};
+		if (n.nextSibling) forgive = false;
 		n = n.parentElement;
-	}
+	} 
 
 	let all_on = true;
 	for (let ee of affected) {
-		if (ee.node.nodeType === Node.TEXT_NODE) {
-			if (ee.start_offset === ee.node.textContent.length || ee.end_offset === 0) {
-				ee.zero = true;
-				continue;
-			}
-		} else {
-			if (ee.start_offset === ee.childNodes.length || ee.end_offset === 0) {
-				ee.zero = true;
-				continue;
-			}
+		if ((ee.start_offset != undefined && ee.start_offset === ee.node.textContent.length) || ee.end_offset === 0) {
+			ee.zero = true;
+			continue;
 		}
 		let n = ee.node.parentNode;
 		ee.on = false;
@@ -414,12 +393,14 @@ function run_command(e, command) {
 		while (n != e.target) {
 			let cmd = to_command(n);
 			if (command === cmd) ee.on = true;
+			if (command === 'keep') throw -1;
 			ee.formats.push(cmd);
 			n = n.parentElement;
 		}
-		if (n.nextSibling) forgive = false;
 		if (!ee.on) all_on = false;
 	}
+
+	if (command === 'a' && affected.length !== 1) throw -1;
 
 	let range = document.createRange();
 	let last = affected[affected.length-1];
@@ -429,31 +410,57 @@ function run_command(e, command) {
 	range.setEndAfter(e.target.lastChild);
 	let r_ext = range.extractContents();
 
+	console.log(affected);
 	let els = document.createDocumentFragment();
-	for (let ee of affected) {
-		if (ee.zero) continue;
-		let el = ee.node;
-		if (ee.start_offset) {
-			el = document.createTextNode(ee.node.textContent.substring(ee.start_offset));
-			ee.node.textContent = ee.node.textContent.substring(0, ee.start_offset);
+	try {
+		for (let ee of affected) {
+			if (ee.zero) continue;
+			let el = ee.node;
+			if (ee.start_offset) {
+				el = document.createTextNode(ee.node.textContent.substring(ee.start_offset));
+				ee.node.textContent = ee.node.textContent.substring(0, ee.start_offset);
+			}
+			if (command === 'a') {
+				if (el.nodeName !== 'A') {
+					let d = el.textContent.split('|');
+					if (d.length < 1 || d.length > 2) throw -1;
+					let link = d[0];
+					let display = (d.length === 2) ? d[1] : d[0];
+					let new_el = document.createElement('a');
+					new_el.setAttribute("href", link);
+					new_el.textContent = display;
+					el.remove();
+					el = new_el;
+				} else {
+					let link = el.getAttribute("href");
+					let display = el.textContent;
+					let text = (link === display) ? link : `${link}|${display}`;
+					el.remove();
+					el = document.createTextNode(text);
+				}
+			}
+			for (let eee of ee.formats) {
+				if (ee.on && eee === command) continue;
+				if (command === 'ins' && eee === 'del' || command === 'del' && eee === 'ins' ||
+				command === 'sup' && eee === 'sub' || command === 'sub' && eee === 'sup' ||
+				command !== eee && (command.startsWith('color') && eee.startsWith('color') ||
+				command.startsWith('colorbox') && eee.startsWith('colorbox'))) continue;
+				let new_el = to_element(eee);
+				new_el.append(el);
+				el = new_el;
+			}
+			if (command !== "a" && !all_on) {
+				let new_el = to_element(command);
+				new_el.append(el);
+				el = new_el;
+			}
+			els.append(el);
 		}
-		for (let eee of ee.formats) {
-			if (ee.on && eee === command) continue;
-			if (command === 'ins' && eee === 'del' || command === 'del' && eee === 'ins' ||
-			command === 'sup' && eee === 'sub' || command === 'sub' && eee === 'sup' ||
-			command !== eee && (command.startsWith('color') && eee.startsWith('color') ||
-			command.startsWith('colorbox') && eee.startsWith('colorbox'))) continue;
-			let new_el = to_element(eee);
-			new_el.append(el);
-			el = new_el;
-		}
-		if (!all_on) {
-			let new_el = to_element(command);
-			new_el.append(el);
-			el = new_el;
-		}
-		els.append(el);
+	} catch (e) {
+		if (e !== -1) throw e;
+		e.target.append(r_ext);
 	}
+	console.log(els.childNodes);
 
 	let marker_start = document.createElement("span");
 	let marker_end = document.createElement("span");
@@ -519,6 +526,7 @@ function tab_command(e) {
 	else if (cmd === "d") command = "del";
 	else if (cmd === "e") command = "ins";
 	else if ("0" <= cmd && cmd <= "9") command = `color${cmd}`;
+	else if (cmd === "a") command = "a";
 	if (command == null) return;
 
 	let open_idx = first_text.textContent.lastIndexOf("[");
@@ -533,7 +541,11 @@ function tab_command(e) {
 	range.setEnd(last_text, close_idx);
 	s.removeAllRanges();
 	s.addRange(range);
-	run_command(e, command);
+	try {
+		run_command(e, command);
+	} catch (e) {
+		if (e !== -1) throw e;
+	}
 	s.collapseToEnd();
 }
 
@@ -638,7 +650,7 @@ function to_command(n) {
 }
 
 function to_element(cmd) {
-	if (cmd === 'keep') throw -1; // TODO
+	if (cmd === 'keep') throw -1;
 	if (cmd.startsWith('color')) {
 		let el = document.createElement('span');
 		el.classList.add("color");
@@ -778,134 +790,3 @@ function delete_element(target, is_first) {
 export function insert_test_p(e) { new_el_name = "p"; start_targeting(insert_element); }
 export function insert_test_s(e) { new_el_name = "section"; start_targeting(insert_element); }
 export function delete_test(e) { start_targeting(delete_element); }
-
-window.addEventListener("beforeunload", (e) => {
-	if ($(".edited").length != 0 || $(".new").length != 0) e.preventDefault();
-});
-
-let dialog_function = null;
-d$("dialog-confirm").addEventListener("click", async function () {
-	if (dialog_function == null) return;
-	if (await dialog_function()) d$("dialog").close();
-});
-
-d$("dialog").addEventListener("close", function () {
-	d$("dialog-title").textContent = '';
-	d$("dialog-main").innerHTML = '';
-	d$("dialog-confirm").classList.remove("danger");
-})
-
-export function dialog_new_post() {
-	d$("dialog-title").textContent = "새 글";
-	d$("dialog-main").innerHTML = `
-		<label for="dialog-new-path">경로: </label>
-		<input id="dialog-new-path" placeholder="경로 입력">
-	`;
-	dialog_function = new_post;
-	d$("dialog").returnValue = "";
-	d$("dialog").showModal();
-}
-
-export function dialog_duplicate_post() {
-	d$("dialog-title").textContent = "이 글 복제";
-	d$("dialog-main").innerHTML = `
-		<label for="dialog-new-path">경로: </label>
-		<input id="dialog-new-path" placeholder="경로 입력">
-	`;
-	dialog_function = duplicate_post;
-	d$("dialog").returnValue = "";
-	d$("dialog").showModal();
-}
-
-export function dialog_delete_post() {
-	d$("dialog-title").textContent = "이 글 삭제";
-	d$("dialog-main").innerHTML = `
-		정말로 삭제하시겠습니까?<br>
-		이 작업은 되돌릴 수 없습니다.
-	`;
-	dialog_function = delete_post;
-	d$("dialog").returnValue = "";
-	d$("dialog").showModal();
-	d$("dialog-confirm").classList.add("danger");
-}
-
-export function dialog_load() {
-	d$("dialog-title").textContent = "JSON에서 불러오기";
-	d$("dialog-main").innerHTML = `
-		JSON 파일의 내용으로 <strong>이 글</strong>을 덮어씌웁니다.<br>
-		이 작업은 되돌릴 수 없습니다.<br><br>
-		<label for="dialog-json-file">파일: </label>
-		<input id="dialog-json-file" type="file" accept=".json">
-	`;
-	dialog_function = load_from_json;
-	d$("dialog").returnValue = "";
-	d$("dialog").showModal();
-	d$("dialog-confirm").classList.add("danger");
-}
-
-async function new_post() {
-	let path = d$("dialog-new-path").value;
-	let abs_path = new URL(path, `file://${window.location.pathname}`).pathname;
-	if (!abs_path || !abs_path.startsWith("/posts/")) {
-		// TODO: 경고
-		return false;
-	}
-	try {
-		let f = await fetch(abs_path, { method: "HEAD" });
-		if (f.status !== 404) {
-			if (f.status !== 200) throw f.status;
-			// TODO: 경고
-			return false;
-		}
-		let s = {type: "body",children:[{type: "h1",children: [abs_path]},{type: "nav",children: null},{type: "p",children: []}]};
-		fetch(abs_path, { method: "PUT", body: JSON.stringify(s) });
-		return true;
-	} catch (e) {
-		alert(`오류: ${e}`);
-		return false;
-	}
-}
-
-async function duplicate_post() {
-	let path = d$("dialog-new-path").value;
-	let abs_path = new URL(path, `file://${window.location.pathname}`).pathname;
-	if (!abs_path || !abs_path.startsWith("/posts/")) {
-		// TODO: 경고
-		return false;
-	}
-	try {
-		let f = await fetch(abs_path, { method: "HEAD" });
-		if (f.status !== 404) {
-			if (f.status !== 200) throw f.status;
-			// TODO: 경고
-			return false;
-		}
-		let s = serialize($("body").get(0));
-		fetch(abs_path, { method: "PUT", body: JSON.stringify(s) });
-		return true;
-	} catch (e) {
-		alert(`오류: ${e}`);
-		return false;
-	}
-}
-
-async function load_from_json() {
-	let path = window.location.pathname;
-	try {
-		fetch(path, { method: "PUT", headers: {'Content-Type': 'text/plain'}, body: d$("dialog-json-file").files[0] });
-		return true;
-	} catch (e) {
-		alert(`오류: ${e}`);
-		return false;
-	}
-}
-
-async function delete_post() {
-	try {
-		fetch(window.location.pathname, { method: "DELETE" });
-		return true;
-	} catch (e) {
-		alert(`오류: ${e}`);
-		return false;
-	}
-}

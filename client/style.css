@@ -428,6 +428,8 @@ fieldset.container > :is(.container-bar, .middle-bar) {
 	opacity: 0.8;
 }
 
+:is(.edited, .new, .deleted) a { text-decoration: underline; }
+
 .edited.edited { --bg: var(--c-3-bg); text-decoration: var(--c-3) dotted underline; }
 .edited.will-submit { color: var(--c-3); }
 .edited.will-cancel { --bg: var(--c-2-bg); color: var(--c-2); text-decoration-color: var(--c-2); }

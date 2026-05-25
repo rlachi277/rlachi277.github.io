@@ -1,5 +1,6 @@
 import { $ } from "../script/jquery.js";
 import { seri, no_lf } from "../script/posts/seri.js";
+import { dialog } from "./dialog.js";
 
 export function serialize(el, init) {
 	if (el.nodeName === 'NAV') return {type: "nav", children: null};
@@ -60,10 +61,24 @@ if (params.get("edit")) {
 			e.setAttribute("href", e.getAttribute("href") + "?edit=t");
 		});
 
-		$("#menu-new").on("click", edit.dialog_new_post);
-		$("#menu-duplicate").on("click", edit.dialog_duplicate_post);
-		$("#menu-delete").on("click", edit.dialog_delete_post);
-		$("#menu-load").on("click", edit.dialog_load);
+		$("#menu-new").on("click", dialog("새 글", `
+			<label for="dialog-new-path">경로: </label>
+			<input id="dialog-new-path" placeholder="경로 입력">
+		`, "new_post", false));
+		$("#menu-duplicate").on("click", dialog("이 글 복제", `
+			<label for="dialog-new-path">경로: </label>
+			<input id="dialog-new-path" placeholder="경로 입력">
+		`, "duplicate_post", false));
+		$("#menu-delete").on("click", dialog("이 글 삭제", `
+			정말로 삭제하시겠습니까?<br>
+			이 작업은 되돌릴 수 없습니다.
+		`, "delete_post", true));
+		$("#menu-load").on("click",dialog("JSON에서 불러오기", `
+			JSON 파일의 내용으로 <strong>이 글</strong>을 덮어씌웁니다.<br>
+			이 작업은 되돌릴 수 없습니다.<br><br>
+			<label for="dialog-json-file">파일: </label>
+			<input id="dialog-json-file" type="file" accept=".json">
+		`, "load_from_json", true));
 
 		$("#menu-inserttestp").on("click", edit.insert_test_p);
 		$("#menu-inserttests").on("click", edit.insert_test_s);
