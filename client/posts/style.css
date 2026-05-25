@@ -9,7 +9,7 @@ body {
 	margin-block: 3rem;
 }
 
-section:not(:has(fieldset, p)):after {
+section:not(:has(> *:not(.container-bar, .middle-bar))):after {
 	content: '### 비어 있음 :O ###';
 	opacity: 0.8;
 	border-block: 1px solid currentColor;
@@ -23,7 +23,7 @@ article.float-right, article.float-left {
 article.float-right { float: inline-end; }
 article.float-left { float: inline-start; }
 
-article:not(:has(fieldset, p)):after {
+article:not(:has(> *:not(.container-bar, .middle-bar))):after {
 	content: '### 비어 있음 :O ###';
 	opacity: 0.8;
 	border: 1px solid currentColor;
@@ -75,6 +75,12 @@ hr { color: inherit; border: none; margin-block: 0.5lh; }
 
 .columns > :is(h1, h2, h3, h4, h5, h6) {
 	break-after: avoid-column;
+}
+
+.columns:not(:has(> *:not(.container-bar, .middle-bar))):after {
+	content: '### 비어 있음 :O ###';
+	opacity: 0.8;
+	border-block: 1px solid currentColor;
 }
 
 fieldset {

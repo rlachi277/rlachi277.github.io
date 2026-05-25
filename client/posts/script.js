@@ -1,6 +1,6 @@
-import { $ } from "../script/jquery.js";
-import { seri, no_lf } from "../script/posts/seri.js";
-import { dialog } from "./dialog.js";
+import { $ } from "/script/jquery.js";
+import { seri, no_lf } from "/script/posts/seri.js";
+import { dialog, diaf } from "./dialog.js";
 
 export function serialize(el, init) {
 	if (el.nodeName === 'NAV') return {type: "nav", children: null};
@@ -64,25 +64,41 @@ if (params.get("edit")) {
 		$("#menu-new").on("click", dialog("새 글", `
 			<label for="dialog-new-path">경로: </label>
 			<input id="dialog-new-path" placeholder="경로 입력">
-		`, "new_post", false));
+		`, diaf("new_post"), false));
 		$("#menu-duplicate").on("click", dialog("이 글 복제", `
 			<label for="dialog-new-path">경로: </label>
 			<input id="dialog-new-path" placeholder="경로 입력">
-		`, "duplicate_post", false));
+		`, diaf("duplicate_post"), false));
 		$("#menu-delete").on("click", dialog("이 글 삭제", `
-			정말로 삭제하시겠습니까?<br>
+			정말로 <strong>이 글 전체</strong>를 삭제하시겠습니까?<br>
 			이 작업은 되돌릴 수 없습니다.
-		`, "delete_post", true));
+		`, diaf("delete_post"), true));
 		$("#menu-load").on("click",dialog("JSON에서 불러오기", `
 			JSON 파일의 내용으로 <strong>이 글</strong>을 덮어씌웁니다.<br>
 			이 작업은 되돌릴 수 없습니다.<br><br>
 			<label for="dialog-json-file">파일: </label>
 			<input id="dialog-json-file" type="file" accept=".json">
-		`, "load_from_json", true));
+		`, diaf("load_from_json"), true));
 
-		$("#menu-inserttestp").on("click", edit.insert_test_p);
-		$("#menu-inserttests").on("click", edit.insert_test_s);
-		$("#menu-deletetest").on("click", edit.delete_test);
+		$("#menu-insert-p").on("click", edit.menu_insert("p", false));
+		$("#menu-insert-section").on("click", edit.menu_insert("section", true));
+		$("#menu-insert-article").on("click", edit.menu_insert("article", true));
+		$("#menu-insert-fieldset").on("click", edit.menu_insert(() => {
+			let el = document.createElement("fieldset");
+			el.append(document.createElement("legend"));
+			return el;
+		}, false));
+		$("#menu-insert-legend").on("click", edit.menu_insert((after, is_first) => {
+			if (!is_first || after.nodeName !== "FIELDSET") return undefined;
+			return document.createElement("legend");
+		}, false));
+		$("#menu-insert-columns").on("click", edit.menu_insert(() => {
+			let el = document.createElement("div");
+			el.classList.add("columns");
+			return el;
+		}, true));
+		$("#menu-insert-header").on("click", edit.menu_insert(edit.header, false));
+		$("#menu-delete-element").on("click", edit.menu_delete);
 		$("#menu-stoptargeting").on("click", edit.stop_targeting);
 	});
 }

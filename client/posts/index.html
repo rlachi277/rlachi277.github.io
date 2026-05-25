@@ -4,9 +4,9 @@
 	<title>cycweb post</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="/client/colors.css">
-	<link rel="stylesheet" href="/client/style.css">
-	<script src="/client/script.js" type="module"></script>
+	<link rel="stylesheet" href="/client/posts/colors.css">
+	<link rel="stylesheet" href="/client/posts/style.css">
+	<script src="/client/posts/script.js" type="module"></script>
 </head>
 <body>
 	<header>
@@ -22,10 +22,15 @@
 			</li>
 			<li class="menu-edit"><button id="menu-insert" popovertarget="menu-insertsub">삽입</button>
 			<ul id="menu-insertsub" popover>
-				<li><button class="menu-action" id="menu-inserttestp">삽입 테스트[문단]</button></li>
-				<li><button class="menu-action" id="menu-inserttests">삽입 테스트[단락]</button></li>
-				<li><button class="menu-action" id="menu-deletetest">삭제 테스트</button></li>
-				<li><button class="menu-action" id="menu-stoptargeting">타게팅 종료</button></li>
+				<li><button class="menu-action" id="menu-insert-p">문단 삽입</button></li>
+				<li><button class="menu-action" id="menu-insert-section">&lt;section&gt; 삽입</button></li>
+				<li><button class="menu-action" id="menu-insert-article">&lt;article&gt; 삽입</button></li>
+				<li><button class="menu-action" id="menu-insert-fieldset">&lt;fieldset&gt; 삽입</button></li>
+				<li><button class="menu-action" id="menu-insert-legend">&lt;legend&gt; 삽입</button></li>
+				<li><button class="menu-action" id="menu-insert-columns">다단 레이아웃 삽입</button></li>
+				<li><button class="menu-action" id="menu-insert-header">제목 삽입</button></li>
+				<li><button class="menu-action" id="menu-delete-element">요소 삭제</button></li>
+				<li><button class="menu-action" id="menu-stoptargeting">삽입/삭제 취소</button></li>
 			</ul>
 			</li>
 		</menu>

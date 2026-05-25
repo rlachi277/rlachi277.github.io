@@ -29,7 +29,7 @@ db.prepare(`
 `).run();
 
 let template = 'wkatlaksdy...';
-fs.readFile(path.join(__dirname, 'client', 'index.html'), 'utf8', (err, data) => {
+fs.readFile(path.join(__dirname, 'client', 'posts', 'index.html'), 'utf8', (err, data) => {
 	if (err) throw err;
 	template = data.replaceAll(/\n|\t/g, '');
 });

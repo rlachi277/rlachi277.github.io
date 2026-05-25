@@ -1,16 +1,10 @@
-import { $, d$ } from "../script/jquery.js";
+import { $, d$ } from "/script/jquery.js";
 import { serialize } from "./script.js";
 
 let dialog_function = null;
-let diaf_dict = {
-	"new_post": new_post,
-	"duplicate_post": duplicate_post,
-	"load_from_json": load_from_json,
-	"delete_post": delete_post
-}
 d$("dialog-confirm").addEventListener("click", async function () {
 	if (dialog_function == null) return;
-	if (await diaf_dict[dialog_function]()) d$("dialog").close();
+	if (await dialog_function()) d$("dialog").close();
 });
 
 d$("dialog").addEventListener("close", function () {
@@ -30,6 +24,15 @@ export function dialog(title, main, diaf, danger) {
 	return f;
 }
 
+let diaf_dict = {
+	"new_post": new_post,
+	"duplicate_post": duplicate_post,
+	"load_from_json": load_from_json,
+	"delete_post": delete_post
+}
+export function diaf(name) {
+	return diaf_dict[name];
+}
 
 async function new_post() {
 	let path = d$("dialog-new-path").value;
@@ -97,3 +100,4 @@ async function delete_post() {
 		return false;
 	}
 }
+

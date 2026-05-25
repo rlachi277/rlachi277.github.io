@@ -1,6 +1,7 @@
-import { d$, q$, $ } from "../script/jquery.js";
-import { seri, deseri, getColor } from "../script/posts/seri.js";
+import { d$, q$, $ } from "/script/jquery.js";
+import { seri, deseri, getColor } from "/script/posts/seri.js";
 import { serialize } from "./script.js";
+import { dialog } from "./dialog.js";
 
 let editing = null;
 let edit_id = null;
@@ -39,8 +40,8 @@ export function start_edit(el, init) {
 	case 'STRONG': case 'EM': case 'B': case 'I': case 'U':
 	case 'RUBY': case 'RT': case 'RP':
 	case 'SUB': case 'SUP': case 'INS': case 'DEL':
-	case 'A': case 'BUTTON':
 	case 'SUMMARY':
+	case 'A': case 'BUTTON':
 		type = EDITABLE;
 		break;
 	case 'DETAILS':
@@ -66,6 +67,12 @@ export function start_edit(el, init) {
 		} else if (el.classList.contains("color") || el.classList.contains("colorbox")) {
 			type = EDITABLE;
 		} else return undefined;
+	}
+
+	if (el.nodeName === "FIELDSET" && el.matches("fieldset:has(> legend)")) type = DETAILS;
+	if (el.nodeName === "FIELDSET" && el.getAttribute("data-old") != null) {
+		el.querySelectorAll(".container-bar, .middle-bar").forEach((e) => e.remove());
+		el.removeAttribute("data-old");
 	}
 
 	if (el.getAttribute("data-old") == null) {
@@ -126,14 +133,12 @@ export function start_edit(el, init) {
 	}
 
 	let edit_curi = 0;
-	if (type !== UNIT) {
-		el.childNodes.forEach((e) => {
-			edit_cur.push(edit_curi);
-			let c = start_edit(e);
-			if (c != undefined) edit_curi++;
-			edit_cur.pop();
-		});
-	}
+	el.childNodes.forEach((e) => {
+		edit_cur.push(edit_curi);
+		let c = start_edit(e);
+		if (c != undefined) edit_curi++;
+		edit_cur.pop();
+	});
 
 	pos_map.set(el, Array.from(edit_cur));
 	if (type === EDITABLE) {
@@ -180,6 +185,7 @@ function on_editable_keydown(e) {
 		return;
 	} else if ((e.ctrlKey || e.metaKey) && e.key == "Backspace") {
 		e.preventDefault();
+		if (!e.target.matches("p:not(hgroup p)")) return;
 		e.target.classList.add("deleted");
 	} else if ((e.ctrlKey || e.metaKey) && (e.key == "ArrowUp" || e.key == "ArrowDown")) {
 		e.preventDefault();
@@ -300,6 +306,7 @@ function submit_delete(el) {
 
 function submit_new(el) {
 	el.classList.remove("new");
+	el.classList.remove("edited");
 	edit_cur = Array.from(pos_map.get(el.parentElement));
 	start_edit(el.parentElement);
 	submit(el, true, 0);
@@ -410,69 +417,64 @@ function run_command(e, command) {
 	range.setEndAfter(e.target.lastChild);
 	let r_ext = range.extractContents();
 
-	console.log(affected);
-	let els = document.createDocumentFragment();
-	try {
-		for (let ee of affected) {
-			if (ee.zero) continue;
-			let el = ee.node;
-			if (ee.start_offset) {
-				el = document.createTextNode(ee.node.textContent.substring(ee.start_offset));
-				ee.node.textContent = ee.node.textContent.substring(0, ee.start_offset);
-			}
-			if (command === 'a') {
-				if (el.nodeName !== 'A') {
-					let d = el.textContent.split('|');
-					if (d.length < 1 || d.length > 2) throw -1;
-					let link = d[0];
-					let display = (d.length === 2) ? d[1] : d[0];
-					let new_el = document.createElement('a');
-					new_el.setAttribute("href", link);
-					new_el.textContent = display;
-					el.remove();
-					el = new_el;
-				} else {
-					let link = el.getAttribute("href");
-					let display = el.textContent;
-					let text = (link === display) ? link : `${link}|${display}`;
-					el.remove();
-					el = document.createTextNode(text);
-				}
-			}
-			for (let eee of ee.formats) {
-				if (ee.on && eee === command) continue;
-				if (command === 'ins' && eee === 'del' || command === 'del' && eee === 'ins' ||
-				command === 'sup' && eee === 'sub' || command === 'sub' && eee === 'sup' ||
-				command !== eee && (command.startsWith('color') && eee.startsWith('color') ||
-				command.startsWith('colorbox') && eee.startsWith('colorbox'))) continue;
-				let new_el = to_element(eee);
-				new_el.append(el);
-				el = new_el;
-			}
-			if (command !== "a" && !all_on) {
-				let new_el = to_element(command);
-				new_el.append(el);
-				el = new_el;
-			}
-			els.append(el);
-		}
-	} catch (e) {
-		if (e !== -1) throw e;
-		e.target.append(r_ext);
-	}
-	console.log(els.childNodes);
-
 	let marker_start = document.createElement("span");
-	let marker_end = document.createElement("span");
 	marker_start.classList.add("select-marker");
+	r_ext.prepend(marker_start);
+	e.target.append(r_ext);
+
+	let els = document.createDocumentFragment();
+	for (let ee of affected) {
+		if (ee.zero) continue;
+		let el = ee.node;
+		if (ee.start_offset) {
+			el = document.createTextNode(ee.node.textContent.substring(ee.start_offset));
+			ee.node.textContent = ee.node.textContent.substring(0, ee.start_offset);
+		}
+		if (command === 'a') {
+			if (el.nodeName !== 'A') {
+				let d = el.textContent.split('|');
+				if (d.length < 1 || d.length > 2) throw -1;
+				let link = d[0];
+				let display = (d.length === 2) ? d[1] : d[0];
+				let new_el = document.createElement('a');
+				new_el.setAttribute("href", link);
+				new_el.textContent = display;
+				el.remove();
+				el = new_el;
+			} else {
+				let link = el.getAttribute("href");
+				let display = el.textContent;
+				let text = (link === display) ? link : `${link}|${display}`;
+				el.remove();
+				el = document.createTextNode(text);
+			}
+		}
+		for (let eee of ee.formats) {
+			if (ee.on && eee === command) continue;
+			if (command === 'ins' && eee === 'del' || command === 'del' && eee === 'ins' ||
+			command === 'sup' && eee === 'sub' || command === 'sub' && eee === 'sup' ||
+			command !== eee && (command.startsWith('color') && eee.startsWith('color') ||
+			command.startsWith('colorbox') && eee.startsWith('colorbox'))) continue;
+			let new_el = to_element(eee);
+			new_el.append(el);
+			el = new_el;
+		}
+		if (command !== "a" && !all_on) {
+			let new_el = to_element(command);
+			new_el.append(el);
+			el = new_el;
+		}
+		els.append(el);
+	}
+
+	let marker_end = document.createElement("span");
 	marker_end.classList.add("select-marker");
-	els.prepend(marker_start); els.append(marker_end);
-	e.target.append(els);
+	els.append(marker_end);
+	marker_start.after(els);
 	range.setStartAfter(marker_start);
 	range.setEndBefore(marker_end);
 	s.removeAllRanges();
 	s.addRange(range);
-	e.target.append(r_ext);
 
 	normalize_editable(e.target);
 	on_editable_input(e);
@@ -708,21 +710,21 @@ function start_targeting(f) {
 		}
 		el.addEventListener("click", (e) => {
 			e.preventDefault();
-			f(e.target);
+			f(e.currentTarget);
 			stop_targeting();
 		}, {signal: targeting_abort.signal});
 	}
 	for (let el of document.getElementsByClassName("first-bar")) {
 		el.addEventListener("click", (e) => {
 			e.preventDefault();
-			f(e.target.parentElement, true);
+			f(e.currentTarget.parentElement, true);
 			stop_targeting();
 		}, {signal: targeting_abort.signal});
 	}
 	for (let el of document.getElementsByClassName("last-bar")) {
 		el.addEventListener("click", (e) => {
 			e.preventDefault();
-			f(e.target.parentElement);
+			f(e.currentTarget.parentElement);
 			stop_targeting();
 		}, {signal: targeting_abort.signal});
 	}
@@ -741,20 +743,26 @@ export function stop_targeting() {
 	}
 	targeting_abort.abort();
 	targeting_abort = null;
+	document.activeElement.blur();
 }
 
-let new_el_name = null; // testing
+let new_el_func = null;
+let new_el_title = null;
 function insert_element(after, is_first) {
-	if (after.tagName === 'H1') after = after.nextSibling;
-	if (new_el_name == null) return;
-	let new_el = document.createElement(new_el_name); // testing
+	if (after.nextSibling?.tagName === 'NAV') after = after.nextSibling;
+	if (new_el_func == null) return;
+	let new_el = (new_el_func instanceof Function) ? new_el_func(after, is_first) : document.createElement(new_el_func);
+	if (new_el == undefined) return; // TODO: 경고
 
 	if (is_first) {
 		after.insertAdjacentElement("afterbegin", new_el);
+		if (new_el_title) new_el.append(header(new_el, true));
 		edit_cur = Array.from(pos_map.get(after));
+		console.log(after.matches("fieldset:has(> legend)"));
 		start_edit(after);
 	} else {
 		after.insertAdjacentElement("afterend", new_el);
+		if (new_el_title) new_el.append(header(new_el, true));
 		let p = after.parentElement;
 		edit_cur = Array.from(pos_map.get(p));
 		start_edit(p);
@@ -773,7 +781,7 @@ function insert_element(after, is_first) {
 }
 
 function delete_element(target, is_first) {
-	if (target.tagName === 'H1' || target.tagName === 'NAV') return;
+	if (target.nextSibling.tagName === 'NAV' || target.tagName === 'NAV') return;
 	let p = target.parentElement;
 	let pos = pos_map.get(target);
 	fetch(window.location.pathname, { method: "PATCH", headers: {
@@ -784,9 +792,35 @@ function delete_element(target, is_first) {
 		splice: 1
 	})});
 	target.remove();
+	console.log(p.matches("fieldset:has(> legend)"));
 	start_edit(p);
 }
 
-export function insert_test_p(e) { new_el_name = "p"; start_targeting(insert_element); }
-export function insert_test_s(e) { new_el_name = "section"; start_targeting(insert_element); }
-export function delete_test(e) { start_targeting(delete_element); }
+export function header(after, is_first) {
+	let parent = is_first ? after : after.parentElement;
+	if (parent === document.body || parent.firstChild === document.body) return document.createElement("h1");
+	let depth = 1;
+	let el = parent;
+	while (el != document.body) {
+		if (el.matches("section, article, fieldset, .columns")) depth++;
+		el = el.parentElement;
+	}
+	if (depth > 6) depth = 6;
+	return document.createElement(`h${depth}`);
+}
+
+export function menu_insert(el, title) {
+	function f() {
+		new_el_func = el;
+		new_el_title = title;
+		start_targeting(insert_element);
+	}
+	return f;
+}
+
+export function menu_delete(e) { start_targeting((target, is_first) => {
+	dialog("요소 삭제", `
+		이 &lt;${target.nodeName.toLowerCase()}&gt; 요소를 삭제하시겠습니까?<br>
+		이 작업은 되돌릴 수 없습니다.
+	`, () => {delete_element(target, is_first); return true;}, true)();
+}); }
