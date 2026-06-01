@@ -482,6 +482,7 @@ function run_command(e, command) {
 }
 
 function tab_command(e) {
+	if (!s.rangeCount || (s.anchorNode == s.focusNode && s.anchorOffset == s.focusOffset && s.anchorOffset == 0)) return;
 	e.preventDefault();
 	if (!s.isCollapsed) {
 		s.collapseToEnd();
