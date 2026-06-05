@@ -1,5 +1,5 @@
-import { $ } from "/script/jquery.js";
-import { seri, no_lf } from "/script/posts/seri.js";
+import { $ } from "/client/jquery.js";
+import { seri } from "./seri.js";
 import { dialog, diaf } from "./dialog.js";
 
 export function serialize(el, init) {

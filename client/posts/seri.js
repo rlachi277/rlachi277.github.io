@@ -1,3 +1,182 @@
+export function seri(el, init, recur=seri) {
+	if (el.nodeName === "#text") {
+		if (/^\n\s*$/.test(el.textContent)) return undefined;
+		return el.textContent.replace(/\n\s*$/, "");
+	}
+	if (el.nodeName.startsWith("#")) return undefined;
+	if (el.classList.contains("new")) return undefined;
+
+	let result = {
+		type: null,
+		variant: undefined,
+		children: []
+	};
+	let type_unset = false;
+	switch (init ? 'BODY' : el.nodeName) {
+	case 'BODY':
+		result.type = "body";
+		break;
+	case 'SECTION':
+		result.type = "section";
+		break;
+	case 'ARTICLE':
+		result.type = "article";
+		result.variant = {float: null};
+		if (el.classList.contains('float-right')) result.variant.float = "right";
+		else if (el.classList.contains('float-left')) result.variant.float = "left";
+		break;
+	case 'H1': case 'H2': case 'H3':
+	case 'H4': case 'H5': case 'H6':
+	case 'HGROUP':
+		result.type = el.nodeName.toLowerCase();
+		break;
+	case 'HR':
+		result.variant = {rule: null};
+		if (el.classList.contains('rule')) result.variant.rule = true;
+	case 'BR':
+		result.children = null;
+		result.type = el.nodeName.toLowerCase();
+		break;
+	case 'P':
+		result.type = "p";
+		result.variant = {lang: null};
+		if (el.getAttribute('lang') === "en") result.variant.lang = "en";
+		break;
+	case 'FIGURE':
+		result.type = "figure";
+		result.variant = {float: null};
+		if (el.classList.contains('float-right')) result.variant.float = "right";
+		else if (el.classList.contains('float-left')) result.variant.float = "left";
+		break;
+	case 'FIGCAPTION':
+		result.type = "figcaption";
+		break;
+	case 'IMG':
+		result.type = "img";
+		result.variant = {
+			src: no_lf(el.getAttribute('src')),
+			alt: no_lf(el.getAttribute('alt')),
+			size: 'medium'
+		};
+		if (el.classList.contains('large')) result.variant.size = "large";
+		else if (el.classList.contains('small')) result.variant.size = "small";
+		if (el.classList.contains('full')) result.variant.size = "full";
+		result.children = null;
+		break;
+	case 'LEGEND':
+	case 'FIELDSET':
+		result.type = el.nodeName.toLowerCase();
+		break;
+	case 'LI':
+	case 'UL': case 'DETAILS': case 'SUMMARY':
+		result.type = el.nodeName.toLowerCase();
+		break;
+	case 'OL':
+		result.type = 'ol';
+		result.variant = {start: no_lf(el.getAttribute('start'))};
+		break;
+	case 'STRONG': case 'EM': case 'B': case 'I': case 'U':
+	case 'RUBY': case 'RT': case 'RP':
+	case 'SUB': case 'SUP': case 'INS': case 'DEL':
+		result.type = el.nodeName.toLowerCase();
+		break;
+	case 'AUDIO':
+		result.type = "audio";
+		result.variant = {
+			src: no_lf(el.getAttribute('src')),
+			controls: no_lf(el.getAttribute('controls')),
+			crossorigin: no_lf(el.getAttribute('crossorigin')),
+			loop: no_lf(el.getAttribute('loop')),
+			muted: no_lf(el.getAttribute('muted')),
+			preload: no_lf(el.getAttribute('preload'))
+		}
+		break;
+	case 'VIDEO':
+		result.type = "video";
+		result.variant = {
+			size: "medium",
+			src: no_lf(el.getAttribute('src')),
+			autoplay: no_lf(el.getAttribute('autoplay')),
+			controls: no_lf(el.getAttribute('controls')),
+			crossorigin: no_lf(el.getAttribute('crossorigin')),
+			loop: no_lf(el.getAttribute('loop')),
+			muted: no_lf(el.getAttribute('muted')),
+			poster: no_lf(el.getAttribute('poster')),
+			preload: no_lf(el.getAttribute('preload'))
+		}
+		if (el.classList.contains('large')) result.variant.size = "large";
+		else if (el.classList.contains('small')) result.variant.size = "small";
+		if (el.classList.contains('full')) result.variant.size = "full";
+		break;
+	case 'TRACK':
+		result.type = "track";
+		result.variant = {
+			src: no_lf(el.getAttribute('src')),
+			srclang: no_lf(el.getAttribute('srclang')),
+			default: no_lf(el.getAttribute('default')),
+			kind: no_lf(el.getAttribute('kind')),
+			label: no_lf(el.getAttribute('label'))
+		}
+		break;
+	case 'SOURCE':
+		// currently <audio>, <video> only
+		result.type = "source";
+		result.variant = {
+			src: no_lf(el.getAttribute('src')),
+			media: no_lf(el.getAttribute('media'))
+		}
+		break;
+	case 'A':
+		result.type = "a";
+		result.variant = {
+			href: no_lf(el.getAttribute('href')),
+			target: no_lf(el.getAttribute('target')),
+			download: no_lf(el.getAttribute('download')),
+			rel: no_lf(el.getAttribute('rel')),
+			shape: null
+		}
+		if (el.classList.contains("broken")) {
+			result.variant.shape = "broken";
+		} else if (el.classList.contains("color")) {
+			result.variant.shape = "color";
+			result.variant.color = getColor(el.classList);
+		} else if (el.classList.contains("colorbox")) {
+			result.variant.shape = "colorbox";
+			result.variant.color = getColor(el.classList);
+		}
+		break;
+	case 'BUTTON':
+		result.type = "button";
+		// todo: button attributes
+		result.variant = {};
+		if (el.classList.contains("colorbox")) {
+			result.variant.shape = "colorbox";
+			result.variant.color = getColor(el.classList);
+		}
+		break;
+	default:
+		type_unset = true;
+	}
+	if (type_unset) {
+		if (el.classList.contains("columns")) {
+			result.type = "columns";
+		} else if (el.classList.contains("color")) {
+			result.type = "color";
+			result.variant = {color: getColor(el.classList), click: el.classList.contains("click")};
+		} else if (el.classList.contains("colorbox")) {
+			result.type = "colorbox";
+			result.variant = {color: getColor(el.classList), click: el.classList.contains("click")};
+		} else {
+			return undefined;
+		}
+	}
+	el.childNodes.forEach((e) => {
+		let c = recur(e);
+		if (c != undefined) result.children?.push(c);
+	});
+	return result;
+}
+
 export function deseri(data, cur, init, recur=deseri) {
 	let eltype = null;
 	let void_element = false;
@@ -145,7 +324,25 @@ export function deseri(data, cur, init, recur=deseri) {
 	return `<${eltype}${eldata}>${elmiddle}</${eltype}>`;
 }
 
-export function sani(s) {
+export function getColor(classList) {
+	if (classList.contains("c0")) return 0;
+	if (classList.contains("c1")) return 1;
+	if (classList.contains("c2")) return 2;
+	if (classList.contains("c3")) return 3;
+	if (classList.contains("c4")) return 4;
+	if (classList.contains("c5")) return 5;
+	if (classList.contains("c6")) return 6;
+	if (classList.contains("c7")) return 7;
+	if (classList.contains("c8")) return 8;
+	if (classList.contains("c9")) return 9;
+	if (classList.contains("c10")) return 10;
+}
+
+function no_lf(s) {
+	return s?.replaceAll("\n","") ?? null;
+}
+
+function sani(s) {
 	// 막기 귀찮아요
 	// 여러분 XSS는 하면 안 되는 겁니다
 	return s

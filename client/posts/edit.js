@@ -1,5 +1,5 @@
-import { d$, q$, $ } from "/script/jquery.js";
-import { seri, deseri, getColor } from "/script/posts/seri.js";
+import { d$, q$, $ } from "/client/jquery.js";
+import { seri, deseri, getColor } from "./seri.js";
 import { serialize } from "./script.js";
 import { dialog } from "./dialog.js";
 
