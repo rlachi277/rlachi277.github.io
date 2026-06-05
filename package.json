@@ -7,7 +7,9 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "nodemon -e js,json,html,css index.js"
+    "dev": "nodemon -e js,json,html,css index.js",
+    "vibing-test": "node --test vibing/test/*.test.js",
+    "vibing-test:browser": "node --test vibing/playwright/*.test.js"
   },
   "dependencies": {
     "better-sqlite3": "^12.6.2",
@@ -15,6 +17,7 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
-    "nodemon": "^3.1.14"
+    "nodemon": "^3.1.14",
+    "playwright": "^1.60.0"
   }
 }

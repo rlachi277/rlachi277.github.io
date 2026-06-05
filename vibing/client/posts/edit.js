@@ -1,6 +1,14 @@
 import { q$, $ } from "/client/jquery.js";
-import { serialize, deserialize, getColor } from "./seri.js";
-import { dialog } from "./script.js";
+import { serialize, deserialize } from "./seri.js";
+import { dialog } from "./dialog.js";
+import {
+	clearInlineHistory,
+	normalizeEditable,
+	redoInline,
+	runInlineCommand,
+	tabCommand,
+	undoInline
+} from "./edit-inline.js";
 
 const EDIT_NODE = Object.freeze({
 	DETAILS: 6,
@@ -32,17 +40,11 @@ const LIST_TAGS = new Set(["UL", "OL"]);
 const CONTENTEDITABLE_VALUE = "plaintext-only";
 const PATCH_HEADERS = {"Content-type": "application/json"};
 const PARAGRAPH_EDIT_SELECTOR = "p:not(hgroup p)";
-const COMMAND_CANCELLED = -1;
-const KEEP_COMMAND = "keep";
-const TEXT_COMMAND = "text";
-const SELECT_MARKER_CLASS = "select-marker";
-const SUB_EDITABLE_TAGS = new Set(["STRONG", "EM", "SUP", "SUB", "INS", "DEL"]);
 
 let editingRoot = null;
 let nextEditId = null;
 let positionMap = null;
 let originalContentMap = null;
-
 let positionStack = [];
 
 export function start_edit(el, init) {
@@ -55,8 +57,13 @@ export function start_edit(el, init) {
 
 	let type = editableTypeFor(el, init);
 	if (type == null) return undefined;
-	type = normalizeFieldsetType(el, type);
+	if (el.nodeName === "FIELDSET" && el.matches("fieldset:has(> legend)")) type = EDIT_NODE.DETAILS;
+	if (el.nodeName === "FIELDSET" && el.getAttribute("data-old") != null) {
+		el.querySelectorAll(".container-bar, .middle-bar").forEach((e) => e.remove());
+		el.removeAttribute("data-old");
+	}
 	type = applyEditClasses(el, type);
+
 	walkEditableChildren(el);
 	positionMap.set(el, Array.from(positionStack));
 	if (type === EDIT_NODE.EDITABLE) registerEditableElement(el);
@@ -73,18 +80,14 @@ function editableTypeFor(el, init) {
 	case "DETAILS":
 		return EDIT_NODE.DETAILS;
 	default:
-		return editableFallbackType(el);
+		if (LIST_TAGS.has(el.nodeName)) return EDIT_NODE.LIST;
+		if (EDITABLE_TAGS.has(el.nodeName)) return EDIT_NODE.EDITABLE;
+		if (CONTAINER_TAGS.has(el.nodeName)) return EDIT_NODE.CONTAINER;
+		if (UNIT_TAGS.has(el.nodeName)) return EDIT_NODE.UNIT;
+		if (el.classList.contains("columns")) return EDIT_NODE.CONTAINER;
+		if (el.classList.contains("color") || el.classList.contains("colorbox")) return EDIT_NODE.EDITABLE;
+		return null;
 	}
-}
-
-function editableFallbackType(el) {
-	if (LIST_TAGS.has(el.nodeName)) return EDIT_NODE.LIST;
-	if (EDITABLE_TAGS.has(el.nodeName)) return EDIT_NODE.EDITABLE;
-	if (CONTAINER_TAGS.has(el.nodeName)) return EDIT_NODE.CONTAINER;
-	if (UNIT_TAGS.has(el.nodeName)) return EDIT_NODE.UNIT;
-	if (el.classList.contains("columns")) return EDIT_NODE.CONTAINER;
-	if (el.classList.contains("color") || el.classList.contains("colorbox")) return EDIT_NODE.EDITABLE;
-	return null;
 }
 
 function startEditSession(root) {
@@ -93,18 +96,6 @@ function startEditSession(root) {
 	nextEditId = 0;
 	positionMap = new WeakMap();
 	originalContentMap = new WeakMap();
-}
-
-function normalizeFieldsetType(el, type) {
-	let normalizedType = type;
-	if (el.nodeName === "FIELDSET" && el.matches("fieldset:has(> legend)")) {
-		normalizedType = EDIT_NODE.DETAILS;
-	}
-	if (el.nodeName === "FIELDSET" && el.getAttribute("data-old") != null) {
-		el.querySelectorAll(".container-bar, .middle-bar").forEach((e) => e.remove());
-		el.removeAttribute("data-old");
-	}
-	return normalizedType;
 }
 
 function applyEditClasses(el, type) {
@@ -117,7 +108,16 @@ function applyEditClasses(el, type) {
 	} else if (type === EDIT_NODE.LI) {
 		markListItem(el);
 	} else {
-		type = markRegularElement(el, type);
+		if (el.closest(".editable") && type != EDIT_NODE.CONTAINER) type = EDIT_NODE.UNIT;
+
+		if (type === EDIT_NODE.EDITABLE) {
+			el.classList.add("editable");
+			if (!el.closest(".unit")) el.classList.add("unit");
+		} else if (type === EDIT_NODE.CONTAINER) {
+			markContainer(el, true, true);
+		} else if (type === EDIT_NODE.UNIT && !el.closest(".unit")) {
+			el.classList.add("unit");
+		}
 	}
 
 	el.setAttribute("data-old", true);
@@ -136,25 +136,13 @@ function markListItem(el) {
 	if (el.childNodes.length === 1 && el.firstChild.nodeType === Node.TEXT_NODE) {
 		el.classList.add("unit");
 	}
-	if (el.childNodes.length === 1 && el.firstChild.nodeType === Node.ELEMENT_NODE && el.firstChild.tagName === "DETAILS") {
+	if (
+		el.childNodes.length === 1 &&
+		el.firstChild.nodeType === Node.ELEMENT_NODE &&
+		el.firstChild.tagName === "DETAILS"
+	) {
 		el.classList.add("unit");
 	}
-}
-
-function markRegularElement(el, type) {
-	let adjustedType = type;
-	if (el.closest(".editable") && adjustedType != EDIT_NODE.CONTAINER) adjustedType = EDIT_NODE.UNIT;
-
-	if (adjustedType === EDIT_NODE.EDITABLE) {
-		el.classList.add("editable");
-		if (!el.closest(".unit")) el.classList.add("unit");
-	} else if (adjustedType === EDIT_NODE.CONTAINER) {
-		markContainer(el, true, true);
-	} else if (adjustedType === EDIT_NODE.UNIT && !el.closest(".unit")) {
-		el.classList.add("unit");
-	}
-
-	return adjustedType;
 }
 
 function prependMarker(el, ...classes) {
@@ -179,12 +167,12 @@ function registerEditableElement(el) {
 
 	el.setAttribute("data-id", nextEditId++);
 	el.setAttribute("contenteditable", CONTENTEDITABLE_VALUE);
-	el.addEventListener("keydown", on_editable_keydown);
-	el.addEventListener("input", on_editable_input);
-	el.addEventListener("blur", on_editable_blur);
+	el.addEventListener("keydown", onEditableKeydown);
+	el.addEventListener("input", onEditableInput);
+	el.addEventListener("blur", onEditableBlur);
 }
 
-function on_editable_keydown(e) {
+function onEditableKeydown(e) {
 	if (e.isComposing) return;
 
 	if (e.key === "Enter" && !e.shiftKey) {
@@ -208,11 +196,11 @@ function on_editable_keydown(e) {
 		return;
 	}
 	if (e.key === "Tab") {
-		tab_command(e);
+		tabCommand(e, onEditableInput);
 		return;
 	}
 
-	clearHistory();
+	clearInlineHistory();
 }
 
 function handleSubmitKey(e) {
@@ -225,7 +213,7 @@ function handleSubmitKey(e) {
 		submit_new(e.target);
 		return;
 	}
-	if (manage_confirm(e.target, "will-submit", "will-cancel")) submit_changes(e.target);
+	if (manageConfirm(e.target, "will-submit", "will-cancel")) submit_changes(e.target);
 }
 
 function handleCancelKey(e) {
@@ -238,7 +226,7 @@ function handleCancelKey(e) {
 		e.target.remove();
 		return;
 	}
-	if (!manage_confirm(e.target, "will-cancel", "will-submit")) return;
+	if (!manageConfirm(e.target, "will-cancel", "will-submit")) return;
 	restoreOriginalContent(e.target);
 	e.target.blur();
 }
@@ -252,27 +240,23 @@ function handleParagraphDeleteKey(e) {
 function handleParagraphInsertKey(e) {
 	e.preventDefault();
 	if (!e.target.matches(PARAGRAPH_EDIT_SELECTOR)) return;
-	const newParagraph = createEditableParagraph();
+	const paragraph = createEditableParagraph();
 	const position = (e.key == "ArrowUp") ? "beforebegin" : "afterend";
-	e.target.insertAdjacentElement(position, newParagraph);
+	e.target.insertAdjacentElement(position, paragraph);
 }
 
 function handleShortcutCommand(e) {
 	const command = shortcutCommandFor(e);
 	if (command == null) return;
 	if (command === "undo") {
-		if (undo(e.target)) e.preventDefault();
+		if (undoInline(e.target)) e.preventDefault();
 		return;
 	}
 	if (command === "redo") {
-		if (redo(e.target)) e.preventDefault();
+		if (redoInline(e.target)) e.preventDefault();
 		return;
 	}
-	try {
-		run_command(e, command);
-	} catch (error) {
-		if (error !== COMMAND_CANCELLED) throw error;
-	}
+	runInlineCommand(e, command, onEditableInput);
 }
 
 function shortcutCommandFor(e) {
@@ -291,27 +275,12 @@ function shortcutCommandFor(e) {
 
 function createEditableParagraph() {
 	const paragraph = document.createElement("p");
-	paragraph.classList.add("editable");
-	paragraph.classList.add("new");
+	paragraph.classList.add("editable", "new");
 	paragraph.setAttribute("contenteditable", CONTENTEDITABLE_VALUE);
-	paragraph.addEventListener("keydown", on_editable_keydown);
-	paragraph.addEventListener("input", on_editable_input);
-	paragraph.addEventListener("blur", on_editable_blur);
+	paragraph.addEventListener("keydown", onEditableKeydown);
+	paragraph.addEventListener("input", onEditableInput);
+	paragraph.addEventListener("blur", onEditableBlur);
 	return paragraph;
-}
-
-function undo(el) {
-	if (undoBuffer.length === 0) return false;
-	redoBuffer.push(serialize(el));
-	el.innerHTML = deserialize(undoBuffer.pop(), window.location.pathname, true);
-	return true;
-}
-
-function redo(el) {
-	if (redoBuffer.length === 0) return false;
-	undoBuffer.push(serialize(el));
-	el.innerHTML = deserialize(redoBuffer.pop(), window.location.pathname, true);
-	return true;
 }
 
 function restoreOriginalContent(el) {
@@ -322,43 +291,38 @@ function hasShortcutModifier(e) {
 	return e.ctrlKey || e.metaKey;
 }
 
-function clearHistory() {
-	undoBuffer = [];
-	redoBuffer = [];
-}
+function manageConfirm(el, confirmClass, stopClass) {
+	if (el.classList.contains(confirmClass)) return true;
 
-function manage_confirm(el, confirm_class, stop_class) {
-	if (!el.classList.contains(confirm_class)) {
-		if ($(`.${stop_class}`).length !== 0) {
-			$(`.${stop_class}`).removeClass(stop_class);
-			return false;
-		}
-		if (!el.classList.contains("edited") && !el.classList.contains("deleted")) return false;
-		$(`.${confirm_class}`).removeClass(confirm_class);
-		el.classList.add(confirm_class);
+	if ($(`.${stopClass}`).length !== 0) {
+		$(`.${stopClass}`).removeClass(stopClass);
 		return false;
 	}
-	return true;
+	if (!el.classList.contains("edited") && !el.classList.contains("deleted")) return false;
+
+	$(`.${confirmClass}`).removeClass(confirmClass);
+	el.classList.add(confirmClass);
+	return false;
 }
 
-function on_editable_input(e) {
+function onEditableInput(e) {
 	e.target.classList.add("edited");
-	if (e.target.innerHTML === '<br>' || e.target.innerHTML === '\n') e.target.innerHTML = '';
+	if (e.target.innerHTML === "<br>" || e.target.innerHTML === "\n") e.target.innerHTML = "";
 }
 
-function on_editable_blur(e) {
+function onEditableBlur(e) {
 	$(".will-submit").removeClass("will-submit");
 	$(".will-cancel").removeClass("will-cancel");
-	$(e.target).find(`.${SELECT_MARKER_CLASS}`).remove();
-	normalize_editable(e.target);
-	clearHistory();
+	e.target.querySelectorAll(".select-marker").forEach((marker) => marker.remove());
+	normalizeEditable(e.target);
+	clearInlineHistory();
 	if (JSON.stringify(serialize(e.target)) === originalContentMap.get(e.target)) {
 		e.target.classList.remove("edited");
 	}
 }
 
 function submit(el, shouldSerialize, splice) {
-	el.innerHTML = el.innerHTML.replaceAll("\n","<br>");
+	el.innerHTML = el.innerHTML.replaceAll("\n", "<br>");
 	if (el.lastChild?.nodeName === "BR") el.removeChild(el.lastChild);
 	document.activeElement.blur();
 
@@ -394,8 +358,7 @@ function submit_delete(el) {
 }
 
 function submit_new(el) {
-	el.classList.remove("new");
-	el.classList.remove("edited");
+	el.classList.remove("new", "edited");
 	positionStack = Array.from(positionMap.get(el.parentElement));
 	start_edit(el.parentElement);
 	submit(el, true, 0);
@@ -410,13 +373,13 @@ export function submit_all() {
 
 export function stop_edit() {
 	submit_all();
-	q$(".editable").forEach((e) => {
-		e.removeAttribute("data-id");
-		e.removeAttribute("contenteditable");
-		e.removeEventListener("keydown", on_editable_keydown);
-		e.removeEventListener("input", on_editable_input);
-		e.removeEventListener("blur", on_editable_blur);
-		e.classList.remove("editable");
+	q$(".editable").forEach((el) => {
+		el.removeAttribute("data-id");
+		el.removeAttribute("contenteditable");
+		el.removeEventListener("keydown", onEditableKeydown);
+		el.removeEventListener("input", onEditableInput);
+		el.removeEventListener("blur", onEditableBlur);
+		el.classList.remove("editable");
 	});
 	editingRoot = null;
 	nextEditId = null;
@@ -428,444 +391,65 @@ window.addEventListener("beforeunload", (e) => {
 	if ($(".edited").length != 0 || $(".new").length != 0) e.preventDefault();
 });
 
-const selection = window.getSelection();
-let undoBuffer = [];
-let redoBuffer = [];
-function run_command(e, command) {
-	const r = selection.getRangeAt(0);
-	if (r.collapsed) return;
-
-	e.preventDefault();
-	undoBuffer.push(serialize(e.target));
-
-	$(e.target).find(`.${SELECT_MARKER_CLASS}`).remove();
-	// Gather the selected text runs, then rebuild only those runs with the requested inline format.
-	let affected = [], cur = null;
-	if (r.startContainer.nodeType === Node.TEXT_NODE) {
-		cur = r.startContainer;
-		affected.push({node: cur, start_offset: r.startOffset});
-	} else {
-		cur = to_text_node(r.startContainer, r.startOffset);
-		affected.push({node: cur});
-	}
-	let n = cur, forgive = r.startContainer.nodeType !== Node.TEXT_NODE || r.startOffset === 0;
-	while (n != e.target && n.parentElement) {
-		if (to_command(n) === KEEP_COMMAND) {
-			if (!forgive) throw COMMAND_CANCELLED;
-			affected[0] = {node: n};
-		};
-		if (n.previousSibling) forgive = false;
-		n = n.parentElement;
-	}
-	cur = to_text_node(next_node(affected[0].node));
-	while (cur != null && r.intersectsNode(cur)) {
-		affected.push({node: cur});
-		cur = to_text_node(next_node(cur));
-	}
-	if (r.endContainer.nodeType === Node.TEXT_NODE) {
-		let start_offset = affected.pop()?.start_offset;
-		if (start_offset) {
-			affected.push({node: r.endContainer, start_offset: start_offset, end_offset: r.endOffset});
-		} else affected.push({node: r.endContainer, end_offset: r.endOffset});
-	}
-	n = affected[affected.length-1].node;
-	forgive = r.endContainer.nodeType !== Node.TEXT_NODE || r.endOffset === r.endContainer.textContent.length;
-	while (n != e.target && n.parentElement) {
-		if (to_command(n) === KEEP_COMMAND) {
-			if (!forgive) throw COMMAND_CANCELLED;
-			affected[affected.length-1] = {node: n};
-		};
-		if (n.nextSibling) forgive = false;
-		n = n.parentElement;
-	} 
-
-	let all_on = true;
-	for (let ee of affected) {
-		if ((ee.start_offset != undefined && ee.start_offset === ee.node.textContent.length) || ee.end_offset === 0) {
-			ee.zero = true;
-			continue;
-		}
-		let n = ee.node.parentNode;
-		ee.on = false;
-		if (n.nodeType !== Node.ELEMENT_NODE) continue;
-		ee.formats = [];
-		while (n != e.target) {
-			let cmd = to_command(n);
-			if (command === cmd) ee.on = true;
-			if (command === KEEP_COMMAND) throw COMMAND_CANCELLED;
-			ee.formats.push(cmd);
-			n = n.parentElement;
-		}
-		if (!ee.on) all_on = false;
-	}
-
-	if (command === 'a' && affected.length !== 1) throw COMMAND_CANCELLED;
-
-	let range = document.createRange();
-	let last = affected[affected.length-1];
-
-	if (last.end_offset != undefined) range.setStart(last.node, last.end_offset);
-	else range.setStartAfter(last.node);
-	range.setEndAfter(e.target.lastChild);
-	let r_ext = range.extractContents();
-
-	let marker_start = document.createElement("span");
-	marker_start.classList.add(SELECT_MARKER_CLASS);
-	r_ext.prepend(marker_start);
-	e.target.append(r_ext);
-
-	let els = document.createDocumentFragment();
-	for (let ee of affected) {
-		if (ee.zero) continue;
-		let el = ee.node;
-		if (ee.start_offset) {
-			el = document.createTextNode(ee.node.textContent.substring(ee.start_offset));
-			ee.node.textContent = ee.node.textContent.substring(0, ee.start_offset);
-		}
-		if (command === 'a') {
-			if (el.nodeName !== 'A') {
-				let d = el.textContent.split('|');
-				if (d.length < 1 || d.length > 2) throw COMMAND_CANCELLED;
-				let link = d[0];
-				let display = (d.length === 2) ? d[1] : d[0];
-				let new_el = document.createElement('a');
-				new_el.setAttribute("href", link);
-				new_el.textContent = display;
-				el.remove();
-				el = new_el;
-			} else {
-				let link = el.getAttribute("href");
-				let display = el.textContent;
-				let text = (link === display) ? link : `${link}|${display}`;
-				el.remove();
-				el = document.createTextNode(text);
-			}
-		}
-		for (let eee of ee.formats) {
-			if (ee.on && eee === command) continue;
-			if (command === 'ins' && eee === 'del' || command === 'del' && eee === 'ins' ||
-			command === 'sup' && eee === 'sub' || command === 'sub' && eee === 'sup' ||
-			command !== eee && (command.startsWith('color') && eee.startsWith('color') ||
-			command.startsWith('colorbox') && eee.startsWith('colorbox'))) continue;
-			let new_el = to_element(eee);
-			new_el.append(el);
-			el = new_el;
-		}
-		if (command !== "a" && !all_on) {
-			let new_el = to_element(command);
-			new_el.append(el);
-			el = new_el;
-		}
-		els.append(el);
-	}
-
-	let marker_end = document.createElement("span");
-	marker_end.classList.add(SELECT_MARKER_CLASS);
-	els.append(marker_end);
-	marker_start.after(els);
-	range.setStartAfter(marker_start);
-	range.setEndBefore(marker_end);
-	selection.removeAllRanges();
-	selection.addRange(range);
-
-	normalize_editable(e.target);
-	on_editable_input(e);
-	return;
-}
-
-function tab_command(e) {
-	if (!selection.rangeCount || (selection.anchorNode == selection.focusNode && selection.anchorOffset == selection.focusOffset && selection.anchorOffset == 0)) return;
-	e.preventDefault();
-	if (!selection.isCollapsed) {
-		selection.collapseToEnd();
-		return;
-	}
-	let last_text = selection.anchorNode, first_text = last_text;
-	let cmd = null, flag = 0;
-	if (last_text.nodeType !== Node.TEXT_NODE) {
-		last_text = to_text_node_prev(last_text, selection.anchorOffset);
-	} else if (selection.anchorOffset === 0) {
-		last_text = to_text_node_prev(prev_node(last_text));
-	} else {
-		if (selection.anchorOffset === 1) return;
-		let t = last_text.textContent.substring(0, selection.anchorOffset);
-		if (!t.includes("]")) return;
-		cmd = k2e(t.match(/\]([^\]]*)$/)[1]).toLowerCase();
-		if (cmd.length === 0) return;
-		first_text = last_text;
-		flag = 2;
-	}
-	while (!flag && last_text) {
-		let t = last_text.textContent;
-		if (t.length === 0) {
-			last_text = to_text_node_prev(prev_node(last_text));
-			continue;
-		}
-		if (!t.includes("]")) return;
-		cmd = k2e(t.match(/\]([^\]]*)$/)[1]).toLowerCase();
-		if (cmd.length === 0) return;
-		first_text = last_text;
-		flag = 1;
-	}
-	if (cmd == null) throw COMMAND_CANCELLED;
-
-	if (cmd === "." || cmd === "st") {
-		let close_idx = (flag === 2) ? last_text.textContent.lastIndexOf("]", selection.anchorOffset-1) : last_text.textContent.lastIndexOf("]");
-		let cursor_idx = (flag === 2) ? selection.anchorOffset : last_text.textContent.length;
-		let range = document.createRange();
-		range.setStart(last_text, close_idx);
-		range.setEnd(last_text, cursor_idx);
-		range.deleteContents();
-		let sym = {".": "·", "st": "★"}
-		range.insertNode(document.createTextNode(sym[cmd]));
-		selection.removeAllRanges();
-		selection.addRange(range);
-		selection.collapseToEnd();
-		normalize_editable(e.target);
-		return;
-	}
-
-	let flag2 = 1;
-	while (first_text) {
-		if (first_text.textContent.includes("[")) break;
-		first_text = to_text_node_prev(prev_node(first_text));
-		if (!e.target.contains(first_text)) return;
-		flag2 = 0;
-	}
-	if (!first_text || !first_text.textContent.includes("[")) return;
-
-	let command = null;
-	if (cmd === "b") command = "strong";
-	else if (cmd === "u") command = "em";
-	else if (cmd === ".") command = "sup";
-	else if (cmd === ",") command = "sub";
-	else if (cmd === "d") command = "del";
-	else if (cmd === "e") command = "ins";
-	else if ("0" <= cmd && cmd <= "9") command = `color${cmd}`;
-	else if (cmd === "a") command = "a";
-	if (command == null) return;
-
-	let open_idx = (flag2 === 1) ? first_text.textContent.lastIndexOf("[", selection.anchorOffset-1) : first_text.textContent.lastIndexOf("[");
-	let close_idx = (flag === 2) ? last_text.textContent.lastIndexOf("]", selection.anchorOffset-1) : last_text.textContent.lastIndexOf("]");
-	let cursor_idx = (flag === 2) ? selection.anchorOffset : last_text.textContent.length;
-	let ft = first_text.textContent;
-	first_text.textContent = ft.substring(0, open_idx) + ft.substring(open_idx+1);
-	if (first_text === last_text) close_idx--;
-	let lt = last_text.textContent;
-	last_text.textContent = lt.substring(0, close_idx) + lt.substring(cursor_idx);
-	let range = document.createRange();
-	range.setStart(first_text, open_idx);
-	range.setEnd(last_text, close_idx);
-	selection.removeAllRanges();
-	selection.addRange(range);
-	try {
-		run_command(e, command);
-	} catch (error) {
-		if (error !== COMMAND_CANCELLED) throw error;
-	}
-	selection.collapseToEnd();
-}
-
-function next_node(n) {
-	if (n == null) return null;
-	return n.nextSibling ?? next_node(n.parentNode);
-}
-
-function to_text_node(n, o) {
-	if (n == null) return null;
-	if (o != undefined) {
-		if (n.childNodes[o] == undefined) n = next_node(n);
-		n = n.childNodes[o];
-	}
-	while (n.nodeType !== Node.TEXT_NODE) {
-		if (to_command(n) === KEEP_COMMAND) return n;
-		if (n.firstChild == null) n = next_node(n);
-		if (n == null) return null;
-		if (n.firstChild != null) n = n.firstChild;
-	}
-	return n;
-}
-
-function prev_node(n) {
-	if (n == null) return null;
-	return n.previousSibling ?? prev_node(n.parentNode);
-}
-
-function to_text_node_prev(n, o) {
-	if (n == null) return null;
-	if (o != undefined) {
-		if (o === 0 || n.childNodes[o-1] == undefined) n = prev_node(n);
-		n = n.childNodes[o-1];
-	}
-	while (n.nodeType !== Node.TEXT_NODE) {
-		if (to_command(n) === KEEP_COMMAND) return n;
-		if (n.lastChild == null) n = prev_node(n);
-		if (n == null) return null;
-		if (n.lastChild != null) n = n.lastChild;
-	}
-	return n;
-}
-
-function normalize_editable(el) {
-	if (el.classList.contains(SELECT_MARKER_CLASS)) return;
-
-	let cur = el.firstChild;
-
-	function remove_node(n) {
-		let next = n.nextSibling;
-		el.removeChild(n);
-		return next;
-	}
-
-	while (cur != null) {
-		if (cur.nodeType === Node.TEXT_NODE) {
-			if (cur.textContent === '' || (cur.textContent === '\n' && cur.previousSibling == null && cur.nextSibling == null)) {
-				cur = remove_node(cur);
-				continue;
-			}
-			let prev = cur.previousSibling;
-			if (prev != null && prev.nodeType === Node.TEXT_NODE) {
-				prev.textContent += cur.textContent;
-				cur = remove_node(cur);
-				continue;
-			}
-			cur = cur.nextSibling;
-			continue;
-		}
-		if (cur.nodeType !== Node.ELEMENT_NODE || to_command(cur) === KEEP_COMMAND) {
-			cur = cur.nextSibling;
-			continue;
-		}
-		normalize_editable(cur);
-		let prev = cur.previousSibling;
-		if (prev != null && prev.nodeType === Node.ELEMENT_NODE && to_command(prev) === to_command(cur)) {
-			while (cur.firstChild) prev.appendChild(cur.firstChild);
-		}
-		if (cur.firstChild == null) {
-			cur = remove_node(cur);
-			continue;
-		}
-		cur = cur.nextSibling;
-	}
-
-	el.normalize();
-}
-
-function to_command(n) {
-	if (n.nodeType === Node.TEXT_NODE) return TEXT_COMMAND;
-	if (n.tagName === "SPAN") {
-		if (n.classList.contains('color')) {
-			return `color${getColor(n.classList)}`;
-		} else if (n.classList.contains('colorbox')) {
-			return `colorbox${getColor(n.classList)}`;
-		}
-		return KEEP_COMMAND;
-	}
-	if (!SUB_EDITABLE_TAGS.has(n.tagName)) return KEEP_COMMAND;
-	return n.tagName.toLowerCase();
-}
-
-function to_element(cmd) {
-	if (cmd === KEEP_COMMAND) throw COMMAND_CANCELLED;
-	if (cmd.startsWith('colorbox')) {
-		let el = document.createElement('span');
-		el.classList.add("colorbox");
-		el.classList.add(`c${cmd.substring(8)}`);
-		return el;
-	}
-	if (cmd.startsWith('color')) {
-		let el = document.createElement('span');
-		el.classList.add("color");
-		el.classList.add(`c${cmd.substring(5)}`);
-		return el;
-	}
-	return document.createElement(cmd);
-}
-
-const chcode = ['r','R','s','e','E','f','a','q','Q','t','T','d','w','W','c','z','x','v','g']
-const jucode = ['k','o','i','O','j','p','u','P','h','hk','ho','hl','y','n','nj','np','nl','b','m','ml','l']
-const jocode = ['','r','R','rt','s','sw','sg','e','f','fr','fa','fq','ft','fx','fv','fg','a','q','qt','t','T','d','w','c','z','x','v','g']
-const cscode = ['','r','R','rt','s','sw','sg','e','E','f','fr','fa','fq','ft','fx','fv','fg','a','q','Q','qt','t','T','d','w','W','c','z','x','v','g']
-function k2e(str) {
-	if (!str) return null;
-	let res = ''
-	for (let ch of str) {
-		let c = ch.charCodeAt(0)
-		if (0x1100 <= c && c <= 0x1112) { res += chcode[c - 0x1100]; continue; }
-		if (0x1161 <= c && c <= 0x1175) { res += jucode[c - 0x1161]; continue; }
-		if (0x11a8 <= c && c <= 0x11c2) { res += jocode[c - 0x11a7]; continue; }
-		if (0x3131 <= c && c <= 0x314e) { res += cscode[c - 0x3130]; continue; }
-		if (0x314f <= c && c <= 0x3163) { res += jucode[c - 0x314f]; continue; }
-		if (0xac00 <= c && c <= 0xd7a3) {
-			c -= 0xac00
-			let chidx = Math.floor(c / 588)
-			let juidx = Math.floor((c%588) / 28)
-			let joidx = c%28
-			res += chcode[chidx]
-			res += jucode[juidx]
-			if (joidx===0) continue;
-			res += jocode[joidx]
-			continue;
-		}
-		res += ch
-	}
-	return res;
-}
-
 let targetingAbort = null;
+let newElementFactory = null;
+let insertWithHeader = null;
 
-function start_targeting(f) {
+function startTargeting(callback) {
 	if (targetingAbort != null) stop_targeting();
 	document.body.classList.add("targeting");
 	targetingAbort = new AbortController();
-	for (let el of document.getElementsByClassName("unit")) {
-		if (el.classList.contains("editable")) {
-			el.removeAttribute("contenteditable");
-		}
-		el.addEventListener("click", (e) => {
-			e.preventDefault();
-			f(e.currentTarget);
-			stop_targeting();
-		}, {signal: targetingAbort.signal});
-	}
-	for (let el of document.getElementsByClassName("first-bar")) {
-		el.addEventListener("click", (e) => {
-			e.preventDefault();
-			f(e.currentTarget.parentElement, true);
-			stop_targeting();
-		}, {signal: targetingAbort.signal});
-	}
-	for (let el of document.getElementsByClassName("last-bar")) {
-		el.addEventListener("click", (e) => {
-			e.preventDefault();
-			f(e.currentTarget.parentElement);
-			stop_targeting();
-		}, {signal: targetingAbort.signal});
+
+	for (const el of document.getElementsByClassName("unit")) {
+		if (el.classList.contains("editable")) el.removeAttribute("contenteditable");
 	}
 
+	addTargetListeners("unit", (el, event) => {
+		event.preventDefault();
+		callback(el);
+	});
+	addTargetListeners("first-bar", (_, event) => {
+		event.preventDefault();
+		callback(event.currentTarget.parentElement, true);
+	});
+	addTargetListeners("last-bar", (_, event) => {
+		event.preventDefault();
+		callback(event.currentTarget.parentElement);
+	});
+
 	document.addEventListener("keydown", (e) => {
-		if (e.key == 'Escape') stop_targeting();
+		if (e.key == "Escape") stop_targeting();
 	}, {signal: targetingAbort.signal});
+}
+
+function addTargetListeners(className, handler) {
+	for (const el of document.getElementsByClassName(className)) {
+		el.addEventListener("click", (event) => {
+			handler(el, event);
+			stop_targeting();
+		}, {signal: targetingAbort.signal});
+	}
 }
 
 export function stop_targeting() {
 	document.body.classList.remove("targeting");
-	for (let el of document.getElementsByClassName("unit")) {
+	for (const el of document.getElementsByClassName("unit")) {
 		if (el.classList.contains("editable")) {
 			el.setAttribute("contenteditable", CONTENTEDITABLE_VALUE);
 		}
 	}
-	targetingAbort.abort();
+	targetingAbort?.abort();
 	targetingAbort = null;
 	document.activeElement.blur();
 }
 
-let newElementFactory = null;
-let insertWithHeader = null;
 function insert_element(after, isFirst) {
-	if (after.nextSibling?.tagName === 'NAV') after = after.nextSibling;
+	if (after.nextSibling?.tagName === "NAV") after = after.nextSibling;
 	if (newElementFactory == null) return;
-	const newElement = createPendingElement(after, isFirst);
+
+	const newElement = newElementFactory instanceof Function
+		? newElementFactory(after, isFirst)
+		: document.createElement(newElementFactory);
 	if (newElement == undefined) return; // TODO: 경고
 
 	if (isFirst) {
@@ -891,13 +475,9 @@ function insert_element(after, isFirst) {
 	originalContentMap.set(newElement, JSON.stringify(newData));
 }
 
-function createPendingElement(after, isFirst) {
-	if (newElementFactory instanceof Function) return newElementFactory(after, isFirst);
-	return document.createElement(newElementFactory);
-}
-
 function delete_element(target, isFirst) {
-	if (target.nextSibling.tagName === 'NAV' || target.tagName === 'NAV') return;
+	if (target.nextSibling?.tagName === "NAV" || target.tagName === "NAV") return;
+
 	const parent = target.parentElement;
 	const pos = positionMap.get(target);
 	patchPost({
@@ -910,29 +490,30 @@ function delete_element(target, isFirst) {
 }
 
 export function header(after, isFirst) {
-	let parent = isFirst ? after : after.parentElement;
-	if (parent === document.body || parent.firstChild === document.body) return document.createElement("h1");
+	const parent = isFirst ? after : after.parentElement;
+	if (parent === document.body || parent.firstChild === document.body) {
+		return document.createElement("h1");
+	}
+
 	let depth = 1;
 	let el = parent;
 	while (el != document.body) {
 		if (el.matches("section, article, fieldset, .columns")) depth++;
 		el = el.parentElement;
 	}
-	if (depth > 6) depth = 6;
-	return document.createElement(`h${depth}`);
+	return document.createElement(`h${Math.min(depth, 6)}`);
 }
 
 export function menu_insert(el, addHeader) {
-	function f() {
+	return function startInsertTargeting() {
 		newElementFactory = el;
 		insertWithHeader = addHeader;
-		start_targeting(insert_element);
-	}
-	return f;
+		startTargeting(insert_element);
+	};
 }
 
 export function menu_delete() {
-	start_targeting((target, isFirst) => {
+	startTargeting((target, isFirst) => {
 		dialog("요소 삭제", `
 			이 &lt;${target.nodeName.toLowerCase()}&gt; 요소를 삭제하시겠습니까?<br>
 			이 작업은 되돌릴 수 없습니다.

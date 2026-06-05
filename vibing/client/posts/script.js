@@ -1,4 +1,5 @@
 import { $, d$ } from "/client/jquery.js";
+import { setupDialog, dialog } from "./dialog.js";
 import { serialize } from "./seri.js";
 
 const POST_PATH_PREFIX = "/posts/";
@@ -13,7 +14,7 @@ function currentPostJson() {
 	return serialize(currentPostElement());
 }
 
-function savePost(path, data, headers) {
+function putPost(path, data, headers) {
 	return fetch(path, {
 		method: "PUT",
 		headers: headers,
@@ -22,39 +23,42 @@ function savePost(path, data, headers) {
 }
 
 function refresh_data() { // 테스트용
-	savePost(window.location.pathname, JSON.stringify(currentPostJson()));
+	putPost(window.location.pathname, JSON.stringify(currentPostJson()));
 }
 refresh_data();
 
 let mobile = false;
-let nav_details;
+let navDetails;
 
-function on_resize(init) {
+function onResize(init) {
 	if (init) {
 		mobile = false;
-		nav_details = $("nav details");
+		navDetails = $("nav details");
 	}
 
 	if (window.matchMedia(MOBILE_NAV_QUERY).matches) {
 		if (!init || mobile) return;
 		mobile = true;
-		nav_details.removeAttr("open");
+		navDetails.removeAttr("open");
 	} else {
 		if (!mobile) return;
 		mobile = false;
-		nav_details.attr("open", "");
+		navDetails.attr("open", "");
 	}
 }
 
-on_resize(true);
-window.addEventListener("resize", () => on_resize());
+setupDialog();
+onResize(true);
+window.addEventListener("resize", () => onResize());
 
 $(".menu-action").on("click", (event) => {
 	const popover = event.target.parentElement.parentElement;
 	if (popover.matches(":popover-open")) popover.hidePopover();
 });
 
-$("#menu-export").on("click", () => {
+$("#menu-export").on("click", exportPostJson);
+
+function exportPostJson() {
 	try {
 		const file = new Blob([JSON.stringify(currentPostJson())], {type: "application/json"});
 		const link = document.createElement("a");
@@ -65,59 +69,24 @@ $("#menu-export").on("click", () => {
 	} catch (error) {
 		alert(`오류: ${error}`);
 	}
-});
-
-let dialog_function = null;
-
-d$("dialog-confirm").addEventListener("click", async function () {
-	if (dialog_function == null) return;
-	if (await dialog_function()) d$("dialog").close();
-});
-
-d$("dialog").addEventListener("close", function () {
-	d$("dialog-title").textContent = "";
-	d$("dialog-main").innerHTML = "";
-	d$("dialog-confirm").classList.remove("danger");
-});
-
-export function dialog(title, main, diaf, danger) {
-	function open_dialog() {
-		d$("dialog-title").textContent = title;
-		d$("dialog-main").innerHTML = main;
-		dialog_function = diaf;
-		if (danger) d$("dialog-confirm").classList.add("danger");
-		d$("dialog").showModal();
-	}
-	return open_dialog;
-}
-
-function resolvePostPath(path) {
-	const resolved = new URL(path, `file://${window.location.pathname}`).pathname;
-	if (!resolved || !resolved.startsWith(POST_PATH_PREFIX)) return null;
-	return resolved;
-}
-
-async function pathIsUnused(path) {
-	const response = await fetch(path, {method: "HEAD"});
-	if (response.status === 404) return true;
-	if (response.status !== 200) throw response.status;
-	return false;
 }
 
 async function createPostAtDialogPath(makePostData) {
 	const path = d$("dialog-new-path").value;
-	const abs_path = resolvePostPath(path);
-	if (!abs_path) {
+	const absPath = new URL(path, `file://${window.location.pathname}`).pathname;
+	if (!absPath || !absPath.startsWith(POST_PATH_PREFIX)) {
 		// TODO: 경고
 		return false;
 	}
 
 	try {
-		if (!await pathIsUnused(abs_path)) {
+		const response = await fetch(absPath, {method: "HEAD"});
+		if (response.status !== 404) {
+			if (response.status !== 200) throw response.status;
 			// TODO: 경고
 			return false;
 		}
-		savePost(abs_path, JSON.stringify(makePostData(abs_path)));
+		putPost(absPath, JSON.stringify(makePostData(absPath)));
 		return true;
 	} catch (error) {
 		alert(`오류: ${error}`);
@@ -125,22 +94,18 @@ async function createPostAtDialogPath(makePostData) {
 	}
 }
 
-function blankPostData(path) {
-	return {
+function setupPostFileMenus() {
+	$("#menu-new").on("click", dialog("새 글", `
+		<label for="dialog-new-path">경로: </label>
+		<input id="dialog-new-path" placeholder="경로 입력">
+	`, () => createPostAtDialogPath((path) => ({
 		type: "body",
 		children: [
 			{type: "h1", children: [path]},
 			{type: "nav", children: null},
 			{type: "p", children: []}
 		]
-	};
-}
-
-function setupPostFileMenus() {
-	$("#menu-new").on("click", dialog("새 글", `
-		<label for="dialog-new-path">경로: </label>
-		<input id="dialog-new-path" placeholder="경로 입력">
-	`, () => createPostAtDialogPath(blankPostData), false));
+	})), false));
 
 	$("#menu-duplicate").on("click", dialog("이 글 복제", `
 		<label for="dialog-new-path">경로: </label>
@@ -167,7 +132,7 @@ function setupPostFileMenus() {
 		<input id="dialog-json-file" type="file" accept=".json">
 	`, async () => {
 		try {
-			savePost(
+			putPost(
 				window.location.pathname,
 				d$("dialog-json-file").files[0],
 				{"Content-Type": "text/plain"}
@@ -195,8 +160,8 @@ function setupInsertMenus(edit) {
 		element.append(document.createElement("legend"));
 		return element;
 	}, false));
-	$("#menu-insert-legend").on("click", edit.menu_insert((after, is_first) => {
-		if (!is_first || after.nodeName !== "FIELDSET") return undefined;
+	$("#menu-insert-legend").on("click", edit.menu_insert((after, isFirst) => {
+		if (!isFirst || after.nodeName !== "FIELDSET") return undefined;
 		return document.createElement("legend");
 	}, false));
 	$("#menu-insert-columns").on("click", edit.menu_insert(() => {
