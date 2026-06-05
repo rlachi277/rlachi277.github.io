@@ -1,6 +1,6 @@
 import { d$, q$, $ } from "/client/jquery.js";
 import { serialize, deserialize, getColor } from "./seri.js";
-import { dialog } from "./dialog.js";
+import { dialog } from "./script.js";
 
 let editing = null;
 let edit_id = null;
@@ -769,7 +769,7 @@ export function stop_targeting() {
 }
 
 let new_el_func = null;
-let new_el_title = null;
+let new_el_header = null;
 function insert_element(after, is_first) {
 	if (after.nextSibling?.tagName === 'NAV') after = after.nextSibling;
 	if (new_el_func == null) return;
@@ -778,13 +778,12 @@ function insert_element(after, is_first) {
 
 	if (is_first) {
 		after.insertAdjacentElement("afterbegin", new_el);
-		if (new_el_title) new_el.append(header(new_el, true));
+		if (new_el_header) new_el.append(header(new_el, true));
 		edit_cur = Array.from(pos_map.get(after));
-		console.log(after.matches("fieldset:has(> legend)"));
 		start_edit(after);
 	} else {
 		after.insertAdjacentElement("afterend", new_el);
-		if (new_el_title) new_el.append(header(new_el, true));
+		if (new_el_header) new_el.append(header(new_el, true));
 		let p = after.parentElement;
 		edit_cur = Array.from(pos_map.get(p));
 		start_edit(p);
@@ -814,7 +813,6 @@ function delete_element(target, is_first) {
 		splice: 1
 	})});
 	target.remove();
-	console.log(p.matches("fieldset:has(> legend)"));
 	start_edit(p);
 }
 
@@ -831,10 +829,10 @@ export function header(after, is_first) {
 	return document.createElement(`h${depth}`);
 }
 
-export function menu_insert(el, title) {
+export function menu_insert(el, header) {
 	function f() {
 		new_el_func = el;
-		new_el_title = title;
+		new_el_header = header;
 		start_targeting(insert_element);
 	}
 	return f;

@@ -186,7 +186,14 @@ export function deserialize(data, cur, init) {
 	let void_element = false;
 	let eldata = "";
 	if (typeof data === 'string' || data instanceof String) return sani(data);
-	if (init || data.type === 'body') return elmiddle;
+	if (init || data.type === 'body') {
+		let elmiddle = "";
+		data.children?.forEach((e) => {
+			let d = render(e, cur);
+			if (d != null) elmiddle += d;
+		});
+		return elmiddle;
+	}
 	switch (data.type) {
 	case 'nav': case 'br':
 		void_element = true;
