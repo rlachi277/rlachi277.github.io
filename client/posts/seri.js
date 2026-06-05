@@ -1,4 +1,4 @@
-export function seri(el, init, recur=seri) {
+export function serialize(el, init) {
 	if (el.nodeName === "#text") {
 		if (/^\n\s*$/.test(el.textContent)) return undefined;
 		return el.textContent.replace(/\n\s*$/, "");
@@ -15,6 +15,10 @@ export function seri(el, init, recur=seri) {
 	switch (init ? 'BODY' : el.nodeName) {
 	case 'BODY':
 		result.type = "body";
+		break;
+	case 'NAV':
+		result.children = null;
+		result.type = 'nav';
 		break;
 	case 'SECTION':
 		result.type = "section";
@@ -171,25 +175,20 @@ export function seri(el, init, recur=seri) {
 		}
 	}
 	el.childNodes.forEach((e) => {
-		let c = recur(e);
+		let c = serialize(e);
 		if (c != undefined) result.children?.push(c);
 	});
 	return result;
 }
 
-export function deseri(data, cur, init, recur=deseri) {
+export function deserialize(data, cur, init) {
 	let eltype = null;
 	let void_element = false;
 	let eldata = "";
 	if (typeof data === 'string' || data instanceof String) return sani(data);
-	let elmiddle = "";
-	data.children?.forEach((e) => {
-		let d = recur(e, cur);
-		if (d != null) elmiddle += d;
-	});
 	if (init || data.type === 'body') return elmiddle;
 	switch (data.type) {
-	case 'br':
+	case 'nav': case 'br':
 		void_element = true;
 	case 'section': case 'hgroup':
 	case 'fieldset': case 'ul': case 'details':
@@ -321,7 +320,14 @@ export function deseri(data, cur, init, recur=deseri) {
 		return null;
 	}
 	if (void_element) return `<${eltype}${eldata}>`;
-	return `<${eltype}${eldata}>${elmiddle}</${eltype}>`;
+	else {
+		let elmiddle = "";
+		data.children?.forEach((e) => {
+			let d = deserialize(e, cur);
+			if (d != null) elmiddle += d;
+		});
+		return `<${eltype}${eldata}>${elmiddle}</${eltype}>`;
+	}
 }
 
 export function getColor(classList) {

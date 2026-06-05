@@ -1,11 +1,5 @@
-import { $ } from "/client/jquery.js";
-import { seri } from "./seri.js";
-import { dialog, diaf } from "./dialog.js";
-
-export function serialize(el, init) {
-	if (el.nodeName === 'NAV') return {type: "nav", children: null};
-	return seri(el, init, serialize);
-}
+import { $, d$ } from "/client/jquery.js";
+import { serialize } from "./seri.js";
 
 function refresh_data() { // 테스트용
 	let s = serialize($("body").get(0));
@@ -64,7 +58,28 @@ if (params.get("edit")) {
 		$("#menu-new").on("click", dialog("새 글", `
 			<label for="dialog-new-path">경로: </label>
 			<input id="dialog-new-path" placeholder="경로 입력">
-		`, diaf("new_post"), false));
+		`, async () => {
+			let path = d$("dialog-new-path").value;
+			let abs_path = new URL(path, `file://${window.location.pathname}`).pathname;
+			if (!abs_path || !abs_path.startsWith("/posts/")) {
+				// TODO: 경고
+				return false;
+			}
+			try {
+				let f = await fetch(abs_path, { method: "HEAD" });
+				if (f.status !== 404) {
+					if (f.status !== 200) throw f.status;
+					// TODO: 경고
+					return false;
+				}
+				let s = {type: "body",children:[{type: "h1",children: [abs_path]},{type: "nav",children: null},{type: "p",children: []}]};
+				fetch(abs_path, { method: "PUT", body: JSON.stringify(s) });
+				return true;
+			} catch (e) {
+				alert(`오류: ${e}`);
+				return false;
+			}
+		}, false));
 		$("#menu-duplicate").on("click", dialog("이 글 복제", `
 			<label for="dialog-new-path">경로: </label>
 			<input id="dialog-new-path" placeholder="경로 입력">
@@ -101,4 +116,81 @@ if (params.get("edit")) {
 		$("#menu-delete-element").on("click", edit.menu_delete);
 		$("#menu-stoptargeting").on("click", edit.stop_targeting);
 	});
+}
+
+let dialog_function = null;
+d$("dialog-confirm").addEventListener("click", async function () {
+	if (dialog_function == null) return;
+	if (await dialog_function()) d$("dialog").close();
+});
+
+d$("dialog").addEventListener("close", function () {
+	d$("dialog-title").textContent = '';
+	d$("dialog-main").innerHTML = '';
+	d$("dialog-confirm").classList.remove("danger");
+})
+
+export function dialog(title, main, diaf, danger) {
+	function f() {
+		d$("dialog-title").textContent = title;
+		d$("dialog-main").innerHTML = main;
+		dialog_function = diaf;
+		if (danger) d$("dialog-confirm").classList.add("danger");
+		d$("dialog").showModal();
+	}
+	return f;
+}
+
+let diaf_dict = {
+	"new_post": new_post,
+	"duplicate_post": duplicate_post,
+	"load_from_json": load_from_json,
+	"delete_post": delete_post
+}
+export function diaf(name) {
+	return diaf_dict[name];
+}
+
+async function duplicate_post() {
+	let path = d$("dialog-new-path").value;
+	let abs_path = new URL(path, `file://${window.location.pathname}`).pathname;
+	if (!abs_path || !abs_path.startsWith("/posts/")) {
+		// TODO: 경고
+		return false;
+	}
+	try {
+		let f = await fetch(abs_path, { method: "HEAD" });
+		if (f.status !== 404) {
+			if (f.status !== 200) throw f.status;
+			// TODO: 경고
+			return false;
+		}
+		let s = serialize($("body").get(0));
+		fetch(abs_path, { method: "PUT", body: JSON.stringify(s) });
+		return true;
+	} catch (e) {
+		alert(`오류: ${e}`);
+		return false;
+	}
+}
+
+async function load_from_json() {
+	let path = window.location.pathname;
+	try {
+		fetch(path, { method: "PUT", headers: {'Content-Type': 'text/plain'}, body: d$("dialog-json-file").files[0] });
+		return true;
+	} catch (e) {
+		alert(`오류: ${e}`);
+		return false;
+	}
+}
+
+async function delete_post() {
+	try {
+		fetch(window.location.pathname, { method: "DELETE" });
+		return true;
+	} catch (e) {
+		alert(`오류: ${e}`);
+		return false;
+	}
 }

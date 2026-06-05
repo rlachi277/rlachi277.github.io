@@ -1,6 +1,5 @@
 import { d$, q$, $ } from "/client/jquery.js";
-import { seri, deseri, getColor } from "./seri.js";
-import { serialize } from "./script.js";
+import { serialize, deserialize, getColor } from "./seri.js";
 import { dialog } from "./dialog.js";
 
 let editing = null;
@@ -143,14 +142,14 @@ export function start_edit(el, init) {
 	pos_map.set(el, Array.from(edit_cur));
 	if (type === EDITABLE) {
 		if (el.getAttribute("data-id") == null) {
-			original_map.set(el, JSON.stringify(seri(el)));
+			original_map.set(el, JSON.stringify(serialize(el)));
 			el.setAttribute("data-id", edit_id++);
 			el.setAttribute("contenteditable", "plaintext-only");
 			el.addEventListener("keydown", on_editable_keydown);
 			el.addEventListener("input", on_editable_input);
 			el.addEventListener("blur", on_editable_blur);
 		} else {
-			original_map.set(el, JSON.stringify(seri(el)));
+			original_map.set(el, JSON.stringify(serialize(el)));
 		}
 	}
 	return true;
@@ -180,7 +179,7 @@ function on_editable_keydown(e) {
 			return;
 		}
 		if (!manage_confirm(e.target, "will-cancel", "will-submit")) return;
-		e.target.innerHTML = deseri(JSON.parse(original_map.get(e.target)), window.location.pathname, true);
+		e.target.innerHTML = deserialize(JSON.parse(original_map.get(e.target)), window.location.pathname, true);
 		e.target.blur();
 		return;
 	} else if ((e.ctrlKey || e.metaKey) && e.key == "Backspace") {
@@ -217,14 +216,14 @@ function on_editable_keydown(e) {
 		
 		if (command === "undo") {
 			if (undo_buffer.length === 0) return;
-			redo_buffer.push(seri(e.target));
-			e.target.innerHTML = deseri(undo_buffer.pop(), window.location.pathname, true);
+			redo_buffer.push(serialize(e.target));
+			e.target.innerHTML = deserialize(undo_buffer.pop(), window.location.pathname, true);
 			e.preventDefault();
 			return;
 		} else if (command === "redo") {
 			if (redo_buffer.length === 0) return;
-			undo_buffer.push(seri(e.target));
-			e.target.innerHTML = deseri(redo_buffer.pop(), window.location.pathname, true);
+			undo_buffer.push(serialize(e.target));
+			e.target.innerHTML = deserialize(redo_buffer.pop(), window.location.pathname, true);
 			e.preventDefault();
 			return;
 		}
@@ -269,7 +268,7 @@ function on_editable_blur(e) {
 	normalize_editable(e.target);
 	undo_buffer = [];
 	redo_buffer = [];
-	if (JSON.stringify(seri(e.target)) === original_map.get(e.target)) {
+	if (JSON.stringify(serialize(e.target)) === original_map.get(e.target)) {
 		e.target.classList.remove("edited");
 	}
 }
@@ -280,7 +279,7 @@ function submit(el, data, splice) {
 	document.activeElement.blur();
 	let pos = pos_map.get(el);
 	let new_data = undefined;
-	if (data) new_data = seri(el);
+	if (data) new_data = serialize(el);
 	fetch(window.location.pathname, { method: "PATCH", headers: {
 		'Content-type': 'application/json'
 	}, body: JSON.stringify({
@@ -344,7 +343,7 @@ function run_command(e, command) {
 	if (r.collapsed) return;
 
 	e.preventDefault();
-	undo_buffer.push(seri(e.target));
+	undo_buffer.push(serialize(e.target));
 
 	$(e.target).find('.select-marker').remove();
 	let affected = [], cur = null;
@@ -792,7 +791,7 @@ function insert_element(after, is_first) {
 	}
 
 	let pos = pos_map.get(new_el);
-	let new_data = seri(new_el);
+	let new_data = serialize(new_el);
 	fetch(window.location.pathname, { method: "PATCH", headers: {
 		'Content-type': 'application/json'
 	}, body: JSON.stringify({
