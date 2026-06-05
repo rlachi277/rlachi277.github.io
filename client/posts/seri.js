@@ -189,7 +189,7 @@ export function deserialize(data, cur, init) {
 	if (init || data.type === 'body') {
 		let elmiddle = "";
 		data.children?.forEach((e) => {
-			let d = render(e, cur);
+			let d = deserialize(e, cur);
 			if (d != null) elmiddle += d;
 		});
 		return elmiddle;
@@ -226,7 +226,7 @@ export function deserialize(data, cur, init) {
 		eltype = "img";
 		void_element = true;
 		if (data.variant?.src != null) eldata += ` src="${sani(assets(data.variant?.src, cur))}"`;
-		if (data.variant?.alt != null) ` alt="${sani(data.variant?.alt)}"`;
+		if (data.variant?.alt != null) eldata += ` alt="${sani(data.variant?.alt)}"`;
 		switch (data.variant?.size) {
 			case 'large': eldata += ` class="loading large"`; break;
 			case 'small': eldata += ` class="loading small"`; break;
@@ -258,12 +258,11 @@ export function deserialize(data, cur, init) {
 		if (data.variant?.muted != null) eldata += ` muted="${sani(data.variant?.muted)}"`;
 		if (data.variant?.poster != null) eldata += ` poster="${sani(assets(data.variant?.poster, cur))}"`;
 		if (data.variant?.preload != null) eldata += ` preload="${sani(data.variant?.preload)}"`;
-		if (data.variant?.autoplay != null) eldata += ` autoplay="${sani(data.variant?.autoplay)}"`;
 		switch (data.variant?.size) {
 			case 'large': eldata += ` class="loading large"`; break;
 			case 'small': eldata += ` class="loading small"`; break;
 			case 'full': eldata += ` class="loading full"`; break;
-			default: eldata += `class="loading"`;
+			default: eldata += ` class="loading"`;
 		}
 		eldata += ` onload="this.classList.remove('loading');"`
 		break;
