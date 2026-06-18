@@ -1,12 +1,12 @@
 export function addPost(db, path) {
 	if (path.length === 0) {
-		addDirectory([]);
+		addDirectory(db, []);
 		return;
 	}
 	const parent = path.slice(0, -1).join('/') + '/';
 	let dbResult = db.prepare('SELECT posts FROM dir WHERE path = ?').get(parent)?.posts;
 	if (dbResult === undefined) {
-		addDirectory(path.slice(0, -1));
+		addDirectory(db, path.slice(0, -1));
 		dbResult = "[]";
 	}
 	const data = JSON.parse(dbResult);
@@ -38,7 +38,7 @@ function addDirectory(db, path) {
 	const parent = path.slice(0, -1).join('/') + '/';
 	let dbResult = db.prepare('SELECT subdir FROM dir WHERE path = ?').get(parent)?.subdir;
 	if (dbResult === undefined) {
-		addDirectory(path.slice(0, -1));
+		addDirectory(db, path.slice(0, -1));
 		dbResult = "[]";
 	}
 	const data = JSON.parse(dbResult);
@@ -66,7 +66,7 @@ export function removePost(db, path) {
 	`).run(JSON.stringify(data), parent);
 	if (data.length === 0) {
 		const parentSubdirs = db.prepare('SELECT subdir FROM dir WHERE path = ?').get(parent)?.subdir;
-		if (JSON.parse(parentSubdirs).length === 0) removeDirectory(path.slice(0, -1));
+		if (JSON.parse(parentSubdirs).length === 0) removeDirectory(db, path.slice(0, -1));
 	}
 }
 
@@ -96,15 +96,18 @@ function removeDirectory(db, path) {
 	`).run(JSON.stringify(data), parent);
 	if (data.length === 0) {
 		const parentPosts = db.prepare('SELECT posts FROM dir WHERE path = ?').get(parent)?.posts;
-		if (JSON.parse(parentPosts).length === 0) removeDirectory(path.slice(0, -1));
+		if (JSON.parse(parentPosts).length === 0) removeDirectory(db, path.slice(0, -1));
 	}
 }
 
 export function buildNav(db, path) {
 	const data = [];
 	const dbResult = db.prepare('SELECT posts,subdir FROM dir WHERE path = ?').get(new URL("./", `file://${path}`).pathname.substring(7));
-	if (dbResult === undefined) return data; // ???
 	data.push({name: "", children: []});
+	if (dbResult === undefined) { // 404
+		data[0].children.push(path.split('/').at(-1));
+		return data;
+	}
 	for (const e of JSON.parse(dbResult.subdir)) {
 		const cur = {name: e, children: []};
 		const curResult = db.prepare('SELECT posts,subdir FROM dir WHERE path = ?').get(e);
@@ -125,7 +128,9 @@ export function buildNav(db, path) {
 	}
 	if (path == "") return data;
 
-	const parentResult = db.prepare('SELECT posts,subdir FROM dir WHERE path = ?').get(new URL("../", `file://${path}`).pathname.substring(7));
+	const parent = new URL("../", `file://${path}`).pathname;
+	if (!parent.includes("/posts/")) return data; // root
+	const parentResult = db.prepare('SELECT posts,subdir FROM dir WHERE path = ?').get(parent.substring(7));
 	if (parentResult === undefined) return data; // ???
 	data.push({name: "../", children: []});
 	for (const e of JSON.parse(parentResult.subdir)) data[1].children.push(e);

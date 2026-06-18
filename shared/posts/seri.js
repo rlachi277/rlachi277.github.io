@@ -15,7 +15,7 @@ export function seri(data, init, hooks = []) {
 		return data.textContent.replaceAll(/\n\s*/g, "");
 	}
 	if (data.nodeName.startsWith("#")) return undefined;
-	if (data.classList.contains("new")) return undefined;
+	if (data.classList.contains("new") && !init) return undefined;
 
 	const children = [];
 	data.childNodes.forEach((e) => {

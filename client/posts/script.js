@@ -32,7 +32,6 @@ function setupDefaultMenus() {
 		const pparent = e.target.parentElement.parentElement;
 		if (pparent.matches(":popover-open")) pparent.hidePopover();
 	});
-
 	$("#menu-export").on("click", () => {
 		try {
 			const data = seri($("body").get(0));
@@ -42,6 +41,15 @@ function setupDefaultMenus() {
 			anchor.download = "export.json";
 			anchor.click();
 			URL.revokeObjectURL(anchor.href);
+		} catch (e) {
+			alert(`오류: ${e}`);
+		}
+	});
+
+	$("#menu-startedit").on("click", () => {
+		try {
+			sessionStorage.setItem('scrollY', window.scrollY);
+			window.location.search = "edit=t";
 		} catch (e) {
 			alert(`오류: ${e}`);
 		}
@@ -68,7 +76,7 @@ function setupEditMenus(edit) {
 				return false;
 			}
 			await check(fetch(absPath, {method: "PUT", body: JSON.stringify(data)}));
-			// TODO: '새로고침으로 적용' 메시지 표시
+			window.location.reload();
 			return true;
 		} catch (e) {
 			alert(`오류: ${e}`);
@@ -98,7 +106,7 @@ function setupEditMenus(edit) {
 		try {
 			edit.stopEdit();
 			await check(fetch(window.location.pathname, {method: "DELETE"}));
-			// TODO: '새로고침으로 적용 혹은 nav 링크 클릭' 메시지 표시
+			window.location.reload();
 			return true;
 		} catch (e) {
 			alert(`오류: ${e}`);
@@ -127,6 +135,15 @@ function setupEditMenus(edit) {
 		}
 	}, true));
 
+	$("#menu-stopedit").on("click", () => {
+		try {
+			sessionStorage.setItem('scrollY', window.scrollY);
+			window.location.search = "";
+		} catch (e) {
+			alert(`오류: ${e}`);
+		}
+	});
+
 	$("#menu-insert-p").on("click", edit.menuInsert("p", false));
 	$("#menu-insert-section").on("click", edit.menuInsert("section", true));
 	$("#menu-insert-article").on("click", edit.menuInsert("article", true));
@@ -149,13 +166,19 @@ function setupEditMenus(edit) {
 	$("#menu-stoptargeting").on("click", edit.stopTargeting);
 }
 
+const scrollY = sessionStorage.getItem('scrollY');
+if (scrollY !== null) {
+	window.scrollTo(0, scrollY);
+	sessionStorage.removeItem('scrollY');
+}
+
 setupDialog();
 setupDefaultMenus();
 const params = new URLSearchParams(window.location.search);
 if (params.get("edit")) {
 	import("./edit.js").then((edit) => {
-		edit.startEdit($("body").get(0), true);
-		$(".menu-edit").css("display", "revert");
+		if (!$(":root.notfound").length) edit.startEdit($("body").get(0), true);
+		$("menu .menu-edit").css("display", "revert");
 		$("nav a").each((i, e) => {
 			e.setAttribute("href", e.getAttribute("href") + "?edit=t");
 		});

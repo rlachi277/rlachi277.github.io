@@ -30,14 +30,14 @@ db.prepare(`
 const router = express.Router();
 export default router;
 
-router.get('/raw/*path', (req, res) => {
+router.get('/raw/{*path}', (req, res) => {
 	const path = getPath(req.params.path);
 	withErrors(res, () => {
 		return getRawPost(db, path);
 	}, true);
 }); // PUT-ing at /raw/* will make a secret post only accessible as raw by /raw/raw/*
 
-router.get('/*path', (req, res) => {
+router.get('/{*path}', (req, res) => {
 	const path = getPath(req.params.path);
 	withErrors(res, () => {
 		res.setHeader('Content-Type', 'text/html');
@@ -45,30 +45,30 @@ router.get('/*path', (req, res) => {
 	}, true);
 });
 
-router.put('/*path', (req, res) => {
+router.put('/{*path}', (req, res) => {
 	const path = getPath(req.params.path);
 	withErrors(res, () => {
 		putPost(db, path, req.body);
 	}, false);
 });
 
-router.patch('/*path', (req, res) => {
+router.patch('/{*path}', (req, res) => {
 	const path = getPath(req.params.path);
 	withErrors(res, () => {
 		patchPost(db, path, req.body);
 	}, false);
 });
 
-router.delete('/*path', (req, res) => {
+router.delete('/{*path}', (req, res) => {
 	const path = getPath(req.params.path);
 	withErrors(res, () => {
 		deletePost(db, path);
 	}, false);
 });
 
-function getPath(path) {
+function getPath(path = []) {
 	let result = path.join('/');
-	if (result.endsWith("/")) result += "index.html";
+	if (result === "" || result.endsWith("/")) result += "index.html";
 	return result;
 }
 
@@ -81,11 +81,18 @@ function withErrors(res, func, sendResult) {
 			res.sendStatus(204);
 		}
 	} catch (e) {
-		res.setHeader('Content-Type', 'text/plain');
-		if (Number.isInteger(e)) res.sendStatus(e);
+		if (Number.isInteger(e)) {
+			res.setHeader('Content-Type', 'text/plain');
+			res.sendStatus(e);
+		}
 		else if (e.status != undefined) {
-			if (e.reason != undefined) res.status(e.status).send(e.reason);
-			else res.sendStatus(e.status);
+			if (e.reason != undefined) {
+				res.setHeader('Content-Type', 'text/plain');
+				res.status(e.status).send(e.reason);
+			} else if (e.html != undefined) {
+				res.setHeader('Content-Type', 'text/html');
+				res.status(e.status).send(e.html);
+			} else res.sendStatus(e.status);
 		} else throw e;
 	}
 }

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko" class="notfound">
+<head>
+	<title>cycweb posts 404</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="/client/colors.css">
+	<link rel="stylesheet" href="/client/posts/style.css">
+	<script src="/client/posts/script.js" type="module"></script>
+</head>
+<body>
+	<header>
+		<menu>
+			<li class="menu-edit"><button id="menu-file" popovertarget="menu-filesub">파일</button>
+			<ul id="menu-filesub" popover>
+				<li class="menu-edit"><button class="menu-action" id="menu-new">새 글...</button></li>
+				<li class="menu-edit"><button class="menu-action" id="menu-load">JSON에서 불러오기...</button></li>
+			</ul>
+			</li>
+			</li>
+			<li><button id="menu-edit" popovertarget="menu-editsub">편집</button>
+			<ul id="menu-editsub" popover>
+				<li><button class="menu-action" id="menu-startedit">편집 시작</button></li>
+				<li class="menu-edit"><button class="menu-action" id="menu-stopedit">편집 종료</button></li>
+			</ul>
+			</li>
+		</menu>
+	</header>
+	<dialog id="dialog">
+		<h6 id="dialog-title"></h6>
+		<div id="dialog-main"></div>
+		<div id="dialog-buttons">
+			<button id="dialog-cancel" command="close" commandfor="dialog">취소</button>
+			<button id="dialog-confirm">확인</button>
+		</div>
+	</dialog>
+	###여기까지가 템플릿임###
+</body>
+</html>

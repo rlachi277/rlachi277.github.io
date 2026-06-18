@@ -1,6 +1,15 @@
 import { q$, $ } from "/client/jquery.js";
 import { seri, deseri } from "/shared/posts/seri.js";
-import { runCommand, tabCommand, normalizeEditable, tryUndo, tryRedo, clearHistory } from "./edit_inline.js";
+import {
+	runCommand,
+	tabCommand,
+	normalizeEditable,
+	tryUndo,
+	tryRedo,
+	clearHistory,
+	markCursor,
+	returnToMarker
+} from "./edit_inline.js";
 import { dialog } from "./dialog.js";
 
 const EDIT_TYPE = Object.freeze({
@@ -309,12 +318,25 @@ function handlePInsertKey(target, key) {
 function onEditableInput(e) {
 	e.target.classList.add("edited");
 	if (e.target.innerHTML === '<br>' || e.target.innerHTML === '\n') e.target.innerHTML = '';
+	const remove = e.target.querySelectorAll("font, span:not(.color, .colorbox, .select-marker)");
+	if (remove.length !== 0) {
+		const { startMarker, endMarker } = markCursor();
+		for (const ee of remove) ee.replaceWith(...ee.childNodes);
+		returnToMarker(startMarker, endMarker);
+	}
 }
 
 function onEditableBlur(e) {
 	$(".will-submit").removeClass("will-submit");
 	$(".will-cancel").removeClass("will-cancel");
 	$(e.target).find('.select-marker').remove();
+	if (e.target.innerHTML === '<br>' || e.target.innerHTML === '\n') e.target.innerHTML = '';
+	const remove = e.target.querySelectorAll("font, span:not(.color, .colorbox, .select-marker)");
+	if (remove.length !== 0) {
+		const { startMarker, endMarker } = markCursor();
+		for (const ee of remove) ee.replaceWith(...ee.childNodes);
+		returnToMarker(startMarker, endMarker);
+	}
 	normalizeEditable(e.target);
 	clearHistory();
 	if (JSON.stringify(seri(e.target)) === originalMap.get(e.target)) {

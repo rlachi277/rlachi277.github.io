@@ -7,14 +7,14 @@ let redoBuffer = [];
 
 export function tryUndo(target) {
 	if (undoBuffer.length === 0) return false;
-	redoBuffer.push(seri(target));
+	redoBuffer.push(seri(target, true));
 	target.innerHTML = deseri(undoBuffer.pop(), window.location.pathname, true);
 	return true;
 }
 
 export function tryRedo(target) {
 	if (redoBuffer.length === 0) return false;
-	undoBuffer.push(seri(target));
+	undoBuffer.push(seri(target, true));
 	target.innerHTML = deseri(redoBuffer.pop(), window.location.pathname, true);
 	return true;
 }
@@ -29,9 +29,9 @@ export function runCommand(e, command) {
 	if (range.collapsed) throw -1;
 
 	e.preventDefault();
-	undoBuffer.push(seri(e.target));
+	undoBuffer.push(seri(e.target, true));
 
-	$(e.target).find('.select-marker').remove();
+	$(e.target).find('.select-marker:not(.tab-select-marker)').remove();
 	
 	const affected = collectAffected(range, e.target);
 	const allOn = annotateFormats(affected, e.target, command);
@@ -44,11 +44,7 @@ export function runCommand(e, command) {
 	applied.append(endMarker);
 	startMarker.after(applied);
 
-	range.setStartAfter(startMarker);
-	range.setEndBefore(endMarker);
-	S.removeAllRanges();
-	S.addRange(range);
-
+	returnToMarker(startMarker, endMarker)
 	normalizeEditable(e.target);
 }
 
@@ -229,17 +225,20 @@ export function tabCommand(e) {
 		throw -1;
 	}
 
+	undoBuffer.push(seri(e.target, true));
+
 	const cdata = findCloseBracket(e.target);
 	const closeTextNode = cdata.text;
 	const closeFlag = cdata.flag;
+	const closeFront = cdata.front;
 	const cmd = cdata.cmd;
 
 	let closeIdx = closeFlag === 2 ?
-		closeTextNode.textContent.lastIndexOf("]", S.anchorOffset-1) :
-		closeTextNode.textContent.lastIndexOf("]");
+		closeTextNode.textContent.lastIndexOf("]", S.anchorOffset-1) - cmd.length - 1 :
+		closeTextNode.textContent.lastIndexOf("]") - cmd.length - 1;
 	let cursorIdx = closeFlag === 2 ?
-		S.anchorOffset :
-		closeTextNode.textContent.length;
+		closeTextNode.textContent.lastIndexOf("]", S.anchorOffset-1) + 1 :
+		closeTextNode.textContent.lastIndexOf("]") + 1;
 	
 	if (SYMBOLS[cmd] != undefined) {
 		const range = document.createRange();
@@ -247,11 +246,11 @@ export function tabCommand(e) {
 		range.setEnd(closeTextNode, cursorIdx);
 		range.deleteContents();
 
+		const { startMarker, endMarker } = markCursor();
+
 		range.insertNode(document.createTextNode(SYMBOLS[cmd]));
-		S.removeAllRanges();
-		S.addRange(range);
-		S.collapseToEnd();
 		normalizeEditable(e.target);
+		returnToMarker(startMarker, endMarker);
 		return;
 	}
 
@@ -262,21 +261,27 @@ export function tabCommand(e) {
 	let command = null;
 	if (cmd === "b") command = "strong";
 	else if (cmd === "u") command = "em";
-	else if (cmd === ".") command = "sup";
-	else if (cmd === ",") command = "sub";
+	else if (cmd === "^") command = "sup";
+	else if (cmd === "_") command = "sub";
 	else if (cmd === "d") command = "del";
 	else if (cmd === "e") command = "ins";
-	else if ("0" <= cmd && cmd <= "9") command = `color${cmd}`;
-	else if (cmd === "a") command = "a";
+	else if (0 <= cmd && cmd <= 10) command = `color${cmd}`; // cursed JS moment
+	else if (cmd.startsWith("cb")) {
+		const color = cmd.substring(2);
+		if (0 <= color && color <= 10) command = `colorbox${color}`;
+	}
+	else if (cmd === "a" || cmd == "k") command = "a";
 	else throw -1;
 
-	const openIdx = openFlag === 1 ?
+	const openIdx = (openFlag === 1 && closeFlag === 2) ?
 		openTextNode.textContent.lastIndexOf("[", S.anchorOffset-1) :
 		openTextNode.textContent.lastIndexOf("[");
 
+	const { startMarker, endMarker } = markCursor();
+
 	const openText = openTextNode.textContent;
 	openTextNode.textContent = openText.substring(0, openIdx) + openText.substring(openIdx+1);
-	if (openTextNode === closeTextNode) {
+	if (openFlag === 1) {
 		closeIdx--;
 		cursorIdx--;
 	}
@@ -290,42 +295,45 @@ export function tabCommand(e) {
 	S.addRange(range);
 
 	runCommand(e, command);
-	S.collapseToEnd();
+	returnToMarker(startMarker, endMarker);
 }
 
 function findCloseBracket(root) {
 	let cur = S.anchorNode;
 	let cmd = null, flag = 0;
+	let front = 0;
 	if (cur.nodeType !== Node.TEXT_NODE) {
 		cur = descendLeft(cur, S.anchorOffset);
 	} else if (S.anchorOffset === 0) {
 		cur = descendLeft(prevNode(cur));
 	} else {
 		if (S.anchorOffset === 1) throw -1;
-		let text = cur.textContent.substring(0, S.anchorOffset);
-		if (!text.includes("]")) throw -1;
-		cmd = k2e(text.match(/\]([^\]]*)$/)[1]).toLowerCase();
+		const text = cur.textContent.substring(0, S.anchorOffset).split(']');
+		if (text.length < 3) throw -1;
+		cmd = k2e(text.at(-2)).toLowerCase();
 		if (cmd.length === 0) throw -1;
 		flag = 2;
+		front = text.at(-1).length;
 	}
 	while (!flag && cur) {
-		let text = cur.textContent;
-		if (text.length === 0) {
+		const text = cur.textContent.split(']');
+		if (text.length < 3) {
 			cur = descendLeft(prevNode(cur));
 			if (!root.contains(cur)) throw -1;
 			continue;
 		}
-		if (!text.includes("]")) throw -1;
-		cmd = k2e(text.match(/\]([^\]]*)$/)[1]).toLowerCase();
+		cmd = k2e(text.at(-2)).toLowerCase();
 		if (cmd.length === 0) throw -1;
 		flag = 1;
+		front = text.at(-1).length;
 	}
 	if (cmd == null) throw -1;
 
 	return {
 		text: cur,
 		cmd: cmd,
-		flag: flag
+		flag: flag,
+		front: front
 	};
 }
 
@@ -363,6 +371,29 @@ function descendLeft(node, offset) {
 		if (node.lastChild != null) node = node.lastChild;
 	}
 	return node;
+}
+
+export function markCursor() {
+	const startMarker = document.createElement("span");
+	startMarker.classList.add("select-marker", "tab-select-marker");
+	const endMarker = document.createElement("span");
+	endMarker.classList.add("select-marker", "tab-select-marker");
+
+	const cursor = S.getRangeAt(0);
+	cursor.insertNode(startMarker);
+	startMarker.after(endMarker);
+	return {
+		startMarker: startMarker,
+		endMarker: endMarker
+	};
+}
+
+export function returnToMarker(startMarker, endMarker) {
+	const cursor = document.createRange();
+	cursor.setStartAfter(startMarker);
+	cursor.setEndBefore(endMarker);
+	S.removeAllRanges();
+	S.addRange(cursor);
 }
 
 export function normalizeEditable(el) {
@@ -457,7 +488,7 @@ function k2e(str) {
 	if (!str) return null;
 	let result = '';
 	for (const ch of str) {
-		const c = ch.charCodeAt(0);
+		let c = ch.charCodeAt(0);
 		if (0x1100 <= c && c <= 0x1112) { result += chcode[c - 0x1100]; continue; }
 		if (0x1161 <= c && c <= 0x1175) { result += jucode[c - 0x1161]; continue; }
 		if (0x11a8 <= c && c <= 0x11c2) { result += jocode[c - 0x11a7]; continue; }

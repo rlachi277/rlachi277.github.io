@@ -9,7 +9,7 @@ body {
 	margin-block: 3rem;
 }
 
-section:not(:has(> *:not(.container-bar, .middle-bar))):after {
+section.container:not(:has(> *:not(.container-bar, .middle-bar))):after {
 	content: '### 비어 있음 :O ###';
 	opacity: 0.8;
 	border-block: 1px solid currentColor;
@@ -23,7 +23,7 @@ article.float-right, article.float-left {
 article.float-right { float: inline-end; }
 article.float-left { float: inline-start; }
 
-article:not(:has(> *:not(.container-bar, .middle-bar))):after {
+article.container:not(:has(> *:not(.container-bar, .middle-bar))):after {
 	content: '### 비어 있음 :O ###';
 	opacity: 0.8;
 	border: 1px solid currentColor;
@@ -77,7 +77,7 @@ hr { color: inherit; border: none; margin-block: 0.5lh; }
 	break-after: avoid-column;
 }
 
-.columns:not(:has(> *:not(.container-bar, .middle-bar))):after {
+.columns.container:not(:has(> *:not(.container-bar, .middle-bar))):after {
 	content: '### 비어 있음 :O ###';
 	opacity: 0.8;
 	border-block: 1px solid currentColor;
@@ -156,6 +156,9 @@ a.broken:active { color: var(--c-linkea); }
 a.self { color: var(--c-links); }
 a.self:hover, a.self:focus-visible { color: var(--c-linksh); }
 a.self:active { color: var(--c-linksa); }
+a:not(nav a):visited { color: var(--c-links); }
+a:not(nav a):visited:hover, a.self:focus-visible { color: var(--c-linksh); }
+a:not(nav a):visited:active { color: var(--c-linksa); }
 
 .color {
 	--c: currentColor; --ch: currentColor; --ca: currentColor;
@@ -419,6 +422,18 @@ article.container { --barbg: var(--c-6-3); --barbgh: var(--c-6-2); --barbga: var
 	inset-inline-end: calc(100% + 0.45lh);
 	inset-inline-start: -0.85lh;
 }
+:is(section, article).container:has(:is(section, article)) > :is(.container-bar, .middle-bar) {
+	inset-inline-end: calc(100% + 0.85lh);
+	inset-inline-start: -1.25lh;
+}
+:is(section, article).container:has(:is(section, article) :is(section, article)) > :is(.container-bar, .middle-bar) {
+	inset-inline-end: calc(100% + 1.25lh);
+	inset-inline-start: -1.65lh;
+}
+:is(section, article).container:has(:is(section, article) :is(section, article) :is(section, article)) > :is(.container-bar, .middle-bar) {
+	inset-inline-end: calc(100% + 1.65lh);
+	inset-inline-start: -2.05lh;
+} /* please do not nest things 4+ times */
 fieldset.container > :is(.container-bar, .middle-bar) {
 	inset-inline-end: calc(100% + 0.05lh + 1px);
 	inset-inline-start: calc(-0.45lh - 1px);

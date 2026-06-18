@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-	<title>cycweb post</title>
+	<title>cycweb posts</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="/client/colors.css">
@@ -20,6 +20,12 @@
 				<li class="menu-edit"><button class="menu-action" id="menu-delete">이 글 삭제...</button></li>
 			</ul>
 			</li>
+			<li><button id="menu-edit" popovertarget="menu-editsub">편집</button>
+			<ul id="menu-editsub" popover>
+				<li><button class="menu-action" id="menu-startedit">편집 시작</button></li>
+				<li class="menu-edit"><button class="menu-action" id="menu-stopedit">편집 종료</button></li>
+			</ul>
+			</li>
 			<li class="menu-edit"><button id="menu-insert" popovertarget="menu-insertsub">삽입</button>
 			<ul id="menu-insertsub" popover>
 				<li><button class="menu-action" id="menu-insert-p">문단 삽입</button></li>
@@ -30,7 +36,7 @@
 				<li><button class="menu-action" id="menu-insert-columns">다단 레이아웃 삽입</button></li>
 				<li><button class="menu-action" id="menu-insert-header">제목 삽입</button></li>
 				<li><button class="menu-action" id="menu-delete-element">요소 삭제</button></li>
-				<li><button class="menu-action" id="menu-stoptargeting">삽입/삭제 취소</button></li>
+				<li><button class="menu-action" id="menu-stoptargeting">삽입/삭제 중단</button></li>
 			</ul>
 			</li>
 		</menu>

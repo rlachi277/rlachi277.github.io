@@ -10,6 +10,12 @@ fs.readFile(path.join(__dirname, 'client', 'posts', 'index.html'), 'utf8', (err,
 	template = data.replaceAll(/\n|\t/g, '');
 });
 
+let template_404 = 'wiatlaksdy...';
+fs.readFile(path.join(__dirname, 'client', 'posts', '404.html'), 'utf8', (err, data) => {
+	if (err) throw err;
+	template_404 = data.replaceAll(/\n|\t/g, '');
+});
+
 export function getRawPost(db, path) {
 	const dbResult = db.prepare('SELECT data FROM posts WHERE path = ?').get(path);
 	if (dbResult === undefined) throw 404;
@@ -17,8 +23,23 @@ export function getRawPost(db, path) {
 }
 
 export function getPost(db, path) {
-	const rendered = render(db, getRawPost(db, path), `/posts/${path}`);
-	return template.replace("###여기까지가 템플릿임###", rendered);
+	try {
+		const rendered = render(db, getRawPost(db, path), `/posts/${path}`);
+		return template.replace("###여기까지가 템플릿임###", rendered);
+	} catch (e) {
+		if (e !== 404) throw e;
+		const rendered = render(db, {
+			type: "body",
+			children: [
+				{type: "h1", children: ["404 Not Found"]},
+				{type: "nav"}
+			]
+		}, `/posts/${path}`);
+		throw {
+			status: 404,
+			html: template_404.replace("###여기까지가 템플릿임###", rendered)
+		};
+	}
 }
 
 export function putPost(db, path, body) {
