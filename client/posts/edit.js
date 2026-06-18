@@ -1,7 +1,7 @@
 import { d$, q$, $ } from "/client/jquery.js";
 import { serialize, deserialize, getColor } from "./seri.js";
-import { dialog } from "./script.js";
 import { runCommand, tabCommand, normalizeEditable, tryUndo, tryRedo, clearHistory } from "./edit_inline.js";
+import { dialog } from "./dialog.js";
 
 const EDIT_TYPE = Object.freeze({
 	DETAILS: 6,
@@ -360,7 +360,7 @@ function startTargeting(f) {
 
 	document.addEventListener("keydown", (e) => {
 		if (e.key == 'Escape') stopTargeting();
-	}, {signal: targetingAbort.signal});
+	}, {signal: targetingAbort?.signal});
 }
 
 function addTargetListeners(cls, f, parent, isFirst) {
@@ -370,14 +370,14 @@ function addTargetListeners(cls, f, parent, isFirst) {
 			const after = parent ? e.currentTarget.parentElement : e.currentTarget;
 			f(after, isFirst);
 			stopTargeting();
-		}, {signal: targetingAbort.signal});
+		}, {signal: targetingAbort?.signal});
 	}
 }
 
 export function stopTargeting() {
 	document.body.classList.remove("targeting");
 	$(".unit.editable").attr("contenteditable", "plaintext-only");
-	targetingAbort.abort();
+	targetingAbort?.abort();
 	targetingAbort = null;
 	document.activeElement.blur();
 }

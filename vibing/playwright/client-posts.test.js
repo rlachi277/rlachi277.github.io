@@ -85,7 +85,7 @@ async function setupEditableBody(markup) {
 	await page.setContent(`<!doctype html><body>${markup}</body>`);
 	await page.evaluate(async () => {
 		const edit = await import("/client/posts/edit.js");
-		edit.start_edit(document.body, true);
+		edit.startEdit(document.body, true);
 	});
 }
 

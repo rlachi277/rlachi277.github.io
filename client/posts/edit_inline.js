@@ -230,7 +230,7 @@ export function tabCommand(e) {
 		throw -1;
 	}
 
-	const cdata = findCloseBracket();
+	const cdata = findCloseBracket(e.target);
 	const closeTextNode = cdata.text;
 	const closeFlag = cdata.flag;
 	const cmd = cdata.cmd;
@@ -256,9 +256,9 @@ export function tabCommand(e) {
 		return;
 	}
 
-	const odata = findOpenBracket(closeTextNode);
-	const openTextNode = cdata.text;
-	const openFlag = cdata.flag;
+	const odata = findOpenBracket(closeTextNode, e.target);
+	const openTextNode = odata.text;
+	const openFlag = odata.flag;
 
 	let command = null;
 	if (cmd === "b") command = "strong";
@@ -294,7 +294,7 @@ export function tabCommand(e) {
 	S.collapseToEnd();
 }
 
-function findCloseBracket() {
+function findCloseBracket(root) {
 	let cur = S.anchorNode;
 	let cmd = null, flag = 0;
 	if (cur.nodeType !== Node.TEXT_NODE) {
@@ -313,6 +313,7 @@ function findCloseBracket() {
 		let text = cur.textContent;
 		if (text.length === 0) {
 			cur = descendLeft(prevNode(cur));
+			if (!root.contains(cur)) throw -1;
 			continue;
 		}
 		if (!text.includes("]")) throw -1;
@@ -329,13 +330,13 @@ function findCloseBracket() {
 	};
 }
 
-function findOpenBracket(closeText) {
+function findOpenBracket(closeText, root) {
 	let cur = closeText;
 	let flag = 1;
 	while (cur) {
 		if (cur.textContent.includes("[")) break;
 		cur = descendLeft(prevNode(cur));
-		if (!e.target.contains(cur)) return;
+		if (!root.contains(cur)) throw -1;
 		flag = 0;
 	}
 	if (!cur || !cur.textContent.includes("[")) throw -1;

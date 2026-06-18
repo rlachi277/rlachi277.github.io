@@ -237,7 +237,7 @@ export function deserialize(el, cur, init) {
 		break;
 	case 'a':
 		tagName = "a";
-		attrs += setAttributes(el, el.variant, ["hraf", "target", "download", "rel"]);
+		attrs += setAttributes(el, el.variant, ["href", "target", "download", "rel"]);
 		switch (el.variant?.shape) {
 		case 'broken':
 			attrs += ` class="broken"`;
@@ -268,11 +268,11 @@ export function deserialize(el, cur, init) {
 		break;
 	case 'color':
 		tagName = "span";
-		attrs = ` class="color c${el.variant?.color}"${el.variant?.click?" click":""}`;
+		attrs = ` class="color c${el.variant?.color}${el.variant?.click?" click":""}"`;
 		break;
 	case 'colorbox':
 		tagName = "span";
-		attrs = ` class="colorbox c${el.variant?.color}"${el.variant?.click?" click":""}`;
+		attrs = ` class="colorbox c${el.variant?.color}${el.variant?.click?" click":""}"`;
 		break;
 	default:
 		return null;
@@ -290,12 +290,13 @@ export function getColor(classList) {
 }
 
 function deseriSize(size) {
+	let sizeClass = '';
 	switch (size) {
-	case 'large': return ` class="loading large" onload="this.classList.remove('loading')`;
-	case 'small': return ` class="loading small" onload="this.classList.remove('loading')`;
-	case 'full': return ` class="loading full" onload="this.classList.remove('loading')`;
-	default: return ` class="loading" onload="this.classList.remove('loading')`;
+	case 'large': sizeClass = ' large'; break;
+	case 'small': sizeClass = ' small'; break;
+	case 'full': sizeClass = ' full'; break;
 	}
+	return ` class="loading${sizeClass}" onload="this.classList.remove('loading')"`;
 }
 
 function setAttributes(el, variant, names) {

@@ -1,11 +1,14 @@
 import { $, d$ } from "/client/jquery.js";
 import { serialize } from "./seri.js";
+import { setupDialog, dialog } from "./dialog.js";
 
+/*
 function refreshData() { // 테스트용
 	const data = serialize($("body").get(0));
 	fetch(window.location.pathname, {method: "PUT", body: JSON.stringify(data)});
 }
 refreshData();
+*/
 
 let isMobile = false;
 const navDetails = $("nav details");
@@ -23,31 +26,6 @@ function onResize() {
 }
 onResize();
 window.addEventListener('resize', onResize);
-
-
-let dialogAction = null;
-export function dialog(title, main, action, danger) {
-	return function () {
-		d$("dialog-title").textContent = title;
-		d$("dialog-main").innerHTML = main;
-		dialogAction = action;
-		if (danger) d$("dialog-confirm").classList.add("danger");
-		d$("dialog").showModal();
-	}
-}
-
-function setupDialog() {
-	d$("dialog-confirm").addEventListener("click", async function () {
-		if (dialogAction == null) return;
-		if (await dialogAction()) d$("dialog").close();
-	});
-
-	d$("dialog").addEventListener("close", function () {
-		d$("dialog-title").textContent = '';
-		d$("dialog-main").innerHTML = '';
-		d$("dialog-confirm").classList.remove("danger");
-	});
-}
 
 function setupDefaultMenus() {
 	$(".menu-action").on("click", (e) => {
@@ -84,7 +62,7 @@ function setupEditMenus(edit) {
 				// TODO: 경고
 				return false;
 			}
-			fetch(absPath, {method: "PUT", body: JSON.stringify(data)});
+			await fetch(absPath, {method: "PUT", body: JSON.stringify(data)});
 			return true;
 		} catch (e) {
 			alert(`오류: ${e}`);
@@ -112,7 +90,7 @@ function setupEditMenus(edit) {
 		이 작업은 되돌릴 수 없습니다.
 	`, async () => {
 		try {
-			fetch(window.location.pathname, {method: "DELETE"});
+			await fetch(window.location.pathname, {method: "DELETE"});
 			return true;
 		} catch (e) {
 			alert(`오류: ${e}`);
@@ -127,7 +105,7 @@ function setupEditMenus(edit) {
 	`, async () => {
 		const path = window.location.pathname;
 		try {
-			fetch(path, {
+			await fetch(path, {
 				method: "PUT",
 				headers: {'Content-Type': 'text/plain'},
 				body: d$("dialog-json-file").files[0]
