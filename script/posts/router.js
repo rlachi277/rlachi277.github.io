@@ -1,3 +1,5 @@
+import express from "express";
+import Database from 'better-sqlite3';
 import {
 	getRawPost,
 	getPost,
@@ -66,7 +68,7 @@ router.delete('/*path', (req, res) => {
 
 function getPath(path) {
 	let result = path.join('/');
-	if (path.endsWith("/")) result += "index.html";
+	if (result.endsWith("/")) result += "index.html";
 	return result;
 }
 

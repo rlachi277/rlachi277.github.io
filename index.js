@@ -1,6 +1,6 @@
 import express from 'express';
 import path from 'path';
-import posts from './script/posts/posts.js';
+import posts from './script/posts/router.js';
 import __dirname from './dirname.js';
 
 const app = express();

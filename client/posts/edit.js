@@ -178,7 +178,11 @@ function onEditableKeydown(e) {
 		e.preventDefault();
 		handlePDeleteKey(e.target);
 		return;
-	} else if (shortcut && (e.key == "ArrowUp" || e.key == "ArrowDown")) {
+	} else if (shortcut && (e.key == "ArrowUp" || e.key == "ArrowDown") && !e.shiftKey) {
+		e.preventDefault();
+		handlePNavigateKey(e.target, e.key);
+		return;
+	} else if (shortcut && (e.key == "ArrowUp" || e.key == "ArrowDown") && e.shiftKey) {
 		e.preventDefault();
 		handlePInsertKey(e.target, e.key);
 		return;
@@ -243,8 +247,14 @@ function handleCancelKey(target) {
 		target.classList.remove("deleted");
 		return;
 	} else if (target.classList.contains("new")) {
+		const successor = (target.previousSibling?.matches(".editable")) ?
+		target.previousSibling :
+		(target.nextSibling?.matches(".editable") ? target.nextSibling : null);
+
 		target.remove();
-		return;
+		
+		if (successor == null) return;
+		regainFocus(successor);
 	}
 	if (!manageConfirm(target, "will-cancel", "will-submit")) return;
 	target.innerHTML = deseri(JSON.parse(originalMap.get(target)), window.location.pathname, true);
@@ -270,15 +280,29 @@ function handlePDeleteKey(target) {
 	target.classList.add("deleted");
 }
 
+function handlePNavigateKey(target, key) {
+	if (!target.matches("p:not(hgroup p)")) return;
+	const sibling = (key === "ArrowUp") ? "previousSibling" : "nextSibling";
+	if (!target[sibling]?.matches("p:not(hgroup p)")) return;
+	
+	target.blur();
+	if (!target.classList.contains("deleted")) {
+		if (target.classList.contains("new")) submitNew(target);
+		else if (target.classList.contains("edited")) submitChanges(target);
+	}
+	target[sibling].focus();
+}
+
 function handlePInsertKey(target, key) {
 	if (!target.matches("p:not(hgroup p)")) return;
+
 	const newP = document.createElement("p");
 	newP.classList.add("editable", "new");
 	newP.setAttribute("contenteditable", "plaintext-only");
 	newP.addEventListener("keydown", onEditableKeydown);
 	newP.addEventListener("input", onEditableInput);
 	newP.addEventListener("blur", onEditableBlur);
-	const pos = (key == "ArrowUp") ? "beforebegin" : "afterend";
+	const pos = (key === "ArrowUp") ? "beforebegin" : "afterend";
 	target.insertAdjacentElement(pos, newP);
 }
 
@@ -314,17 +338,28 @@ function submit(el, makeData, splice) {
 	originalMap.set(el, JSON.stringify(data));
 }
 
+const S = window.getSelection();
+
 function submitChanges(el) {
 	submit(el, true, 1);
 	el.classList.remove("edited");
+	regainFocus(el);
 }
 
 function submitDelete(el) {
 	submit(el, false, 1);
 	const parent = el.parentElement;
 	positionStack = Array.from(positionMap.get(parent));
+
+	const successor = (el.previousSibling?.matches(".editable")) ?
+		el.previousSibling :
+		(el.nextSibling?.matches(".editable") ? el.nextSibling : null);
+
 	el.remove();
 	startEdit(parent);
+	
+	if (successor == null) return;
+	regainFocus(successor);
 }
 
 function submitNew(el) {
@@ -332,6 +367,16 @@ function submitNew(el) {
 	positionStack = Array.from(positionMap.get(el.parentElement));
 	startEdit(el.parentElement);
 	submit(el, true, 0);
+	regainFocus(el);
+}
+
+function regainFocus(el) {
+	el.focus();
+	const range = document.createRange();
+	range.selectNodeContents(el);
+	range.collapse();
+	S.removeAllRanges();
+	S.addRange(range);
 }
 
 export function submitAll() {

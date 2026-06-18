@@ -1,7 +1,5 @@
-import express from "express";
 import fs from 'fs';
 import path from 'path';
-import Database from 'better-sqlite3';
 import __dirname from '../../dirname.js';
 import { render } from './render.js';
 import { addPost, removePost } from "./nav.js";
