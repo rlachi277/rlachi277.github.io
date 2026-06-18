@@ -4,7 +4,7 @@ let dialogAction = null;
 export function dialog(title, main, action, danger) {
 	return function () {
 		d$("dialog-title").textContent = title;
-		d$("dialog-main").innerHTML = main.replaceAll(/\n\t*/g, "");
+		d$("dialog-main").innerHTML = main.replaceAll(/\n|\t/g, '');
 		dialogAction = action;
 		if (danger) d$("dialog-confirm").classList.add("danger");
 		d$("dialog").showModal();

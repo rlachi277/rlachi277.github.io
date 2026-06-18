@@ -1,11 +1,8 @@
-import { db } from "./posts.js";
-
-export function addPost(path) {
+export function addPost(db, path) {
 	if (path.length === 0) {
 		addDirectory([]);
 		return;
 	}
-	if (path.at(-1) === '') path[path.length-1] = 'index.html';
 	const parent = path.slice(0, -1).join('/') + '/';
 	let dbResult = db.prepare('SELECT posts FROM dir WHERE path = ?').get(parent)?.posts;
 	if (dbResult === undefined) {
@@ -22,7 +19,7 @@ export function addPost(path) {
 	`).run(JSON.stringify(data.sort()), parent);
 }
 
-function addDirectory(path) {
+function addDirectory(db, path) {
 	if (path.length === 0) {
 		db.prepare(`
 			INSERT INTO dir (path, posts, subdir)
@@ -54,9 +51,8 @@ function addDirectory(path) {
 	`).run(JSON.stringify(data.sort()), parent);
 }
 
-export function removePost(path) {
+export function removePost(db, path) {
 	if (path.length === 0) return;
-	if (path.at(-1) === '') path[path.length-1] = 'index.html';
 	const parent = path.slice(0, -1).join('/') + '/';
 	const dbResult = db.prepare('SELECT posts FROM dir WHERE path = ?').get(parent)?.posts;
 	if (dbResult === undefined) return; // ???
@@ -74,7 +70,7 @@ export function removePost(path) {
 	}
 }
 
-function removeDirectory(path) {
+function removeDirectory(db, path) {
 	if (path.length === 0) {
 		db.prepare(`
 			DELETE FROM dir WHERE path = ''
@@ -104,7 +100,7 @@ function removeDirectory(path) {
 	}
 }
 
-export function buildNav(path) {
+export function buildNav(db, path) {
 	const data = [];
 	const dbResult = db.prepare('SELECT posts,subdir FROM dir WHERE path = ?').get(new URL("./", `file://${path}`).pathname.substring(7));
 	if (dbResult === undefined) return data; // ???

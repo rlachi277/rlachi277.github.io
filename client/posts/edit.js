@@ -304,7 +304,7 @@ function submit(el, makeData, splice) {
 	document.activeElement.blur();
 	const pos = positionMap.get(el);
 	const data = makeData ? seri(el) : undefined;
-	fetch(window.location.pathname, { method: "PATCH", headers: {
+	fetch(window.location.pathname, {method: "PATCH", headers: {
 		'Content-type': 'application/json'
 	}, body: JSON.stringify({
 		pos: pos,
@@ -387,8 +387,8 @@ let newElementAddHeader = null;
 function insertElement(after, isFirst) {
 	if (after.nextSibling?.tagName === 'NAV') after = after.nextSibling;
 	if (newElementFactory == null) return;
-	const newElement = newElementFactory instanceof Function ? 
-		newElementFactory(after, isFirst) : 
+	const newElement = newElementFactory instanceof Function ?
+		newElementFactory(after, isFirst) :
 		document.createElement(newElementFactory);
 	if (newElement == undefined) return; // TODO: 경고
 
@@ -411,7 +411,7 @@ function insertElement(after, isFirst) {
 
 	const pos = positionMap.get(newElement);
 	const newData = seri(newElement);
-	fetch(window.location.pathname, { method: "PATCH", headers: {
+	fetch(window.location.pathname, {method: "PATCH", headers: {
 		'Content-type': 'application/json'
 	}, body: JSON.stringify({
 		pos: pos,
@@ -425,7 +425,7 @@ function deleteElement(target) {
 	if (target.nextSibling?.tagName === 'NAV' || target.tagName === 'NAV') return;
 	const parent = target.parentElement;
 	const pos = positionMap.get(target);
-	fetch(window.location.pathname, { method: "PATCH", headers: {
+	fetch(window.location.pathname, {method: "PATCH", headers: {
 		'Content-type': 'application/json'
 	}, body: JSON.stringify({
 		pos: pos,

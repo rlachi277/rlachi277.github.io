@@ -234,11 +234,11 @@ export function tabCommand(e) {
 	const closeFlag = cdata.flag;
 	const cmd = cdata.cmd;
 
-	let closeIdx = closeFlag === 2 ? 
-		closeTextNode.textContent.lastIndexOf("]", S.anchorOffset-1) : 
+	let closeIdx = closeFlag === 2 ?
+		closeTextNode.textContent.lastIndexOf("]", S.anchorOffset-1) :
 		closeTextNode.textContent.lastIndexOf("]");
-	let cursorIdx = closeFlag === 2 ? 
-		S.anchorOffset : 
+	let cursorIdx = closeFlag === 2 ?
+		S.anchorOffset :
 		closeTextNode.textContent.length;
 	
 	if (SYMBOLS[cmd] != undefined) {
@@ -270,8 +270,8 @@ export function tabCommand(e) {
 	else if (cmd === "a") command = "a";
 	else throw -1;
 
-	const openIdx = openFlag === 1 ? 
-		openTextNode.textContent.lastIndexOf("[", S.anchorOffset-1) : 
+	const openIdx = openFlag === 1 ?
+		openTextNode.textContent.lastIndexOf("[", S.anchorOffset-1) :
 		openTextNode.textContent.lastIndexOf("[");
 
 	const openText = openTextNode.textContent;

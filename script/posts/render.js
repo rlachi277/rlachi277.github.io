@@ -2,19 +2,19 @@ import { deseri, sani } from '../../shared/posts/seri.js';
 import { buildNav } from './nav.js';
 import { postExists } from './posts.js';
 
-export function render(data, cur, init, hooks = []) {
+export function render(db, data, cur, init, hooks = []) {
 	const newHooks = hooks.concat([(data) => {
 		if (data.type === 'nav') return {
 			type: "html",
-			html: renderNav(cur)
+			html: renderNav(db, cur)
 		};
 		return null;
 	}]);
 	return deseri(data, cur, init, newHooks);
 }
 
-function renderNav(cur) {
-	const data = buildNav(cur);
+function renderNav(db, cur) {
+	const data = buildNav(db, cur);
 
 	function makeNavEntry(base, data) {
 		const newData = (typeof data === 'string' || data instanceof String) ?
@@ -22,15 +22,16 @@ function renderNav(cur) {
 			data;
 		const link = base + newData.name;
 		const isSelf = simulateLink(cur, link ? link : "./") === cur;
-		const exists = fileExists(cur, link ? link : "./");
-		const anchor = `<a${isSelf ?
-			` class="self"`
-		: (!exists ? 
-			` class="broken"` : '')} href="${link ? link : "./"}">${(!link || base) ?
-			`<span class="nav-base">${sani(link ? base : "./")}</span>`
-		: ''}${
-			sani(newData.name)
-		}</a>`;
+		const exists = fileExists(db, cur, link ? link : "./");
+		const anchor = `<a${
+			isSelf ?
+			` class="self"` :
+			(!exists ? ` class="broken"` : '')
+		} href="${link ? link : './'}">${
+			(!link || base) ?
+			`<span class="nav-base">${sani(link ? base : './')}</span>` :
+			''
+		}${sani(newData.name)}</a>`;
 		if (newData.children.length === 0) return `<li>${anchor}</li>`;
 		let middle = "";
 		for (let e of newData.children) middle += makeNavEntry(link, e);
@@ -47,9 +48,9 @@ function simulateLink(cur, p) {
 	return pathname;
 }
 
-function fileExists(cur, p) {
+function fileExists(db, cur, p) {
 	const resolved = simulateLink(cur, p);
 	if (!resolved) return false;
 	if (!resolved.startsWith("/posts/")) return false;
-	return postExists(resolved.substring(7));
+	return postExists(db, resolved.substring(7));
 }
