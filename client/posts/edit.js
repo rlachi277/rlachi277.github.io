@@ -1,206 +1,189 @@
 import { d$, q$, $ } from "/client/jquery.js";
 import { serialize, deserialize, getColor } from "./seri.js";
 import { dialog } from "./script.js";
+import { runCommand, tabCommand, normalizeEditable, tryUndo, tryRedo, clearHistory } from "./edit_inline.js";
 
-let editing = null;
-let edit_id = null;
-let pos_map = null;
-let original_map = null;
+const EDIT_TYPE = Object.freeze({
+	DETAILS: 6,
+	LIST: 5,
+	LI: 4,
+	EDITABLE: 3,
+	CONTAINER: 2,
+	UNIT: 1,
+	NONE: 0
+});
 
-let edit_cur = [];
+const EDITABLES = new Set([
+	"H1", "H2", "H3", "H4", "H5", "H6",
+	"P", "FIGCAPTION", "LEGEND",
+	"STRONG", "EM", "B", "I", "U",
+	"RUBY", "RT", "RP",
+	"SUB", "SUP", "INS", "DEL",
+	"SUMMARY", "A", "BUTTON"
+]);
+const CONTAINERS = new Set([
+	"SECTION", "ARTICLE", "FIELDSET"
+]);
+const UNITS = new Set([
+	"HGROUP", "IMG", "AUDIO", "VIDEO",
+	"FIGURE", "HR", "BR",
+	"TRACK", "SOURCE", "NAV"
+]);
 
-export function start_edit(el, init) {
-	if (el.nodeName === "#text") {
+let editing = false;
+let editCnt = null;
+let positionMap = null;
+let positionStack = [];
+let originalMap = null;
+
+export function startEdit(el, init) {
+	if (init) {
+		if (editing) stopEdit();
+		editing = true; editCnt = 0;
+		positionStack = [];
+		positionMap = new WeakMap();
+		originalMap = new WeakMap();
+	}
+
+	if (el.nodeType === Node.TEXT_NODE) {
 		if (/^\n\s*$/.test(el.textContent)) return undefined;
 		return false;
 	}
 	if (el.nodeName.startsWith("#")) return undefined;
 	if (el.classList.contains("new")) return undefined;
-	const DETAILS = 6, LIST = 5, LI = 4, EDITABLE = 3, CONTAINER = 2, UNIT = 1, NONE = 0;
-	let type_unset = false, type = NONE;
-	switch (el.nodeName) {
-	case 'BODY':
-		if (init) {
-			if (editing != null && editing !== el) stop_edit();
-			editing = el; edit_id = 0;
-			pos_map = new WeakMap();
-			original_map = new WeakMap();
-		}
-		break;
-	case 'UL': case 'OL':
-		type = LIST;
-		break;
-	case 'LI':
-		type = LI;
-		break;
-	case 'H1': case 'H2': case 'H3':
-	case 'H4': case 'H5': case 'H6':
-	case 'P': case 'FIGCAPTION': case 'LEGEND':
-	case 'STRONG': case 'EM': case 'B': case 'I': case 'U':
-	case 'RUBY': case 'RT': case 'RP':
-	case 'SUB': case 'SUP': case 'INS': case 'DEL':
-	case 'SUMMARY':
-	case 'A': case 'BUTTON':
-		type = EDITABLE;
-		break;
-	case 'DETAILS':
-		type = DETAILS;
-		break;
-	case 'SECTION': case 'ARTICLE':
-	case 'FIELDSET':
-		type = CONTAINER;
-		break;
-	case 'HGROUP': case 'IMG': case 'AUDIO': case 'VIDEO':
-	case 'FIGURE':
-	case 'HR': case 'BR':
-	case 'TRACK': case 'SOURCE':
-	case 'NAV':
-		type = UNIT;
-		break;
-	default:
-		type_unset = true;
-	}
-	if (type_unset) {
-		if (el.classList.contains("columns")) {
-			type = CONTAINER;
-		} else if (el.classList.contains("color") || el.classList.contains("colorbox")) {
-			type = EDITABLE;
-		} else return undefined;
-	}
 
-	if (el.nodeName === "FIELDSET" && el.matches("fieldset:has(> legend)")) type = DETAILS;
+	let type = getEditType(el);
+	if (type == null) return undefined;
+	if (el.nodeName === "FIELDSET" && el.matches("fieldset:has(> legend)")) type = EDIT_TYPE.DETAILS;
 	if (el.nodeName === "FIELDSET" && el.getAttribute("data-old") != null) {
 		el.querySelectorAll(".container-bar, .middle-bar").forEach((e) => e.remove());
 		el.removeAttribute("data-old");
 	}
+	type = applyEditType(el, type);
 
-	if (el.getAttribute("data-old") == null) {
-		if (type === DETAILS) {
-			if (!el.closest("li")) {
-				el.classList.add("container");
-				let bar3 = document.createElement("span");
-				bar3.classList.add("container-bar");
-				bar3.classList.add("last-bar");
-				el.prepend(bar3);
-				let bar1 = document.createElement("span");
-				bar1.classList.add("middle-bar");
-				el.prepend(bar1);
-			}
-		} else if (type === LIST) {
-			el.classList.add("container");
-			let bar2 = document.createElement("span");
-			bar2.classList.add("container-bar");
-			bar2.classList.add("first-bar");
-			el.prepend(bar2);
-			if (!el.parentElement?.closest("ul, ol, dir, menu")) {
-				let bar3 = document.createElement("span");
-				bar3.classList.add("container-bar");
-				bar3.classList.add("last-bar");
-				el.prepend(bar3);
-			}
-			let bar1 = document.createElement("span");
-			bar1.classList.add("middle-bar");
-			el.prepend(bar1);
-		}
-		else if (type === LI) {
-			if (!el.closest(".editable")) el.classList.add("editable");
-			if (el.childNodes.length === 1 && el.firstChild.nodeType === Node.TEXT_NODE) el.classList.add("unit");
-			if (el.childNodes.length === 1 && el.firstChild.nodeType === Node.ELEMENT_NODE && el.firstChild.tagName === "DETAILS") el.classList.add("unit");
-		} else {
-			if (el.closest(".editable") && type != CONTAINER) type = UNIT;
-			if (type === EDITABLE) {
-				el.classList.add("editable");
-				if (!el.closest(".unit")) el.classList.add("unit");
-			}
-			else if (type === CONTAINER) {
-				el.classList.add("container");
-				let bar2 = document.createElement("span");
-				bar2.classList.add("container-bar");
-				bar2.classList.add("first-bar");
-				el.prepend(bar2);
-				let bar3 = document.createElement("span");
-				bar3.classList.add("container-bar");
-				bar3.classList.add("last-bar");
-				el.prepend(bar3);
-				let bar1 = document.createElement("span");
-				bar1.classList.add("middle-bar");
-				el.prepend(bar1);
-			}
-			else if (type === UNIT && !el.closest(".unit")) el.classList.add("unit");
-		}
-		el.setAttribute("data-old", true);
-	}
-
-	let edit_curi = 0;
+	positionMap.set(el, Array.from(positionStack));
+	let idx = 0;
 	el.childNodes.forEach((e) => {
-		edit_cur.push(edit_curi);
-		let c = start_edit(e);
-		if (c != undefined) edit_curi++;
-		edit_cur.pop();
+		positionStack.push(idx);
+		if (startEdit(e) != undefined) idx++;
+		positionStack.pop();
 	});
 
-	pos_map.set(el, Array.from(edit_cur));
-	if (type === EDITABLE) {
+	if (type === EDIT_TYPE.EDITABLE) {
+		originalMap.set(el, JSON.stringify(serialize(el)));
 		if (el.getAttribute("data-id") == null) {
-			original_map.set(el, JSON.stringify(serialize(el)));
-			el.setAttribute("data-id", edit_id++);
+			el.setAttribute("data-id", editCnt++);
 			el.setAttribute("contenteditable", "plaintext-only");
-			el.addEventListener("keydown", on_editable_keydown);
-			el.addEventListener("input", on_editable_input);
-			el.addEventListener("blur", on_editable_blur);
-		} else {
-			original_map.set(el, JSON.stringify(serialize(el)));
+			el.addEventListener("keydown", onEditableKeydown);
+			el.addEventListener("input", onEditableInput);
+			el.addEventListener("blur", onEditableBlur);
 		}
 	}
+
 	return true;
 }
 
-function on_editable_keydown(e) {
+function getEditType(el, init) {
+	switch (el.nodeName) {
+	case 'BODY':
+		return EDIT_TYPE.NONE;
+	case 'UL': case 'OL':
+		return EDIT_TYPE.LIST;
+	case 'LI':
+		return EDIT_TYPE.LI;
+	case 'DETAILS':
+		return EDIT_TYPE.DETAILS;
+	default:
+		if (EDITABLES.has(el.nodeName)) return EDIT_TYPE.EDITABLE;
+		else if (CONTAINERS.has(el.nodeName)) return EDIT_TYPE.CONTAINER;
+		else if (UNITS.has(el.nodeName)) return EDIT_TYPE.UNIT;
+		else {
+			if (el.classList.contains("columns")) {
+				return EDIT_TYPE.CONTAINER;
+			} else if (el.classList.contains("color") || el.classList.contains("colorbox")) {
+				return EDIT_TYPE.EDITABLE;
+			} else return null;
+		}
+	}
+	return null;
+}
+
+function applyEditType(el, type) {
+	function markContainer(el, first, last) {
+		el.classList.add("container");
+		if (last) {
+			const lbar = document.createElement("span");
+			lbar.classList.add("container-bar", "last-bar");
+			el.prepend(lbar);
+		}
+		const mbar = document.createElement("span");
+		mbar.classList.add("container-bar", "middle-bar");
+		el.prepend(mbar);
+		if (first) {
+			const fbar = document.createElement("span");
+			fbar.classList.add("container-bar", "first-bar");
+			el.prepend(fbar);
+		}
+	}
+	if (el.getAttribute("data-old") != null) return type;
+	if (type === EDIT_TYPE.DETAILS) {
+		if (!el.closest("li")) markContainer(el, false, true);
+	} else if (type === EDIT_TYPE.LIST) {
+		markContainer(el, true, !el.parentElement?.closest("ul, ol, dir, menu"));
+	} else if (type === EDIT_TYPE.LI) {
+		if (!el.closest(".editable")) el.classList.add("editable");
+		el.classList.add("unit");
+	} else if (type === EDIT_TYPE.CONTAINER) {
+		markContainer(el, true, true);
+	} else {
+		if (el.closest(".editable")) type = EDIT_TYPE.UNIT;
+
+		if (type === EDIT_TYPE.EDITABLE) {
+			el.classList.add("editable");
+			if (!el.closest(".unit")) el.classList.add("unit");
+		}
+		else if (type === EDIT_TYPE.UNIT && !el.closest(".unit")) el.classList.add("unit");
+	}
+	el.setAttribute("data-old", true);
+	return type;
+}
+
+export function stopEdit() {
+	submitAll();
+	q$(".editable").forEach((e) => {
+		e.removeAttribute("data-id");
+		e.removeAttribute("contenteditable");
+		e.removeEventListener("keydown", onEditableKeydown);
+		e.removeEventListener("input", onEditableInput);
+		e.removeEventListener("blur", onEditableBlur);
+		e.classList.remove("editable");
+	});
+	editing = false;
+	editCnt = positionMap = originalMap = null;
+	positionStack = [];
+}
+
+function onEditableKeydown(e) {
 	if (e.isComposing) return;
+	const shortcut = e.ctrlKey || e.metaKey;
 	if (e.key === "Enter" && !e.shiftKey) {
 		e.preventDefault();
-		if (e.target.classList.contains("deleted")) {
-			submit_delete(e.target);
-			return;
-		} else if (e.target.classList.contains("new")) {
-			submit_new(e.target);
-			return;
-		}
-		if (!manage_confirm(e.target, "will-submit", "will-cancel")) return;
-		else submit_changes(e.target);
+		handleSubmitKey(e.target);
 		return;
 	} else if (e.key === "Escape") {
 		e.preventDefault();
-		if (e.target.classList.contains("deleted")) {
-			e.target.classList.remove("deleted");
-			return;
-		} else if (e.target.classList.contains("new")) {
-			e.target.remove();
-			return;
-		}
-		if (!manage_confirm(e.target, "will-cancel", "will-submit")) return;
-		e.target.innerHTML = deserialize(JSON.parse(original_map.get(e.target)), window.location.pathname, true);
-		e.target.blur();
+		handleCancelKey(e.target);
 		return;
-	} else if ((e.ctrlKey || e.metaKey) && e.key == "Backspace") {
+	} else if (shortcut && e.key == "Backspace") {
 		e.preventDefault();
-		if (!e.target.matches("p:not(hgroup p)")) return;
-		e.target.classList.add("deleted");
-	} else if ((e.ctrlKey || e.metaKey) && (e.key == "ArrowUp" || e.key == "ArrowDown")) {
+		handlePDeleteKey(e.target);
+		return;
+	} else if (shortcut && (e.key == "ArrowUp" || e.key == "ArrowDown")) {
 		e.preventDefault();
-		if (!e.target.matches("p:not(hgroup p)")) return;
-		let new_el = document.createElement("p");
-		new_el.classList.add("editable");
-		new_el.classList.add("new");
-		new_el.setAttribute("contenteditable", "plaintext-only");
-		new_el.addEventListener("keydown", on_editable_keydown);
-		new_el.addEventListener("input", on_editable_input);
-		new_el.addEventListener("blur", on_editable_blur);
-		let pos = (e.key == "ArrowUp") ? "beforebegin" : "afterend";
-		e.target.insertAdjacentElement(pos, new_el);
+		handlePInsertKey(e.target, e.key);
 		return;
 	}
-	if (e.ctrlKey || e.metaKey) {
+	if (shortcut) {
 		let command = null;
 		if (e.key === "b") command = "strong";
 		else if (e.key === "u") command = "em";
@@ -212,599 +195,236 @@ function on_editable_keydown(e) {
 		else if (e.key === "z" && e.shiftKey) command = "redo";
 		else if (e.key === "z") command = "undo";
 		else if ("0" <= e.key && e.key <= "9") command = `color${e.key}`;
-		if (command == null) return;
+		else return;
 		
 		if (command === "undo") {
-			if (undo_buffer.length === 0) return;
-			redo_buffer.push(serialize(e.target));
-			e.target.innerHTML = deserialize(undo_buffer.pop(), window.location.pathname, true);
-			e.preventDefault();
+			if (tryUndo(e.target)) e.preventDefault();
 			return;
 		} else if (command === "redo") {
-			if (redo_buffer.length === 0) return;
-			undo_buffer.push(serialize(e.target));
-			e.target.innerHTML = deserialize(redo_buffer.pop(), window.location.pathname, true);
-			e.preventDefault();
+			if (tryRedo(e.target)) e.preventDefault();
 			return;
 		}
 		try {
-			run_command(e, command);
+			runCommand(e, command);
+			onEditableInput(e);
+			e.preventDefault();
 		} catch (e) {
 			if (e !== -1) throw e;
 		}
 		return;
 	}
 	if (e.key === "Tab") {
-		tab_command(e);
+		try {
+			tabCommand(e);
+			onEditableInput(e);
+			e.preventDefault();
+		} catch (e) {
+			if (e !== -1) throw e;
+		}
 		return;
 	}
-	undo_buffer = [];
-	redo_buffer = [];
+	clearHistory();
 }
 
-function manage_confirm(el, confirm_class, stop_class) {
-	if (!el.classList.contains(confirm_class)) {
-		if ($(`.${stop_class}`).length !== 0) {
-			$(`.${stop_class}`).removeClass(stop_class);
-			return false;
-		}
-		if (!el.classList.contains("edited") && !el.classList.contains("deleted")) return false;
-		$(`.${confirm_class}`).removeClass(confirm_class);
-		el.classList.add(confirm_class);
+function handleSubmitKey(target) {
+	if (target.classList.contains("deleted")) {
+		submitDelete(target);
+		return;
+	} else if (target.classList.contains("new")) {
+		submitNew(target);
+		return;
+	}
+	if (!manageConfirm(target, "will-submit", "will-cancel")) return;
+	submitChanges(target);
+}
+
+function handleCancelKey(target) {
+	if (target.classList.contains("deleted")) {
+		target.classList.remove("deleted");
+		return;
+	} else if (target.classList.contains("new")) {
+		target.remove();
+		return;
+	}
+	if (!manageConfirm(target, "will-cancel", "will-submit")) return;
+	target.innerHTML = deserialize(JSON.parse(originalMap.get(target)), window.location.pathname, true);
+	target.blur();
+}
+
+function manageConfirm(el, confirmClass, stopClass) {
+	if (el.classList.contains(confirmClass)) return true;
+
+	if ($(`.${stopClass}`).length !== 0) {
+		$(`.${stopClass}`).removeClass(stopClass);
 		return false;
 	}
-	return true;
+	if (!el.classList.contains("edited") && !el.classList.contains("deleted")) return false;
+
+	$(`.${confirmClass}`).removeClass(confirmClass);
+	el.classList.add(confirmClass);
+	return false;
 }
 
-function on_editable_input(e) {
+function handlePDeleteKey(target) {
+	if (!target.matches("p:not(hgroup p)")) return;
+	target.classList.add("deleted");
+}
+
+function handlePInsertKey(target, key) {
+	if (!target.matches("p:not(hgroup p)")) return;
+	const newP = document.createElement("p");
+	newP.classList.add("editable", "new");
+	newP.setAttribute("contenteditable", "plaintext-only");
+	newP.addEventListener("keydown", onEditableKeydown);
+	newP.addEventListener("input", onEditableInput);
+	newP.addEventListener("blur", onEditableBlur);
+	const pos = (key == "ArrowUp") ? "beforebegin" : "afterend";
+	target.insertAdjacentElement(pos, newP);
+}
+
+function onEditableInput(e) {
 	e.target.classList.add("edited");
 	if (e.target.innerHTML === '<br>' || e.target.innerHTML === '\n') e.target.innerHTML = '';
 }
 
-function on_editable_blur(e) {
+function onEditableBlur(e) {
 	$(".will-submit").removeClass("will-submit");
 	$(".will-cancel").removeClass("will-cancel");
 	$(e.target).find('.select-marker').remove();
-	normalize_editable(e.target);
-	undo_buffer = [];
-	redo_buffer = [];
-	if (JSON.stringify(serialize(e.target)) === original_map.get(e.target)) {
+	normalizeEditable(e.target);
+	clearHistory();
+	if (JSON.stringify(serialize(e.target)) === originalMap.get(e.target)) {
 		e.target.classList.remove("edited");
 	}
 }
 
-function submit(el, data, splice) {
-	el.innerHTML = el.innerHTML.replaceAll("\n","<br>");
+function submit(el, seri, splice) {
+	el.innerHTML = el.innerHTML.replaceAll("\n", "<br>");
 	if (el.lastChild?.nodeName === "BR") el.removeChild(el.lastChild);
 	document.activeElement.blur();
-	let pos = pos_map.get(el);
-	let new_data = undefined;
-	if (data) new_data = serialize(el);
+	const pos = positionMap.get(el);
+	const data = seri ? serialize(el) : undefined;
 	fetch(window.location.pathname, { method: "PATCH", headers: {
 		'Content-type': 'application/json'
 	}, body: JSON.stringify({
 		pos: pos,
-		data: new_data,
+		data: data,
 		splice: splice
 	})});
-	original_map.set(el, JSON.stringify(new_data));
+	originalMap.set(el, JSON.stringify(data));
 }
 
-function submit_changes(el) {
+function submitChanges(el) {
 	submit(el, true, 1);
 	el.classList.remove("edited");
 }
 
-function submit_delete(el) {
+function submitDelete(el) {
 	submit(el, false, 1);
-	let p = el.parentElement;
-	edit_cur = Array.from(pos_map.get(p));
+	const parent = el.parentElement;
+	positionStack = Array.from(positionMap.get(parent));
 	el.remove();
-	start_edit(p);
+	startEdit(parent);
 }
 
-function submit_new(el) {
-	el.classList.remove("new");
-	el.classList.remove("edited");
-	edit_cur = Array.from(pos_map.get(el.parentElement));
-	start_edit(el.parentElement);
+function submitNew(el) {
+	el.classList.remove("new", "edited");
+	positionStack = Array.from(positionMap.get(el.parentElement));
+	startEdit(el.parentElement);
 	submit(el, true, 0);
 }
 
-export function submit_all() {
+export function submitAll() {
 	document.activeElement.blur();
-	q$(".edited").forEach((e) => submit_changes(e));
-	q$(".new").forEach((e) => submit_new(e));
-	q$(".deleted").forEach((e) => submit_delete(e));
-}
-
-export function stop_edit() {
-	submit_all();
-	q$(".editable").forEach((e) => {
-		e.removeAttribute("data-id");
-		e.removeAttribute("contenteditable");
-		e.removeEventListener("keydown", on_editable_keydown);
-		e.removeEventListener("input", on_editable_input);
-		e.removeEventListener("blur", on_editable_blur);
-		e.classList.remove("editable");
-	});
-	editing = edit_id = pos_map = original_map = null;
+	q$(".edited").forEach((e) => submitChanges(e));
+	q$(".new").forEach((e) => submitNew(e));
+	q$(".deleted").forEach((e) => submitDelete(e));
 }
 
 window.addEventListener("beforeunload", (e) => {
 	if ($(".edited").length != 0 || $(".new").length != 0) e.preventDefault();
 });
 
-const s = window.getSelection();
-let undo_buffer = [];
-let redo_buffer = [];
-function run_command(e, command) {
-	const r = s.getRangeAt(0);
-	if (r.collapsed) return;
 
-	e.preventDefault();
-	undo_buffer.push(serialize(e.target));
+let targetingAbort = null;
 
-	$(e.target).find('.select-marker').remove();
-	let affected = [], cur = null;
-	if (r.startContainer.nodeType === Node.TEXT_NODE) {
-		cur = r.startContainer;
-		affected.push({node: cur, start_offset: r.startOffset});
-	} else {
-		cur = to_text_node(r.startContainer, r.startOffset);
-		affected.push({node: cur});
-	}
-	let n = cur, forgive = r.startContainer.nodeType !== Node.TEXT_NODE || r.startOffset === 0;
-	while (n != e.target && n.parentElement) {
-		if (to_command(n) === 'keep') {
-			if (!forgive) throw -1;
-			affected[0] = {node: n};
-		};
-		if (n.previousSibling) forgive = false;
-		n = n.parentElement;
-	}
-	cur = to_text_node(next_node(affected[0].node));
-	while (cur != null && r.intersectsNode(cur)) {
-		if (to_command(cur) === 'keep') affected.push({node: cur});
-		else affected.push({node: cur});
-		cur = to_text_node(next_node(cur));
-	}
-	if (r.endContainer.nodeType === Node.TEXT_NODE) {
-		let start_offset = affected.pop()?.start_offset;
-		if (start_offset) {
-			affected.push({node: r.endContainer, start_offset: start_offset, end_offset: r.endOffset});
-		} else affected.push({node: r.endContainer, end_offset: r.endOffset});
-	}
-	n = affected[affected.length-1].node;
-	forgive = r.endContainer.nodeType !== Node.TEXT_NODE || r.endOffset === r.endContainer.textContent.length;
-	while (n != e.target && n.parentElement) {
-		if (to_command(n) === 'keep') {
-			if (!forgive) throw -1;
-			affected[affected.length-1] = {node: n};
-		};
-		if (n.nextSibling) forgive = false;
-		n = n.parentElement;
-	} 
-
-	let all_on = true;
-	for (let ee of affected) {
-		if ((ee.start_offset != undefined && ee.start_offset === ee.node.textContent.length) || ee.end_offset === 0) {
-			ee.zero = true;
-			continue;
-		}
-		let n = ee.node.parentNode;
-		ee.on = false;
-		if (n.nodeType !== Node.ELEMENT_NODE) continue;
-		ee.formats = [];
-		while (n != e.target) {
-			let cmd = to_command(n);
-			if (command === cmd) ee.on = true;
-			if (command === 'keep') throw -1;
-			ee.formats.push(cmd);
-			n = n.parentElement;
-		}
-		if (!ee.on) all_on = false;
-	}
-
-	if (command === 'a' && affected.length !== 1) throw -1;
-
-	let range = document.createRange();
-	let last = affected[affected.length-1];
-
-	if (last.end_offset != undefined) range.setStart(last.node, last.end_offset);
-	else range.setStartAfter(last.node);
-	range.setEndAfter(e.target.lastChild);
-	let r_ext = range.extractContents();
-
-	let marker_start = document.createElement("span");
-	marker_start.classList.add("select-marker");
-	r_ext.prepend(marker_start);
-	e.target.append(r_ext);
-
-	let els = document.createDocumentFragment();
-	for (let ee of affected) {
-		if (ee.zero) continue;
-		let el = ee.node;
-		if (ee.start_offset) {
-			el = document.createTextNode(ee.node.textContent.substring(ee.start_offset));
-			ee.node.textContent = ee.node.textContent.substring(0, ee.start_offset);
-		}
-		if (command === 'a') {
-			if (el.nodeName !== 'A') {
-				let d = el.textContent.split('|');
-				if (d.length < 1 || d.length > 2) throw -1;
-				let link = d[0];
-				let display = (d.length === 2) ? d[1] : d[0];
-				let new_el = document.createElement('a');
-				new_el.setAttribute("href", link);
-				new_el.textContent = display;
-				el.remove();
-				el = new_el;
-			} else {
-				let link = el.getAttribute("href");
-				let display = el.textContent;
-				let text = (link === display) ? link : `${link}|${display}`;
-				el.remove();
-				el = document.createTextNode(text);
-			}
-		}
-		for (let eee of ee.formats) {
-			if (ee.on && eee === command) continue;
-			if (command === 'ins' && eee === 'del' || command === 'del' && eee === 'ins' ||
-			command === 'sup' && eee === 'sub' || command === 'sub' && eee === 'sup' ||
-			command !== eee && (command.startsWith('color') && eee.startsWith('color') ||
-			command.startsWith('colorbox') && eee.startsWith('colorbox'))) continue;
-			let new_el = to_element(eee);
-			new_el.append(el);
-			el = new_el;
-		}
-		if (command !== "a" && !all_on) {
-			let new_el = to_element(command);
-			new_el.append(el);
-			el = new_el;
-		}
-		els.append(el);
-	}
-
-	let marker_end = document.createElement("span");
-	marker_end.classList.add("select-marker");
-	els.append(marker_end);
-	marker_start.after(els);
-	range.setStartAfter(marker_start);
-	range.setEndBefore(marker_end);
-	s.removeAllRanges();
-	s.addRange(range);
-
-	normalize_editable(e.target);
-	on_editable_input(e);
-	return;
-}
-
-function tab_command(e) {
-	if (!s.rangeCount || (s.anchorNode == s.focusNode && s.anchorOffset == s.focusOffset && s.anchorOffset == 0)) return;
-	e.preventDefault();
-	if (!s.isCollapsed) {
-		s.collapseToEnd();
-		return;
-	}
-	let last_text = s.anchorNode, first_text = last_text;
-	let cmd = null, flag = 0;
-	if (last_text.nodeType !== Node.TEXT_NODE) {
-		last_text = to_text_node_prev(last_text, s.anchorOffset);
-	} else if (s.anchorOffset === 0) {
-		last_text = to_text_node_prev(prev_node(last_text));
-	} else {
-		if (s.anchorOffset === 1) return;
-		let t = last_text.textContent.substring(0, s.anchorOffset);
-		if (!t.includes("]")) return;
-		cmd = k2e(t.match(/\]([^\]]*)$/)[1]).toLowerCase();
-		if (cmd.length === 0) return;
-		first_text = last_text;
-		flag = 2;
-	}
-	while (!flag && last_text) {
-		let t = last_text.textContent;
-		if (t.length === 0) {
-			last_text = to_text_node_prev(prev_node(last_text));
-			continue;
-		}
-		if (!t.includes("]")) return;
-		cmd = k2e(t.match(/\]([^\]]*)$/)[1]).toLowerCase();
-		if (cmd.length === 0) return;
-		first_text = last_text;
-		flag = 1;
-	}
-	if (cmd == null) throw -1;
-
-	if (cmd === "." || cmd === "st") {
-		let close_idx = (flag === 2) ? last_text.textContent.lastIndexOf("]", s.anchorOffset-1) : last_text.textContent.lastIndexOf("]");
-		let cursor_idx = (flag === 2) ? s.anchorOffset : last_text.textContent.length;
-		let range = document.createRange();
-		range.setStart(last_text, close_idx);
-		range.setEnd(last_text, cursor_idx);
-		range.deleteContents();
-		let sym = {".": "·", "st": "★"}
-		range.insertNode(document.createTextNode(sym[cmd]));
-		s.removeAllRanges();
-		s.addRange(range);
-		s.collapseToEnd();
-		normalize_editable(e.target);
-		return;
-	}
-
-	let flag2 = 1;
-	while (first_text) {
-		if (first_text.textContent.includes("[")) break;
-		first_text = to_text_node_prev(prev_node(first_text));
-		if (!e.target.contains(first_text)) return;
-		flag2 = 0;
-	}
-	if (!first_text || !first_text.textContent.includes("[")) return;
-
-	let command = null;
-	if (cmd === "b") command = "strong";
-	else if (cmd === "u") command = "em";
-	else if (cmd === ".") command = "sup";
-	else if (cmd === ",") command = "sub";
-	else if (cmd === "d") command = "del";
-	else if (cmd === "e") command = "ins";
-	else if ("0" <= cmd && cmd <= "9") command = `color${cmd}`;
-	else if (cmd === "a") command = "a";
-	if (command == null) return;
-
-	let open_idx = (flag2 === 1) ? first_text.textContent.lastIndexOf("[", s.anchorOffset-1) : first_text.textContent.lastIndexOf("[");
-	let close_idx = (flag === 2) ? last_text.textContent.lastIndexOf("]", s.anchorOffset-1) : last_text.textContent.lastIndexOf("]");
-	let cursor_idx = (flag === 2) ? s.anchorOffset : last_text.textContent.length;
-	let ft = first_text.textContent;
-	first_text.textContent = ft.substring(0, open_idx) + ft.substring(open_idx+1);
-	if (first_text === last_text) close_idx--;
-	let lt = last_text.textContent;
-	last_text.textContent = lt.substring(0, close_idx) + lt.substring(cursor_idx);
-	let range = document.createRange();
-	range.setStart(first_text, open_idx);
-	range.setEnd(last_text, close_idx);
-	s.removeAllRanges();
-	s.addRange(range);
-	try {
-		run_command(e, command);
-	} catch (e) {
-		if (e !== -1) throw e;
-	}
-	s.collapseToEnd();
-}
-
-function next_node(n) {
-	if (n == null) return null;
-	return n.nextSibling ?? next_node(n.parentNode);
-}
-
-function to_text_node(n, o) {
-	if (n == null) return null;
-	if (o != undefined) {
-		if (n.childNodes[o] == undefined) n = next_node(n);
-		n = n.childNodes[o];
-	}
-	while (n.nodeType !== Node.TEXT_NODE) {
-		if (to_command(n) === 'keep') return n;
-		if (n.firstChild == null) n = next_node(n);
-		if (n == null) return null;
-		if (n.firstChild != null) n = n.firstChild;
-	}
-	return n;
-}
-
-function prev_node(n) {
-	if (n == null) return null;
-	return n.previousSibling ?? prev_node(n.parentNode);
-}
-
-function to_text_node_prev(n, o) {
-	if (n == null) return null;
-	if (o != undefined) {
-		if (o === 0 || n.childNodes[o-1] == undefined) n = prev_node(n);
-		n = n.childNodes[o-1];
-	}
-	while (n.nodeType !== Node.TEXT_NODE) {
-		if (to_command(n) === 'keep') return n;
-		if (n.lastChild == null) n = prev_node(n);
-		if (n == null) return null;
-		if (n.lastChild != null) n = n.lastChild;
-	}
-	return n;
-}
-
-function normalize_editable(el) {
-	if (el.classList.contains("select-marker")) return;
-
-	let cur = el.firstChild;
-
-	function remove_node(n) {
-		let next = n.nextSibling;
-		el.removeChild(n);
-		return next;
-	}
-
-	while (cur != null) {
-		if (cur.nodeType === Node.TEXT_NODE) {
-			if (cur.textContent === '' || (cur.textContent === '\n' && cur.previousSibling == null && cur.nextSibling == null)) {
-				cur = remove_node(cur);
-				continue;
-			}
-			let prev = cur.previousSibling;
-			if (prev != null && prev.nodeType === Node.TEXT_NODE) {
-				prev.textContent += cur.textContent;
-				cur = remove_node(cur);
-				continue;
-			}
-			cur = cur.nextSibling;
-			continue;
-		}
-		if (cur.nodeType !== Node.ELEMENT_NODE || to_command(cur) === 'keep') {
-			cur = cur.nextSibling;
-			continue;
-		}
-		normalize_editable(cur);
-		let prev = cur.previousSibling;
-		if (prev != null && prev.nodeType === Node.ELEMENT_NODE && to_command(prev) === to_command(cur)) {
-			while (cur.firstChild) prev.appendChild(cur.firstChild);
-		}
-		if (cur.firstChild == null) {
-			cur = remove_node(cur);
-			continue;
-		}
-		cur = cur.nextSibling;
-	}
-
-	el.normalize();
-}
-
-function to_command(n) {
-	if (n.nodeType === Node.TEXT_NODE) return 'text';
-	if (n.tagName === "SPAN") {
-		if (n.classList.contains('color')) {
-			return `color${getColor(n.classList)}`;
-		} else if (n.classList.contains('colorbox')) {
-			return `colorbox${getColor(n.classList)}`;
-		}
-		return 'keep';
-	}
-	const sub_editable = ['STRONG', 'EM', 'SUP', 'SUB', 'INS', 'DEL'];
-	if (!sub_editable.includes(n.tagName)) return 'keep';
-	return n.tagName.toLowerCase();
-}
-
-function to_element(cmd) {
-	if (cmd === 'keep') throw -1;
-	if (cmd.startsWith('colorbox')) {
-		let el = document.createElement('span');
-		el.classList.add("colorbox");
-		el.classList.add(`c${cmd.substring(8)}`);
-		return el;
-	}
-	if (cmd.startsWith('color')) {
-		let el = document.createElement('span');
-		el.classList.add("color");
-		el.classList.add(`c${cmd.substring(5)}`);
-		return el;
-	}
-	return document.createElement(cmd);
-}
-
-const chcode = ['r','R','s','e','E','f','a','q','Q','t','T','d','w','W','c','z','x','v','g']
-const jucode = ['k','o','i','O','j','p','u','P','h','hk','ho','hl','y','n','nj','np','nl','b','m','ml','l']
-const jocode = ['','r','R','rt','s','sw','sg','e','f','fr','fa','fq','ft','fx','fv','fg','a','q','qt','t','T','d','w','c','z','x','v','g']
-const cscode = ['','r','R','rt','s','sw','sg','e','E','f','fr','fa','fq','ft','fx','fv','fg','a','q','Q','qt','t','T','d','w','W','c','z','x','v','g']
-function k2e(str) {
-	if (!str) return null;
-	let res = ''
-	for (let ch of str) {
-		let c = ch.charCodeAt(0)
-		if (0x1100 <= c && c <= 0x1112) { res += chcode[c - 0x1100]; continue; }
-		if (0x1161 <= c && c <= 0x1175) { res += jucode[c - 0x1161]; continue; }
-		if (0x11a8 <= c && c <= 0x11c2) { res += jocode[c - 0x11a7]; continue; }
-		if (0x3131 <= c && c <= 0x314e) { res += cscode[c - 0x3130]; continue; }
-		if (0x314f <= c && c <= 0x3163) { res += jucode[c - 0x314f]; continue; }
-		if (0xac00 <= c && c <= 0xd7a3) {
-			c -= 0xac00
-			let chidx = Math.floor(c / 588)
-			let juidx = Math.floor((c%588) / 28)
-			let joidx = c%28
-			res += chcode[chidx]
-			res += jucode[juidx]
-			if (joidx===0) continue;
-			res += jocode[joidx]
-			continue;
-		}
-		res += ch
-	}
-	return res;
-}
-
-let targeting_abort = null;
-
-function start_targeting(f) {
-	if (targeting_abort != null) stop_targeting();
+function startTargeting(f) {
+	if (targetingAbort != null) stopTargeting();
 	document.body.classList.add("targeting");
-	targeting_abort = new AbortController();
-	for (let el of document.getElementsByClassName("unit")) {
-		if (el.classList.contains("editable")) {
-			el.removeAttribute("contenteditable");
-		}
-		el.addEventListener("click", (e) => {
-			e.preventDefault();
-			f(e.currentTarget);
-			stop_targeting();
-		}, {signal: targeting_abort.signal});
-	}
-	for (let el of document.getElementsByClassName("first-bar")) {
-		el.addEventListener("click", (e) => {
-			e.preventDefault();
-			f(e.currentTarget.parentElement, true);
-			stop_targeting();
-		}, {signal: targeting_abort.signal});
-	}
-	for (let el of document.getElementsByClassName("last-bar")) {
-		el.addEventListener("click", (e) => {
-			e.preventDefault();
-			f(e.currentTarget.parentElement);
-			stop_targeting();
-		}, {signal: targeting_abort.signal});
-	}
+	targetingAbort = new AbortController();
+
+	$(".unit.editable").removeAttr("contenteditable");
+	addTargetListeners("unit", f, false, false);
+	addTargetListeners("first-bar", f, true, true);
+	addTargetListeners("last-bar", f, true, false);
 
 	document.addEventListener("keydown", (e) => {
-		if (e.key == 'Escape') stop_targeting();
-	}, {signal: targeting_abort.signal});
+		if (e.key == 'Escape') stopTargeting();
+	}, {signal: targetingAbort.signal});
 }
 
-export function stop_targeting() {
-	document.body.classList.remove("targeting");
-	for (let el of document.getElementsByClassName("unit")) {
-		if (el.classList.contains("editable")) {
-			el.setAttribute("contenteditable", "plaintext-only");
-		}
+function addTargetListeners(cls, f, parent, isFirst) {
+	for (const el of document.getElementsByClassName(cls)) {
+		el.addEventListener("click", (e) => {
+			e.preventDefault();
+			const after = parent ? e.currentTarget.parentElement : e.currentTarget;
+			f(after, isFirst);
+			stopTargeting();
+		}, {signal: targetingAbort.signal});
 	}
-	targeting_abort.abort();
-	targeting_abort = null;
+}
+
+export function stopTargeting() {
+	document.body.classList.remove("targeting");
+	$(".unit.editable").attr("contenteditable", "plaintext-only");
+	targetingAbort.abort();
+	targetingAbort = null;
 	document.activeElement.blur();
 }
 
-let new_el_func = null;
-let new_el_header = null;
-function insert_element(after, is_first) {
+let newElementFactory = null;
+let newElementAddHeader = null;
+function insertElement(after, isFirst) {
 	if (after.nextSibling?.tagName === 'NAV') after = after.nextSibling;
-	if (new_el_func == null) return;
-	let new_el = (new_el_func instanceof Function) ? new_el_func(after, is_first) : document.createElement(new_el_func);
-	if (new_el == undefined) return; // TODO: 경고
+	if (newElementFactory == null) return;
+	const newElement = newElementFactory instanceof Function ? 
+		newElementFactory(after, isFirst) : 
+		document.createElement(newElementFactory);
+	if (newElement == undefined) return; // TODO: 경고
 
-	if (is_first) {
-		after.insertAdjacentElement("afterbegin", new_el);
-		if (new_el_header) new_el.append(header(new_el, true));
-		edit_cur = Array.from(pos_map.get(after));
-		start_edit(after);
+	if (after.tagName === 'LI' || (
+		(after.tagName === 'UL' || after.tagName === 'OL') && isFirst
+	)) return; // TODO: 경고 / 리스트 편집 구현
+
+	if (isFirst) {
+		after.insertAdjacentElement("afterbegin", newElement);
+		if (newElementAddHeader) newElement.append(header(newElement, true));
+		positionStack = Array.from(positionMap.get(after));
+		startEdit(after);
 	} else {
-		after.insertAdjacentElement("afterend", new_el);
-		if (new_el_header) new_el.append(header(new_el, true));
-		let p = after.parentElement;
-		edit_cur = Array.from(pos_map.get(p));
-		start_edit(p);
+		after.insertAdjacentElement("afterend", newElement);
+		if (newElementAddHeader) newElement.append(header(newElement, true));
+		const parent = after.parentElement;
+		positionStack = Array.from(positionMap.get(parent));
+		startEdit(parent);
 	}
 
-	let pos = pos_map.get(new_el);
-	let new_data = serialize(new_el);
+	const pos = positionMap.get(newElement);
+	const newData = serialize(newElement);
 	fetch(window.location.pathname, { method: "PATCH", headers: {
 		'Content-type': 'application/json'
 	}, body: JSON.stringify({
 		pos: pos,
-		data: new_data,
+		data: newData,
 		splice: 0
 	})});
-	original_map.set(new_el, JSON.stringify(new_data));
+	originalMap.set(newElement, JSON.stringify(newData));
 }
 
-function delete_element(target, is_first) {
-	if (target.nextSibling.tagName === 'NAV' || target.tagName === 'NAV') return;
-	let p = target.parentElement;
-	let pos = pos_map.get(target);
+function deleteElement(target, isFirst) {
+	if (target.nextSibling?.tagName === 'NAV' || target.tagName === 'NAV') return;
+	const parent = target.parentElement;
+	const pos = positionMap.get(target);
 	fetch(window.location.pathname, { method: "PATCH", headers: {
 		'Content-type': 'application/json'
 	}, body: JSON.stringify({
@@ -813,34 +433,41 @@ function delete_element(target, is_first) {
 		splice: 1
 	})});
 	target.remove();
-	start_edit(p);
+	startEdit(parent);
 }
 
-export function header(after, is_first) {
-	let parent = is_first ? after : after.parentElement;
-	if (parent === document.body || parent.firstChild === document.body) return document.createElement("h1");
+export function header(after, isFirst) {
+	const parent = isFirst ? after : after.parentElement;
+	if (parent === document.body || parent.firstChild === document.body) {
+		return document.createElement("h1");
+	}
+	
 	let depth = 1;
-	let el = parent;
-	while (el != document.body) {
-		if (el.matches("section, article, fieldset, .columns")) depth++;
-		el = el.parentElement;
+	let cur = parent;
+	while (cur != document.body) {
+		if (cur.matches("section, article, fieldset, .columns")) depth++;
+		cur = cur.parentElement;
 	}
 	if (depth > 6) depth = 6;
 	return document.createElement(`h${depth}`);
 }
 
-export function menu_insert(el, header) {
-	function f() {
-		new_el_func = el;
-		new_el_header = header;
-		start_targeting(insert_element);
+export function menuInsert(el, addHeader) {
+	return function () {
+		newElementFactory = el;
+		newElementAddHeader = addHeader;
+		startTargeting(insertElement);
 	}
-	return f;
 }
 
-export function menu_delete(e) { start_targeting((target, is_first) => {
-	dialog("요소 삭제", `
-		이 &lt;${target.nodeName.toLowerCase()}&gt; 요소를 삭제하시겠습니까?<br>
-		이 작업은 되돌릴 수 없습니다.
-	`, () => {delete_element(target, is_first); return true;}, true)();
-}); }
+export function menuDelete(e) {
+	startTargeting((target, isFirst) => {
+		dialog("요소 삭제", `
+			이 &lt;${target.nodeName.toLowerCase()}&gt; 요소를 삭제하시겠습니까?<br>
+			이 작업은 되돌릴 수 없습니다.
+		`, () => {
+			deleteElement(target, isFirst);
+			return true;
+		}, true)();
+	});
+}
