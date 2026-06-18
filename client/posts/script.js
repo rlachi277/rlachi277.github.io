@@ -49,6 +49,11 @@ function setupDefaultMenus() {
 }
 
 function setupEditMenus(edit) {
+	async function check(promise) {
+		const res = await promise;
+		if (!res.ok) throw res.status;
+	}
+
 	async function newPost(path, data) {
 		const absPath = new URL(path, `file://${window.location.pathname}`).pathname;
 		if (!absPath || !absPath.startsWith("/posts/")) {
@@ -62,7 +67,7 @@ function setupEditMenus(edit) {
 				// TODO: 경고
 				return false;
 			}
-			await fetch(absPath, {method: "PUT", body: JSON.stringify(data)});
+			check(fetch(absPath, {method: "PUT", body: JSON.stringify(data)}));
 			return true;
 		} catch (e) {
 			alert(`오류: ${e}`);
@@ -90,7 +95,7 @@ function setupEditMenus(edit) {
 		이 작업은 되돌릴 수 없습니다.
 	`, async () => {
 		try {
-			await fetch(window.location.pathname, {method: "DELETE"});
+			check(fetch(window.location.pathname, {method: "DELETE"}));
 			return true;
 		} catch (e) {
 			alert(`오류: ${e}`);
@@ -105,11 +110,11 @@ function setupEditMenus(edit) {
 	`, async () => {
 		const path = window.location.pathname;
 		try {
-			await fetch(path, {
+			check(fetch(path, {
 				method: "PUT",
 				headers: {'Content-Type': 'text/plain'},
 				body: d$("dialog-json-file").files[0]
-			});
+			}));
 			return true;
 		} catch (e) {
 			alert(`오류: ${e}`);

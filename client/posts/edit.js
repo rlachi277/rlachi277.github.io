@@ -1,4 +1,4 @@
-import { d$, q$, $ } from "/client/jquery.js";
+import { q$, $ } from "/client/jquery.js";
 import { serialize, deserialize, getColor } from "./seri.js";
 import { runCommand, tabCommand, normalizeEditable, tryUndo, tryRedo, clearHistory } from "./edit_inline.js";
 import { dialog } from "./dialog.js";
@@ -83,7 +83,7 @@ export function startEdit(el, init) {
 	return true;
 }
 
-function getEditType(el, init) {
+function getEditType(el) {
 	switch (el.nodeName) {
 	case 'BODY':
 		return EDIT_TYPE.NONE;
@@ -338,7 +338,7 @@ export function submitAll() {
 	document.activeElement.blur();
 	q$(".edited").forEach((e) => submitChanges(e));
 	q$(".new").forEach((e) => submitNew(e));
-	q$(".deleted").forEach((e) => submitDelete(e));
+	// q$(".deleted").forEach((e) => submitDelete(e));
 }
 
 window.addEventListener("beforeunload", (e) => {
