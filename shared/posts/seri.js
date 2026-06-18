@@ -9,31 +9,40 @@ const SIMPLE_TYPES = new Set([
 	"sub", "sup", "ins", "del"
 ]);
 
-export function serialize(el, init) {
-	if (el.nodeType === Node.TEXT_NODE) {
-		if (/^\n\s*$/.test(el.textContent)) return undefined;
-		return el.textContent.replaceAll(/\n\s*/g, "");
+export function seri(data, init, hooks = []) {
+	if (data.nodeType === Node.TEXT_NODE) {
+		if (/^\n\s*$/.test(data.textContent)) return undefined;
+		return data.textContent.replaceAll(/\n\s*/g, "");
 	}
-	if (el.nodeName.startsWith("#")) return undefined;
-	if (el.classList.contains("new")) return undefined;
+	if (data.nodeName.startsWith("#")) return undefined;
+	if (data.classList.contains("new")) return undefined;
+
+	const children = [];
+	data.childNodes.forEach((e) => {
+		const child = seri(e, false, hooks);
+		if (child != undefined) children.push(child);
+	});
+
+	for (const e of hooks) {
+		const hookResult = e(data, init);
+		if (hookResult !== null) {
+			if (hookResult?.children != null) hookResult.children = children;
+			return hookResult;
+		}
+	}
 
 	const result = {
 		type: null,
 		variant: undefined,
-		children: []
+		children: children
 	};
 
-	el.childNodes.forEach((e) => {
-		const child = serialize(e);
-		if (child != undefined) result.children?.push(child);
-	});
-
-	if (SIMPLE_TYPES.has(el.nodeName.toLowerCase())) {
-		result.type = el.nodeName.toLowerCase();
+	if (SIMPLE_TYPES.has(data.nodeName.toLowerCase())) {
+		result.type = data.nodeName.toLowerCase();
 		return result;
 	}
 
-	switch (init ? 'BODY' : el.nodeName) {
+	switch (init ? 'BODY' : data.nodeName) {
 	case 'BODY':
 		result.type = "body";
 		break;
@@ -44,49 +53,49 @@ export function serialize(el, init) {
 	case 'ARTICLE':
 		result.type = "article";
 		result.variant = {float: null};
-		if (el.classList.contains('float-right')) result.variant.float = "right";
-		else if (el.classList.contains('float-left')) result.variant.float = "left";
+		if (data.classList.contains('float-right')) result.variant.float = "right";
+		else if (data.classList.contains('float-left')) result.variant.float = "left";
 		break;
 	case 'HR':
 		result.variant = {rule: null};
-		if (el.classList.contains('rule')) result.variant.rule = true;
+		if (data.classList.contains('rule')) result.variant.rule = true;
 	case 'BR':
 		result.children = null;
-		result.type = el.nodeName.toLowerCase();
+		result.type = data.nodeName.toLowerCase();
 		break;
 	case 'P':
 		result.type = "p";
-		result.variant = getAttributes(el, ["lang"]);
+		result.variant = getAttributes(data, ["lang"]);
 		break;
 	case 'FIGURE':
 		result.type = "figure";
 		result.variant = {float: null};
-		if (el.classList.contains('float-right')) result.variant.float = "right";
-		else if (el.classList.contains('float-left')) result.variant.float = "left";
+		if (data.classList.contains('float-right')) result.variant.float = "right";
+		else if (data.classList.contains('float-left')) result.variant.float = "left";
 		break;
 	case 'IMG':
 		result.type = "img";
 		result.variant = {
-			size: seriSize(el),
-			...getAttributes(el, ["src", "alt"])
+			size: seriSize(data),
+			...getAttributes(data, ["src", "alt"])
 		};
 		result.children = null;
 		break;
 	case 'OL':
 		result.type = 'ol';
-		result.variant = getAttributes(el, ["start"]);
+		result.variant = getAttributes(data, ["start"]);
 		break;
 	case 'AUDIO':
 		result.type = "audio";
-		result.variant = getAttributes(el, [
+		result.variant = getAttributes(data, [
 			"src", "controls", "crossorigin", "loop", "muted", "preload"
 		]);
 		break;
 	case 'VIDEO':
 		result.type = "video";
 		result.variant = {
-			size: seriSize(el),
-			...getAttributes(el, [
+			size: seriSize(data),
+			...getAttributes(data, [
 				"src", "autoplay", "controls", "crossorigin", "loop",
 				"muted", "poster", "preload"
 			])
@@ -94,49 +103,49 @@ export function serialize(el, init) {
 		break;
 	case 'TRACK':
 		result.type = "track";
-		result.variant = getAttributes(el, [
+		result.variant = getAttributes(data, [
 			"src", "srclang", "default", "kind", "label"
 		]);
 		break;
 	case 'SOURCE':
 		// currently <audio>, <video> only
 		result.type = "source";
-		result.variant = getAttributes(el, ["src", "media"]);
+		result.variant = getAttributes(data, ["src", "media"]);
 		break;
 	case 'A':
 		result.type = "a";
-		result.variant = getAttributes(el, [
+		result.variant = getAttributes(data, [
 			"href", "target", "download", "rel"
 		]);
 		result.variant.shape = null;
-		if (el.classList.contains("broken")) {
+		if (data.classList.contains("broken")) {
 			result.variant.shape = "broken";
-		} else if (el.classList.contains("color")) {
+		} else if (data.classList.contains("color")) {
 			result.variant.shape = "color";
-			result.variant.color = getColor(el.classList);
-		} else if (el.classList.contains("colorbox")) {
+			result.variant.color = getColor(data.classList);
+		} else if (data.classList.contains("colorbox")) {
 			result.variant.shape = "colorbox";
-			result.variant.color = getColor(el.classList);
+			result.variant.color = getColor(data.classList);
 		}
 		break;
 	case 'BUTTON':
 		result.type = "button";
 		// todo: button attributes
 		result.variant = {};
-		if (el.classList.contains("colorbox")) {
+		if (data.classList.contains("colorbox")) {
 			result.variant.shape = "colorbox";
-			result.variant.color = getColor(el.classList);
+			result.variant.color = getColor(data.classList);
 		}
 		break;
 	default:
-		if (el.classList.contains("columns")) {
+		if (data.classList.contains("columns")) {
 			result.type = "columns";
-		} else if (el.classList.contains("color")) {
+		} else if (data.classList.contains("color")) {
 			result.type = "color";
-			result.variant = {color: getColor(el.classList), click: el.classList.contains("click")};
-		} else if (el.classList.contains("colorbox")) {
+			result.variant = {color: getColor(data.classList), click: data.classList.contains("click")};
+		} else if (data.classList.contains("colorbox")) {
 			result.type = "colorbox";
-			result.variant = {color: getColor(el.classList), click: el.classList.contains("click")};
+			result.variant = {color: getColor(data.classList), click: data.classList.contains("click")};
 		} else {
 			return undefined;
 		}
@@ -160,17 +169,39 @@ function getAttributes(el, names) {
 	return variant;
 }
 
-export function deserialize(el, cur, init) {
+export function getColor(classList) {
+	for (let i=0; i<=10; i++) {
+		if (classList.contains(`c${i}`)) return i;
+	}
+	return -1;
+}
+
+export function deseri(el, cur, init, hooks = []) {
 	if (typeof el === 'string' || el instanceof String) return sani(el);
+
+	let children = "";
+	el.children?.forEach((e) => {
+		const child = deseri(e, cur, false, hooks);
+		if (child != null) children += child;
+	});
+
+	for (const e of hooks) {
+		const hookResult = e(el, cur, init);
+		if (hookResult !== null) {
+			switch (hookResult.type) {
+			case 'html':
+				return hookResult.html;
+			case 'void':
+				return `<${hookResult.tagName}>`;
+			default:
+				return `<${hookResult.tagName}${hookResult.attrs}>${children}</${hookResult.tagName}>`;
+			}
+		}
+	}
 
 	let tagName = null;
 	let attrs = "";
-	let children = "";
 	let isVoid = false;
-	el.children?.forEach((e) => {
-		const child = deserialize(e, cur);
-		if (child != null) children += child;
-	});
 	
 	if (init || el.type === 'body') return children;
 	if (SIMPLE_TYPES.has(el.type)) return `<${el.type}>${children}</${el.type}>`;
@@ -193,13 +224,13 @@ export function deserialize(el, cur, init) {
 		break;
 	case 'p':
 		tagName = "p";
-		attrs += setAttributes(el, el.variant, ["lang"]);
+		attrs += setAttributes(el.variant, ["lang"]);
 		break;
 	case 'img':
 		tagName = "img";
 		isVoid = true;
 		if (el.variant?.src != null) attrs += ` src="${sani(assets(el.variant?.src, cur))}"`;
-		attrs += setAttributes(el, el.variant, ["alt"]);
+		attrs += setAttributes(el.variant, ["alt"]);
 		attrs += deseriSize(el.variant?.size);
 		break;
 	case 'ol':
@@ -209,14 +240,14 @@ export function deserialize(el, cur, init) {
 	case 'audio':
 		tagName = "audio";
 		if (el.variant?.src != null) attrs += ` src="${sani(assets(el.variant?.src, cur))}"`;
-		attrs += setAttributes(el, el.variant, [
+		attrs += setAttributes(el.variant, [
 			"controls", "crossorigin", "loop", "muted", "preload"
 		]);
 		break;
 	case 'video':
 		tagName = "video";
 		if (el.variant?.src != null) attrs += ` src="${sani(assets(el.variant?.src, cur))}"`;
-		attrs += setAttributes(el, el.variant, [
+		attrs += setAttributes(el.variant, [
 			"autoplay", "controls", "crossorigin", "loop",
 			"muted", "poster", "preload"
 		]);
@@ -225,7 +256,7 @@ export function deserialize(el, cur, init) {
 	case 'track':
 		tagName = "track";
 		if (el.variant?.src != null) attrs += ` src="${sani(assets(el.variant?.src, cur))}"`;
-		attrs += setAttributes(el, el.variant, [
+		attrs += setAttributes(el.variant, [
 			"srclang", "default", "kind", "label"
 		]);
 		break;
@@ -233,11 +264,11 @@ export function deserialize(el, cur, init) {
 		// currently <audio>, <video> only
 		tagName = "source";
 		if (el.variant?.src != null) attrs += ` src="${sani(assets(el.variant?.src, cur))}"`;
-		attrs += setAttributes(el, el.variant, ["media"]);
+		attrs += setAttributes(el.variant, ["media"]);
 		break;
 	case 'a':
 		tagName = "a";
-		attrs += setAttributes(el, el.variant, ["href", "target", "download", "rel"]);
+		attrs += setAttributes(el.variant, ["href", "target", "download", "rel"]);
 		switch (el.variant?.shape) {
 		case 'broken':
 			attrs += ` class="broken"`;
@@ -275,18 +306,11 @@ export function deserialize(el, cur, init) {
 		attrs = ` class="colorbox c${el.variant?.color}${el.variant?.click?" click":""}"`;
 		break;
 	default:
-		return null;
+		return undefined;
 	}
 
 	if (isVoid) return `<${tagName}${attrs}>`;
 	else return `<${tagName}${attrs}>${children}</${tagName}>`;
-}
-
-export function getColor(classList) {
-	for (let i=0; i<=10; i++) {
-		if (classList.contains(`c${i}`)) return i;
-	}
-	return -1;
 }
 
 function deseriSize(size) {
@@ -299,7 +323,7 @@ function deseriSize(size) {
 	return ` class="loading${sizeClass}" onload="this.classList.remove('loading')"`;
 }
 
-function setAttributes(el, variant, names) {
+function setAttributes(variant, names) {
 	let result = '';
 	for (const e of names) {
 		if (variant?.[e] != null) result += ` ${e}="${sani(variant?.[e])}"`;
@@ -307,7 +331,7 @@ function setAttributes(el, variant, names) {
 	return result;
 }
 
-function sani(s) {
+export function sani(s) {
 	// 막기 귀찮아요
 	// 여러분 XSS는 하면 안 되는 겁니다
 	return s

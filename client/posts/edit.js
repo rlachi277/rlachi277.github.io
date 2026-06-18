@@ -1,5 +1,5 @@
 import { q$, $ } from "/client/jquery.js";
-import { serialize, deserialize, getColor } from "./seri.js";
+import { seri, deseri } from "/shared/posts/seri.js";
 import { runCommand, tabCommand, normalizeEditable, tryUndo, tryRedo, clearHistory } from "./edit_inline.js";
 import { dialog } from "./dialog.js";
 
@@ -70,7 +70,7 @@ export function startEdit(el, init) {
 	});
 
 	if (type === EDIT_TYPE.EDITABLE) {
-		originalMap.set(el, JSON.stringify(serialize(el)));
+		originalMap.set(el, JSON.stringify(seri(el)));
 		if (el.getAttribute("data-id") == null) {
 			el.setAttribute("data-id", editCnt++);
 			el.setAttribute("contenteditable", "plaintext-only");
@@ -247,7 +247,7 @@ function handleCancelKey(target) {
 		return;
 	}
 	if (!manageConfirm(target, "will-cancel", "will-submit")) return;
-	target.innerHTML = deserialize(JSON.parse(originalMap.get(target)), window.location.pathname, true);
+	target.innerHTML = deseri(JSON.parse(originalMap.get(target)), window.location.pathname, true);
 	target.blur();
 }
 
@@ -293,17 +293,17 @@ function onEditableBlur(e) {
 	$(e.target).find('.select-marker').remove();
 	normalizeEditable(e.target);
 	clearHistory();
-	if (JSON.stringify(serialize(e.target)) === originalMap.get(e.target)) {
+	if (JSON.stringify(seri(e.target)) === originalMap.get(e.target)) {
 		e.target.classList.remove("edited");
 	}
 }
 
-function submit(el, seri, splice) {
+function submit(el, makeData, splice) {
 	el.innerHTML = el.innerHTML.replaceAll("\n", "<br>");
 	if (el.lastChild?.nodeName === "BR") el.removeChild(el.lastChild);
 	document.activeElement.blur();
 	const pos = positionMap.get(el);
-	const data = seri ? serialize(el) : undefined;
+	const data = makeData ? seri(el) : undefined;
 	fetch(window.location.pathname, { method: "PATCH", headers: {
 		'Content-type': 'application/json'
 	}, body: JSON.stringify({
@@ -410,7 +410,7 @@ function insertElement(after, isFirst) {
 	}
 
 	const pos = positionMap.get(newElement);
-	const newData = serialize(newElement);
+	const newData = seri(newElement);
 	fetch(window.location.pathname, { method: "PATCH", headers: {
 		'Content-type': 'application/json'
 	}, body: JSON.stringify({
@@ -421,7 +421,7 @@ function insertElement(after, isFirst) {
 	originalMap.set(newElement, JSON.stringify(newData));
 }
 
-function deleteElement(target, isFirst) {
+function deleteElement(target) {
 	if (target.nextSibling?.tagName === 'NAV' || target.tagName === 'NAV') return;
 	const parent = target.parentElement;
 	const pos = positionMap.get(target);
@@ -460,7 +460,7 @@ export function menuInsert(el, addHeader) {
 	}
 }
 
-export function menuDelete(e) {
+export function menuDelete() {
 	startTargeting((target, isFirst) => {
 		dialog("요소 삭제", `
 			이 &lt;${target.nodeName.toLowerCase()}&gt; 요소를 삭제하시겠습니까?<br>

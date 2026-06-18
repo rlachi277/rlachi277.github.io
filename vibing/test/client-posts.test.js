@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {deserialize} from "../../client/posts/seri.js";
+import {deseri as deserialize} from "../../shared/posts/seri.js";
 
 test("deserialize keeps media attributes well formed", () => {
 	const html = deserialize({

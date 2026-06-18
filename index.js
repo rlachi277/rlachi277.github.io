@@ -10,6 +10,7 @@ app.get('/', (_, res) => { res.sendFile(path.join(__dirname, 'index.html')); });
 app.get('/index.html', (_, res) => { res.sendFile(path.join(__dirname, 'index.html')); });
 app.get('/README.md', (_, res) => { res.sendFile(path.join(__dirname, 'README.md')); });
 app.use('/client', express.static(path.join(__dirname, 'client')));
+app.use('/shared', express.static(path.join(__dirname, 'shared')));
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 app.use('/vibing', express.static(path.join(__dirname, 'vibing')));
 

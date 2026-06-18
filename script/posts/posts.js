@@ -4,7 +4,7 @@ import path from 'path';
 import Database from 'better-sqlite3';
 import __dirname from '../../dirname.js';
 import { render } from './render.js';
-import { add_post, remove_post } from "./nav.js";
+import { addPost, removePost } from "./nav.js";
 
 const router = express.Router();
 export default router;
@@ -35,10 +35,9 @@ fs.readFile(path.join(__dirname, 'client', 'posts', 'index.html'), 'utf8', (err,
 });
 
 router.get('/raw/*path', (req, res) => {
-	let path = req.params.path.join('/');
-	if (path.endsWith("/")) path += "index.html";
+	const path = getPath(req.params.path);
 	try {
-		res.send(get_post_json(path));
+		res.send(getPostJSON(path));
 	} catch (e) {
 		if (e === 404) res.sendStatus(404);
 		throw e;
@@ -46,10 +45,9 @@ router.get('/raw/*path', (req, res) => {
 }); // PUTing at /raw/* will make a secret post only accessible as raw by /raw/raw/*
 
 router.get('/*path', (req, res) => {
-	let path = req.params.path.join('/');
-	if (path.endsWith("/")) path += "index.html";
+	const path = getPath(req.params.path);
 	try {
-		const rendered = render(get_post_json(path), `/posts/${path}`);
+		const rendered = render(getPostJSON(path), `/posts/${path}`);
 		res.setHeader('Content-Type', 'text/html');
 		res.send(template.replace("###여기까지가 템플릿임###", rendered));
 	} catch (e) {
@@ -59,23 +57,21 @@ router.get('/*path', (req, res) => {
 });
 
 router.put('/*path', (req, res) => {
-	let path = req.params.path.join('/');
-	if (path.endsWith("/")) path += "index.html";
+	const path = getPath(req.params.path);
 	db.prepare(`
 		INSERT INTO posts (path, data)
 		VALUES (?, ?)
 		ON CONFLICT(path)
 		DO UPDATE SET data = excluded.data;
 	`).run(path, req.body);
-	add_post(req.params.path);
+	addPost(req.params.path);
 	res.sendStatus(204);
 });
 
 router.patch('/*path', (req, res) => {
-	let path = req.params.path.join('/');
-	if (path.endsWith("/")) path += "index.html";
-	const db_res = db.prepare('SELECT data FROM posts WHERE path = ?').get(path)?.data;
-	if (db_res === undefined) {
+	const path = getPath(req.params.path);
+	const dbResult = db.prepare('SELECT data FROM posts WHERE path = ?').get(path)?.data;
+	if (dbResult === undefined) {
 		res.sendStatus(404); return;
 	}
 	const { pos, data, splice } = req.body;
@@ -88,7 +84,7 @@ router.patch('/*path', (req, res) => {
 	if (splice === 0 && data == undefined) {
 		res.status(400).send("data absent"); return;
 	}
-	let old_data = JSON.parse(db_res);
+	const dbData = JSON.parse(dbResult);
 	if (pos.length === 0) {
 		db.prepare(`
 			UPDATE posts
@@ -98,52 +94,57 @@ router.patch('/*path', (req, res) => {
 		res.status(200).send(data);
 		return;
 	}
-	let cur_data = old_data;
+	let cur = dbData;
 	pos.reverse();
 	while (pos.length > 1) {
-		cur_data = cur_data.children[pos.pop()];
-		if (cur_data == undefined) {
+		cur = cur.children[pos.pop()];
+		if (cur == undefined) {
 			res.status(400).send("invalid pos"); return;
 		}
 	}
-	if (cur_data.children.length < pos[0]) {
+	if (cur.children.length < pos[0]) {
 		res.status(400).send("invalid pos"); return;
 	}
-	if (data != undefined) cur_data.children.splice(pos[0], splice, data);
-	else cur_data.children.splice(pos[0], splice);
+	if (data != undefined) cur.children.splice(pos[0], splice, data);
+	else cur.children.splice(pos[0], splice);
 	db.prepare(`
 		UPDATE posts
 		SET data = ?
 		WHERE path = ?;
-	`).run(JSON.stringify(old_data), path);
+	`).run(JSON.stringify(dbData), path);
 	res.sendStatus(204);
 });
 
 router.delete('/*path', (req, res) => {
-	let path = req.params.path.join('/');
-	if (path.endsWith("/")) path += "index.html";
+	const path = getPath(req.params.path);
 	const info = db.prepare('DELETE FROM posts WHERE path = ?').run(path);
 	if (info.changes === 0) {
 		res.sendStatus(404); return;
 	}
-	remove_post(req.params.path);
+	removePost(req.params.path);
 	res.sendStatus(204);
 });
 
-export function get_post_raw(path) {
-	const db_res = db.prepare('SELECT data FROM posts WHERE path = ?').get(path);
-	return db_res;
+function getPath(path) {
+	let result = path.join('/');
+	if (path.endsWith("/")) result += "index.html";
+	return result;
 }
 
-function get_post_json(path) {
-	const db_res = get_post_raw(path);
-	if (db_res === undefined) {
+function getRawPost(path) {
+	const dbResult = db.prepare('SELECT data FROM posts WHERE path = ?').get(path);
+	return dbResult;
+}
+
+function getPostJSON(path) {
+	const dbResult = getRawPost(path);
+	if (dbResult === undefined) {
 		throw 404;
 	}
-	return JSON.parse(db_res.data);
+	return JSON.parse(dbResult.data);
 }
 
-export function post_exists(path) {
-	const db_res = db.prepare('SELECT COUNT(1) FROM posts WHERE path = ?').get(path);
-	return db_res['COUNT(1)'] == 1;
+export function postExists(path) {
+	const dbResult = db.prepare('SELECT COUNT(1) FROM posts WHERE path = ?').get(path);
+	return dbResult['COUNT(1)'] == 1;
 }

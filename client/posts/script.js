@@ -1,5 +1,5 @@
 import { $, d$ } from "/client/jquery.js";
-import { serialize } from "./seri.js";
+import { seri } from "/shared/posts/seri.js";
 import { setupDialog, dialog } from "./dialog.js";
 
 /*
@@ -35,7 +35,7 @@ function setupDefaultMenus() {
 
 	$("#menu-export").on("click", () => {
 		try {
-			const data = serialize($("body").get(0));
+			const data = seri($("body").get(0));
 			const file = new Blob([JSON.stringify(data)], {type: "application/json"});
 			const anchor = document.createElement("a");
 			anchor.href = URL.createObjectURL(file);
@@ -89,7 +89,7 @@ function setupEditMenus(edit) {
 	$("#menu-duplicate").on("click", dialog("이 글 복제", `
 		<label for="dialog-new-path">경로: </label>
 		<input id="dialog-new-path" placeholder="경로 입력">
-	`, () => newPost(d$("dialog-new-path").value, serialize($("body").get(0))), false));
+	`, () => newPost(d$("dialog-new-path").value, seri($("body").get(0))), false));
 	$("#menu-delete").on("click", dialog("이 글 삭제", `
 		정말로 <strong>이 글 전체</strong>를 삭제하시겠습니까?<br>
 		이 작업은 되돌릴 수 없습니다.

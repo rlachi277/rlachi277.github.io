@@ -1,4 +1,4 @@
-import { serialize, deserialize, getColor } from "./seri.js";
+import { seri, deseri, getColor } from "/shared/posts/seri.js";
 import { $ } from "/client/jquery.js";
 
 const S = window.getSelection();
@@ -7,15 +7,15 @@ let redoBuffer = [];
 
 export function tryUndo(target) {
 	if (undoBuffer.length === 0) return false;
-	redoBuffer.push(serialize(target));
-	target.innerHTML = deserialize(undoBuffer.pop(), window.location.pathname, true);
+	redoBuffer.push(seri(target));
+	target.innerHTML = deseri(undoBuffer.pop(), window.location.pathname, true);
 	return true;
 }
 
 export function tryRedo(target) {
 	if (redoBuffer.length === 0) return false;
-	undoBuffer.push(serialize(target));
-	target.innerHTML = deserialize(redoBuffer.pop(), window.location.pathname, true);
+	undoBuffer.push(seri(target));
+	target.innerHTML = deseri(redoBuffer.pop(), window.location.pathname, true);
 	return true;
 }
 
@@ -29,7 +29,7 @@ export function runCommand(e, command) {
 	if (range.collapsed) throw -1;
 
 	e.preventDefault();
-	undoBuffer.push(serialize(e.target));
+	undoBuffer.push(seri(e.target));
 
 	$(e.target).find('.select-marker').remove();
 	
@@ -79,8 +79,7 @@ function collectAffected(range, root) {
 
 	cur = descendRight(nextNode(affected[0].node));
 	while (cur != null && range.intersectsNode(cur)) {
-		if (toCommand(cur) === 'keep') affected.push({node: cur});
-		else affected.push({node: cur});
+		affected.push({node: cur});
 		cur = descendRight(nextNode(cur));
 	}
 
@@ -151,7 +150,7 @@ function applyCommand(affected, command, allOn) {
 		if (command === 'a') {
 			if (!allOn && el.nodeName !== 'A') {
 				const args = el.textContent.split('|');
-				if (args.length < 1 || args.length > 2) throw -1;
+				if (!(args.length === 1 || args.length === 2)) throw -1;
 				const link = args[0];
 				const display = (args.length === 2) ? args[1] : args[0];
 				const newElement = document.createElement('a');
