@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import __dirname from '../../dirname.js';
-import { render } from './render.js';
+import { deseri } from '../../shared/posts/seri.js';
+import { renderNavHook } from './nav.js';
 import { addPost, removePost } from "./nav.js";
 
 let template = 'wkatlaksdy...';
@@ -24,17 +25,17 @@ export function getRawPost(db, path) {
 
 export function getPost(db, path) {
 	try {
-		const rendered = render(db, getRawPost(db, path), `/posts/${path}`);
+		const rendered = deseri(getRawPost(db, path), `/posts/${path}`, true, [renderNavHook(db)]);
 		return template.replace("###여기까지가 템플릿임###", rendered);
 	} catch (e) {
 		if (e !== 404) throw e;
-		const rendered = render(db, {
+		const rendered = deseri({
 			type: "body",
 			children: [
 				{type: "h1", children: ["404 Not Found"]},
 				{type: "nav"}
 			]
-		}, `/posts/${path}`);
+		}, `/posts/${path}`, true, [renderNavHook(db)]);
 		throw {
 			status: 404,
 			html: template_404.replace("###여기까지가 템플릿임###", rendered)
