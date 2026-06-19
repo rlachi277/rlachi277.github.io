@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "nodemon -e js,json,html,css index.js",
     "vibing-test": "node --test vibing/test/*.test.js",
-    "vibing-test:browser": "node --test vibing/playwright/*.test.js"
+    "vibing-test:browser": "node --test vibing/test/playwright/*.test.js"
   },
   "dependencies": {
     "better-sqlite3": "^12.6.2",

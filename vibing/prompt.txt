@@ -1,0 +1,1 @@
+Create an intro file at `/vibing/index.html`. You should briefly explain facts about vibe coding, both in Korean and English. The background should be whatever gradient you want it to be, but it shouldn't be obstructing the foreground.

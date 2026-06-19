@@ -1,0 +1,8 @@
+At vibing/, make a chat program where users can talk with each other in real-time.
+
+- Files for clients should be at vibing/chat/*, and files for servers should be at vibing/script/chat/*.
+- For databases, create vibing/db/chat.db and use it.
+- There should be a file at vibing/script/chat/router.js that has similar purpose with script/posts/router.js, i.e. exporting a router that can be added to index.js to enable the entirity of the app.
+- For now, no login features are needed, and everyone has the permission to send chats. However, each session should be distinguished by e.g. 'profile picture' color difference.
+- If you know a way to somehow apply third-party library to the specified folder only and have no effects on other places, you may use that third-party library. Otherwise, do not use it.
+- If you need testing, feel free to add more tests at vibing/test/* etc. or ask me for permission to modify index.js.
