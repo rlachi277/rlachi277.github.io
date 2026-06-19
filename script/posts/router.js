@@ -1,5 +1,8 @@
+import fs from 'fs';
+import path from 'path';
 import express from "express";
 import Database from 'better-sqlite3';
+import __dirname from '../../dirname.js';
 import {
 	getRawPost,
 	getPost,
@@ -7,10 +10,10 @@ import {
 	patchPost,
 	deletePost
 } from "./posts.js";
+import { renderNavHook } from './render_nav.js';
 
-export const db = new Database('db/posts.db');
+const db = new Database('db/posts.db');
 db.pragma('journal_mode = WAL');
-
 db.prepare(`
 	CREATE TABLE IF NOT EXISTS posts (
 		id INTEGER PRIMARY KEY,
@@ -27,6 +30,24 @@ db.prepare(`
 	)
 `).run();
 
+let template = 'wkatlaksdy...';
+let notFoundTemplate = 'wiatlaksdy...';
+fs.readFile(path.join(__dirname, 'client', 'posts', 'index.html'), 'utf8', (err, data) => {
+	if (err) throw err;
+	template = data.replaceAll(/\n|\t/g, '');
+});
+fs.readFile(path.join(__dirname, 'client', 'posts', '404.html'), 'utf8', (err, data) => {
+	if (err) throw err;
+	notFoundTemplate = data.replaceAll(/\n|\t/g, '');
+});
+const notFoundData = {
+	type: "body",
+	children: [
+		{type: "h1", children: ["404 Not Found"]},
+		{type: "nav"}
+	]
+};
+
 const router = express.Router();
 export default router;
 
@@ -41,7 +62,11 @@ router.get('/{*path}', (req, res) => {
 	const path = getPath(req.params.path);
 	withErrors(res, () => {
 		res.setHeader('Content-Type', 'text/html');
-		return getPost(db, path);
+		return getPost(db, path, {
+			normal: template,
+			notFound: notFoundTemplate,
+			notFoundData: notFoundData
+		}, [renderNavHook(db, "/posts/")]);
 	}, true);
 });
 
@@ -72,7 +97,7 @@ function getPath(path = []) {
 	return result;
 }
 
-function withErrors(res, func, sendResult) {
+export function withErrors(res, func, sendResult) {
 	try {
 		if (sendResult) {
 			res.status(200).send(func());

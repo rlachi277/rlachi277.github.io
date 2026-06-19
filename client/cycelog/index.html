@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-	<title>cycweb posts</title>
+	<title>cycelog</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="/client/colors.css">
 	<link rel="stylesheet" href="/client/posts/style.css">
 	<script type="module">
 		import { setup } from "/client/posts/script.js";
-		import { defaultMenu, editMenu } from "/client/posts/menu.js";
+		import { defaultMenu, editMenu } from "/client/cycelog/menu.js";
 		setup(defaultMenu, editMenu);
 	</script>
 </head>
@@ -20,7 +20,6 @@
 				<li><button class="menu-action" data-menu="export">JSON으로 저장</button></li>
 				<li class="menu-edit"><button class="menu-action" data-menu="load">JSON에서 불러오기...</button></li>
 				<li class="menu-edit"><button class="menu-action" data-menu="new">새 글...</button></li>
-				<li class="menu-edit"><button class="menu-action" data-menu="duplicate">이 글 복제...</button></li>
 				<li class="menu-edit"><button class="menu-action" data-menu="delete">이 글 삭제...</button></li>
 			</ul>
 			</li>
@@ -32,14 +31,11 @@
 			</li>
 			<li class="menu-edit"><button id="menu-insert" popovertarget="menu-insertsub">삽입</button>
 			<ul id="menu-insertsub" popover>
+				<li><button class="menu-action" data-menu="insertWeek">주차 추가</button></li>
 				<li><button class="menu-action" data-menu="insertP">문단 삽입</button></li>
 				<li><button class="menu-action" data-menu="insertSection">&lt;section&gt; 삽입</button></li>
-				<li><button class="menu-action" data-menu="insertArticle">&lt;article&gt; 삽입</button></li>
 				<li><button class="menu-action" data-menu="insertFieldset">&lt;fieldset&gt; 삽입</button></li>
-				<li><button class="menu-action" data-menu="insertLegend">&lt;legend&gt; 삽입</button></li>
 				<li><button class="menu-action" data-menu="insertColumns">다단 레이아웃 삽입</button></li>
-				<li><button class="menu-action" data-menu="insertHeader">제목 삽입</button></li>
-				<li><button class="menu-action" data-menu="insertHgroup">부제 추가/삭제</button></li>
 				<li><button class="menu-action" data-menu="deleteElement">요소 삭제</button></li>
 				<li><button class="menu-action" data-menu="stopTargeting">삽입/삭제 중단</button></li>
 			</ul>

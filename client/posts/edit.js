@@ -1,16 +1,10 @@
 import { q$, $ } from "/client/jquery.js";
 import { seri, deseri } from "/shared/posts/seri.js";
 import {
-	runCommand,
-	tabCommand,
-	normalizeEditable,
-	tryUndo,
-	tryRedo,
-	clearHistory,
-	markCursor,
-	returnToMarker
+	inlineCommands,
+	inlineCleanup,
+	blurCleanup
 } from "./edit_inline.js";
-import { dialog } from "./dialog.js";
 
 const EDIT_TYPE = Object.freeze({
 	DETAILS: 6,
@@ -52,6 +46,7 @@ export function startEdit(el, init) {
 		positionStack = [];
 		positionMap = new WeakMap();
 		originalMap = new WeakMap();
+		window.addEventListener("beforeunload", beforeUnload);
 	} else if (!editing) return;
 
 	if (el.nodeType === Node.TEXT_NODE) {
@@ -180,6 +175,7 @@ export function stopEdit() {
 	editing = false;
 	editCnt = positionMap = originalMap = null;
 	positionStack = [];
+	window.removeEventListener("beforeunload", beforeUnload);
 }
 
 function onEditableKeydown(e) {
@@ -206,45 +202,7 @@ function onEditableKeydown(e) {
 		handlePInsertKey(e.target, e.key);
 		return;
 	}
-	if (shortcut) {
-		let command = null;
-		if (e.key === "b") command = "strong";
-		else if (e.key === "u") command = "em";
-		else if (e.key === ".") command = "sup";
-		else if (e.key === ",") command = "sub";
-		else if (e.key === "d") command = "del";
-		else if (e.key === "e") command = "ins";
-		else if (e.key === "k") command = "a";
-		else if (e.key === "z" && e.shiftKey) command = "redo";
-		else if (e.key === "z") command = "undo";
-		else if ("0" <= e.key && e.key <= "9") command = `color${e.key}`;
-		else return;
-		
-		if (command === "undo") {
-			if (tryUndo(e.target)) e.preventDefault();
-			return;
-		} else if (command === "redo") {
-			if (tryRedo(e.target)) e.preventDefault();
-			return;
-		}
-		try {
-			runCommand(e, command);
-			onEditableInput(e);
-		} catch (e) {
-			if (e !== -1) throw e;
-		}
-		return;
-	}
-	if (e.key === "Tab") {
-		try {
-			tabCommand(e);
-			onEditableInput(e);
-		} catch (e) {
-			if (e !== -1) throw e;
-		}
-		return;
-	}
-	clearHistory();
+	if (inlineCommands(shortcut, e)) onEditableInput(e);
 }
 
 function handleSubmitKey(target) {
@@ -325,28 +283,14 @@ function handlePInsertKey(target, key) {
 
 function onEditableInput(e) {
 	e.target.classList.add("edited");
-	if (e.target.innerHTML === '<br>' || e.target.innerHTML === '\n') e.target.innerHTML = '';
-	const remove = e.target.querySelectorAll("font, span:not(.color, .colorbox, .select-marker)");
-	if (remove.length !== 0) {
-		const { startMarker, endMarker } = markCursor();
-		for (const ee of remove) ee.replaceWith(...ee.childNodes);
-		returnToMarker(startMarker, endMarker);
-	}
+	inlineCleanup(e.target);
 }
 
 function onEditableBlur(e) {
 	$(".will-submit").removeClass("will-submit");
 	$(".will-cancel").removeClass("will-cancel");
-	$(e.target).find('.select-marker').remove();
-	if (e.target.innerHTML === '<br>' || e.target.innerHTML === '\n') e.target.innerHTML = '';
-	const remove = e.target.querySelectorAll("font, span:not(.color, .colorbox, .select-marker)");
-	if (remove.length !== 0) {
-		const { startMarker, endMarker } = markCursor();
-		for (const ee of remove) ee.replaceWith(...ee.childNodes);
-		returnToMarker(startMarker, endMarker);
-	}
-	normalizeEditable(e.target);
-	clearHistory();
+	inlineCleanup(e.target);
+	blurCleanup(e.target);
 	if (JSON.stringify(seri(e.target)) === originalMap.get(e.target)) {
 		e.target.classList.remove("edited");
 	}
@@ -409,21 +353,20 @@ function regainFocus(el) {
 	S.addRange(range);
 }
 
-export function submitAll() {
+function submitAll() {
 	document.activeElement.blur();
 	q$(".edited").forEach((e) => submitChanges(e));
 	q$(".new").forEach((e) => submitNew(e));
 	// q$(".deleted").forEach((e) => submitDelete(e));
 }
 
-window.addEventListener("beforeunload", (e) => {
+function beforeUnload(e) {
 	if ($(".edited").length != 0 || $(".new").length != 0) e.preventDefault();
-});
-
+}
 
 let targetingAbort = null;
 
-function startTargeting(f) {
+export function startTargeting(f) {
 	if (targetingAbort != null) stopTargeting();
 	document.body.classList.add("targeting");
 	targetingAbort = new AbortController();
@@ -442,8 +385,9 @@ function addTargetListeners(cls, f, parent, isFirst) {
 	for (const el of document.getElementsByClassName(cls)) {
 		el.addEventListener("click", (e) => {
 			e.preventDefault();
+			e.target.blur();
 			const after = parent ? e.currentTarget.parentElement : e.currentTarget;
-			f(after, isFirst);
+			if (!f(after, isFirst)) return;
 			stopTargeting();
 		}, {signal: targetingAbort?.signal});
 	}
@@ -461,15 +405,21 @@ let newElementFactory = null;
 let newElementAddHeader = null;
 function insertElement(after, isFirst) {
 	if (after.nextSibling?.tagName === 'NAV') after = after.nextSibling;
-	if (newElementFactory == null) return;
+	if (newElementFactory == null) {
+		alert("오류: newElementFactory == null");
+		return false;
+	}
 	const newElement = newElementFactory instanceof Function ?
 		newElementFactory(after, isFirst) :
 		document.createElement(newElementFactory);
-	if (newElement == undefined) return; // TODO: 경고
+	if (newElement == undefined) {
+		// TODO: 경고
+		return false;
+	}
 
 	if (after.tagName === 'LI' || (
 		(after.tagName === 'UL' || after.tagName === 'OL') && isFirst
-	)) return; // TODO: 경고 / 리스트 편집 구현
+	)) return false; // TODO: 경고 / 리스트 편집 구현
 
 	if (isFirst) {
 		after.insertAdjacentElement("afterbegin", newElement);
@@ -493,10 +443,42 @@ function insertElement(after, isFirst) {
 		data: newData,
 		splice: 0
 	})});
-	originalMap.set(newElement, JSON.stringify(newData));
+	return true;
 }
 
-function deleteElement(target) {
+export function insertHgroup(target) {
+	if (!/^H[1-6]$/.test(target.tagName) && target.tagName !== "HGROUP") return false; // TODO: 경고
+
+	let newElement = null;
+	if (target.tagName === "HGROUP") {
+		newElement = target.querySelector("h1, h2, h3, h4, h5, h6");
+		target.insertAdjacentElement("beforebegin", newElement);
+		newElement.classList.add("unit");
+		target.remove();
+	} else {
+		newElement = document.createElement("hgroup");
+		target.insertAdjacentElement("beforebegin", newElement);
+		newElement.append(target);
+		target.classList.remove("unit");
+		newElement.append(document.createElement("p"));
+	}
+	if (newElement == null) return false; // ???
+	const parent = newElement.parentElement;
+	positionStack = Array.from(positionMap.get(parent));
+	startEdit(parent);
+	const pos = positionMap.get(newElement);
+	const newData = seri(newElement);
+	fetch(window.location.pathname, {method: "PATCH", headers: {
+		'Content-type': 'application/json'
+	}, body: JSON.stringify({
+		pos: pos,
+		data: newData,
+		splice: 1
+	})});
+	return true;
+}
+
+export function deleteElement(target) {
 	if (target.nextSibling?.tagName === 'NAV' || target.tagName === 'NAV') return;
 	const parent = target.parentElement;
 	const pos = positionMap.get(target);
@@ -520,7 +502,7 @@ export function header(after, isFirst) {
 	let depth = 1;
 	let cur = parent;
 	while (cur != document.body) {
-		if (cur.matches("section, article, fieldset, .columns")) depth++;
+		if (cur.matches("section, article")) depth++;
 		cur = cur.parentElement;
 	}
 	if (depth > 6) depth = 6;
@@ -533,16 +515,4 @@ export function menuInsert(el, addHeader) {
 		newElementAddHeader = addHeader;
 		startTargeting(insertElement);
 	}
-}
-
-export function menuDelete() {
-	startTargeting((target, isFirst) => {
-		dialog("요소 삭제", `
-			이 &lt;${target.nodeName.toLowerCase()}&gt; 요소를 삭제하시겠습니까?<br>
-			이 작업은 되돌릴 수 없습니다.
-		`, () => {
-			deleteElement(target, isFirst);
-			return true;
-		}, true)();
-	});
 }

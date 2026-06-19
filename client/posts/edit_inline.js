@@ -5,26 +5,59 @@ const S = window.getSelection();
 let undoBuffer = [];
 let redoBuffer = [];
 
-export function tryUndo(target) {
-	if (undoBuffer.length === 0) return false;
-	redoBuffer.push(seri(target, true));
-	target.innerHTML = deseri(undoBuffer.pop(), window.location.pathname, true);
-	return true;
-}
-
-export function tryRedo(target) {
-	if (redoBuffer.length === 0) return false;
-	undoBuffer.push(seri(target, true));
-	target.innerHTML = deseri(redoBuffer.pop(), window.location.pathname, true);
-	return true;
-}
-
-export function clearHistory() {
+function clearHistory() {
 	undoBuffer = [];
 	redoBuffer = [];
 }
 
-export function runCommand(e, command) {
+export function inlineCommands(shortcut, e) {
+	if (shortcut) {
+		let command = null;
+		if (e.key === "b") command = "strong";
+		else if (e.key === "u") command = "em";
+		else if (e.key === ".") command = "sup";
+		else if (e.key === ",") command = "sub";
+		else if (e.key === "d") command = "del";
+		else if (e.key === "e") command = "ins";
+		else if (e.key === "k") command = "a";
+		else if (e.key === "z" && e.shiftKey) command = "redo";
+		else if (e.key === "z") command = "undo";
+		else if ("0" <= e.key && e.key <= "9") command = `color${e.key}`;
+		else return false;
+		
+		if (command === "undo") {
+			if (undoBuffer.length === 0) return false;
+			redoBuffer.push(seri(e.target, true));
+			e.target.innerHTML = deseri(undoBuffer.pop(), window.location.pathname, true);
+			e.preventDefault();
+			return true;
+		} else if (command === "redo") {
+			if (redoBuffer.length === 0) return false;
+			undoBuffer.push(seri(e.target, true));
+			e.target.innerHTML = deseri(redoBuffer.pop(), window.location.pathname, true);
+			e.preventDefault();
+			return true;
+		}
+		try {
+			runCommand(e, command);
+		} catch (e) {
+			if (e !== -1) throw e;
+		}
+		return true;
+	}
+	if (e.key === "Tab") {
+		try {
+			tabCommand(e);
+		} catch (e) {
+			if (e !== -1) throw e;
+		}
+		return true;
+	}
+	clearHistory();
+	return false;
+}
+
+function runCommand(e, command) {
 	const range = S.getRangeAt(0);
 	if (range.collapsed) throw -1;
 
@@ -211,7 +244,7 @@ function descendRight(node, offset) {
 
 const SYMBOLS = {".": "·", "st": "★"};
 
-export function tabCommand(e) {
+function tabCommand(e) {
 	if (
 		!S.rangeCount ||
 		(S.anchorNode == S.focusNode &&
@@ -376,7 +409,7 @@ function descendLeft(node, offset) {
 	return node;
 }
 
-export function markCursor() {
+function markCursor() {
 	const startMarker = document.createElement("span");
 	startMarker.classList.add("select-marker", "tab-select-marker");
 	const endMarker = document.createElement("span");
@@ -391,7 +424,7 @@ export function markCursor() {
 	};
 }
 
-export function returnToMarker(startMarker, endMarker) {
+function returnToMarker(startMarker, endMarker) {
 	const cursor = document.createRange();
 	cursor.setStartAfter(startMarker);
 	cursor.setEndBefore(endMarker);
@@ -399,7 +432,7 @@ export function returnToMarker(startMarker, endMarker) {
 	S.addRange(cursor);
 }
 
-export function normalizeEditable(el) {
+function normalizeEditable(el) {
 	if (el.classList.contains("select-marker")) return;
 
 	let cur = el.firstChild;
@@ -511,4 +544,20 @@ function k2e(str) {
 		result += ch;
 	}
 	return result;
+}
+
+export function inlineCleanup(target) {
+	if (target.innerHTML === '<br>' || target.innerHTML === '\n') target.innerHTML = '';
+	const remove = target.querySelectorAll("font, span:not(.color, .colorbox, .select-marker)");
+	if (remove.length !== 0) {
+		const { startMarker, endMarker } = markCursor();
+		for (const e of remove) e.replaceWith(...e.childNodes);
+		returnToMarker(startMarker, endMarker);
+	}
+}
+
+export function blurCleanup(target) {
+	$(target).find('.select-marker').remove();
+	normalizeEditable(target);
+	clearHistory();
 }

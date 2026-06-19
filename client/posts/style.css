@@ -55,27 +55,9 @@ p[lang=en] { hyphens: auto; }
 
 hr { color: inherit; border: none; margin-block: 0.5lh; }
 
-.columns {
-	columns: 20em;
-}
-
+.columns { columns: 20em; }
 .columns:has( > :is(p, figure):first-child) { margin-block-start: 0.4lh; }
-.columns:has( > h1:first-child) { margin-block-start: 3em; }
-.columns:has( > h2:first-child) { margin-block-start: 2em; }
-.columns:has( > h3:first-child) { margin-block-start: 1.5em; }
-.columns:has( > h4:first-child) { margin-block-start: 1.33em; }
-.columns:has( > h5:first-child) { margin-block-start: 1.17em; }
-.columns:has( > h6:first-child) { margin-block-start: 1em; }
-
-.columns > :is(h1, h2, h3, h4, h5, h6, p, figure):first-child, .columns > :is(h1, h2, h3, h4, h5, h6) + :is(p, figure) {
-	margin-block-start: 0;
-}
-
-.columns > :is(h1, h2, h3, h4, h5, h6):first-child { column-span: all; }
-
-.columns > :is(h1, h2, h3, h4, h5, h6) {
-	break-after: avoid-column;
-}
+.columns > :is(p, figure):first-child { margin-block-start: 0; }
 
 .columns.container:not(:has(> *:not(.container-bar, .middle-bar))):after {
 	content: '### 비어 있음 :O ###';
@@ -93,7 +75,7 @@ fieldset {
 article:is(.float-right, .float-left) > fieldset { margin-block: 0; }
 fieldset:not(:has( > legend)) { padding-block-start: 0.625em; }
 
-fieldset > legend + :is(h1, h2, h3, h4, h5, h6, p, .columns), fieldset > :is(h1, h2, h3, h4, h5, h6, p, .columns):first-child,
+fieldset > :is(h1, h2, h3, h4, h5, h6, p, .columns):first-child, fieldset > legend + :is(h1, h2, h3, h4, h5, h6, p, .columns),
 fieldset > .first-bar + :is(h1, h2, h3, h4, h5, h6, p, .columns) { margin-block-start: 0; }
 fieldset .columns { column-rule: thin solid; }
 fieldset hr, hr.rule { margin-block: calc(0.5lh - 0.5px); border-block-start: 1px solid currentColor; }

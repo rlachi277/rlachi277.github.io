@@ -3,6 +3,7 @@ import path from 'path';
 import __dirname from './dirname.js';
 
 import posts from './script/posts/router.js';
+import cycelog from './script/cycelog/router.js';
 
 import vibing from './vibing/script/router.js';
 
@@ -18,7 +19,9 @@ app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
 app.use(express.text());
 app.use(express.json());
+
 app.use('/posts', posts);
+app.use('/cycelog', cycelog);
 
 app.use('/vibing', vibing);
 

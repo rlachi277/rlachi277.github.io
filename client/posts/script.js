@@ -1,14 +1,6 @@
-import { $, d$ } from "/client/jquery.js";
-import { seri } from "/shared/posts/seri.js";
-import { setupDialog, dialog } from "./dialog.js";
-import {
-	startEdit,
-	stopEdit,
-	menuInsert,
-	menuDelete,
-	header,
-	stopTargeting
-} from "./edit.js";
+import { $ } from "/client/jquery.js";
+import { setupDialog } from "./dialog.js";
+import { startEdit } from "./edit.js";
 
 /*
 function refreshData() { // 테스트용
@@ -20,7 +12,6 @@ refreshData();
 
 let isMobile = false;
 const navDetails = $("nav details");
-
 function onResize() {
 	if (window.matchMedia("(max-width: 480px)").matches) {
 		if (isMobile) return;
@@ -32,162 +23,43 @@ function onResize() {
 		navDetails.attr("open", "");
 	}
 }
-onResize();
-window.addEventListener('resize', onResize);
 
-function setupDefaultMenus() {
+function setupDefaultMenu(menu) {
 	$(".menu-action").on("click", (e) => {
 		const pparent = e.target.parentElement.parentElement;
 		if (pparent.matches(":popover-open")) pparent.hidePopover();
 	});
-	$("#menu-export").on("click", () => {
-		try {
-			const data = seri($("body").get(0));
-			const file = new Blob([JSON.stringify(data)], {type: "application/json"});
-			const anchor = document.createElement("a");
-			anchor.href = URL.createObjectURL(file);
-			anchor.download = "export.json";
-			anchor.click();
-			URL.revokeObjectURL(anchor.href);
-		} catch (e) {
-			alert(`오류: ${e}`);
-		}
-	});
 
-	$("#menu-startedit").on("click", () => {
-		try {
-			sessionStorage.setItem('scrollY', window.scrollY);
-			window.location.search = "edit=t";
-		} catch (e) {
-			alert(`오류: ${e}`);
-		}
-	});
+	for (const [k, v] of Object.entries(menu)) {
+		$(`[data-menu="${k}"]`).on("click", v);
+	}
 }
 
-function setupEditMenus() {
-	async function check(promise) {
-		const res = await promise;
-		if (!res.ok) throw res.status;
+function setupEditMenu(menu) {
+	for (const [k, v] of Object.entries(menu)) {
+		$(`[data-menu="${k}"]`).on("click", v);
+	}
+}
+
+export function setup(defaultMenu, editMenu) {
+	onResize();
+	window.addEventListener('resize', onResize);
+
+	const scrollY = sessionStorage.getItem('scrollY');
+	if (scrollY !== null) {
+		window.scrollTo(0, scrollY);
+		sessionStorage.removeItem('scrollY');
 	}
 
-	async function newPost(path, data) {
-		const absPath = new URL(path, `file://${window.location.pathname}`).pathname;
-		if (!absPath || !absPath.startsWith("/posts/")) {
-			// TODO: 경고
-			return false;
-		}
-		try {
-			const res = await fetch(absPath, {method: "HEAD"});
-			if (res.status !== 404) {
-				if (res.status !== 200) throw res.status;
-				// TODO: 경고
-				return false;
-			}
-			await check(fetch(absPath, {method: "PUT", body: JSON.stringify(data)}));
-			window.location.reload();
-			return true;
-		} catch (e) {
-			alert(`오류: ${e}`);
-			return false;
-		}
+	setupDialog();
+	setupDefaultMenu(defaultMenu);
+	const params = new URLSearchParams(window.location.search);
+	if (params.get("edit")) {
+		if (!$(":root.notfound").length) startEdit($("body").get(0), true);
+		$("menu .menu-edit").css("display", "revert");
+		$("nav a").each((i, e) => {
+			e.setAttribute("href", e.getAttribute("href") + "?edit=t");
+		});
+		setupEditMenu(editMenu);
 	}
-
-	$("#menu-new").on("click", dialog("새 글", `
-		<label for="dialog-new-path">경로: </label>
-		<input id="dialog-new-path" placeholder="경로 입력">
-	`, () => newPost(d$("dialog-new-path").value, {
-		type: "body",
-		children: [
-			{type: "h1", children: [`${d$("dialog-new-path").value} @ ${window.location.pathname}`]},
-			{type: "nav",children: null},
-			{type: "p",children: []}
-		]
-	}), false));
-	$("#menu-duplicate").on("click", dialog("이 글 복제", `
-		<label for="dialog-new-path">경로: </label>
-		<input id="dialog-new-path" placeholder="경로 입력">
-	`, () => newPost(d$("dialog-new-path").value, seri($("body").get(0))), false));
-	$("#menu-delete").on("click", dialog("이 글 삭제", `
-		정말로 <strong>이 글 전체</strong>를 삭제하시겠습니까?<br>
-		이 작업은 되돌릴 수 없습니다.
-	`, async () => {
-		try {
-			stopEdit();
-			await check(fetch(window.location.pathname, {method: "DELETE"}));
-			window.location.reload();
-			return true;
-		} catch (e) {
-			alert(`오류: ${e}`);
-			return false;
-		}
-	}, true));
-	$("#menu-load").on("click",dialog("JSON에서 불러오기", `
-		JSON 파일의 내용으로 <strong>이 글</strong>을 덮어씌웁니다.<br>
-		이 작업은 되돌릴 수 없습니다.<br><br>
-		<label for="dialog-json-file">파일: </label>
-		<input id="dialog-json-file" type="file" accept=".json">
-	`, async () => {
-		const path = window.location.pathname;
-		try {
-			await check(fetch(path, {
-				method: "PUT",
-				headers: {'Content-Type': 'text/plain'},
-				body: d$("dialog-json-file").files[0]
-			}));
-			$(".edited, .new").removeClass("edited new");
-			window.location.reload();
-			return true;
-		} catch (e) {
-			alert(`오류: ${e}`);
-			return false;
-		}
-	}, true));
-
-	$("#menu-stopedit").on("click", () => {
-		try {
-			sessionStorage.setItem('scrollY', window.scrollY);
-			window.location.search = "";
-		} catch (e) {
-			alert(`오류: ${e}`);
-		}
-	});
-
-	$("#menu-insert-p").on("click", menuInsert("p", false));
-	$("#menu-insert-section").on("click", menuInsert("section", true));
-	$("#menu-insert-article").on("click", menuInsert("article", true));
-	$("#menu-insert-fieldset").on("click", menuInsert(() => {
-		const el = document.createElement("fieldset");
-		el.append(document.createElement("legend"));
-		return el;
-	}, false));
-	$("#menu-insert-legend").on("click", menuInsert((after, isFirst) => {
-		if (!isFirst || after.nodeName !== "FIELDSET") return undefined;
-		return document.createElement("legend");
-	}, false));
-	$("#menu-insert-columns").on("click", menuInsert(() => {
-		const el = document.createElement("div");
-		el.classList.add("columns");
-		return el;
-	}, true));
-	$("#menu-insert-header").on("click", menuInsert(header, false));
-	$("#menu-delete-element").on("click", menuDelete);
-	$("#menu-stoptargeting").on("click", stopTargeting);
-}
-
-const scrollY = sessionStorage.getItem('scrollY');
-if (scrollY !== null) {
-	window.scrollTo(0, scrollY);
-	sessionStorage.removeItem('scrollY');
-}
-
-setupDialog();
-setupDefaultMenus();
-const params = new URLSearchParams(window.location.search);
-if (params.get("edit")) {
-	if (!$(":root.notfound").length) startEdit($("body").get(0), true);
-	$("menu .menu-edit").css("display", "revert");
-	$("nav a").each((i, e) => {
-		e.setAttribute("href", e.getAttribute("href") + "?edit=t");
-	});
-	setupEditMenus();
 }

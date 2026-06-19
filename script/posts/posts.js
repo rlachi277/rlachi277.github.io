@@ -1,21 +1,7 @@
-import fs from 'fs';
-import path from 'path';
-import __dirname from '../../dirname.js';
 import { deseri } from '../../shared/posts/seri.js';
-import { renderNavHook } from './nav.js';
-import { addPost, removePost } from "./nav.js";
+import { addPost, removePost } from "./manage_nav.js";
 
-let template = 'wkatlaksdy...';
-fs.readFile(path.join(__dirname, 'client', 'posts', 'index.html'), 'utf8', (err, data) => {
-	if (err) throw err;
-	template = data.replaceAll(/\n|\t/g, '');
-});
-
-let template_404 = 'wiatlaksdy...';
-fs.readFile(path.join(__dirname, 'client', 'posts', '404.html'), 'utf8', (err, data) => {
-	if (err) throw err;
-	template_404 = data.replaceAll(/\n|\t/g, '');
-});
+const TEMPLATE_SLOT = "###여기까지가 템플릿임###";
 
 export function getRawPost(db, path) {
 	const dbResult = db.prepare('SELECT data FROM posts WHERE path = ?').get(path);
@@ -23,22 +9,17 @@ export function getRawPost(db, path) {
 	return JSON.parse(dbResult.data);
 }
 
-export function getPost(db, path) {
+export function getPost(db, path, template, renderHooks) {
+	const { normal, notFound, notFoundData } = template;
 	try {
-		const rendered = deseri(getRawPost(db, path), `/posts/${path}`, true, [renderNavHook(db)]);
-		return template.replace("###여기까지가 템플릿임###", rendered);
+		const rendered = deseri(getRawPost(db, path), `/posts/${path}`, true, renderHooks);
+		return normal.replace(TEMPLATE_SLOT, rendered);
 	} catch (e) {
 		if (e !== 404) throw e;
-		const rendered = deseri({
-			type: "body",
-			children: [
-				{type: "h1", children: ["404 Not Found"]},
-				{type: "nav"}
-			]
-		}, `/posts/${path}`, true, [renderNavHook(db)]);
+		const rendered = deseri(notFoundData, `/posts/${path}`, true, renderHooks);
 		throw {
 			status: 404,
-			html: template_404.replace("###여기까지가 템플릿임###", rendered)
+			html: notFound.replace(TEMPLATE_SLOT, rendered)
 		};
 	}
 }
@@ -105,9 +86,4 @@ export function deletePost(db, path) {
 	const info = db.prepare('DELETE FROM posts WHERE path = ?').run(path);
 	if (info.changes === 0) throw 404;
 	removePost(db, path.split('/'));
-}
-
-export function postExists(db, path) {
-	const dbResult = db.prepare('SELECT COUNT(1) FROM posts WHERE path = ?').get(path);
-	return dbResult['COUNT(1)'] == 1;
 }
