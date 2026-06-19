@@ -217,11 +217,11 @@ export function tabCommand(e) {
 		(S.anchorNode == S.focusNode &&
 		S.anchorOffset == S.focusOffset &&
 		S.anchorOffset == 0)
-	) return;
+	) throw -1;
 
-	e.preventDefault();
 	if (!S.isCollapsed) {
 		S.collapseToEnd();
+		e.preventDefault();
 		throw -1;
 	}
 
@@ -251,12 +251,15 @@ export function tabCommand(e) {
 		range.insertNode(document.createTextNode(SYMBOLS[cmd]));
 		normalizeEditable(e.target);
 		returnToMarker(startMarker, endMarker);
+		e.preventDefault();
 		return;
 	}
 
 	const odata = findOpenBracket(closeTextNode, e.target);
 	const openTextNode = odata.text;
 	const openFlag = odata.flag;
+
+	e.preventDefault();
 
 	let command = null;
 	if (cmd === "b") command = "strong";

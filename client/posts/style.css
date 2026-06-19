@@ -87,7 +87,7 @@ fieldset {
 	margin-inline: 0;
 	margin-block: 0.4lh;
 	padding-inline: 0.625em;
-	padding-block: 0.35em 0.625em;
+	padding-block: 0.35em calc(0.625em - 0.4lh);
 	border: 1px solid currentColor;
 }
 article:is(.float-right, .float-left) > fieldset { margin-block: 0; }
@@ -95,9 +95,6 @@ fieldset:not(:has( > legend)) { padding-block-start: 0.625em; }
 
 fieldset > legend + :is(h1, h2, h3, h4, h5, h6, p, .columns), fieldset > :is(h1, h2, h3, h4, h5, h6, p, .columns):first-child,
 fieldset > .first-bar + :is(h1, h2, h3, h4, h5, h6, p, .columns) { margin-block-start: 0; }
-fieldset > :last-child, fieldset > :last-child > :last-child,
-fieldset > :last-child > :last-child > :last-child,
-fieldset > :last-child > :last-child > :last-child > :last-child { margin-block-end: 0; } /* please do not nest something 4+ times */
 fieldset .columns { column-rule: thin solid; }
 fieldset hr, hr.rule { margin-block: calc(0.5lh - 0.5px); border-block-start: 1px solid currentColor; }
 
@@ -400,8 +397,8 @@ dialog {
 	--barbg: var(--c-0-3); --barbgh: var(--c-0-2); --barbga: var(--c-0-1);
 	--midbg: var(--c-0-5);
 }
-:where(body:not(.targeting)) :is(.container-bar, .middle-bar) { display: none; }
-.container-bar, .middle-bar {
+:where(body:not(.targeting)) .container-bar { display: none; }
+.container-bar {
 	content: '';
 	position: absolute;
 	inset-block-start: 0;
@@ -410,7 +407,7 @@ dialog {
 	inset-inline-start: -0.45lh;
 	background-color: var(--barbg);
 }
-.middle-bar { background-color: var(--midbg); z-index: -1; }
+.container-bar.middle-bar { background-color: var(--midbg); z-index: -1; }
 .container-bar.first-bar { inset-block-end: max(50% + 1px, 100% - 3lh); }
 .container-bar.last-bar { inset-block-start: max(50% + 1px, 100% - 3lh); }
 .container-bar:is(:hover, :focus-visible) { background-color: var(--barbgh); }
@@ -418,23 +415,23 @@ dialog {
 
 section.container { --barbg: var(--c-7-3); --barbgh: var(--c-7-2); --barbga: var(--c-7-1); --midbg: var(--c-7-5); }
 article.container { --barbg: var(--c-6-3); --barbgh: var(--c-6-2); --barbga: var(--c-6-1); --midbg: var(--c-6-5); }
-:is(section, article).container > :is(.container-bar, .middle-bar) {
+:is(section, article).container > .container-bar {
 	inset-inline-end: calc(100% + 0.45lh);
 	inset-inline-start: -0.85lh;
 }
-:is(section, article).container:has(:is(section, article)) > :is(.container-bar, .middle-bar) {
+:is(section, article).container:has(:is(section, article)) > .container-bar {
 	inset-inline-end: calc(100% + 0.85lh);
 	inset-inline-start: -1.25lh;
 }
-:is(section, article).container:has(:is(section, article) :is(section, article)) > :is(.container-bar, .middle-bar) {
+:is(section, article).container:has(:is(section, article) :is(section, article)) > .container-bar {
 	inset-inline-end: calc(100% + 1.25lh);
 	inset-inline-start: -1.65lh;
 }
-:is(section, article).container:has(:is(section, article) :is(section, article) :is(section, article)) > :is(.container-bar, .middle-bar) {
+:is(section, article).container:has(:is(section, article) :is(section, article) :is(section, article)) > .container-bar {
 	inset-inline-end: calc(100% + 1.65lh);
 	inset-inline-start: -2.05lh;
 } /* please do not nest things 4+ times */
-fieldset.container > :is(.container-bar, .middle-bar) {
+fieldset.container > .container-bar {
 	inset-inline-end: calc(100% + 0.05lh + 1px);
 	inset-inline-start: calc(-0.45lh - 1px);
 }

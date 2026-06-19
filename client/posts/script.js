@@ -1,6 +1,14 @@
 import { $, d$ } from "/client/jquery.js";
 import { seri } from "/shared/posts/seri.js";
 import { setupDialog, dialog } from "./dialog.js";
+import {
+	startEdit,
+	stopEdit,
+	menuInsert,
+	menuDelete,
+	header,
+	stopTargeting
+} from "./edit.js";
 
 /*
 function refreshData() { // 테스트용
@@ -56,7 +64,7 @@ function setupDefaultMenus() {
 	});
 }
 
-function setupEditMenus(edit) {
+function setupEditMenus() {
 	async function check(promise) {
 		const res = await promise;
 		if (!res.ok) throw res.status;
@@ -104,7 +112,7 @@ function setupEditMenus(edit) {
 		이 작업은 되돌릴 수 없습니다.
 	`, async () => {
 		try {
-			edit.stopEdit();
+			stopEdit();
 			await check(fetch(window.location.pathname, {method: "DELETE"}));
 			window.location.reload();
 			return true;
@@ -144,26 +152,26 @@ function setupEditMenus(edit) {
 		}
 	});
 
-	$("#menu-insert-p").on("click", edit.menuInsert("p", false));
-	$("#menu-insert-section").on("click", edit.menuInsert("section", true));
-	$("#menu-insert-article").on("click", edit.menuInsert("article", true));
-	$("#menu-insert-fieldset").on("click", edit.menuInsert(() => {
+	$("#menu-insert-p").on("click", menuInsert("p", false));
+	$("#menu-insert-section").on("click", menuInsert("section", true));
+	$("#menu-insert-article").on("click", menuInsert("article", true));
+	$("#menu-insert-fieldset").on("click", menuInsert(() => {
 		const el = document.createElement("fieldset");
 		el.append(document.createElement("legend"));
 		return el;
 	}, false));
-	$("#menu-insert-legend").on("click", edit.menuInsert((after, isFirst) => {
+	$("#menu-insert-legend").on("click", menuInsert((after, isFirst) => {
 		if (!isFirst || after.nodeName !== "FIELDSET") return undefined;
 		return document.createElement("legend");
 	}, false));
-	$("#menu-insert-columns").on("click", edit.menuInsert(() => {
+	$("#menu-insert-columns").on("click", menuInsert(() => {
 		const el = document.createElement("div");
 		el.classList.add("columns");
 		return el;
 	}, true));
-	$("#menu-insert-header").on("click", edit.menuInsert(edit.header, false));
-	$("#menu-delete-element").on("click", edit.menuDelete);
-	$("#menu-stoptargeting").on("click", edit.stopTargeting);
+	$("#menu-insert-header").on("click", menuInsert(header, false));
+	$("#menu-delete-element").on("click", menuDelete);
+	$("#menu-stoptargeting").on("click", stopTargeting);
 }
 
 const scrollY = sessionStorage.getItem('scrollY');
@@ -176,12 +184,10 @@ setupDialog();
 setupDefaultMenus();
 const params = new URLSearchParams(window.location.search);
 if (params.get("edit")) {
-	import("./edit.js").then((edit) => {
-		if (!$(":root.notfound").length) edit.startEdit($("body").get(0), true);
-		$("menu .menu-edit").css("display", "revert");
-		$("nav a").each((i, e) => {
-			e.setAttribute("href", e.getAttribute("href") + "?edit=t");
-		});
-		setupEditMenus(edit);
+	if (!$(":root.notfound").length) startEdit($("body").get(0), true);
+	$("menu .menu-edit").css("display", "revert");
+	$("nav a").each((i, e) => {
+		e.setAttribute("href", e.getAttribute("href") + "?edit=t");
 	});
+	setupEditMenus();
 }

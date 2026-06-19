@@ -58,7 +58,7 @@ test("formatting inside a colorbox preserves the colorbox wrapper", async () => 
 });
 
 test("Tab symbol shortcuts mark the editable as changed", async () => {
-	await setupEditableBody("<p id=\"target\">].</p>");
+	await setupEditableBody("<p id=\"target\">].]</p>");
 	await placeCursor("#target");
 	await page.locator("#target").dispatchEvent("keydown", {
 		key: "Tab",
@@ -75,7 +75,7 @@ test("Tab symbol shortcuts mark the editable as changed", async () => {
 });
 
 test("Tab bracket shortcut formats text and marks the editable as changed", async () => {
-	await setupEditableBody("<p id=\"target\">[hello]b</p>");
+	await setupEditableBody("<p id=\"target\">[hello]b]</p>");
 	await placeCursor("#target");
 	await page.locator("#target").dispatchEvent("keydown", {
 		key: "Tab",
@@ -89,6 +89,41 @@ test("Tab bracket shortcut formats text and marks the editable as changed", asyn
 		edited: el.classList.contains("edited")
 	}));
 	assert.equal(result.html, "<strong>hello</strong>");
+	assert.equal(result.edited, true);
+});
+
+test("Tab symbol shortcuts work when the cursor is after following text", async () => {
+	await setupEditableBody("<p id=\"target\">].] tail</p>");
+	await placeCursor("#target");
+	await page.locator("#target").dispatchEvent("keydown", {
+		key: "Tab",
+		bubbles: true,
+		cancelable: true
+	});
+
+	const result = await page.locator("#target").evaluate((el) => ({
+		text: el.textContent,
+		edited: el.classList.contains("edited")
+	}));
+	assert.equal(result.text, "· tail");
+	assert.equal(result.edited, true);
+});
+
+test("Tab bracket shortcuts format when the cursor is after following text", async () => {
+	await setupEditableBody("<p id=\"target\">[hello]b] tail</p>");
+	await placeCursor("#target");
+	await page.locator("#target").dispatchEvent("keydown", {
+		key: "Tab",
+		bubbles: true,
+		cancelable: true
+	});
+	await page.locator("#target").dispatchEvent("blur");
+
+	const result = await page.locator("#target").evaluate((el) => ({
+		html: el.innerHTML,
+		edited: el.classList.contains("edited")
+	}));
+	assert.equal(result.html, "<strong>hello</strong> tail");
 	assert.equal(result.edited, true);
 });
 

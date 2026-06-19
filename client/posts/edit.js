@@ -52,7 +52,7 @@ export function startEdit(el, init) {
 		positionStack = [];
 		positionMap = new WeakMap();
 		originalMap = new WeakMap();
-	}
+	} else if (!editing) return;
 
 	if (el.nodeType === Node.TEXT_NODE) {
 		if (/^\n\s*$/.test(el.textContent)) return undefined;
@@ -120,18 +120,18 @@ function getEditType(el) {
 function applyEditType(el, type) {
 	function markContainer(el, first, last) {
 		el.classList.add("container");
-		if (last) {
-			const lbar = document.createElement("span");
-			lbar.classList.add("container-bar", "last-bar");
-			el.prepend(lbar);
-		}
-		const mbar = document.createElement("span");
-		mbar.classList.add("container-bar", "middle-bar");
-		el.prepend(mbar);
 		if (first) {
 			const fbar = document.createElement("span");
 			fbar.classList.add("container-bar", "first-bar");
-			el.prepend(fbar);
+			el.append(fbar);
+		}
+		const mbar = document.createElement("span");
+		mbar.classList.add("container-bar", "middle-bar");
+		el.append(mbar);
+		if (last) {
+			const lbar = document.createElement("span");
+			lbar.classList.add("container-bar", "last-bar");
+			el.append(lbar);
 		}
 	}
 	if (el.getAttribute("data-old") != null) return type;
@@ -161,12 +161,22 @@ export function stopEdit() {
 	submitAll();
 	q$(".editable").forEach((e) => {
 		e.removeAttribute("data-id");
+		e.removeAttribute("data-old");
 		e.removeAttribute("contenteditable");
 		e.removeEventListener("keydown", onEditableKeydown);
 		e.removeEventListener("input", onEditableInput);
 		e.removeEventListener("blur", onEditableBlur);
 		e.classList.remove("editable");
 	});
+	q$(".unit").forEach((e) => {
+		e.removeAttribute("data-old");
+		e.classList.remove("unit");
+	});
+	q$(".container").forEach((e) => {
+		e.removeAttribute("data-old");
+		e.classList.remove("container");
+	})
+	$(".container-bar").remove();
 	editing = false;
 	editCnt = positionMap = originalMap = null;
 	positionStack = [];
@@ -220,7 +230,6 @@ function onEditableKeydown(e) {
 		try {
 			runCommand(e, command);
 			onEditableInput(e);
-			e.preventDefault();
 		} catch (e) {
 			if (e !== -1) throw e;
 		}
@@ -230,7 +239,6 @@ function onEditableKeydown(e) {
 		try {
 			tabCommand(e);
 			onEditableInput(e);
-			e.preventDefault();
 		} catch (e) {
 			if (e !== -1) throw e;
 		}
