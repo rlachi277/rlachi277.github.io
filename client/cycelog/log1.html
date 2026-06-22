@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>cycelog log 1</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="/client/colors.css">
+	<link rel="stylesheet" href="/client/posts/style.css">
+	<link rel="stylesheet" href="/client/cycelog/log1.css">
+	<script type="module">
+		import { setup } from "/client/cycelog/log1.js";
+
+		setup();
+	</script>
+</head>
+<body>
+	<dialog id="dialog">
+		<h6 id="dialog-title"></h6>
+		<div id="dialog-main"></div>
+		<div id="dialog-buttons">
+			<button id="dialog-cancel" command="close" commandfor="dialog">취소</button>
+			<button id="dialog-confirm">확인</button>
+		</div>
+	</dialog>
+	<div id="warning" role="alert"></div>
+	###여기까지가 템플릿임###
+</body>
+</html>

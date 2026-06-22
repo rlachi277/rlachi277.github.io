@@ -8,6 +8,7 @@ import cycelog from './script/cycelog/router.js';
 import vibing from './vibing/script/router.js';
 
 const app = express();
+// const port = 27717; // 포트포워딩됨
 const port = 8080;
 
 app.get('/', (_, res) => { res.sendFile(path.join(__dirname, 'index.html')); });

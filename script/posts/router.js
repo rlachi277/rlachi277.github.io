@@ -40,13 +40,6 @@ fs.readFile(path.join(__dirname, 'client', 'posts', '404.html'), 'utf8', (err, d
 	if (err) throw err;
 	notFoundTemplate = data.replaceAll(/\n|\t/g, '');
 });
-const notFoundData = {
-	type: "body",
-	children: [
-		{type: "h1", children: ["404 Not Found"]},
-		{type: "nav"}
-	]
-};
 
 const router = express.Router();
 export default router;
@@ -62,10 +55,9 @@ router.get('/{*path}', (req, res) => {
 	const path = getPath(req.params.path);
 	withErrors(res, () => {
 		res.setHeader('Content-Type', 'text/html');
-		return getPost(db, path, {
+		return getPost(db, "/posts/", path, {
 			normal: template,
-			notFound: notFoundTemplate,
-			notFoundData: notFoundData
+			notFound: notFoundTemplate
 		}, [renderNavHook(db, "/posts/")]);
 	}, true);
 });

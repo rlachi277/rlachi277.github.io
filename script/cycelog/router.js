@@ -7,10 +7,16 @@ import {
 	getLog3,
 	putLog3,
 	patchLog3,
-	deleteLog3
+	deleteLog3,
+	getLog1,
+	postLog1,
+	patchLog1,
+	deleteLog1,
+	moveLog1
 } from "./cycelog.js";
-import { cycelogHook } from './cycelog_hook.js';
 import { withErrors } from "../posts/router.js";
+import { renderNavHook } from '../posts/render_nav.js';
+import { cycelogHook } from './cycelog_hook.js';
 
 const db = new Database('db/cycelog.db');
 db.pragma('journal_mode = WAL');
@@ -29,36 +35,38 @@ db.prepare(`
 		subdir TEXT NOT NULL
 	)
 `).run();
+db.prepare(`
+	CREATE TABLE IF NOT EXISTS entries (
+		id INTEGER PRIMARY KEY,
+		type INTEGER NOT NULL,
+		time TEXT NOT NULL,
+		content TEXT NOT NULL,
+		post TEXT NOT NULL
+	)`
+).run();
 
-let template = 'wkatlaksdy...';
-let notFoundTemplate = 'wiatlaksdy...';
-fs.readFile(path.join(__dirname, 'client', 'cycelog', 'index.html'), 'utf8', (err, data) => {
+let log3Template = 'wkatlaksdy...';
+let log3NotFoundTemplate = 'wiatlaksdy...';
+fs.readFile(path.join(__dirname, 'client', 'cycelog', 'log3.html'), 'utf8', (err, data) => {
 	if (err) throw err;
-	template = data.replaceAll(/\n|\t/g, '');
+	log3Template = data.replaceAll(/\n|\t/g, '');
 });
-fs.readFile(path.join(__dirname, 'client', 'cycelog', '404.html'), 'utf8', (err, data) => {
+fs.readFile(path.join(__dirname, 'client', 'cycelog', 'log3_404.html'), 'utf8', (err, data) => {
 	if (err) throw err;
-	notFoundTemplate = data.replaceAll(/\n|\t/g, '');
+	log3NotFoundTemplate = data.replaceAll(/\n|\t/g, '');
 });
-const notFoundData = {
-	type: "body",
-	children: [
-		{type: "h1", children: ["404 Not Found"]}
-	]
-};
 
 const router = express.Router();
 export default router;
 
-router.get('/log3/:id', (req, res) => {
-	const id = req.params.id;
+router.get('/log3/{:id}', (req, res) => {
+	const id = req.params.id ?? 'index.html';
 	withErrors(res, () => {
 		res.setHeader('Content-Type', 'text/html');
-		return getLog3(db, id, {
-			normal: template,
-			notFound: notFoundTemplate,
-			notFoundData: notFoundData
-		}, [cycelogHook(db)]);
+		return getLog3(db, "/cycelog/log3/", id, {
+			normal: log3Template,
+			notFound: log3NotFoundTemplate
+		}, [renderNavHook(db, "/cycelog/log3/"), cycelogHook(db)]);
 	}, true);
 });
 
@@ -81,4 +89,53 @@ router.delete('/log3/:id', (req, res) => {
 	withErrors(res, () => {
 		deleteLog3(db, id);
 	}, false);
+});
+
+let log1Template = 'wkatlaksdy...';
+let log1NotFoundTemplate = 'wiatlaksdy...';
+fs.readFile(path.join(__dirname, 'client', 'cycelog', 'log1.html'), 'utf8', (err, data) => {
+	if (err) throw err;
+	log1Template = data.replaceAll(/\n|\t/g, '');
+});
+fs.readFile(path.join(__dirname, 'client', 'cycelog', 'log1_404.html'), 'utf8', (err, data) => {
+	if (err) throw err;
+	log1NotFoundTemplate = data.replaceAll(/\n|\t/g, '');
+});
+
+router.get('/log1/{:id}', (req, res) => {
+	const id = req.params.id ?? 'index.html';
+	withErrors(res, () => {
+		res.setHeader('Content-Type', 'text/html');
+		return getLog1(db, "/cycelog/log1/", id, {
+			normal: log1Template,
+			notFound: log1NotFoundTemplate
+		}, [renderNavHook(db, "/cycelog/log1/"), cycelogHook(db)]);
+	}, true);
+});
+
+router.post('/log1/{:id}', (req, res) => {
+	const id = req.params.id ?? 'index.html';
+	withErrors(res, () => {
+		postLog1(db, id, req.body);
+	})
+});
+
+router.patch('/log1/{:id}', (req, res) => {
+	const id = req.params.id ?? 'index.html';
+	withErrors(res, () => {
+		return patchLog1(db, id, req.body);
+	}, true);
+});
+
+router.delete('/log1/{:id}', (req, res) => {
+	const id = req.params.id ?? 'index.html';
+	withErrors(res, () => {
+		deleteLog1(db, id, req.body);
+	})
+});
+
+router.post('/log1/:id/move', (req, res) => {
+	withErrors(res, () => {
+		moveLog1(db, req.params.id, req.body);
+	})
 });

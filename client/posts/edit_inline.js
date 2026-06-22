@@ -1,5 +1,6 @@
 import { seri, deseri, getColor } from "/shared/posts/seri.js";
 import { $ } from "/client/jquery.js";
+import { showWarning } from "./dialog.js";
 
 const S = window.getSelection();
 let undoBuffer = [];
@@ -87,7 +88,10 @@ function collectAffected(range, root) {
 		const key = prev ? "previousSibling" : "nextSibling";
 		while (node != root && node.parentElement) {
 			if (toCommand(node) === 'keep') {
-				if (!forgive) throw -1;
+				if (!forgive) {
+					showWarning("부분적 서식 적용이 불가합니다.");
+					throw -1;
+				}
 				affected[idx] = {node: node};
 			};
 			if (node[key]) forgive = false;
@@ -107,7 +111,7 @@ function collectAffected(range, root) {
 	ascendEdge(affected, 0, root, true, range.startContainer.nodeType !== Node.TEXT_NODE || range.startOffset === 0);
 
 	cur = descendRight(nextNode(affected[0].node));
-	while (cur != null && range.intersectsNode(cur)) {
+	while (cur !== null && range.intersectsNode(cur)) {
 		affected.push({node: cur});
 		cur = descendRight(nextNode(cur));
 	}
@@ -126,7 +130,7 @@ function collectAffected(range, root) {
 function annotateFormats(affected, root, command) {
 	let allOn = true;
 	for (const e of affected) {
-		if ((e.startOffset != undefined && e.startOffset === e.node.textContent.length) || e.endOffset === 0) {
+		if ((e.startOffset !== undefined && e.startOffset === e.node.textContent.length) || e.endOffset === 0) {
 			e.zero = true;
 			continue;
 		}
@@ -138,7 +142,10 @@ function annotateFormats(affected, root, command) {
 		while (node != root) {
 			const cmd = toCommand(node);
 			if (cmd === command) e.on = true;
-			if (cmd === 'keep') throw -1;
+			if (cmd === 'keep') {
+				showWarning("부분적 서식 적용이 불가합니다.");
+				throw -1;
+			}
 			e.formats.push(cmd);
 			node = node.parentElement;
 		}
@@ -153,7 +160,7 @@ function insertMarker(affected, root) {
 	const range = document.createRange();
 	const last = affected[affected.length-1];
 
-	if (last.endOffset != undefined) range.setStart(last.node, last.endOffset);
+	if (last.endOffset !== undefined) range.setStart(last.node, last.endOffset);
 	else range.setStartAfter(last.node);
 	range.setEndAfter(root.lastChild);
 	const extracted = range.extractContents();
@@ -179,7 +186,10 @@ function applyCommand(affected, command, allOn) {
 		if (command === 'a') {
 			if (!allOn && el.nodeName !== 'A') {
 				const args = el.textContent.split('|');
-				if (!(args.length === 1 || args.length === 2)) throw -1;
+				if (!(args.length === 1 || args.length === 2)) {
+					showWarning("올바르지 않은 링크 명령어입니다.")
+					throw -1;
+				}
 				const link = args[0];
 				const display = (args.length === 2) ? args[1] : args[0];
 				const newElement = document.createElement('a');
@@ -223,21 +233,21 @@ function applyCommand(affected, command, allOn) {
 }
 
 function nextNode(node) {
-	if (node == null) return null;
+	if (node === null) return null;
 	return node.nextSibling ?? nextNode(node.parentNode);
 }
 
 function descendRight(node, offset) {
-	if (node == null) return null;
-	if (offset != undefined) {
-		if (node.childNodes[offset] == undefined) node = nextNode(node);
+	if (node === null) return null;
+	if (offset !== undefined) {
+		if (node.childNodes[offset] === undefined) node = nextNode(node);
 		node = node.childNodes[offset];
 	}
 	while (node.nodeType !== Node.TEXT_NODE) {
 		if (toCommand(node) === 'keep') return node;
-		if (node.firstChild == null) node = nextNode(node);
-		if (node == null) return null;
-		if (node.firstChild != null) node = node.firstChild;
+		if (node.firstChild === null) node = nextNode(node);
+		if (node === null) return null;
+		if (node.firstChild !== null) node = node.firstChild;
 	}
 	return node;
 }
@@ -273,7 +283,7 @@ function tabCommand(e) {
 		closeTextNode.textContent.lastIndexOf("]", S.anchorOffset-1) + 1 :
 		closeTextNode.textContent.lastIndexOf("]") + 1;
 	
-	if (SYMBOLS[cmd] != undefined) {
+	if (Object.hasOwn(SYMBOLS, cmd)) {
 		const range = document.createRange();
 		range.setStart(closeTextNode, closeIdx);
 		range.setEnd(closeTextNode, cursorIdx);
@@ -307,7 +317,10 @@ function tabCommand(e) {
 		if (0 <= color && color <= 10) command = `colorbox${color}`;
 	}
 	else if (cmd === "a" || cmd == "k") command = "a";
-	else throw -1;
+	else {
+		showWarning("올바르지 않은 탭 명령어입니다.");
+		throw -1;
+	}
 
 	const openIdx = (openFlag === 1 && closeFlag === 2) ?
 		openTextNode.textContent.lastIndexOf("[", S.anchorOffset-1) :
@@ -363,7 +376,7 @@ function findCloseBracket(root) {
 		flag = 1;
 		front = text.at(-1).length;
 	}
-	if (cmd == null) throw -1;
+	if (cmd === null) throw -1;
 
 	return {
 		text: cur,
@@ -390,21 +403,21 @@ function findOpenBracket(closeText, root) {
 }
 
 function prevNode(node) {
-	if (node == null) return null;
+	if (node === null) return null;
 	return node.previousSibling ?? prevNode(node.parentNode);
 }
 
 function descendLeft(node, offset) {
-	if (node == null) return null;
-	if (offset != undefined) {
-		if (offset === 0 || node.childNodes[offset-1] == undefined) node = prevNode(node);
+	if (node === null) return null;
+	if (offset !== undefined) {
+		if (offset === 0 || node.childNodes[offset-1] === undefined) node = prevNode(node);
 		node = node.childNodes[offset-1];
 	}
 	while (node.nodeType !== Node.TEXT_NODE) {
 		if (toCommand(node) === 'keep') return node;
-		if (node.lastChild == null) node = prevNode(node);
-		if (node == null) return null;
-		if (node.lastChild != null) node = node.lastChild;
+		if (node.lastChild === null) node = prevNode(node);
+		if (node === null) return null;
+		if (node.lastChild !== null) node = node.lastChild;
 	}
 	return node;
 }
@@ -443,19 +456,19 @@ function normalizeEditable(el) {
 		return next;
 	}
 
-	while (cur != null) {
+	while (cur !== null) {
 		if (cur.nodeType === Node.TEXT_NODE) {
 			if (
 				cur.textContent === '' ||
 				(cur.textContent === '\n' &&
-				cur.previousSibling == null &&
-				cur.nextSibling == null)
+				cur.previousSibling === null &&
+				cur.nextSibling === null)
 			) {
 				cur = removeNode(cur);
 				continue;
 			}
 			const prev = cur.previousSibling;
-			if (prev != null && prev.nodeType === Node.TEXT_NODE) {
+			if (prev !== null && prev.nodeType === Node.TEXT_NODE) {
 				prev.textContent += cur.textContent;
 				cur = removeNode(cur);
 				continue;
@@ -470,13 +483,13 @@ function normalizeEditable(el) {
 		normalizeEditable(cur);
 		const prev = cur.previousSibling;
 		if (
-			prev != null &&
+			prev !== null &&
 			prev.nodeType === Node.ELEMENT_NODE &&
 			toCommand(prev) === toCommand(cur)
 		) {
 			while (cur.firstChild) prev.appendChild(cur.firstChild);
 		}
-		if (cur.firstChild == null) {
+		if (cur.firstChild === null) {
 			cur = removeNode(cur);
 			continue;
 		}
@@ -502,7 +515,10 @@ function toCommand(node) {
 }
 
 function toElement(cmd) {
-	if (cmd === 'keep') throw -1;
+	if (cmd === 'keep') {
+		showWarning("부분적 서식 적용이 불가합니다.");
+		throw -1;
+	}
 	if (cmd.startsWith('colorbox')) {
 		const el = document.createElement('span');
 		el.classList.add("colorbox", `c${cmd.substring(8)}`);

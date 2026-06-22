@@ -1,9 +1,8 @@
 import { seri } from "/shared/posts/seri.js";
 import { $, d$ } from "/client/jquery.js";
-import { dialog } from "./dialog.js";
+import { dialog, showWarning } from "./dialog.js";
 import {
 	startTargeting,
-	stopEdit,
 	menuInsert,
 	insertHgroup,
 	deleteElement,
@@ -57,7 +56,6 @@ export const editMenu = {
 		이 작업은 되돌릴 수 없습니다.
 	`, async () => {
 		try {
-			stopEdit();
 			await checkFetch(fetch(window.location.pathname, {method: "DELETE"}));
 			window.location.reload();
 			return true;
@@ -106,7 +104,7 @@ export const editMenu = {
 		return el;
 	}, false),
 	insertLegend: menuInsert((after, isFirst) => {
-		if (!isFirst || after.nodeName !== "FIELDSET") return undefined;
+		if (!isFirst || after.nodeName !== "FIELDSET") return null;
 		return document.createElement("legend");
 	}, false),
 	insertColumns: menuInsert(() => {
@@ -141,14 +139,14 @@ async function checkFetch(promise) {
 async function newPost(path, data) {
 	const absPath = new URL(path, `file://${window.location.pathname}`).pathname;
 	if (!absPath || !absPath.startsWith("/posts/")) {
-		// TODO: 경고
+		showWarning("경로가 적절하지 않습니다.");
 		return false;
 	}
 	try {
 		const res = await fetch(absPath, {method: "HEAD"});
 		if (res.status !== 404) {
 			if (res.status !== 200) throw res.status;
-			// TODO: 경고
+			showWarning("해당 경로에 글이 이미 있습니다.");
 			return false;
 		}
 		await checkFetch(fetch(absPath, {method: "PUT", body: JSON.stringify(data)}));

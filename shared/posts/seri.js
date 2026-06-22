@@ -11,21 +11,21 @@ const SIMPLE_TYPES = new Set([
 
 export function seri(data, init, hooks = []) {
 	if (data.nodeType === Node.TEXT_NODE) {
-		if (/^\n\s*$/.test(data.textContent)) return undefined;
+		if (/^\n\s*$/.test(data.textContent)) return null;
 		return data.textContent.replaceAll(/\n\s*/g, "");
 	}
-	if (data.nodeName.startsWith("#")) return undefined;
-	if (data.classList.contains("new") && !init) return undefined;
+	if (data.nodeName.startsWith("#")) return null;
+	if (data.classList.contains("new") && !init) return null;
 
 	const children = [];
 	data.childNodes.forEach((e) => {
 		const child = seri(e, false, hooks);
-		if (child != undefined) children.push(child);
+		if (child !== null) children.push(child);
 	});
 
 	for (const e of hooks) {
 		const hookResult = e(data, init);
-		if (hookResult !== null) {
+		if (hookResult !== undefined) {
 			if (hookResult?.children != null) hookResult.children = children;
 			return hookResult;
 		}
@@ -147,7 +147,7 @@ export function seri(data, init, hooks = []) {
 			result.type = "colorbox";
 			result.variant = {color: getColor(data.classList), click: data.classList.contains("click")};
 		} else {
-			return undefined;
+			return null;
 		}
 	}
 
@@ -182,12 +182,14 @@ export function deseri(el, cur, init, hooks = []) {
 	let children = "";
 	el.children?.forEach((e) => {
 		const child = deseri(e, cur, false, hooks);
-		if (child != null) children += child;
+		if (child !== null) children += child;
 	});
 
 	for (const e of hooks) {
 		const hookResult = e(el, cur, init);
-		if (hookResult !== null) {
+
+		if (hookResult !== undefined) {
+			if (hookResult === null) return null;
 			switch (hookResult.type) {
 			case 'html':
 				return hookResult.html;
@@ -202,7 +204,7 @@ export function deseri(el, cur, init, hooks = []) {
 	let tagName = null;
 	let attrs = "";
 	let isVoid = false;
-	
+
 	if (init || el.type === 'body') return children;
 	if (SIMPLE_TYPES.has(el.type)) return `<${el.type}>${children}</${el.type}>`;
 
@@ -306,7 +308,7 @@ export function deseri(el, cur, init, hooks = []) {
 		attrs = ` class="colorbox c${el.variant?.color}${el.variant?.click?" click":""}"`;
 		break;
 	default:
-		return undefined;
+		return null;
 	}
 
 	if (isVoid) return `<${tagName}${attrs}>`;

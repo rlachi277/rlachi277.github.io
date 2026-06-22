@@ -24,18 +24,7 @@ function onResize() {
 	}
 }
 
-function setupDefaultMenu(menu) {
-	$(".menu-action").on("click", (e) => {
-		const pparent = e.target.parentElement.parentElement;
-		if (pparent.matches(":popover-open")) pparent.hidePopover();
-	});
-
-	for (const [k, v] of Object.entries(menu)) {
-		$(`[data-menu="${k}"]`).on("click", v);
-	}
-}
-
-function setupEditMenu(menu) {
+function setupMenu(menu) {
 	for (const [k, v] of Object.entries(menu)) {
 		$(`[data-menu="${k}"]`).on("click", v);
 	}
@@ -52,7 +41,12 @@ export function setup(defaultMenu, editMenu) {
 	}
 
 	setupDialog();
-	setupDefaultMenu(defaultMenu);
+
+	$(".menu-action").on("click", (e) => {
+		const pparent = e.target.parentElement.parentElement;
+		if (pparent.matches(":popover-open")) pparent.hidePopover();
+	});
+	setupMenu(defaultMenu);
 	const params = new URLSearchParams(window.location.search);
 	if (params.get("edit")) {
 		if (!$(":root.notfound").length) startEdit($("body").get(0), true);
@@ -60,6 +54,6 @@ export function setup(defaultMenu, editMenu) {
 		$("nav a").each((i, e) => {
 			e.setAttribute("href", e.getAttribute("href") + "?edit=t");
 		});
-		setupEditMenu(editMenu);
+		setupMenu(editMenu);
 	}
 }

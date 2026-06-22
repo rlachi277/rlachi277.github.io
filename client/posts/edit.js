@@ -5,6 +5,7 @@ import {
 	inlineCleanup,
 	blurCleanup
 } from "./edit_inline.js";
+import { showWarning } from "./dialog.js";
 
 const EDIT_TYPE = Object.freeze({
 	DETAILS: 6,
@@ -47,19 +48,19 @@ export function startEdit(el, init) {
 		positionMap = new WeakMap();
 		originalMap = new WeakMap();
 		window.addEventListener("beforeunload", beforeUnload);
-	} else if (!editing) return;
+	} else if (!editing) return null;
 
 	if (el.nodeType === Node.TEXT_NODE) {
-		if (/^\n\s*$/.test(el.textContent)) return undefined;
+		if (/^\n\s*$/.test(el.textContent)) return null;
 		return false;
 	}
-	if (el.nodeName.startsWith("#")) return undefined;
-	if (el.classList.contains("new")) return undefined;
+	if (el.nodeName.startsWith("#")) return null;
+	if (el.classList.contains("new")) return null;
 
 	let type = getEditType(el);
-	if (type == null) return undefined;
+	if (type === null) return null;
 	if (el.nodeName === "FIELDSET" && el.matches("fieldset:has(> legend)")) type = EDIT_TYPE.DETAILS;
-	if (el.nodeName === "FIELDSET" && el.getAttribute("data-old") != null) {
+	if (el.nodeName === "FIELDSET" && el.getAttribute("data-old") !== null) {
 		el.querySelectorAll(".container-bar, .middle-bar").forEach((e) => e.remove());
 		el.removeAttribute("data-old");
 	}
@@ -69,13 +70,13 @@ export function startEdit(el, init) {
 	let idx = 0;
 	el.childNodes.forEach((e) => {
 		positionStack.push(idx);
-		if (startEdit(e) != undefined) idx++;
+		if (startEdit(e)) idx++;
 		positionStack.pop();
 	});
 
 	if (type === EDIT_TYPE.EDITABLE) {
 		originalMap.set(el, JSON.stringify(seri(el)));
-		if (el.getAttribute("data-id") == null) {
+		if (el.getAttribute("data-id") === null) {
 			el.setAttribute("data-id", editCnt++);
 			el.setAttribute("contenteditable", "plaintext-only");
 			el.addEventListener("keydown", onEditableKeydown);
@@ -129,7 +130,7 @@ function applyEditType(el, type) {
 			el.append(lbar);
 		}
 	}
-	if (el.getAttribute("data-old") != null) return type;
+	if (el.getAttribute("data-old") !== null) return type;
 	if (type === EDIT_TYPE.DETAILS) {
 		if (!el.closest("li")) markContainer(el, false, true);
 	} else if (type === EDIT_TYPE.LIST) {
@@ -228,7 +229,7 @@ function handleCancelKey(target) {
 
 		target.remove();
 		
-		if (successor == null) return;
+		if (successor === null) return;
 		regainFocus(successor);
 	}
 	if (!manageConfirm(target, "will-cancel", "will-submit")) return;
@@ -332,7 +333,7 @@ function submitDelete(el) {
 	el.remove();
 	startEdit(parent);
 	
-	if (successor == null) return;
+	if (successor === null) return;
 	regainFocus(successor);
 }
 
@@ -367,7 +368,7 @@ function beforeUnload(e) {
 let targetingAbort = null;
 
 export function startTargeting(f) {
-	if (targetingAbort != null) stopTargeting();
+	if (targetingAbort !== null) stopTargeting();
 	document.body.classList.add("targeting");
 	targetingAbort = new AbortController();
 
@@ -405,21 +406,24 @@ let newElementFactory = null;
 let newElementAddHeader = null;
 function insertElement(after, isFirst) {
 	if (after.nextSibling?.tagName === 'NAV') after = after.nextSibling;
-	if (newElementFactory == null) {
-		alert("오류: newElementFactory == null");
+	if (newElementFactory === null) {
+		alert("오류: newElementFactory === null");
 		return false;
 	}
 	const newElement = newElementFactory instanceof Function ?
 		newElementFactory(after, isFirst) :
 		document.createElement(newElementFactory);
-	if (newElement == undefined) {
-		// TODO: 경고
+	if (newElement === null) {
+		showWarning("삽입 위치가 적절하지 않습니다.");
 		return false;
 	}
 
 	if (after.tagName === 'LI' || (
 		(after.tagName === 'UL' || after.tagName === 'OL') && isFirst
-	)) return false; // TODO: 경고 / 리스트 편집 구현
+	)) {
+		showWarning("리스트 편집은 아직 지원하지 않습니다.");
+		return false;
+	}
 
 	if (isFirst) {
 		after.insertAdjacentElement("afterbegin", newElement);
@@ -447,7 +451,10 @@ function insertElement(after, isFirst) {
 }
 
 export function insertHgroup(target) {
-	if (!/^H[1-6]$/.test(target.tagName) && target.tagName !== "HGROUP") return false; // TODO: 경고
+	if (!/^H[1-6]$/.test(target.tagName) && target.tagName !== "HGROUP") {
+		showWarning("삽입 위치가 적절하지 않습니다.");
+		return false;
+	}
 
 	let newElement = null;
 	if (target.tagName === "HGROUP") {
@@ -462,7 +469,10 @@ export function insertHgroup(target) {
 		target.classList.remove("unit");
 		newElement.append(document.createElement("p"));
 	}
-	if (newElement == null) return false; // ???
+	if (newElement === null) { // ???
+		showWarning("삽입 위치가 적절하지 않습니다.");
+		return false;
+	}
 	const parent = newElement.parentElement;
 	positionStack = Array.from(positionMap.get(parent));
 	startEdit(parent);

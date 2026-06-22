@@ -2,6 +2,13 @@ import { deseri } from '../../shared/posts/seri.js';
 import { addPost, removePost } from "./manage_nav.js";
 
 const TEMPLATE_SLOT = "###여기까지가 템플릿임###";
+const notFoundData = {
+	type: "body",
+	children: [
+		{type: "h1", children: ["404 Not Found"]},
+		{type: "nav"}
+	]
+};
 
 export function getRawPost(db, path) {
 	const dbResult = db.prepare('SELECT data FROM posts WHERE path = ?').get(path);
@@ -9,19 +16,29 @@ export function getRawPost(db, path) {
 	return JSON.parse(dbResult.data);
 }
 
-export function getPost(db, path, template, renderHooks) {
-	const { normal, notFound, notFoundData } = template;
-	try {
-		const rendered = deseri(getRawPost(db, path), `/posts/${path}`, true, renderHooks);
+export function getPostFromData(data, root, path, template, renderHooks) {
+	const { normal, notFound } = template;
+	if (data != undefined) {
+		const rendered = deseri(data, `${root}${path}`, true, renderHooks);
 		return normal.replace(TEMPLATE_SLOT, rendered);
-	} catch (e) {
-		if (e !== 404) throw e;
-		const rendered = deseri(notFoundData, `/posts/${path}`, true, renderHooks);
+	} else {
+		const rendered = deseri(notFoundData, `${root}${path}`, true, renderHooks);
 		throw {
 			status: 404,
 			html: notFound.replace(TEMPLATE_SLOT, rendered)
 		};
 	}
+}
+
+export function getPost(db, root, path, template, renderHooks) {
+	let data;
+	try {
+		data = getRawPost(db, path);
+	} catch (e) {
+		if (e !== 404) throw e;
+		data = undefined;
+	}
+	return getPostFromData(data, root, path, template, renderHooks);
 }
 
 export function putPost(db, path, body) {
@@ -41,15 +58,15 @@ export function patchPost(db, path, body) {
 	const { pos, data, splice } = body;
 	if (splice == undefined || pos == undefined) throw {
 		status: 400,
-		reason: "necessary arguments absent"
+		reason: "데이터가 충분히 주어지지 않았습니다."
 	};
 	if (!Number.isInteger(splice) || splice < 0 || !Array.isArray(pos)) throw {
 		status: 400,
-		reason: "format error"
+		reason: "데이터의 형식이 잘못되었습니다."
 	};
 	if (splice === 0 && data == undefined) throw {
 		status: 400,
-		reason: "data absent"
+		reason: "데이터가 충분히 주어지지 않았습니다."
 	};
 	const dbData = JSON.parse(dbResult);
 	if (pos.length === 0) {
@@ -66,12 +83,12 @@ export function patchPost(db, path, body) {
 		cur = cur.children[pos.pop()];
 		if (cur == undefined) throw {
 			status: 400,
-			reason: "invalid pos"
+			reason: "위치 배열이 올바르지 않습니다."
 		};
 	}
 	if (cur.children.length < pos[0]) throw {
 		status: 400,
-		reason: "invalid pos"
+		reason: "위치 배열이 올바르지 않습니다."
 	};
 	if (data != undefined) cur.children.splice(pos[0], splice, data);
 	else cur.children.splice(pos[0], splice);
@@ -86,4 +103,9 @@ export function deletePost(db, path) {
 	const info = db.prepare('DELETE FROM posts WHERE path = ?').run(path);
 	if (info.changes === 0) throw 404;
 	removePost(db, path.split('/'));
+}
+
+export function postExists(db, path) {
+	const dbResult = db.prepare('SELECT COUNT(1) FROM posts WHERE path = ?').get(path);
+	return dbResult['COUNT(1)'] !== 0;
 }

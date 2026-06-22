@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-	<title>cycelog</title>
+	<title>cycelog log 3</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="/client/colors.css">
 	<link rel="stylesheet" href="/client/posts/style.css">
 	<script type="module">
 		import { setup } from "/client/posts/script.js";
-		import { defaultMenu, editMenu } from "/client/cycelog/menu.js";
+		import { defaultMenu, editMenu } from "/client/cycelog/log3_menu.js";
 		setup(defaultMenu, editMenu);
 	</script>
 </head>
 <body>
-	<header>
+	<div id="menubar"> <!-- TODO: implement keyboard navigation and add role="menubar" -->
 		<menu>
 			<li><button id="menu-file" popovertarget="menu-filesub">파일</button>
 			<ul id="menu-filesub" popover>
@@ -41,7 +41,7 @@
 			</ul>
 			</li>
 		</menu>
-	</header>
+	</div>
 	<dialog id="dialog">
 		<h6 id="dialog-title"></h6>
 		<div id="dialog-main"></div>
@@ -50,6 +50,7 @@
 			<button id="dialog-confirm">확인</button>
 		</div>
 	</dialog>
+	<div id="warning" role="alert"></div>
 	###여기까지가 템플릿임###
 </body>
 </html>

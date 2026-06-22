@@ -1,4 +1,5 @@
 import { sani } from '../../shared/posts/seri.js';
+import { postExists } from './posts.js';
 
 export function renderNavHook(db, root) {
 	return function (data, cur) {
@@ -6,7 +7,7 @@ export function renderNavHook(db, root) {
 			type: "html",
 			html: renderNav(db, root, cur)
 		};
-		return null;
+		return undefined;
 	};
 }
 
@@ -19,7 +20,7 @@ function renderNav(db, root, cur) {
 			data;
 		const link = base + newData.name;
 		const isSelf = simulateLink(cur, link ? link : "./") === cur;
-		const exists = postExists(db, root, cur, link ? link : "./");
+		const exists = linkExists(db, root, cur, link ? link : "./");
 		const anchor = `<a${
 			isSelf ?
 			` class="self"` :
@@ -81,12 +82,11 @@ function buildNav(db, root, path) {
 	return data;
 }
 
-function postExists(db, root, cur, p) {
+function linkExists(db, root, cur, p) {
 	const resolved = simulateLink(cur, p);
 	if (!resolved) return false;
 	if (!resolved.startsWith(root)) return false;
-	const dbResult = db.prepare('SELECT COUNT(1) FROM posts WHERE path = ?').get(resolved.substring(root.length));
-	return dbResult['COUNT(1)'] == 1;
+	return postExists(db, resolved.substring(root.length));
 }
 
 function simulateLink(cur, p) {

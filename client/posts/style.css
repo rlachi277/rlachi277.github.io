@@ -265,30 +265,33 @@ nav menu {
 	nav menu > li:first-child { margin-block-start: 0; }
 }
 
-:where(body.targeting) header * {
+:where(body.targeting) #menubar * {
 	color: var(--c-6);
 }
 
-header menu {
+#menubar {
 	position: fixed;
 	inset-block-start: 0;
 	inset-inline: 0;
+	z-index: 2;
+}
+
+#menubar menu {
 	margin: 0;
 	border-block-end: 1px solid currentColor;
 	background-color: var(--c-bg);
-	z-index: 2;
 	padding: 0;
 	display: flex;
 	list-style: none;
 }
 
-header menu .menu-edit { display: none; }
+#menubar menu .menu-edit { display: none; }
 
-header menu > li {
+#menubar menu > li {
 	margin: 0;
 	border-inline-end: 1px solid currentColor;
 }
-header menu > li > button {
+#menubar menu > li > button {
 	font-family: inherit;
 	font-size: 1em;
 	color: inherit;
@@ -300,10 +303,10 @@ header menu > li > button {
 	background: none;
 	border: none;
 }
-header menu button:is(:hover, :focus-visible) { background-color: var(--c-0-bgh); }
-header menu button:active { background-color: var(--c-0-bga); }
+#menubar menu button:is(:hover, :focus-visible) { background-color: var(--c-0-bgh); }
+#menubar menu button:active { background-color: var(--c-0-bga); }
 
-header menu ul {
+#menubar menu ul {
 	margin: 0;
 	padding: 0;
 	inset: auto;
@@ -314,9 +317,9 @@ header menu ul {
 	list-style: none;
 }
 
-header menu ul > li { margin: 0; }
-header menu ul > li:not(:first-child) { border-block-start: 1px solid currentColor; }
-header menu ul > li > button {
+#menubar menu ul > li { margin: 0; }
+#menubar menu ul > li:not(:first-child) { border-block-start: 1px solid currentColor; }
+#menubar menu ul > li > button {
 	font-family: inherit;
 	font-size: 1em;
 	color: inherit;
@@ -366,7 +369,33 @@ dialog {
 #dialog-buttons button:active { background-color: var(--c-0-bga); }
 #dialog-buttons button.danger:active { background-color: var(--c-1-bga); }
 
+#warning {
+	position: fixed;
+	inset-inline-end: 16px;
+	inset-block-start: 16px;
+	padding: 8px;
+	z-index: 3;
 
+	border: 2px solid var(--c-1-bd);
+	background-color: var(--c-1-bg);
+	color: var(--c-1);
+
+	display: none;
+}
+
+@keyframes warning-fade {
+	from { opacity: 100%; background-color: var(--c-1-bgh); }
+	25% { background-color: var(--c-1-bgh); }
+	25% { background-color: var(--c-1-bg); }
+	50% { opacity: 100%; }
+	to { opacity: 0%; }
+}
+
+#warning.show {
+	display: block;
+	opacity: 0%;
+	animation: 1s warning-fade;
+}
 
 /* for edit */
 

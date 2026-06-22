@@ -1,0 +1,95 @@
+table {
+	font-family: monospace;
+	font-family: "Pretendard GOV Variable", "Pretendard GOV", monospace;
+
+	table-layout: fixed;
+	inline-size: 100%;
+}
+
+thead, tfoot {
+	position: sticky;
+	z-index: 2;
+	background-color: var(--c-bg);
+}
+thead { inset-block-start: 0; cursor: pointer; }
+tfoot { inset-block-end: 0; }
+
+table, th, td {
+	border: 0.5px solid currentColor;
+	border-collapse: separate;
+	border-spacing: 0;
+	vertical-align: top;
+	block-size: 1lh;
+}
+table { border-block-width: 0; }
+thead th { border-block-width: 1px; }
+tbody tr:first-child td { border-block-start-width: 0; }
+tfoot td { border-block-width: 1px; }
+tfoot.empty td { border-block-start-width: 0; border-block-end-width: 1px; }
+tbody tr:last-child td { border-block-end-width: 0; }
+
+th, td { padding: 0.5ic; }
+.wrapper {
+	overflow: clip;
+	text-overflow: ellipsis;
+}
+.wrapper:is(:hover, :focus) {
+	overflow: visible;
+	inline-size: max-content;
+	padding-right: 1ic;
+	position: relative;
+	z-index: 1;
+	background-color: var(--bg);
+	box-shadow: 0 0 0 0.25ic var(--bg);
+}
+
+:is(th, td):nth-child(1) { inline-size: 6ch; text-align: end; }
+:is(th, td):nth-child(2) { inline-size: 2ic; text-align: center; }
+:is(th, td):nth-child(3) { inline-size: 12ch; }
+
+tr[data-type="1"] { background-color: var(--bg); --bg: var(--c-1-bg); color: var(--c-1); }
+tr[data-type="2"] { background-color: var(--bg); --bg: var(--c-8-bg); color: var(--c-8); }
+tr[data-type="3"] { background-color: var(--bg); --bg: var(--c-3-bg); color: var(--c-3); }
+tr[data-type="4"] { background-color: var(--bg); --bg: var(--c-4-bg); color: var(--c-4); }
+tr[data-type="5"] { background-color: var(--bg); --bg: var(--c-6-bg); color: var(--c-6); }
+tr[data-type="6"] { background-color: var(--bg); --bg: var(--c-2-bg); color: var(--c-2); }
+
+td.log1-edited { text-decoration: currentColor dotted underline; }
+
+#dialog-main input[type="number"] {
+	width: 6ch;
+}
+#dialog-main label:has( > input[type="radio"]) {
+	display: inline-flex;
+	align-items: flex-start;
+	line-height: inherit;
+	gap: 0.25em;
+	margin-inline: 0.25em;
+}
+#dialog-main input[type="radio"] {
+	appearance: none;
+	inline-size: 0.85lh;
+	block-size: 0.85lh;
+	box-sizing: border-box;
+	border: 1.5px solid var(--bd);
+	background: var(--bg);
+	margin: 0;
+	position: relative;
+}
+#dialog-main input[type="radio"]:checked::before {
+	content: '';
+	position: absolute;
+	inset: 2.5px;
+	background-color: var(--bd);
+}
+#dialog-main input[type="radio"]:hover { border-color: var(--bdh); background-color: var(--bgh); }
+#dialog-main input[type="radio"]:hover:checked::before { background-color: var(--bdh); }
+#dialog-main input[type="radio"]:active { border-color: var(--bda); background-color: var(--bga); }
+#dialog-main input[type="radio"]:active:checked::before { background-color: var(--bda); }
+
+#dialog-main input[type="radio"][name="log1-type"][value="1"] { --bd: var(--c-1-bd); --bdh: var(--c-1-bdh); --bda: var(--c-1-bda); --bg: var(--c-1-bg); --bgh: var(--c-1-bgh); --bga: var(--c-1-bga); }
+#dialog-main input[type="radio"][name="log1-type"][value="2"] { --bd: var(--c-8-bd); --bdh: var(--c-8-bdh); --bda: var(--c-8-bda); --bg: var(--c-8-bg); --bgh: var(--c-8-bgh); --bga: var(--c-8-bga); }
+#dialog-main input[type="radio"][name="log1-type"][value="3"] { --bd: var(--c-3-bd); --bdh: var(--c-3-bdh); --bda: var(--c-3-bda); --bg: var(--c-3-bg); --bgh: var(--c-3-bgh); --bga: var(--c-3-bga); }
+#dialog-main input[type="radio"][name="log1-type"][value="4"] { --bd: var(--c-4-bd); --bdh: var(--c-4-bdh); --bda: var(--c-4-bda); --bg: var(--c-4-bg); --bgh: var(--c-4-bgh); --bga: var(--c-4-bga); }
+#dialog-main input[type="radio"][name="log1-type"][value="5"] { --bd: var(--c-6-bd); --bdh: var(--c-6-bdh); --bda: var(--c-6-bda); --bg: var(--c-6-bg); --bgh: var(--c-6-bgh); --bga: var(--c-6-bga); }
+#dialog-main input[type="radio"][name="log1-type"][value="6"] { --bd: var(--c-2-bd); --bdh: var(--c-2-bdh); --bda: var(--c-2-bda); --bg: var(--c-2-bg); --bgh: var(--c-2-bgh); --bga: var(--c-2-bga); }
