@@ -1,3 +1,15 @@
+#log1-skip {
+	position: absolute;
+	inset-block-start: -100%;
+	inset-inline-end: 5%;
+	border: 1px solid currentColor;
+	background: var(--c-bg);
+	font-size: 1.2em;
+	padding-block: 4px;
+	padding-inline: 8px;
+}
+#log1-skip:focus { top: auto; }
+
 table {
 	font-family: monospace;
 	font-family: "Pretendard GOV Variable", "Pretendard GOV", monospace;
@@ -29,11 +41,33 @@ tfoot.empty td { border-block-start-width: 0; border-block-end-width: 1px; }
 tbody tr:last-child td { border-block-end-width: 0; }
 
 th, td { padding: 0.5ic; }
+
+:is(th, td):nth-child(1) { inline-size: 6ch; text-align: end; }
+:is(th, td):nth-child(2) { inline-size: 2ic; text-align: center; }
+:is(th, td):nth-child(3) { inline-size: 12ch; }
+
+tr { background-color: var(--bg); --bg: var(--c-bg); --bgf: var(--c-bgh); }
+tr[data-type="1"] { --bg: var(--c-1-bg); --bgf: var(--c-1-bgh); color: var(--c-1); }
+tr[data-type="2"] { --bg: var(--c-8-bg); --bgf: var(--c-8-bgh); color: var(--c-8); }
+tr[data-type="3"] { --bg: var(--c-3-bg); --bgf: var(--c-3-bgh); color: var(--c-3); }
+tr[data-type="4"] { --bg: var(--c-4-bg); --bgf: var(--c-4-bgh); color: var(--c-4); }
+tr[data-type="5"] { --bg: var(--c-6-bg); --bgf: var(--c-6-bgh); color: var(--c-6); }
+tr[data-type="6"] { --bg: var(--c-2-bg); --bgf: var(--c-2-bgh); color: var(--c-2); }
+
+td.log1-edited { text-decoration: currentColor dotted underline; }
+
+td:focus {
+	position: relative;
+	z-index: 3;
+	background-color: var(--bgf);
+	outline: 1px auto currentColor;
+}
+
 .wrapper {
 	overflow: clip;
 	text-overflow: ellipsis;
 }
-.wrapper:is(:hover, :focus) {
+.wrapper:hover {
 	overflow: visible;
 	inline-size: max-content;
 	padding-right: 1ic;
@@ -42,19 +76,11 @@ th, td { padding: 0.5ic; }
 	background-color: var(--bg);
 	box-shadow: 0 0 0 0.25ic var(--bg);
 }
-
-:is(th, td):nth-child(1) { inline-size: 6ch; text-align: end; }
-:is(th, td):nth-child(2) { inline-size: 2ic; text-align: center; }
-:is(th, td):nth-child(3) { inline-size: 12ch; }
-
-tr[data-type="1"] { background-color: var(--bg); --bg: var(--c-1-bg); color: var(--c-1); }
-tr[data-type="2"] { background-color: var(--bg); --bg: var(--c-8-bg); color: var(--c-8); }
-tr[data-type="3"] { background-color: var(--bg); --bg: var(--c-3-bg); color: var(--c-3); }
-tr[data-type="4"] { background-color: var(--bg); --bg: var(--c-4-bg); color: var(--c-4); }
-tr[data-type="5"] { background-color: var(--bg); --bg: var(--c-6-bg); color: var(--c-6); }
-tr[data-type="6"] { background-color: var(--bg); --bg: var(--c-2-bg); color: var(--c-2); }
-
-td.log1-edited { text-decoration: currentColor dotted underline; }
+td:focus .wrapper:hover {
+	z-index: 3;
+	background-color: var(--bgf);
+	box-shadow: 0 0 0 0.25ic var(--bgf);
+}
 
 #dialog-main input[type="number"] {
 	width: 6ch;

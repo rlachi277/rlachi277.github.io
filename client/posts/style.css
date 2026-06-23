@@ -2,6 +2,7 @@
 	color-scheme: light dark;
 	background-color: var(--c-bg);
 	color: var(--c-text);
+	font-family: sans-serif;
 }
 
 body {

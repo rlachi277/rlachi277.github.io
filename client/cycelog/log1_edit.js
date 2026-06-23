@@ -1,11 +1,115 @@
 import { $, d$, q$ } from "/client/jquery.js";
 import { dialog, showWarning } from "../posts/dialog.js";
 
+let curR, curC, isFocused;
+
+export function setupEdit() {
+	$("tbody td").attr("tabindex", "-1");
+	curR = parseInt(sessionStorage.getItem("curR")) ??
+		parseInt($("tbody > tr:first-child").attr("data-id"));
+	curC = parseInt(sessionStorage.getItem("curC")) ?? 0;
+	isFocused = JSON.parse(sessionStorage.getItem("isFocused")) ?? false;
+	focusOn(curR, curC, isFocused);
+	d$("log1-skip").addEventListener("click", (e) => {
+		focusOn(curR, curC, true);
+	});
+	d$("log1-table").addEventListener("keydown", onTableKeydown);
+	$("tbody td").on("blur", onTableBlur);
+
+	for (const row of $("tbody tr")) {
+		const id = parseInt(row.getAttribute("data-id"));
+		if (Number.isNaN(id)) continue;
+		row.querySelector(".log1-td-id")?.addEventListener("click", getIdFieldHandler(row, id));
+		row.querySelector(".log1-td-type")?.addEventListener("click", getTypeHandler(row, id));
+		row.querySelector(".log1-td-time")?.addEventListener("click", getTimeHandler(row, id));
+		row.querySelector(".log1-td-content")?.addEventListener("click", contentClickHandler);
+		row.querySelector(".log1-td-content")?.addEventListener("keydown", contentKeydownHandler);
+		row.querySelector(".log1-td-content")?.addEventListener("input", contentInputHandler);
+	}
+}
+
+function focusOn(row, col, focus, block) {
+	// console.log(`${row} ${col} ${focus}`);
+	const target = q$(`tbody > tr[data-id="${row}"] > td:nth-child(${col+1})`)?.[0];
+	if (target === undefined && block) return;
+	const oldTarget = q$(`tbody > tr[data-id="${curR}"] > td:nth-child(${curC+1})`)?.[0];
+	if (oldTarget !== undefined) oldTarget.setAttribute("tabindex", "-1");
+	if (target !== undefined) {
+		target.setAttribute("tabindex", "0");
+		if (focus) target.focus();
+	}
+	curR = row; curC = col; isFocused = focus;
+	sessionStorage.setItem("curR", curR);
+	sessionStorage.setItem("curC", curC);
+	sessionStorage.setItem("isFocused", focus);
+}
+
+function onTableKeydown(e) {
+	if (e.target.getAttribute("contenteditable") === "plaintext-only") return;
+	const shortcut = e.ctrlKey || e.metaKey;
+	if (e.key === "ArrowUp") {
+		e.preventDefault();
+		if (shortcut) {
+			focusOn(parseInt($("tbody > tr:first-child").attr("data-id")), curC, true);
+			return;
+		}
+		focusOn(curR-1, curC, true, true);
+	} else if (e.key === "ArrowDown") {
+		e.preventDefault();
+		if (shortcut) {
+			focusOn(parseInt($("tbody > tr:last-child").attr("data-id")), curC, true);
+			return;
+		}
+		focusOn(curR+1, curC, true, true);
+	} else if (e.key === "ArrowLeft") {
+		e.preventDefault();
+		if (shortcut) {
+			focusOn(curR, 0, true);
+			return;
+		}
+		focusOn(curR, curC-1, true, true);
+	} else if (e.key === "ArrowRight") {
+		e.preventDefault();
+		if (shortcut) {
+			focusOn(curR, 3, true);
+			return;
+		}
+		focusOn(curR, curC+1, true, true);
+	} else if (e.key === "Escape") {
+		e.preventDefault();
+		e.target.blur();
+	} else if (e.key === "Enter") {
+		e.preventDefault();
+		if (curC === 0 && e.shiftKey) moveHandler(e, curR);
+		else e.target.click();
+	}
+	if (curC === 1) {
+		let type;
+		switch (e.key) {
+			case '1': case 's': type = 1; break;
+			case '2': case 'd': type = 2; break;
+			case '3': case 't': type = 3; break;
+			case '4': case 'g': type = 4; break;
+			case '5': case 'w': type = 5; break;
+			case '6': case 'i': type = 6; break;
+			default: return;
+		}
+		e.preventDefault();
+		changeType(document.activeElement.parentElement, curR, document.activeElement, type);
+	}
+}
+
+function onTableBlur(e) {
+	if (e.relatedTarget !== null) return;
+	focusOn(curR, curC, false);
+}
+
 const S = window.getSelection();
 const SYMBOLS = {".": "·", "st": "★"};
 
-export function getIdFieldHandler(row, id) {
+function getIdFieldHandler(row, id) {
 	return async function (e) {
+		focusOn(id, 0, true);
 		if (e.shiftKey) moveHandler(e, id);
 		else deleteHandler(e, id);
 	}
@@ -26,8 +130,23 @@ async function deleteHandler(e, id) {
 			if (!res.ok) throw res.status;
 
 			const parent = e.target.parentElement;
-			if (parent.matches("tr:first-child") || parent.matches("tr:last-child")) {
-				parent.remove;
+			if (parent.matches("tr:first-child")) {
+				parent.remove();
+				let newR = curR + 1;
+				while ($("tbody tr:first-child").length !== 0 && $("tbody tr:first-child").attr("data-id") === undefined) {
+					$("tbody tr:first-child").remove();
+					newR += 1;
+				}
+				focusOn(newR, curC, true);
+				return true;
+			} else if (parent.matches("tr:last-child")) {
+				parent.remove();
+				let newR = curR - 1;
+				while ($("tbody tr:last-child").length !== 0 && $("tbody tr:last-child").attr("data-id") === undefined) {
+					$("tbody tr:last-child").remove();
+					newR -= 1;
+				}
+				focusOn(newR, curC, true);
 				return true;
 			}
 			parent.querySelectorAll(".log1-td-id, .log1-td-type, .wrapper, .log1-td-content").forEach((e) => {
@@ -92,6 +211,7 @@ async function moveHandler(e, id) {
 				status: res.status,
 				reason: await res.text()
 			};
+			focusOn(curR + delta, curC, true);
 			window.location.reload();
 			return true;
 		} catch (e) {
@@ -102,8 +222,9 @@ async function moveHandler(e, id) {
 	})();
 }
 
-export function getTypeHandler(row, id) {
+function getTypeHandler(row, id) {
 	return async function (e) {
+		focusOn(id, 1, true);
 		const cur = parseInt(row.getAttribute("data-type") ?? 0);
 		dialog(`${id}번 항목 유형 변경`, `
 			<label><input type="radio" name="log1-type" value="1"${cur===1 ? " checked autofocus" : ""}>공부</label>
@@ -115,25 +236,30 @@ export function getTypeHandler(row, id) {
 			<label><input type="radio" name="log1-type" value="6"${cur===6 ? " checked autofocus" : ""}>정보</label>
 		`, async () => {
 			const type = q$(`input[name="log1-type"]:checked`)[0]?.value;
-			if (type == undefined) { // ???
-				showWarning("값을 입력하세요.");
-				return false;
-			}
-			try {
-				const data = await sendPatch({id: id, type: type}, true);
-				e.target.textContent = data.type;
-				row.setAttribute("data-type", type);
-				return true;
-			} catch (e) {
-				alert(`오류: ${e}`);
-				return false;
-			}
+			return await changeType(row, id, e.target, type);
 		})();
 	}
 }
 
-export function getTimeHandler(row, id) {
+async function changeType(row, id, target, type) {
+	if (type == undefined) { // ???
+		showWarning("값을 입력하세요.");
+		return false;
+	}
+	try {
+		const data = await sendPatch({id: id, type: type}, true);
+		target.textContent = data.type;
+		row.setAttribute("data-type", type);
+		return true;
+	} catch (e) {
+		alert(`오류: ${e}`);
+		return false;
+	}
+}
+
+function getTimeHandler(row, id) {
 	return async function (e) {
+		focusOn(id, 2, true);
 		const cur = row.getAttribute("data-time") ?? "";
 		dialog(`${id}번 항목 시간 변경`, `
 			<label for="dialog-new-time">새 시간: </label>
@@ -157,20 +283,27 @@ export function getTimeHandler(row, id) {
 	}
 }
 
-export async function contentClickHandler(e) {
+async function contentClickHandler(e) {
+	focusOn(parseInt(e.target.parentElement.getAttribute("data-id")), 3, true);
 	e.target.setAttribute("contenteditable", "plaintext-only");
-	e.target.focus();
+	if (!e.target.contains(S.anchorNode)) {
+		S.selectAllChildren(e.target);
+		S.collapseToEnd();
+	}
 }
 
-export async function contentKeydownHandler(e) {
+async function contentKeydownHandler(e) {
 	if (e.target.getAttribute("contenteditable") !== "plaintext-only") return;
 	if (e.key === "Enter") {
 		e.preventDefault();
+		e.stopPropagation();
 		submitContent(e.target);
 		return;
 	} else if (e.key === "Escape") {
 		e.preventDefault();
+		e.stopPropagation();
 		cancelContent(e.target);
+		S.removeAllRanges();
 		return;
 	} else if (e.key === "Tab") {
 		e.preventDefault();
@@ -194,9 +327,12 @@ export async function contentKeydownHandler(e) {
 		S.collapseToEnd();
 
 		e.target.normalize();
-		e.target.classList.add("log1-edited");
+		contentInputHandler(e);
 		return;
 	}
+}
+
+async function contentInputHandler(e) {
 	e.target.classList.add("log1-edited");
 }
 
