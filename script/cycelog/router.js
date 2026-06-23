@@ -12,7 +12,8 @@ import {
 	postLog1,
 	patchLog1,
 	deleteLog1,
-	moveLog1
+	moveLog1,
+	log1Exists
 } from "./cycelog.js";
 import { withErrors } from "../posts/router.js";
 import { renderNavHook } from '../posts/render_nav.js';
@@ -117,7 +118,7 @@ router.post('/log1/{:id}', (req, res) => {
 	const id = req.params.id ?? 'index.html';
 	withErrors(res, () => {
 		postLog1(db, id, req.body);
-	})
+	});
 });
 
 router.patch('/log1/{:id}', (req, res) => {
@@ -131,11 +132,17 @@ router.delete('/log1/{:id}', (req, res) => {
 	const id = req.params.id ?? 'index.html';
 	withErrors(res, () => {
 		deleteLog1(db, id, req.body);
-	})
+	});
 });
 
 router.post('/log1/:id/move', (req, res) => {
 	withErrors(res, () => {
 		moveLog1(db, req.params.id, req.body);
-	})
+	});
+});
+
+router.get('/log1/exists/:id', (req, res) => {
+	withErrors(res, () => {
+		return log1Exists(db, req.params.id);
+	}, true);
 });

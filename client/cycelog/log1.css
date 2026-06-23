@@ -37,7 +37,7 @@ table { border-block-width: 0; }
 thead th { border-block-width: 1px; }
 tbody tr:first-child td { border-block-start-width: 0; }
 tfoot td { border-block-width: 1px; }
-tfoot.empty td { border-block-start-width: 0; border-block-end-width: 1px; }
+tbody:empty + tfoot td { border-block-start-width: 0; border-block-end-width: 1px; }
 tbody tr:last-child td { border-block-end-width: 0; }
 
 th, td { padding: 0.5ic; }

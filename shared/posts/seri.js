@@ -220,8 +220,8 @@ export function deseri(el, cur, init, hooks = []) {
 	case 'article': case 'figure':
 		tagName = el.type;
 		switch (el.variant?.float) {
-		case 'right': attrs = ` class="float-right"`; break;
-		case 'left': attrs = ` class="float-left"`; break;
+			case 'right': attrs = ` class="float-right"`; break;
+			case 'left': attrs = ` class="float-left"`; break;
 		}
 		break;
 	case 'p':
@@ -318,9 +318,9 @@ export function deseri(el, cur, init, hooks = []) {
 function deseriSize(size) {
 	let sizeClass = '';
 	switch (size) {
-	case 'large': sizeClass = ' large'; break;
-	case 'small': sizeClass = ' small'; break;
-	case 'full': sizeClass = ' full'; break;
+		case 'large': sizeClass = ' large'; break;
+		case 'small': sizeClass = ' small'; break;
+		case 'full': sizeClass = ' full'; break;
 	}
 	return ` class="loading${sizeClass}" onload="this.classList.remove('loading')"`;
 }
@@ -339,6 +339,8 @@ export function sani(s) {
 	return s
 		.replaceAll(/&/g, "&amp;")
 		.replaceAll(/"/g, "&quot;")
+		.replaceAll(/'/g, "&apos;")
+		.replaceAll(/`/g, "&grave;")
 		.replaceAll(/</g, "&lt;")
 		.replaceAll(/>/g, "&gt;");
 }

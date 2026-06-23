@@ -1,3 +1,4 @@
+import { sani } from "../../shared/posts/seri.js";
 import { patchPost, getPostFromData, postExists, deletePost } from "../posts/posts.js";
 
 export { getPost as getLog3 } from "../posts/posts.js";
@@ -54,6 +55,22 @@ const LOG1_THEAD = `<thead id="log1-thead">
 		<th scope="col">내용</th>
 	</tr>
 </thead>`.replaceAll(/\n|\t/g, '');
+const LOG1_TFOOT = `<tfoot><tr id="log1-new-entry">
+	<td id="log1-new-id"></td>
+	<td id="log1-new-type"></td>
+	<td id="log1-new-time"></td>
+	<td id="log1-new-content"></td>
+</tr></tfoot>`;
+
+export function getLog1(db, root, postId, template, renderHooks) {
+	const data = postExists(db, postId) ? log1Header(postId) : undefined;
+	const rendered = getPostFromData(data, root, postId, {
+		normal: template.normal,
+		notFound: template.notFound
+	}, renderHooks);
+	if (data === undefined) return rendered;
+	return rendered.replace(LOG1_TEMPLATE_SLOT, buildLog1Table(db, postId));
+}
 
 function getLog1Entries(db, postId) {
 	const dbResult = db.prepare("SELECT id,type,time,content FROM entries WHERE post = ?").all(postId);
@@ -65,7 +82,8 @@ function buildLog1Table(db, postId) {
 	const data = getLog1Entries(db, postId);
 	if (data.length === 0) return `<table id="log1-table">
 		${LOG1_THEAD}
-		<tfoot class="empty"><tr><td></td><td></td><td></td><td></td></tr></tfoot>
+		<tbody></tbody>
+		${LOG1_TFOOT}
 	</table>`.replaceAll(/\n|\t/g, '');
 	const ids = data.map((e) => e.id);
 	const maxId = Math.max(...ids);
@@ -73,36 +91,24 @@ function buildLog1Table(db, postId) {
 	const dataById = [];
 	for (const e of data) dataById[e.id] = e;
 	let result = '';
-	for (let i = minId; i <= maxId; i++) {
-		const e = dataById[i];
-		if (e === undefined) result += `<tr>
-			<td class="log1-td-id"></td>
-			<td class="log1-td-type"></td>
-			<td class="log1-td-time"><div class="wrapper"></div></td>
-			<td class="log1-td-content"></td>
-		</tr>`.replaceAll(/\n|\t/g, '');
-		else result += `<tr data-id="${e.id}" data-type="${e.type}" data-time="${e.time}">
-			<td class="log1-td-id">${e.id}</td>
-			<td class="log1-td-type">${LOG1_TYPE_NAME[e.type]}</td>
-			<td class="log1-td-time"><div class="wrapper">${e.time}</div></td>
-			<td class="log1-td-content">${e.content}</td>
-		</tr>`.replaceAll(/\n|\t/g, '');
-	}
+	for (let i = minId; i <= maxId; i++) result += buildLog1Row(i, dataById[i]);
 	return `<table id="log1-table">
 		${LOG1_THEAD}
-		${result}
-		<tfoot><tr><td></td><td></td><td></td><td></td></tr></tfoot>
+		<tbody>${result}</tbody>
+		${LOG1_TFOOT}
 	</table>`.replaceAll(/\n|\t/g, '');
 }
 
-export function getLog1(db, root, postId, template, renderHooks) {
-	const data = postExists(db, postId) ? log1Header(postId) : undefined;
-	const rendered = getPostFromData(data, root, postId, {
-		normal: template.normal,
-		notFound: template.notFound
-	}, renderHooks);
-	if (data === undefined) return rendered;
-	return rendered.replace(LOG1_TEMPLATE_SLOT, buildLog1Table(db, postId));
+function buildLog1Row(id, data) {
+	return `<tr data-row="${id}"
+	${data?.id != undefined ? ` data-id="${data.id}"` : ''}
+	${data?.type != undefined ? ` data-type="${data.type}"` : ''}
+	${data?.time != undefined ? ` data-time="${sani(data.time)}"` : ''}>
+		<td class="log1-td-id">${data?.id != undefined ? data.id : ''}</td>
+		<td class="log1-td-type">${data?.type != undefined ? LOG1_TYPE_NAME[data.type] : ''}</td>
+		<td class="log1-td-time"><div class="wrapper">${data?.time != undefined ? sani(data.time) : ''}</div></td>
+		<td class="log1-td-content">${data?.content != undefined ? sani(data.content) : ''}</td>
+	</tr>`.replaceAll(/\n|\t/g, '');
 }
 
 export function postLog1(db, postId, body) {
@@ -152,13 +158,20 @@ export function patchLog1(db, postId, body) {
 		INSERT OR REPLACE INTO entries (id, type, time, content, post)	
 		VALUES (?, ?, ?, ?, ?)
 	`).run(body.id, newData.type, newData.time, newData.content, postId);
-	return {
+	const result = {
 		id: body.id,
 		type: LOG1_TYPE_NAME[newData.type],
 		time: newData.time,
 		content: newData.content,
 		post: postId
 	};
+	if (body.getHtml) result.html = buildLog1Row(result.id, {
+		id: body.id,
+		type: newData.type,
+		time: newData.time,
+		content: newData.content
+	});
+	return result;
 }
 
 export function deleteLog1(db, postId, body) {
@@ -220,4 +233,10 @@ export function moveLog1(db, postId, body) {
 			throw e;
 		}
 	})();
+}
+
+export function log1Exists(db, id) {
+	const cnt = db.prepare(`SELECT COUNT(1) FROM entries
+		WHERE id = ?`).get(id)['COUNT(1)'];
+	return cnt !== 0;
 }

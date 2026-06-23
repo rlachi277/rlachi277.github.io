@@ -1,5 +1,5 @@
 import { seri } from "/shared/posts/seri.js";
-import { $, d$ } from "/client/jquery.js";
+import { $, d$ } from "../jquery.js";
 import { dialog, showWarning } from "./dialog.js";
 import {
 	startTargeting,

@@ -1,5 +1,5 @@
-import { q$, $ } from "/client/jquery.js";
 import { seri, deseri } from "/shared/posts/seri.js";
+import { q$, $ } from "../jquery.js";
 import {
 	inlineCommands,
 	inlineCleanup,

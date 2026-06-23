@@ -1,4 +1,4 @@
-import { d$ } from "/client/jquery.js";
+import { d$ } from "../jquery.js";
 
 let dialogAction = null;
 export function dialog(title, main, action, danger) {
@@ -6,7 +6,12 @@ export function dialog(title, main, action, danger) {
 		d$("dialog-title").textContent = title;
 		d$("dialog-main").innerHTML = main.replaceAll(/\n|\t/g, '');
 		dialogAction = action;
-		if (danger) d$("dialog-confirm").classList.add("danger");
+		if (danger) {
+			d$("dialog-confirm").classList.add("danger");
+			d$("dialog-cancel").removeAttribute("tabindex");
+		} else {
+			d$("dialog-cancel").setAttribute("tabindex", "-1");
+		}
 		d$("dialog").showModal();
 	}
 }

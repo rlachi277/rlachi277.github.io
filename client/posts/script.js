@@ -1,4 +1,4 @@
-import { $ } from "/client/jquery.js";
+import { $ } from "../jquery.js";
 import { setupDialog } from "./dialog.js";
 import { startEdit } from "./edit.js";
 

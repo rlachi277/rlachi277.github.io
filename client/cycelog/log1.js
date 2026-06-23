@@ -1,4 +1,4 @@
-import { $, d$, q$ } from "/client/jquery.js";
+import { $, d$, q$ } from "../jquery.js";
 import { setupDialog, dialog } from "../posts/dialog.js";
 import { setupEdit } from "./log1_edit.js";
 

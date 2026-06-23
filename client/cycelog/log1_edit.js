@@ -1,42 +1,57 @@
-import { $, d$, q$ } from "/client/jquery.js";
+import { $, d$, q$ } from "../jquery.js";
+import { k2e } from "../k2e.js";
 import { dialog, showWarning } from "../posts/dialog.js";
 
 let curR, curC, isFocused;
 
 export function setupEdit() {
-	$("tbody td").attr("tabindex", "-1");
-	curR = parseInt(sessionStorage.getItem("curR")) ??
-		parseInt($("tbody > tr:first-child").attr("data-id"));
-	curC = parseInt(sessionStorage.getItem("curC")) ?? 0;
+	$("tbody td, tfoot td").attr("tabindex", "-1");
+	curR = sessionStorage.getItem("curR") !== null ?
+		parseInt(sessionStorage.getItem("curR")) :
+		parseInt($("tbody > tr:first-child").attr("data-row"));
+	curC = sessionStorage.getItem("curC") !== null ?
+		parseInt(sessionStorage.getItem("curC")) : 0;
 	isFocused = JSON.parse(sessionStorage.getItem("isFocused")) ?? false;
-	focusOn(curR, curC, isFocused);
-	d$("log1-skip").addEventListener("click", (e) => {
-		focusOn(curR, curC, true);
+	if (Number.isNaN(curR)) {
+		curR = -1; isFocused = false;
+	}
+	d$("dialog")?.addEventListener("close", function () {
+		focusOn(curR, curC, isFocused)
 	});
-	d$("log1-table").addEventListener("keydown", onTableKeydown);
+	focusOn(curR, curC, isFocused);
+
+	d$("log1-skip").addEventListener("click", (e) => focusOn(curR, curC, true));
+	q$("#log1-table tbody")[0].addEventListener("keydown", onTableKeydown);
 	$("tbody td").on("blur", onTableBlur);
+
+	document.body.addEventListener("keydown", onBodyKeydown);
+	$("#log1-new-type, #log1-new-time, #log1-new-content").on("blur", onNewEntryBlur);
 
 	for (const row of $("tbody tr")) {
 		const id = parseInt(row.getAttribute("data-id"));
 		if (Number.isNaN(id)) continue;
-		row.querySelector(".log1-td-id")?.addEventListener("click", getIdFieldHandler(row, id));
-		row.querySelector(".log1-td-type")?.addEventListener("click", getTypeHandler(row, id));
-		row.querySelector(".log1-td-time")?.addEventListener("click", getTimeHandler(row, id));
-		row.querySelector(".log1-td-content")?.addEventListener("click", contentClickHandler);
-		row.querySelector(".log1-td-content")?.addEventListener("keydown", contentKeydownHandler);
-		row.querySelector(".log1-td-content")?.addEventListener("input", contentInputHandler);
+		const $row = $(row);
+		$row.children(".log1-td-id").on("click", getIdFieldHandler(row, id));
+		$row.children(".log1-td-type").on("click", getTypeHandler(row, id));
+		$row.children(".log1-td-time").on("click", getTimeHandler(row, id));
+		$row.children(".log1-td-content").on("click", contentClickHandler);
+		$row.children(".log1-td-content").on("keydown", contentKeydownHandler);
+		$row.children(".log1-td-content").on("input", contentInputHandler);
 	}
 }
 
 function focusOn(row, col, focus, block) {
-	// console.log(`${row} ${col} ${focus}`);
-	const target = q$(`tbody > tr[data-id="${row}"] > td:nth-child(${col+1})`)?.[0];
+	if (addingPhase !== 0 && focus) stopAdding();
+	if ($("tbody > tr").length !== 0 && row === -1) row = parseInt($("tbody > tr:first-child").attr("data-row"));
+	else if (row === -1) focus = false;
+	const target = q$(`tbody > tr[data-row="${row}"] > td:nth-child(${col+1})`)?.[0];
 	if (target === undefined && block) return;
-	const oldTarget = q$(`tbody > tr[data-id="${curR}"] > td:nth-child(${curC+1})`)?.[0];
+	const oldTarget = q$(`tbody > tr[data-row="${curR}"] > td:nth-child(${curC+1})`)?.[0];
 	if (oldTarget !== undefined) oldTarget.setAttribute("tabindex", "-1");
 	if (target !== undefined) {
 		target.setAttribute("tabindex", "0");
 		if (focus) target.focus();
+		else if (oldTarget === target) oldTarget.blur();
 	}
 	curR = row; curC = col; isFocused = focus;
 	sessionStorage.setItem("curR", curR);
@@ -46,18 +61,26 @@ function focusOn(row, col, focus, block) {
 
 function onTableKeydown(e) {
 	if (e.target.getAttribute("contenteditable") === "plaintext-only") return;
+	e.stopPropagation();
 	const shortcut = e.ctrlKey || e.metaKey;
 	if (e.key === "ArrowUp") {
 		e.preventDefault();
 		if (shortcut) {
-			focusOn(parseInt($("tbody > tr:first-child").attr("data-id")), curC, true);
+			focusOn(parseInt($("tbody > tr:first-child").attr("data-row")), curC, true);
 			return;
 		}
 		focusOn(curR-1, curC, true, true);
 	} else if (e.key === "ArrowDown") {
 		e.preventDefault();
+		if (e.target.parentElement.matches("tr:last-child")) {
+			focusOn(curR, curC, false);
+			advanceAdding({
+				preventDefault: ()=>{},
+				key: e.target.parentElement.getAttribute("data-type")
+			});
+		}
 		if (shortcut) {
-			focusOn(parseInt($("tbody > tr:last-child").attr("data-id")), curC, true);
+			focusOn(parseInt($("tbody > tr:last-child").attr("data-row")), curC, true);
 			return;
 		}
 		focusOn(curR+1, curC, true, true);
@@ -77,23 +100,21 @@ function onTableKeydown(e) {
 		focusOn(curR, curC+1, true, true);
 	} else if (e.key === "Escape") {
 		e.preventDefault();
-		e.target.blur();
+		focusOn(curR, curC, false);
 	} else if (e.key === "Enter") {
 		e.preventDefault();
-		if (curC === 0 && e.shiftKey) moveHandler(e, curR);
+		if (curC === 0 && e.shiftKey && e.target.parentElement.hasAttribute("data-id")) moveHandler(e, curR);
+		else if (curC === 0) return;
 		else e.target.click();
+	} else if (e.key === "Backspace") {
+		if (curC === 0 && e.target.parentElement.hasAttribute("data-id")) {
+			e.preventDefault();
+			deleteHandler(e, curR);
+		}
 	}
 	if (curC === 1) {
-		let type;
-		switch (e.key) {
-			case '1': case 's': type = 1; break;
-			case '2': case 'd': type = 2; break;
-			case '3': case 't': type = 3; break;
-			case '4': case 'g': type = 4; break;
-			case '5': case 'w': type = 5; break;
-			case '6': case 'i': type = 6; break;
-			default: return;
-		}
+		if (!Object.hasOwn(TYPE_KEYBIND, k2e(e.key))) return;
+		const type = TYPE_KEYBIND[k2e(e.key)];
 		e.preventDefault();
 		changeType(document.activeElement.parentElement, curR, document.activeElement, type);
 	}
@@ -104,11 +125,155 @@ function onTableBlur(e) {
 	focusOn(curR, curC, false);
 }
 
+function onNewEntryBlur(e) {
+	if (addingPhase === 0) return;
+	if (e.relatedTarget?.matches("#log1-new-time, #log1-new-content")) return;
+	stopAdding();
+}
+
+let addingPhase = 0;
+const TYPE_KEYBIND = Object.freeze({
+	'1': 1, 's': 1,
+	'2': 2, 'd': 2,
+	'3': 3, 't': 3,
+	'4': 4, 'g': 4,
+	'5': 5, 'w': 5,
+	'6': 6, 'i': 6
+});
+const TYPE_NAME = Object.freeze([
+	"",
+	"공부",
+	"대화",
+	"생각",
+	"일상",
+	"작업",
+	"정보"
+]);
+function onBodyKeydown(e) {
+	if (document.activeElement?.matches("tbody td")) return;
+	if (d$("dialog").matches(":open")) return;
+	if (e.key === "Escape") {
+		stopAdding();
+		return;
+	} else if (addingPhase !== 0 && e.key === "ArrowUp") {
+		const lastRow = parseInt($("tbody > tr:last-child").attr("data-row"));
+		if (Number.isNaN(lastRow)) {
+			stopAdding();
+			return;
+		}
+		switch (addingPhase) {
+			case 1: focusOn(lastRow, 1, true); break;
+			case 2: focusOn(lastRow, 2, true); break;
+			case 3: focusOn(lastRow, 3, true); break;
+		}
+	}
+	if (e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) return;
+	advanceAdding(e);
+}
+
+async function advanceAdding(e) {
+	switch (addingPhase) {
+	case 0:
+		if (!Object.hasOwn(TYPE_KEYBIND, k2e(e.key))) return;
+		const newId = $("tbody > tr:last-child").length !== 0 ?
+			parseInt($("tbody > tr:last-child").attr("data-row")) + 1 :
+			parseInt(prompt("이 글의 첫 1차 기록의 번호를 입력하세요"));
+		if (Number.isNaN(newId) || newId < 0) {
+			showWarning("잘못된 번호입니다.");
+			return;
+		}
+		const res = await fetch(`./exists/${newId}`);
+		if (!res.ok) throw res.status;
+		const exists = await res.json();
+		if (exists) {
+			showWarning("번호 충돌이 발생합니다.");
+			return;
+		}
+		const type = TYPE_KEYBIND[k2e(e.key)];
+		d$("log1-new-entry").setAttribute("data-id", newId);
+		d$("log1-new-entry").setAttribute("data-type", type);
+		d$("log1-new-id").textContent = newId;
+		d$("log1-new-type").textContent = TYPE_NAME[type];
+		d$("log1-new-type").focus();
+		addingPhase = 1;
+		e.preventDefault();
+		break;
+	case 1:
+		if (e.key === "0" || e.key === "Backspace") {
+			stopAdding();
+			return;
+		}
+		if (Object.hasOwn(TYPE_KEYBIND, k2e(e.key))) {
+			stopAdding();
+			advanceAdding(e);
+			return;
+		}
+		if (e.key !== "Tab") return;
+		d$("log1-new-time").setAttribute("contenteditable", "plaintext-only");
+		d$("log1-new-time").focus();
+		addingPhase = 2;
+		e.preventDefault();
+		break;
+	case 2:
+		if (e.key !== "Tab") return;
+		d$("log1-new-time").removeAttribute("contenteditable");
+		d$("log1-new-entry").setAttribute("data-time", d$("log1-new-time").textContent);
+		d$("log1-new-content").setAttribute("contenteditable", "plaintext-only");
+		d$("log1-new-content").focus();
+		addingPhase = 3;
+		e.preventDefault();
+		break;
+	case 3:
+		if (e.key !== "Enter" && e.key !== "Tab") return;
+		try {
+			const data = await sendPatch({
+				id: parseInt(d$("log1-new-entry").getAttribute("data-id")),
+				type: parseInt(d$("log1-new-entry").getAttribute("data-type")),
+				time: d$("log1-new-entry").getAttribute("data-time"),
+				content: d$("log1-new-content").textContent,
+				getHtml: true
+			}, true);
+			q$("tbody")[0].insertAdjacentHTML("beforeend", data.html);
+
+			const newId = parseInt(d$("log1-new-entry").getAttribute("data-id"));
+			const newRow = q$(`tbody tr[data-id="${newId}"]`)[0];
+			const $newRow = $(newRow);
+			$newRow.children(".log1-td-id").on("click", getIdFieldHandler(newRow, newId));
+			$newRow.children(".log1-td-type").on("click", getTypeHandler(newRow, newId));
+			$newRow.children(".log1-td-time").on("click", getTimeHandler(newRow, newId));
+			$newRow.children(".log1-td-content").on("click", contentClickHandler);
+			$newRow.children(".log1-td-content").on("keydown", contentKeydownHandler);
+			$newRow.children(".log1-td-content").on("input", contentInputHandler);
+
+			stopAdding();
+			e.preventDefault();
+		} catch (e) {
+			alert(`오류: ${e}`);
+			stopAdding();
+			return;
+		}
+	}
+}
+
+function stopAdding() {
+	if (addingPhase === 0) return;
+	$("#log1-new-id, #log1-new-type, #log1-new-time, #log1-new-content").text('');
+	$("#log1-new-entry").removeAttr("data-id data-type data-time");
+	$("#log1-new-time, #log1-new-content").removeAttr("contenteditable")
+	switch (addingPhase) {
+		case 1: d$("log1-new-type").blur(); break;
+		case 2: d$("log1-new-time").blur(); break;
+		case 3: d$("log1-new-content").blur(); break;
+	}
+	addingPhase = 0;
+}
+
 const S = window.getSelection();
 const SYMBOLS = {".": "·", "st": "★"};
 
 function getIdFieldHandler(row, id) {
-	return async function (e) {
+	return async function ($e) {
+		const e = $e.originalEvent;
 		focusOn(id, 0, true);
 		if (e.shiftKey) moveHandler(e, id);
 		else deleteHandler(e, id);
@@ -130,6 +295,11 @@ async function deleteHandler(e, id) {
 			if (!res.ok) throw res.status;
 
 			const parent = e.target.parentElement;
+			if (parent.matches("tr:only-child")) {
+				parent.remove();
+				focusOn(-1, 0, false);
+				return true;
+			}
 			if (parent.matches("tr:first-child")) {
 				parent.remove();
 				let newR = curR + 1;
@@ -155,6 +325,12 @@ async function deleteHandler(e, id) {
 			parent.removeAttribute("data-id");
 			parent.removeAttribute("data-type");
 			parent.removeAttribute("data-time");
+
+			const $parent = $(parent);
+			$parent.children(".log1-td-id, .log1-td-type, .log1-td-time, .log1-td-content").off("click");
+			$parent.children(".log1-td-content").off("keydown");
+			$parent.children(".log1-td-content").off("input");
+
 			return true;
 		} catch (e) {
 			alert(`오류: ${e}`);
@@ -167,17 +343,17 @@ async function moveHandler(e, id) {
 	dialog(`번호 옮기기`, `
 		<label>
 			${id}번부터 
-			<input id="dialog-new-end-id" type="number" value="${id}" min="${id}">
+			<input id="dialog-end-id" type="number" value="${id}" min="${id}">
 			번까지의 항목의
 		</label><br>
 		<label>
 			번호를 
-			<input id="dialog-new-delta" type="number" value="1">
+			<input id="dialog-delta" type="number" value="1">
 			만큼 변경합니다.
 		</label>
 	`, async () => {
-		const endIdStr = d$("dialog-new-end-id").value;
-		const deltaStr = d$("dialog-new-delta").value;
+		const endIdStr = d$("dialog-end-id").value;
+		const deltaStr = d$("dialog-delta").value;
 		if (endIdStr === '' || deltaStr === '') {
 			showWarning("값을 입력하세요.");
 			return false;
@@ -223,7 +399,8 @@ async function moveHandler(e, id) {
 }
 
 function getTypeHandler(row, id) {
-	return async function (e) {
+	return async function ($e) {
+		const e = $e.originalEvent;
 		focusOn(id, 1, true);
 		const cur = parseInt(row.getAttribute("data-type") ?? 0);
 		dialog(`${id}번 항목 유형 변경`, `
@@ -247,8 +424,8 @@ async function changeType(row, id, target, type) {
 		return false;
 	}
 	try {
-		const data = await sendPatch({id: id, type: type}, true);
-		target.textContent = data.type;
+		await sendPatch({id: id, type: type}, true);
+		target.textContent = TYPE_NAME[type];
 		row.setAttribute("data-type", type);
 		return true;
 	} catch (e) {
@@ -258,7 +435,8 @@ async function changeType(row, id, target, type) {
 }
 
 function getTimeHandler(row, id) {
-	return async function (e) {
+	return async function ($e) {
+		const e = $e.originalEvent;
 		focusOn(id, 2, true);
 		const cur = row.getAttribute("data-time") ?? "";
 		dialog(`${id}번 항목 시간 변경`, `
@@ -271,8 +449,8 @@ function getTimeHandler(row, id) {
 				return false;
 			}
 			try {
-				const data = await sendPatch({id: id, time: time}, true);
-				e.target.firstChild.textContent = data.time;
+				await sendPatch({id: id, time: time}, true);
+				e.target.firstChild.textContent = time;
 				row.setAttribute("data-time", time);
 				return true;
 			} catch (e) {
@@ -283,7 +461,8 @@ function getTimeHandler(row, id) {
 	}
 }
 
-async function contentClickHandler(e) {
+async function contentClickHandler($e) {
+	const e = $e.originalEvent;
 	focusOn(parseInt(e.target.parentElement.getAttribute("data-id")), 3, true);
 	e.target.setAttribute("contenteditable", "plaintext-only");
 	if (!e.target.contains(S.anchorNode)) {
@@ -292,7 +471,8 @@ async function contentClickHandler(e) {
 	}
 }
 
-async function contentKeydownHandler(e) {
+async function contentKeydownHandler($e) {
+	const e = $e.originalEvent;
 	if (e.target.getAttribute("contenteditable") !== "plaintext-only") return;
 	if (e.key === "Enter") {
 		e.preventDefault();
@@ -332,7 +512,8 @@ async function contentKeydownHandler(e) {
 	}
 }
 
-async function contentInputHandler(e) {
+async function contentInputHandler($e) {
+	const e = $e.originalEvent;
 	e.target.classList.add("log1-edited");
 }
 
