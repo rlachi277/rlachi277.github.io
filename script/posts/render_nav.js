@@ -1,4 +1,4 @@
-import { sani } from '../..../../shared/posts/seri.js';
+import { sani } from '../../shared/posts/seri.js';
 import { postExists } from './posts.js';
 
 export function renderNavHook(db, root) {

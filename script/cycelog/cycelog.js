@@ -1,4 +1,4 @@
-import { buildLog1Table } from "../..../../shared/cycelog/log1.js";
+import { buildLog1Table } from "../../shared/cycelog/log1.js";
 import {
 	patchPost,
 	getPostFromData,
