@@ -7,7 +7,7 @@ import { setupGrid, getFocusState, focusOn } from "./log1_grid.js";
 const S = window.getSelection();
 const SYMBOLS = {".": "·", "st": "★"};
 
-export function setupEdit() {
+export function setupLog1Edit() {
 	setupGrid();
 	for (const row of $("tbody tr")) setupRow(row);
 }

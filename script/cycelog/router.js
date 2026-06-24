@@ -13,7 +13,8 @@ import {
 	patchLog1,
 	deleteLog1,
 	moveLog1,
-	log1Exists
+	log1Exists,
+	getRawLog1
 } from "./cycelog.js";
 import { withErrors } from "../posts/router.js";
 import { renderNavHook } from '../posts/render_nav.js';
@@ -123,6 +124,12 @@ router.post('/log1/:id/move', (req, res) => {
 	withErrors(res, () => {
 		moveLog1(db, req.params.id, req.body);
 	});
+});
+
+router.get('/log1/:id/raw', (req, res) => {
+	withErrors(res, () => {
+		return getRawLog1(db, req.params.id);
+	}, true);
 });
 
 router.get('/log1/exists/:id', (req, res) => {

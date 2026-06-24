@@ -1,10 +1,8 @@
 import { d$ } from "../jquery.js";
 import { setupDialog } from "../posts/dialog.js";
-import { setupEdit } from "./log1_edit.js";
+import { setupLog1 } from "./log1_edit.js";
 
-export function setup() {
-	d$("log1-thead").addEventListener("click", () => window.scrollTo(0, 0));
+export function setup(menu) {
 
-	setupDialog();
-	setupEdit();
+	setupLog1();
 }

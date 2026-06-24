@@ -25,12 +25,13 @@ function onResize() {
 }
 
 function setupMenu(menu) {
+	if (menu == undefined) return;
 	for (const [k, v] of Object.entries(menu)) {
 		$(`[data-menu="${k}"]`).on("click", v);
 	}
 }
 
-export function setup(defaultMenu, editMenu) {
+export function setup(defaultMenu, editMenu, noEdit) {
 	onResize();
 	window.addEventListener('resize', onResize);
 
@@ -49,7 +50,7 @@ export function setup(defaultMenu, editMenu) {
 	setupMenu(defaultMenu);
 	const params = new URLSearchParams(window.location.search);
 	if (params.get("edit")) {
-		if (!$(":root.notfound").length) startEdit($("body").get(0), true);
+		if (!noEdit && !$(":root.notfound").length) startEdit($("body").get(0), true);
 		$("menu .menu-edit").css("display", "revert");
 		$("nav a").each((i, e) => {
 			e.setAttribute("href", e.getAttribute("href") + "?edit=t");

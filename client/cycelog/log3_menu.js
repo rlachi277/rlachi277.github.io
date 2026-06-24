@@ -5,9 +5,19 @@ import {
 	startTargeting,
 	deleteElement
 } from "../posts/edit.js";
-import { editMenu as superEditMenu } from "../posts/menu.js";
+import { defaultMenu as superDefaultMenu, editMenu as superEditMenu } from "../posts/menu.js";
 
-export { defaultMenu } from "../posts/menu.js";
+export const defaultMenu = {
+	export: superDefaultMenu.export,
+	
+	startEdit: superDefaultMenu.startEdit,
+
+	toLog1: () => {
+		const path = `../log1/${window.location.pathname.split('/').at(-1)}${window.location.search}`;
+		window.location.href = path;
+	}
+}
+
 export const editMenu = {
 	new: dialog("새 글", `
 		<label for="dialog-new-id">식별자: </label>

@@ -21,6 +21,7 @@ export function setupGrid() {
 	d$("dialog")?.addEventListener("close", () => focusOn(curR, curC, isFocused));
 	focusOn(curR, curC, isFocused);
 
+	d$("log1-skip").classList.add("show");
 	d$("log1-skip").addEventListener("click", () => focusOn(curR, curC, true));
 	q$("#log1-table tbody")[0].addEventListener("keydown", onTableKeydown);
 	$("tbody td").on("blur", onTableBlur);

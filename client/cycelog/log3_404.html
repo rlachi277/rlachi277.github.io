@@ -8,7 +8,7 @@
 	<link rel="stylesheet" href="/client/posts/style.css">
 	<script type="module">
 		import { setup } from "/client/posts/script.js";
-		import { defaultMenu, editMenu } from "/client/cycelog/menu.js";
+		import { defaultMenu, editMenu } from "/client/cycelog/log3_menu.js";
 		setup(defaultMenu, editMenu);
 	</script>
 </head>
@@ -17,14 +17,19 @@
 		<menu>
 			<li class="menu-edit"><button id="menu-file" popovertarget="menu-filesub">파일</button>
 			<ul id="menu-filesub" popover>
-				<li class="menu-edit"><button class="menu-action" data-menu="new">새 글...</button></li>
-				<li class="menu-edit"><button class="menu-action" data-menu="load">JSON에서 불러오기...</button></li>
+				<li><button class="menu-action" data-menu="new">새 글...</button></li>
+				<li><button class="menu-action" data-menu="load">JSON에서 불러오기...</button></li>
 			</ul>
 			</li>
 			<li><button id="menu-edit" popovertarget="menu-editsub">편집</button>
 			<ul id="menu-editsub" popover>
 				<li><button class="menu-action" data-menu="startEdit">편집 시작</button></li>
 				<li class="menu-edit"><button class="menu-action" data-menu="stopEdit">편집 종료</button></li>
+			</ul>
+			</li>
+			<li><button id="menu-record" popovertarget="menu-recordsub">기록</button>
+			<ul id="menu-recordsub" popover>
+				<li><button class="menu-action" data-menu="toLog1">1차 기록 보기</button></li>
 			</ul>
 			</li>
 		</menu>

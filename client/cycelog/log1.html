@@ -8,12 +8,38 @@
 	<link rel="stylesheet" href="/client/posts/style.css">
 	<link rel="stylesheet" href="/client/cycelog/log1.css">
 	<script type="module">
-		import { setup } from "/client/cycelog/log1.js";
-
-		setup();
+		import { setup } from "/client/posts/script.js";
+		import { defaultMenu, editMenu } from "/client/cycelog/log1_menu.js";
+		import { setupLog1Edit } from "/client/cycelog/log1_edit.js";
+		setup(defaultMenu, editMenu, true);
+		const params = new URLSearchParams(window.location.search);
+		if (params.get("edit")) setupLog1Edit();
 	</script>
 </head>
 <body>
+	<button id="log1-skip">표로 건너뛰기</button>
+	<div id="menubar"> <!-- TODO: implement keyboard navigation and add role="menubar" -->
+		<menu>
+			<li><button id="menu-file" popovertarget="menu-filesub">파일</button>
+			<ul id="menu-filesub" popover>
+				<li><button class="menu-action" data-menu="export">JSON으로 저장</button></li>
+				<li class="menu-edit"><button class="menu-action" data-menu="new">새 글...</button></li>
+				<li class="menu-edit"><button class="menu-action" data-menu="delete">이 글 삭제...</button></li>
+			</ul>
+			</li>
+			<li><button id="menu-edit" popovertarget="menu-editsub">편집</button>
+			<ul id="menu-editsub" popover>
+				<li><button class="menu-action" data-menu="startEdit">편집 시작</button></li>
+				<li class="menu-edit"><button class="menu-action" data-menu="stopEdit">편집 종료</button></li>
+			</ul>
+			</li>
+			<li><button id="menu-record" popovertarget="menu-recordsub">기록</button>
+			<ul id="menu-recordsub" popover>
+				<li><button class="menu-action" data-menu="toLog3">3차 기록 보기</button></li>
+			</ul>
+			</li>
+		</menu>
+	</div>
 	<dialog id="dialog">
 		<h6 id="dialog-title"></h6>
 		<div id="dialog-main"></div>
@@ -23,7 +49,6 @@
 		</div>
 	</dialog>
 	<div id="warning" role="alert"></div>
-	<button id="log1-skip">표로 건너뛰기</button>
 	###여기까지가 템플릿임###
 </body>
 </html>

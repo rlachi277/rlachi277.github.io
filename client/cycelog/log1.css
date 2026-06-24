@@ -7,7 +7,9 @@
 	font-size: 1.2em;
 	padding-block: 4px;
 	padding-inline: 8px;
+	display: none;
 }
+#log1-skip.show { display: revert; }
 #log1-skip:focus { top: auto; }
 
 table {

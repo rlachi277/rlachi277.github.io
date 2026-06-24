@@ -36,6 +36,12 @@ const log1Header = (id) => {
 	};
 };
 
+export function getRawLog1(db, postId) {
+	const dbResult = db.prepare("SELECT id,type,time,content FROM entries WHERE post = ? ORDER BY id").all(postId);
+	if (dbResult === undefined) throw 404;
+	return dbResult;
+}
+
 export function getLog1(db, root, postId, template, renderHooks) {
 	const data = postExists(db, postId) ? log1Header(postId) : undefined;
 	const rendered = getPostFromData(data, root, postId, {
@@ -44,9 +50,7 @@ export function getLog1(db, root, postId, template, renderHooks) {
 	}, renderHooks);
 	if (data === undefined) return rendered;
 
-	const dbResult = db.prepare("SELECT id,type,time,content FROM entries WHERE post = ?").all(postId);
-	if (dbResult === undefined) throw 404;
-	return rendered.replace(LOG1_TEMPLATE_SLOT, buildLog1Table(dbResult));
+	return rendered.replace(LOG1_TEMPLATE_SLOT, buildLog1Table(getRawLog1(db, postId)));
 }
 
 export function postLog1(db, postId, body) {
