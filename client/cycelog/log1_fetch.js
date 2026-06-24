@@ -25,7 +25,7 @@ export async function sendDelete(id) {
 }
 
 export async function sendMove(startId, endId, delta) {
-	const res = await fetch(`${window.location.href}/move`, {
+	const res = await fetch(`${window.location.origin}${window.location.pathname}/move`, {
 		method: "POST",
 		headers: {'Content-type': 'application/json'},
 		body: JSON.stringify({

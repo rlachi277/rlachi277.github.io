@@ -74,8 +74,8 @@ tr { --bg: var(--c-bg); --bgf: var(--c-bgh); }
 tr[data-type="1"] { --bg: var(--c-1-bg); --bgf: var(--c-1-bgh); color: var(--c-1); }
 tr[data-type="2"] { --bg: var(--c-8-bg); --bgf: var(--c-8-bgh); color: var(--c-8); }
 tr[data-type="3"] { --bg: var(--c-3-bg); --bgf: var(--c-3-bgh); color: var(--c-3); }
-tr[data-type="4"] { --bg: var(--c-4-bg); --bgf: var(--c-4-bgh); color: var(--c-4); }
-tr[data-type="5"] { --bg: var(--c-6-bg); --bgf: var(--c-6-bgh); color: var(--c-6); }
+tr[data-type="4"] { --bg: var(--c-45-bg); --bgf: var(--c-45-bgh); color: var(--c-45); }
+tr[data-type="5"] { --bg: var(--c-67-bg); --bgf: var(--c-67-bgh); color: var(--c-67); }
 tr[data-type="6"] { --bg: var(--c-2-bg); --bgf: var(--c-2-bgh); color: var(--c-2); }
 tr:target { --bg: var(--bgf); outline: 1px auto currentColor; }
 
@@ -137,6 +137,6 @@ td:focus {
 #dialog-main input[type="radio"][name="log1-type"][value="1"] { --bd: var(--c-1-bd); --bdh: var(--c-1-bdh); --bda: var(--c-1-bda); --bg: var(--c-1-bg); --bgh: var(--c-1-bgh); --bga: var(--c-1-bga); }
 #dialog-main input[type="radio"][name="log1-type"][value="2"] { --bd: var(--c-8-bd); --bdh: var(--c-8-bdh); --bda: var(--c-8-bda); --bg: var(--c-8-bg); --bgh: var(--c-8-bgh); --bga: var(--c-8-bga); }
 #dialog-main input[type="radio"][name="log1-type"][value="3"] { --bd: var(--c-3-bd); --bdh: var(--c-3-bdh); --bda: var(--c-3-bda); --bg: var(--c-3-bg); --bgh: var(--c-3-bgh); --bga: var(--c-3-bga); }
-#dialog-main input[type="radio"][name="log1-type"][value="4"] { --bd: var(--c-4-bd); --bdh: var(--c-4-bdh); --bda: var(--c-4-bda); --bg: var(--c-4-bg); --bgh: var(--c-4-bgh); --bga: var(--c-4-bga); }
-#dialog-main input[type="radio"][name="log1-type"][value="5"] { --bd: var(--c-6-bd); --bdh: var(--c-6-bdh); --bda: var(--c-6-bda); --bg: var(--c-6-bg); --bgh: var(--c-6-bgh); --bga: var(--c-6-bga); }
+#dialog-main input[type="radio"][name="log1-type"][value="4"] { --bd: var(--c-45-bd); --bdh: var(--c-45-bdh); --bda: var(--c-45-bda); --bg: var(--c-45-bg); --bgh: var(--c-45-bgh); --bga: var(--c-45-bga); }
+#dialog-main input[type="radio"][name="log1-type"][value="5"] { --bd: var(--c-67-bd); --bdh: var(--c-67-bdh); --bda: var(--c-67-bda); --bg: var(--c-67-bg); --bgh: var(--c-67-bgh); --bga: var(--c-67-bga); }
 #dialog-main input[type="radio"][name="log1-type"][value="6"] { --bd: var(--c-2-bd); --bdh: var(--c-2-bdh); --bda: var(--c-2-bda); --bg: var(--c-2-bg); --bgh: var(--c-2-bgh); --bga: var(--c-2-bga); }

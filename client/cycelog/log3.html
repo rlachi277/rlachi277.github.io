@@ -6,9 +6,14 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="/client/colors.css">
 	<link rel="stylesheet" href="/client/posts/style.css">
+	<link rel="stylesheet" href="/client/cycelog/colors.css">
+	<link rel="stylesheet" href="/client/cycelog/log3.css">
 	<script type="module">
 		import { setup } from "/client/posts/script.js";
 		import { defaultMenu, editMenu } from "/client/cycelog/log3_menu.js";
+		import { setupLog3Edit } from "/client/cycelog/log3_edit.js";
+		const params = new URLSearchParams(window.location.search);
+		if (params.get("edit")) await setupLog3Edit();
 		setup(defaultMenu, editMenu);
 	</script>
 </head>
@@ -57,5 +62,13 @@
 	</dialog>
 	<div id="warning" role="alert"></div>
 	###여기까지가 템플릿임###
+	<a class="entry">test</a>
+	 <a class="entry" data-type="0">test</a>
+	 <a class="entry" data-type="1">test</a>
+	 <a class="entry" data-type="6">test</a>
+	 <a class="entry" data-type="3">test</a>
+	 <a class="entry" data-type="4">test</a>
+	 <a class="entry" data-type="5">test</a>
+	 <a class="entry" data-type="2">test</a>
 </body>
 </html>

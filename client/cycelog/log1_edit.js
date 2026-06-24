@@ -1,4 +1,4 @@
-import { LOG1_TYPE_NAME } from "/shared/cycelog/log1.js";
+import { LOG1_TYPE_NAME } from "../../shared/cycelog/log1.js";
 import { $, d$, q$ } from "../jquery.js";
 import { dialog, showWarning } from "../posts/dialog.js";
 import { sendDelete, sendMove, sendPatch } from "./log1_fetch.js";

@@ -1,4 +1,4 @@
-import { deseri } from '../../shared/posts/seri.js';
+import { deseri } from '../..../../shared/posts/seri.js';
 import { addPost, removePost } from "./manage_nav.js";
 
 const TEMPLATE_SLOT = "###여기까지가 템플릿임###";

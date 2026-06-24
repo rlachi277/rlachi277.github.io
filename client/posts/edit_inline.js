@@ -1,4 +1,4 @@
-import { seri, deseri, getColor } from "/shared/posts/seri.js";
+import { seri, deseri, getColor } from "../../shared/posts/seri.js";
 import { $ } from "../jquery.js";
 import { k2e } from "../k2e.js";
 import { SERI_HOOKS, DESERI_HOOKS } from "./script.js";

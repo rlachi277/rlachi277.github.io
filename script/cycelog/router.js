@@ -14,11 +14,12 @@ import {
 	deleteLog1,
 	moveLog1,
 	log1Exists,
-	getRawLog1
+	getRawLog1,
+	log1Where
 } from "./cycelog.js";
 import { withErrors } from "../posts/router.js";
 import { renderNavHook } from '../posts/render_nav.js';
-import { cycelogHook } from './cycelog_hook.js';
+import { entryDeseriHook, serverWhere } from '../../shared/cycelog/cycelog_hook.js';
 
 const db = new Database('db/cycelog.db');
 db.pragma('journal_mode = WAL');
@@ -57,10 +58,17 @@ router.get('/log3/{:id}', (req, res) => {
 	const id = req.params.id ?? 'index.html';
 	withErrors(res, () => {
 		res.setHeader('Content-Type', 'text/html');
+		const types = [];
+		const data = getRawLog1(db, id);
+		for (const e of data) types[e.id] = e.type;
+
 		return getLog3(db, "/cycelog/log3/", id, {
 			normal: log3Template,
 			notFound: log3NotFoundTemplate
-		}, [renderNavHook(db, "/cycelog/log3/"), cycelogHook(db)]);
+		}, [
+			renderNavHook(db, "/cycelog/log3/"),
+			entryDeseriHook(types, serverWhere(db), false)
+		]);
 	}, true);
 });
 
@@ -95,7 +103,7 @@ router.get('/log1/{:id}', (req, res) => {
 		return getLog1(db, "/cycelog/log1/", id, {
 			normal: log1Template,
 			notFound: log1NotFoundTemplate
-		}, [renderNavHook(db, "/cycelog/log1/"), cycelogHook(db)]);
+		}, [renderNavHook(db, "/cycelog/log1/")]);
 	}, true);
 });
 
@@ -135,5 +143,11 @@ router.get('/log1/:id/raw', (req, res) => {
 router.get('/log1/exists/:id', (req, res) => {
 	withErrors(res, () => {
 		return log1Exists(db, req.params.id);
+	}, true);
+});
+
+router.get('/log1/where/:id', (req, res) => {
+	withErrors(res, () => {
+		return log1Where(db, req.params.id);
 	}, true);
 });

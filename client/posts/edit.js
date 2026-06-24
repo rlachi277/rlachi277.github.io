@@ -1,4 +1,4 @@
-import { seri, deseri } from "/shared/posts/seri.js";
+import { seri, deseri } from "../../shared/posts/seri.js";
 import { SERI_HOOKS, DESERI_HOOKS } from "./script.js";
 import { q$, $ } from "../jquery.js";
 import {

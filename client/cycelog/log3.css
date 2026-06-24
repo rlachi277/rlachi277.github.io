@@ -1,0 +1,14 @@
+.entry { color: var(--c); }
+.entry:hover, .entry:focus-visible { color: var(--ch); }
+.entry:active { color: var(--ca); }
+
+.entry:not([data-type]), .entry[data-type="0"] {
+	background-color: var(--c-1-3);
+	--c: var(--c-linke); --ch: var(--c-linkeh); --ca: var(--c-linkea);
+}
+.entry[data-type="1"] { --c: var(--c-1); --ch: var(--c-1h); --ca: var(--c-1a); }
+.entry[data-type="2"] { --c: var(--c-8); --ch: var(--c-8h); --ca: var(--c-8a); }
+.entry[data-type="3"] { --c: var(--c-3); --ch: var(--c-3h); --ca: var(--c-3a); }
+.entry[data-type="4"] { --c: var(--c-45); --ch: var(--c-45h); --ca: var(--c-45a); }
+.entry[data-type="5"] { --c: var(--c-67); --ch: var(--c-67h); --ca: var(--c-67a); }
+.entry[data-type="6"] { --c: var(--c-2); --ch: var(--c-2h); --ca: var(--c-2a); }

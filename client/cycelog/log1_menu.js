@@ -5,7 +5,7 @@ import { defaultMenu as superDefaultMenu, editMenu as superEditMenu } from "../p
 export const defaultMenu = {
 	export: async () => {
 		try {
-			const res = await fetch(`${window.location.href}/raw`);
+			const res = await fetch(`${window.location.origin}${window.location.pathname}/raw`);
 			if (!res.ok) throw res.status;
 			const data = await res.json();
 			const file = new Blob([JSON.stringify(data)], {type: "application/json"});

@@ -1,4 +1,4 @@
-import { LOG1_TYPE_NAME, buildLog1Row } from "/shared/cycelog/log1.js";
+import { LOG1_TYPE_NAME, buildLog1Row } from "../../shared/cycelog/log1.js";
 import { $, d$, q$ } from "../jquery.js";
 import { k2e } from "../k2e.js";
 import { showWarning } from "../posts/dialog.js";

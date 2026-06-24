@@ -136,9 +136,6 @@ a.broken:active { color: var(--c-linkea); }
 a.self { color: var(--c-links); }
 a.self:hover, a.self:focus-visible { color: var(--c-linksh); }
 a.self:active { color: var(--c-linksa); }
-a:not(nav a):visited { color: var(--c-links); }
-a:not(nav a):visited:hover, a.self:focus-visible { color: var(--c-linksh); }
-a:not(nav a):visited:active { color: var(--c-linksa); }
 
 .color {
 	--c: currentColor; --ch: currentColor; --ca: currentColor;

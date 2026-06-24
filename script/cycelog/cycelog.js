@@ -1,4 +1,5 @@
-import { buildLog1Table } from "../../shared/cycelog/log1.js";
+import { buildLog1Table } from "../..../../shared/cycelog/log1.js";
+import { serverWhere } from "../../shared/cycelog/cycelog_hook.js";
 import {
 	patchPost,
 	getPostFromData,
@@ -144,4 +145,8 @@ export function log1Exists(db, id) {
 	const cnt = db.prepare(`SELECT COUNT(1) FROM entries
 		WHERE id = ?`).get(id)['COUNT(1)'];
 	return cnt !== 0;
+}
+
+export function log1Where(db, id) {
+	return serverWhere(db)(id);
 }
