@@ -1,10 +1,4 @@
-export async function entryExists(id) {
-	const res = await fetch(`./exists/${id}`);
-	if (!res.ok) throw res.status;
-	return await res.json();
-}
-
-export async function patchLog1(body, getData) {
+export async function sendPatch(body, getData) {
 	const res = await fetch(window.location.href, {
 		method: "PATCH",
 		headers: {'Content-type': 'application/json'},
@@ -15,7 +9,13 @@ export async function patchLog1(body, getData) {
 	return await res.json();
 }
 
-export async function deleteLog1Entry(id) {
+export async function sendExists(id) {
+	const res = await fetch(`./exists/${id}`);
+	if (!res.ok) throw res.status;
+	return await res.json();
+}
+
+export async function sendDelete(id) {
 	const res = await fetch(window.location.href, {
 		method: "DELETE",
 		headers: {'Content-type': 'application/json'},
@@ -24,7 +24,7 @@ export async function deleteLog1Entry(id) {
 	if (!res.ok) throw res.status;
 }
 
-export async function moveLog1Entries(startId, endId, delta) {
+export async function sendMove(startId, endId, delta) {
 	const res = await fetch(`${window.location.href}/move`, {
 		method: "POST",
 		headers: {'Content-type': 'application/json'},

@@ -1,31 +1,13 @@
+import { LOG1_TYPE_NAME, buildLog1Row } from "/shared/cycelog/log1.js";
 import { $, d$, q$ } from "../jquery.js";
 import { k2e } from "../k2e.js";
 import { showWarning } from "../posts/dialog.js";
-import { LOG1_TYPE_NAME } from "../../shared/cycelog/log1.js";
-import { entryExists, patchLog1 } from "./log1_api.js";
-import {
-	setupContentEditing,
-	contentClickHandler,
-	contentKeydownHandler,
-	contentInputHandler
-} from "./log1_content.js";
-import {
-	setupRowActions,
-	activateIdField,
-	changeType,
-	getIdFieldHandler,
-	getTypeHandler,
-	getTimeHandler
-} from "./log1_row_actions.js";
+import { sendPatch, sendExists } from "./log1_fetch.js";
+import { onIdFieldClick, setupRow } from "./log1_edit.js";
 
 let curR, curC, isFocused;
 
-export function setupEdit() {
-	setupContentEditing(focusOn);
-	setupRowActions({
-		focusOn: focusOn,
-		getPosition: () => ({row: curR, col: curC})
-	});
+export function setupGrid() {
 	$("tbody td, tfoot td").attr("tabindex", "-1");
 	curR = sessionStorage.getItem("curR") !== null ?
 		parseInt(sessionStorage.getItem("curR")) :
@@ -36,36 +18,23 @@ export function setupEdit() {
 	if (Number.isNaN(curR)) {
 		curR = -1; isFocused = false;
 	}
-	d$("dialog")?.addEventListener("close", function () {
-		focusOn(curR, curC, isFocused)
-	});
+	d$("dialog")?.addEventListener("close", () => focusOn(curR, curC, isFocused));
 	focusOn(curR, curC, isFocused);
 
-	d$("log1-skip").addEventListener("click", (e) => focusOn(curR, curC, true));
+	d$("log1-skip").addEventListener("click", () => focusOn(curR, curC, true));
 	q$("#log1-table tbody")[0].addEventListener("keydown", onTableKeydown);
 	$("tbody td").on("blur", onTableBlur);
 
 	document.body.addEventListener("keydown", onBodyKeydown);
 	$("#log1-new-type, #log1-new-time, #log1-new-content").on("blur", onNewEntryBlur);
-
-	for (const row of $("tbody tr")) setupEntryRow(row);
 }
 
-function setupEntryRow(row) {
-	const id = parseInt(row.getAttribute("data-id"));
-	if (Number.isNaN(id)) return;
-
-	const $row = $(row);
-	$row.children(".log1-td-id").on("click", getIdFieldHandler(row, id));
-	$row.children(".log1-td-type").on("click", getTypeHandler(row, id));
-	$row.children(".log1-td-time").on("click", getTimeHandler(row, id));
-	$row.children(".log1-td-content").on("click", contentClickHandler);
-	$row.children(".log1-td-content").on("keydown", contentKeydownHandler);
-	$row.children(".log1-td-content").on("input", contentInputHandler);
+export function getFocusState() {
+	return {row: curR, col: curC, focus: isFocused};
 }
 
-function focusOn(row, col, focus, block) {
-	if (addingPhase !== 0 && focus) stopAdding();
+export function focusOn(row, col, focus, block) {
+	if (newEntryPhase !== 0 && focus) cancelNewEntry();
 	if ($("tbody > tr").length !== 0 && row === -1) row = parseInt($("tbody > tr:first-child").attr("data-row"));
 	else if (row === -1) focus = false;
 	const target = q$(`tbody > tr[data-row="${row}"] > td:nth-child(${col+1})`)?.[0];
@@ -85,10 +54,11 @@ function focusOn(row, col, focus, block) {
 
 function onTableKeydown(e) {
 	if (e.target.getAttribute("contenteditable") === "plaintext-only") return;
-	e.stopPropagation();
 	const shortcut = e.ctrlKey || e.metaKey;
+	const row = e.target.parentElement;
 	if (e.key === "ArrowUp") {
 		e.preventDefault();
+		e.stopPropagation();
 		if (shortcut) {
 			focusOn(parseInt($("tbody > tr:first-child").attr("data-row")), curC, true);
 			return;
@@ -96,11 +66,12 @@ function onTableKeydown(e) {
 		focusOn(curR-1, curC, true, true);
 	} else if (e.key === "ArrowDown") {
 		e.preventDefault();
-		if (e.target.parentElement.matches("tr:last-child")) {
+		e.stopPropagation();
+		if (row.matches("tr:last-child") && curC === 1) {
 			focusOn(curR, curC, false);
-			advanceAdding({
+			advanceNewEntry({
 				preventDefault: ()=>{},
-				key: e.target.parentElement.getAttribute("data-type")
+				key: row.getAttribute("data-type")
 			});
 		}
 		if (shortcut) {
@@ -110,6 +81,7 @@ function onTableKeydown(e) {
 		focusOn(curR+1, curC, true, true);
 	} else if (e.key === "ArrowLeft") {
 		e.preventDefault();
+		e.stopPropagation();
 		if (shortcut) {
 			focusOn(curR, 0, true);
 			return;
@@ -117,6 +89,7 @@ function onTableKeydown(e) {
 		focusOn(curR, curC-1, true, true);
 	} else if (e.key === "ArrowRight") {
 		e.preventDefault();
+		e.stopPropagation();
 		if (shortcut) {
 			focusOn(curR, 3, true);
 			return;
@@ -124,25 +97,27 @@ function onTableKeydown(e) {
 		focusOn(curR, curC+1, true, true);
 	} else if (e.key === "Escape") {
 		e.preventDefault();
+		e.stopPropagation();
 		focusOn(curR, curC, false);
 	} else if (e.key === "Enter") {
 		e.preventDefault();
-		if (curC === 0 && e.shiftKey && e.target.parentElement.hasAttribute("data-id")) {
-			activateIdField(e.target, curR, true);
-		}
-		else if (curC === 0) return;
+		e.stopPropagation();
+		if (curC === 0 && e.shiftKey && row.hasAttribute("data-id")) {
+			onIdFieldClick({
+				target: e.target,
+				shiftKey: true
+			});
+		} else if (curC === 0) return;
 		else e.target.click();
 	} else if (e.key === "Backspace") {
-		if (curC === 0 && e.target.parentElement.hasAttribute("data-id")) {
+		if (curC === 0 && row.hasAttribute("data-id")) {
 			e.preventDefault();
-			activateIdField(e.target, curR, false);
+			e.stopPropagation();
+			onIdFieldClick({
+				target: e.target,
+				shiftKey: false
+			});
 		}
-	}
-	if (curC === 1) {
-		if (!Object.hasOwn(TYPE_KEYBIND, k2e(e.key))) return;
-		const type = TYPE_KEYBIND[k2e(e.key)];
-		e.preventDefault();
-		changeType(document.activeElement.parentElement, curR, document.activeElement, type);
 	}
 }
 
@@ -151,14 +126,8 @@ function onTableBlur(e) {
 	focusOn(curR, curC, false);
 }
 
-function onNewEntryBlur(e) {
-	if (addingPhase === 0) return;
-	if (e.relatedTarget?.matches("#log1-new-time, #log1-new-content")) return;
-	stopAdding();
-}
-
-let addingPhase = 0;
-const TYPE_KEYBIND = Object.freeze({
+let newEntryPhase = 0;
+const LOG1_TYPE_KEYBIND = Object.freeze({
 	'1': 1, 's': 1,
 	'2': 2, 'd': 2,
 	'3': 3, 't': 3,
@@ -166,66 +135,73 @@ const TYPE_KEYBIND = Object.freeze({
 	'5': 5, 'w': 5,
 	'6': 6, 'i': 6
 });
+
 function onBodyKeydown(e) {
-	if (document.activeElement?.matches("tbody td")) return;
 	if (d$("dialog").matches(":open")) return;
 	if (e.key === "Escape") {
-		stopAdding();
+		cancelNewEntry();
+		focusOn(curR, curC, true);
 		return;
-	} else if (addingPhase !== 0 && e.key === "ArrowUp") {
+	} else if (newEntryPhase !== 0 && e.key === "ArrowUp") {
 		const lastRow = parseInt($("tbody > tr:last-child").attr("data-row"));
 		if (Number.isNaN(lastRow)) {
-			stopAdding();
+			cancelNewEntry();
 			return;
 		}
-		switch (addingPhase) {
+		switch (newEntryPhase) {
 			case 1: focusOn(lastRow, 1, true); break;
 			case 2: focusOn(lastRow, 2, true); break;
 			case 3: focusOn(lastRow, 3, true); break;
 		}
 	}
 	if (e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) return;
-	advanceAdding(e);
+	advanceNewEntry(e);
 }
 
-async function advanceAdding(e) {
-	switch (addingPhase) {
+function onNewEntryBlur(e) {
+	if (newEntryPhase === 0) return;
+	if (e.relatedTarget?.matches("#log1-new-time, #log1-new-content")) return;
+	cancelNewEntry();
+}
+
+async function advanceNewEntry(e) {
+	switch (newEntryPhase) {
 	case 0:
-		if (!Object.hasOwn(TYPE_KEYBIND, k2e(e.key))) return;
+		if (!Object.hasOwn(LOG1_TYPE_KEYBIND, k2e(e.key))) return;
 		const newId = $("tbody > tr:last-child").length !== 0 ?
 			parseInt($("tbody > tr:last-child").attr("data-row")) + 1 :
 			parseInt(prompt("이 글의 첫 1차 기록의 번호를 입력하세요"));
 		if (Number.isNaN(newId) || newId < 0) {
 			showWarning("잘못된 번호입니다.");
 			return;
-		}
-		if (await entryExists(newId)) {
+		} else if (await sendExists(newId)) {
 			showWarning("번호 충돌이 발생합니다.");
 			return;
 		}
-		const type = TYPE_KEYBIND[k2e(e.key)];
+		const type = LOG1_TYPE_KEYBIND[k2e(e.key)];
 		d$("log1-new-entry").setAttribute("data-id", newId);
 		d$("log1-new-entry").setAttribute("data-type", type);
 		d$("log1-new-id").textContent = newId;
 		d$("log1-new-type").textContent = LOG1_TYPE_NAME[type];
 		d$("log1-new-type").focus();
-		addingPhase = 1;
+		newEntryPhase = 1;
 		e.preventDefault();
 		break;
 	case 1:
 		if (e.key === "0" || e.key === "Backspace") {
-			stopAdding();
+			cancelNewEntry();
 			return;
 		}
-		if (Object.hasOwn(TYPE_KEYBIND, k2e(e.key))) {
-			stopAdding();
-			advanceAdding(e);
+		if (Object.hasOwn(LOG1_TYPE_KEYBIND, k2e(e.key))) {
+			const type = LOG1_TYPE_KEYBIND[k2e(e.key)];
+			d$("log1-new-entry").setAttribute("data-type", type);
+			d$("log1-new-type").textContent = LOG1_TYPE_NAME[type];
 			return;
 		}
 		if (e.key !== "Tab") return;
 		d$("log1-new-time").setAttribute("contenteditable", "plaintext-only");
 		d$("log1-new-time").focus();
-		addingPhase = 2;
+		newEntryPhase = 2;
 		e.preventDefault();
 		break;
 	case 2:
@@ -234,44 +210,45 @@ async function advanceAdding(e) {
 		d$("log1-new-entry").setAttribute("data-time", d$("log1-new-time").textContent);
 		d$("log1-new-content").setAttribute("contenteditable", "plaintext-only");
 		d$("log1-new-content").focus();
-		addingPhase = 3;
+		newEntryPhase = 3;
 		e.preventDefault();
 		break;
 	case 3:
 		if (e.key !== "Enter" && e.key !== "Tab") return;
 		try {
-			const data = await patchLog1({
+			const newData = {
 				id: parseInt(d$("log1-new-entry").getAttribute("data-id")),
 				type: parseInt(d$("log1-new-entry").getAttribute("data-type")),
 				time: d$("log1-new-entry").getAttribute("data-time"),
-				content: d$("log1-new-content").textContent,
-				getHtml: true
-			}, true);
-			q$("tbody")[0].insertAdjacentHTML("beforeend", data.html);
+				content: d$("log1-new-content").textContent
+			};
+			await sendPatch(newData);
 
+			q$("tbody")[0].insertAdjacentHTML("beforeend", buildLog1Row(newData.id, newData));
 			const newId = parseInt(d$("log1-new-entry").getAttribute("data-id"));
 			const newRow = q$(`tbody tr[data-id="${newId}"]`)[0];
-			setupEntryRow(newRow);
+			setupRow(newRow);
 
-			stopAdding();
+			cancelNewEntry();
+			focusOn(newId, 3, true);
 			e.preventDefault();
 		} catch (e) {
 			alert(`오류: ${e}`);
-			stopAdding();
+			cancelNewEntry();
 			return;
 		}
 	}
 }
 
-function stopAdding() {
-	if (addingPhase === 0) return;
+function cancelNewEntry() {
+	if (newEntryPhase === 0) return;
 	$("#log1-new-id, #log1-new-type, #log1-new-time, #log1-new-content").text('');
 	$("#log1-new-entry").removeAttr("data-id data-type data-time");
 	$("#log1-new-time, #log1-new-content").removeAttr("contenteditable")
-	switch (addingPhase) {
+	switch (newEntryPhase) {
 		case 1: d$("log1-new-type").blur(); break;
 		case 2: d$("log1-new-time").blur(); break;
 		case 3: d$("log1-new-content").blur(); break;
 	}
-	addingPhase = 0;
+	newEntryPhase = 0;
 }

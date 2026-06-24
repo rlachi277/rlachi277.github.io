@@ -56,18 +56,9 @@ export function patchPost(db, path, body) {
 	if (dbResult === undefined) throw 404;
 
 	const { pos, data, splice } = body;
-	if (splice == undefined || pos == undefined) throw {
-		status: 400,
-		reason: "데이터가 충분히 주어지지 않았습니다."
-	};
-	if (!Number.isInteger(splice) || splice < 0 || !Array.isArray(pos)) throw {
-		status: 400,
-		reason: "데이터의 형식이 잘못되었습니다."
-	};
-	if (splice === 0 && data == undefined) throw {
-		status: 400,
-		reason: "데이터가 충분히 주어지지 않았습니다."
-	};
+	if (splice == undefined || pos == undefined) throw badRequest("데이터가 충분히 주어지지 않았습니다.");
+	if (!Number.isInteger(splice) || splice < 0 || !Array.isArray(pos)) throw badRequest("데이터의 형식이 잘못되었습니다.");
+	if (splice === 0 && data == undefined) throw badRequest("데이터가 충분히 주어지지 않았습니다.")
 	const dbData = JSON.parse(dbResult);
 	if (pos.length === 0) {
 		db.prepare(`
@@ -81,15 +72,9 @@ export function patchPost(db, path, body) {
 	pos.reverse();
 	while (pos.length > 1) {
 		cur = cur.children[pos.pop()];
-		if (cur == undefined) throw {
-			status: 400,
-			reason: "위치 배열이 올바르지 않습니다."
-		};
+		if (cur == undefined) throw badRequest("올바르지 않은 위치입니다.")
 	}
-	if (cur.children.length < pos[0]) throw {
-		status: 400,
-		reason: "위치 배열이 올바르지 않습니다."
-	};
+	if (cur.children.length < pos[0]) throw badRequest("올바르지 않은 위치입니다.")
 	if (data != undefined) cur.children.splice(pos[0], splice, data);
 	else cur.children.splice(pos[0], splice);
 	db.prepare(`
@@ -108,4 +93,11 @@ export function deletePost(db, path) {
 export function postExists(db, path) {
 	const dbResult = db.prepare('SELECT COUNT(1) FROM posts WHERE path = ?').get(path);
 	return dbResult['COUNT(1)'] !== 0;
+}
+
+export function badRequest(reason) {
+	return {
+		status: 400,
+		reason: reason
+	};
 }

@@ -1,15 +1,10 @@
-import { $, d$, q$ } from "../jquery.js";
-import { setupDialog, dialog } from "../posts/dialog.js";
+import { d$ } from "../jquery.js";
+import { setupDialog } from "../posts/dialog.js";
 import { setupEdit } from "./log1_edit.js";
 
-const SYMBOLS = {".": "·", "st": "★"};
-
 export function setup() {
-	d$("log1-thead").addEventListener("click", (e) => {
-		window.scrollTo(0, 0);
-	});
+	d$("log1-thead").addEventListener("click", () => window.scrollTo(0, 0));
 
 	setupDialog();
-
 	setupEdit();
 }

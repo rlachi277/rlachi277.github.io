@@ -46,16 +46,8 @@ db.prepare(`
 	)`
 ).run();
 
-let log3Template = 'wkatlaksdy...';
-let log3NotFoundTemplate = 'wiatlaksdy...';
-fs.readFile(path.join(__dirname, 'client', 'cycelog', 'log3.html'), 'utf8', (err, data) => {
-	if (err) throw err;
-	log3Template = data.replaceAll(/\n|\t/g, '');
-});
-fs.readFile(path.join(__dirname, 'client', 'cycelog', 'log3_404.html'), 'utf8', (err, data) => {
-	if (err) throw err;
-	log3NotFoundTemplate = data.replaceAll(/\n|\t/g, '');
-});
+const log3Template = fs.readFileSync(path.join(__dirname, 'client', 'cycelog', 'log3.html'), 'utf8').replaceAll(/\n|\t/g, '');
+const log3NotFoundTemplate = fs.readFileSync(path.join(__dirname, 'client', 'cycelog', 'log3_404.html'), 'utf8').replaceAll(/\n|\t/g, '');
 
 const router = express.Router();
 export default router;
@@ -92,16 +84,8 @@ router.delete('/log3/:id', (req, res) => {
 	}, false);
 });
 
-let log1Template = 'wkatlaksdy...';
-let log1NotFoundTemplate = 'wiatlaksdy...';
-fs.readFile(path.join(__dirname, 'client', 'cycelog', 'log1.html'), 'utf8', (err, data) => {
-	if (err) throw err;
-	log1Template = data.replaceAll(/\n|\t/g, '');
-});
-fs.readFile(path.join(__dirname, 'client', 'cycelog', 'log1_404.html'), 'utf8', (err, data) => {
-	if (err) throw err;
-	log1NotFoundTemplate = data.replaceAll(/\n|\t/g, '');
-});
+const log1Template = fs.readFileSync(path.join(__dirname, 'client', 'cycelog', 'log1.html'), 'utf8').replaceAll(/\n|\t/g, '');
+const log1NotFoundTemplate = fs.readFileSync(path.join(__dirname, 'client', 'cycelog', 'log1_404.html'), 'utf8').replaceAll(/\n|\t/g, '');
 
 router.get('/log1/{:id}', (req, res) => {
 	const id = req.params.id ?? 'index.html';

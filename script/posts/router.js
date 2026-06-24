@@ -30,16 +30,8 @@ db.prepare(`
 	)
 `).run();
 
-let template = 'wkatlaksdy...';
-let notFoundTemplate = 'wiatlaksdy...';
-fs.readFile(path.join(__dirname, 'client', 'posts', 'index.html'), 'utf8', (err, data) => {
-	if (err) throw err;
-	template = data.replaceAll(/\n|\t/g, '');
-});
-fs.readFile(path.join(__dirname, 'client', 'posts', '404.html'), 'utf8', (err, data) => {
-	if (err) throw err;
-	notFoundTemplate = data.replaceAll(/\n|\t/g, '');
-});
+const template = fs.readFileSync(path.join(__dirname, 'client', 'posts', 'index.html'), 'utf8').replaceAll(/\n|\t/g, '');
+const notFoundTemplate = fs.readFileSync(path.join(__dirname, 'client', 'posts', '404.html'), 'utf8').replaceAll(/\n|\t/g, '');
 
 const router = express.Router();
 export default router;
