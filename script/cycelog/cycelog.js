@@ -1,5 +1,4 @@
 import { buildLog1Table } from "../..../../shared/cycelog/log1.js";
-import { serverWhere } from "../../shared/cycelog/cycelog_hook.js";
 import {
 	patchPost,
 	getPostFromData,
@@ -147,6 +146,4 @@ export function log1Exists(db, id) {
 	return cnt !== 0;
 }
 
-export function log1Where(db, id) {
-	return serverWhere(db)(id);
-}
+export { serverWhere as log1Where } from "../../shared/cycelog/cycelog_hook.js";

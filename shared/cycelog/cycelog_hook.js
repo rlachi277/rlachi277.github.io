@@ -1,7 +1,7 @@
 let refCnt = 0;
 const whereCache = [];
 
-export function entryDeseriHook(types, where, isWhereAsync) {
+export function entryDeseriHook(types, isClient, param) {
 	return function (data, cur) {
 		if (data.type === 'entry') {
 			const id = data.variant?.id;
@@ -16,24 +16,27 @@ export function entryDeseriHook(types, where, isWhereAsync) {
 			};
 		} else if (data.type === 'ref') {
 			const id = data.variant?.id;
-			let data = whereCache[id];
+			let data;
 			refCnt += 1;
 			const refId = `ref${refCnt}`;
-			if (data === undefined) {
-				if (isWhereAsync) {
-					if (typeof document === "undefined") throw "이거 서버에서 쓰지 마세요";
+			if (isClient) {
+				// it is assumed that the log1 data doesn't change while the client is on the same page.
+				// this assumption is valid, because the whole cycweb assumes that there's only one session,
+				// and if it's on log3, it's not on log1.
+				if (typeof document === "undefined") throw "이거 서버에서 쓰지 마세요";
+				data = whereCache[id];
+				if (data === undefined) {
 					data = {where: "tmp", type: 0};
-					where(id).then((newData) => {
+					clientWhere(param, id).then((newData) => {
 						whereCache[id] = newData;
 						const target = document.getElementById(refId);
 						if (target === null) return;
 						target.setAttribute("href", `./${newData.where}#entry${id}`);
 						target.setAttribute("data-type", `${newData.type}`);
 					});
-				} else {
-					whereCache[id] = where(id);
-					data = whereCache[id];
 				}
+			} else {
+				data = serverWhere(param, id);
 			}
 			const path = id != undefined ? `./${data.where}#entry${id}` : '';
 			return {
@@ -62,21 +65,17 @@ export function entrySeriHook(data) {
 	return undefined;
 }
 
-export function clientWhere(root) {
-	return async function (id) {
-		const res = await fetch(`${root}log1/where/${id}`);
-		if (!res.ok) throw res.status;
-		return await res.json();
-	}
+async function clientWhere(root, id) {
+	const res = await fetch(`${root}log1/where/${id}`);
+	if (!res.ok) throw res.status;
+	return await res.json();
 }
 
-export function serverWhere(db) {
-	return function (id) {
-		const dbResult = db.prepare(`SELECT post, type FROM entries WHERE id = ?`).get(id);
-		if (dbResult === undefined) throw 404;
-		return {
-			where: dbResult.post,
-			type: dbResult.type
-		};
-	}
+export function serverWhere(db, id) {
+	const dbResult = db.prepare(`SELECT post, type FROM entries WHERE id = ?`).get(id);
+	if (dbResult === undefined) throw 404;
+	return {
+		where: dbResult.post,
+		type: dbResult.type
+	};
 }

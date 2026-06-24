@@ -1,4 +1,4 @@
-import { entrySeriHook, entryDeseriHook, clientWhere } from '../../shared/cycelog/cycelog_hook.js';
+import { entrySeriHook, entryDeseriHook } from '../../shared/cycelog/cycelog_hook.js';
 import { d$ } from "../jquery.js";
 import { SERI_HOOKS, DESERI_HOOKS } from "../posts/script.js";
 import { dialog, showWarning } from "../posts/dialog.js";
@@ -17,7 +17,7 @@ async function setTypes() {
 	for (const e of data) types[e.id] = e.type;
 
 	SERI_HOOKS.push(entrySeriHook);
-	DESERI_HOOKS.push(entryDeseriHook(types, clientWhere("/cycelog/"), true));
+	DESERI_HOOKS.push(entryDeseriHook(types, "/cycelog/", true));
 }
 
 function onEditableKeydown(e) {

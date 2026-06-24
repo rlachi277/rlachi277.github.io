@@ -19,7 +19,7 @@ import {
 } from "./cycelog.js";
 import { withErrors } from "../posts/router.js";
 import { renderNavHook } from '../posts/render_nav.js';
-import { entryDeseriHook, serverWhere } from '../../shared/cycelog/cycelog_hook.js';
+import { entryDeseriHook } from '../../shared/cycelog/cycelog_hook.js';
 
 const db = new Database('db/cycelog.db');
 db.pragma('journal_mode = WAL');
@@ -67,7 +67,7 @@ router.get('/log3/{:id}', (req, res) => {
 			notFound: log3NotFoundTemplate
 		}, [
 			renderNavHook(db, "/cycelog/log3/"),
-			entryDeseriHook(types, serverWhere(db), false)
+			entryDeseriHook(types, db, false)
 		]);
 	}, true);
 });
