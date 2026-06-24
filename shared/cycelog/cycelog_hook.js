@@ -21,7 +21,7 @@ export function entryDeseriHook(types, isClient, param) {
 			const refId = `ref${refCnt}`;
 			if (isClient) {
 				// it is assumed that the log1 data doesn't change while the client is on the same page.
-				// this assumption is valid, because the whole cycweb assumes that there's only one session,
+				// this assumption is valid, because the whole posts system assumes that there's only one session,
 				// and if it's on log3, it's not on log1.
 				if (typeof document === "undefined") throw "이거 서버에서 쓰지 마세요";
 				data = whereCache[id];
