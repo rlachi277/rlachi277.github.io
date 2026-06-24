@@ -1,5 +1,6 @@
 import { seri } from "/shared/posts/seri.js";
 import { $, d$ } from "../jquery.js";
+import { SERI_HOOKS, DESERI_HOOKS } from "./script.js";
 import { dialog, showWarning } from "./dialog.js";
 import {
 	startTargeting,
@@ -13,7 +14,7 @@ import {
 export const defaultMenu = {
 	export: () => {
 		try {
-			const data = seri($("body").get(0));
+			const data = seri($("body").get(0), true, SERI_HOOKS);
 			const file = new Blob([JSON.stringify(data)], {type: "application/json"});
 			const anchor = document.createElement("a");
 			anchor.href = URL.createObjectURL(file);
@@ -50,7 +51,7 @@ export const editMenu = {
 	duplicate: dialog("이 글 복제", `
 		<label for="dialog-new-path">경로: </label>
 		<input id="dialog-new-path" placeholder="경로 입력">
-	`, () => newPost(d$("dialog-new-path").value, seri($("body").get(0))), false),
+	`, () => newPost(d$("dialog-new-path").value, seri($("body").get(0)), true, SERI_HOOKS), false),
 	delete: dialog("이 글 삭제", `
 		정말로 <strong>이 글 전체</strong>를 삭제하시겠습니까?<br>
 		이 작업은 되돌릴 수 없습니다.

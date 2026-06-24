@@ -49,12 +49,12 @@ export function buildLog1Table(data) {
 
 export function buildLog1Row(id, data) {
 	return `<tr data-row="${id}"
-	${data?.id != undefined ? ` data-id="${data.id}"` : ''}
+	${data?.id != undefined ? ` id="entry${data.id}" data-id="${data.id}"` : ''}
 	${data?.type != undefined ? ` data-type="${data.type}"` : ''}
 	${data?.time != undefined ? ` data-time="${sani(data.time)}"` : ''}>
 		<td class="log1-td-id">${data?.id != undefined ? data.id : ''}</td>
 		<td class="log1-td-type">${data?.type != undefined ? LOG1_TYPE_NAME[data.type] : ''}</td>
-		<td class="log1-td-time"><span class="log1-time-wrapper">${data?.time != undefined ? sani(data.time) : ''}</span></td>
+		<td class="log1-td-time"><div class="log1-time-wrapper">${data?.time != undefined ? sani(data.time) : ''}</div></td>
 		<td class="log1-td-content">${data?.content != undefined ? sani(data.content) : ''}</td>
 	</tr>`.replaceAll(/\n|\t/g, '');
 }

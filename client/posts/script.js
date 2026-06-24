@@ -2,14 +2,6 @@ import { $ } from "../jquery.js";
 import { setupDialog } from "./dialog.js";
 import { startEdit } from "./edit.js";
 
-/*
-function refreshData() { // 테스트용
-	const data = serialize($("body").get(0));
-	fetch(window.location.pathname, {method: "PUT", body: JSON.stringify(data)});
-}
-refreshData();
-*/
-
 let isMobile = false;
 const navDetails = $("nav details");
 function onResize() {
@@ -30,6 +22,9 @@ function setupMenu(menu) {
 		$(`[data-menu="${k}"]`).on("click", v);
 	}
 }
+
+export const SERI_HOOKS = [];
+export const DESERI_HOOKS = [];
 
 export function setup(defaultMenu, editMenu, noEdit) {
 	onResize();

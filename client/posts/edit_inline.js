@@ -1,6 +1,7 @@
 import { seri, deseri, getColor } from "/shared/posts/seri.js";
 import { $ } from "../jquery.js";
 import { k2e } from "../k2e.js";
+import { SERI_HOOKS, DESERI_HOOKS } from "./script.js";
 import { showWarning } from "./dialog.js";
 
 const S = window.getSelection();
@@ -21,6 +22,7 @@ export function inlineCommands(shortcut, e) {
 		else if (e.key === ",") command = "sub";
 		else if (e.key === "d") command = "del";
 		else if (e.key === "e") command = "ins";
+		else if (e.key === "x" && e.shiftKey) command = "s";
 		else if (e.key === "k") command = "a";
 		else if (e.key === "z" && e.shiftKey) command = "redo";
 		else if (e.key === "z") command = "undo";
@@ -29,14 +31,14 @@ export function inlineCommands(shortcut, e) {
 		
 		if (command === "undo") {
 			if (undoBuffer.length === 0) return false;
-			redoBuffer.push(seri(e.target, true));
-			e.target.innerHTML = deseri(undoBuffer.pop(), window.location.pathname, true);
+			redoBuffer.push(seri(e.target, true, SERI_HOOKS));
+			e.target.innerHTML = deseri(undoBuffer.pop(), window.location.pathname, true, DESERI_HOOKS);
 			e.preventDefault();
 			return true;
 		} else if (command === "redo") {
 			if (redoBuffer.length === 0) return false;
-			undoBuffer.push(seri(e.target, true));
-			e.target.innerHTML = deseri(redoBuffer.pop(), window.location.pathname, true);
+			undoBuffer.push(seri(e.target, true, SERI_HOOKS));
+			e.target.innerHTML = deseri(redoBuffer.pop(), window.location.pathname, true, DESERI_HOOKS);
 			e.preventDefault();
 			return true;
 		}
@@ -64,7 +66,7 @@ function runCommand(e, command) {
 	if (range.collapsed) throw -1;
 
 	e.preventDefault();
-	undoBuffer.push(seri(e.target, true));
+	undoBuffer.push(seri(e.target, true, SERI_HOOKS));
 
 	$(e.target).find('.select-marker:not(.tab-select-marker)').remove();
 	
@@ -269,7 +271,7 @@ function tabCommand(e) {
 		throw -1;
 	}
 
-	undoBuffer.push(seri(e.target, true));
+	undoBuffer.push(seri(e.target, true, SERI_HOOKS));
 
 	const cdata = findCloseBracket(e.target);
 	const closeTextNode = cdata.text;
@@ -312,6 +314,7 @@ function tabCommand(e) {
 	else if (cmd === "_") command = "sub";
 	else if (cmd === "d") command = "del";
 	else if (cmd === "e") command = "ins";
+	else if (cmd === "s") command = "s";
 	else if (0 <= cmd && cmd <= 10) command = `color${cmd}`; // cursed JS moment
 	else if (cmd.startsWith("cb")) {
 		const color = cmd.substring(2);
@@ -510,7 +513,7 @@ function toCommand(node) {
 		}
 		return 'keep';
 	}
-	const commands = ['STRONG', 'EM', 'SUP', 'SUB', 'INS', 'DEL'];
+	const commands = ['STRONG', 'EM', 'SUP', 'SUB', 'INS', 'DEL', 'S'];
 	if (!commands.includes(node.tagName)) return 'keep';
 	return node.tagName.toLowerCase();
 }

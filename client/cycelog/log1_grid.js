@@ -8,7 +8,14 @@ import { onIdFieldClick, setupRow } from "./log1_edit.js";
 let curR, curC, isFocused;
 
 export function setupGrid() {
+	$("thead").on("click", () => window.scrollTo(0, 0));
+	window.addEventListener("scroll", onScroll, {passive: true});
+	window.addEventListener("resize", onScroll, {passive: true});
+	onScroll();
+
 	$("tbody td, tfoot td").attr("tabindex", "-1");
+	if (sessionStorage.getItem("log1Page") !== window.location.pathname) sessionStorage.clear();
+	sessionStorage.setItem("log1Page", window.location.pathname);
 	curR = sessionStorage.getItem("curR") !== null ?
 		parseInt(sessionStorage.getItem("curR")) :
 		parseInt($("tbody > tr:first-child").attr("data-row"));
@@ -28,6 +35,17 @@ export function setupGrid() {
 
 	document.body.addEventListener("keydown", onBodyKeydown);
 	$("#log1-new-type, #log1-new-time, #log1-new-content").on("blur", onNewEntryBlur);
+}
+
+function onScroll() {
+	// sorry people who change the default writing-mode etc. for some reason
+	// i think i can't support that here
+	const atTop = window.scrollY < 1;
+	const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+	const atBottom = window.scrollY - maxScroll > -1;
+	d$("log1-table").classList.toggle("unfixed-after", atTop);
+	d$("log1-table").classList.toggle("unfixed-before", atBottom);
+	d$("log1-table").style.setProperty("--unfixed-top", `${maxScroll}px`);
 }
 
 export function getFocusState() {
@@ -186,7 +204,6 @@ async function advanceNewEntry(e) {
 		d$("log1-new-type").textContent = LOG1_TYPE_NAME[type];
 		d$("log1-new-type").focus();
 		newEntryPhase = 1;
-		e.preventDefault();
 		break;
 	case 1:
 		if (e.key === "0" || e.key === "Backspace") {
@@ -203,7 +220,6 @@ async function advanceNewEntry(e) {
 		d$("log1-new-time").setAttribute("contenteditable", "plaintext-only");
 		d$("log1-new-time").focus();
 		newEntryPhase = 2;
-		e.preventDefault();
 		break;
 	case 2:
 		if (e.key !== "Tab") return;
@@ -212,10 +228,10 @@ async function advanceNewEntry(e) {
 		d$("log1-new-content").setAttribute("contenteditable", "plaintext-only");
 		d$("log1-new-content").focus();
 		newEntryPhase = 3;
-		e.preventDefault();
 		break;
 	case 3:
 		if (e.key !== "Enter" && e.key !== "Tab") return;
+		e.preventDefault(); // 뒤에 await이 있으므로 지금 실행하지 않으면 깜빡임(탭으로 페이지 최상단으로 갔다 돌아오기) 발생
 		try {
 			const newData = {
 				id: parseInt(d$("log1-new-entry").getAttribute("data-id")),
@@ -226,19 +242,19 @@ async function advanceNewEntry(e) {
 			await sendPatch(newData);
 
 			q$("tbody")[0].insertAdjacentHTML("beforeend", buildLog1Row(newData.id, newData));
-			const newId = parseInt(d$("log1-new-entry").getAttribute("data-id"));
-			const newRow = q$(`tbody tr[data-id="${newId}"]`)[0];
+			const newRow = q$(`tbody tr[data-id="${newData.id}"]`)[0];
 			setupRow(newRow);
 
 			cancelNewEntry();
-			focusOn(newId, 3, true);
-			e.preventDefault();
+			focusOn(newData.id, 3, true);
 		} catch (e) {
 			alert(`오류: ${e}`);
 			cancelNewEntry();
 			return;
 		}
 	}
+	e.preventDefault();
+	window.scrollTo(0, document.documentElement.scrollHeight);
 }
 
 function cancelNewEntry() {

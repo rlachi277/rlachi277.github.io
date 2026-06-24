@@ -1,4 +1,5 @@
 import { seri, deseri } from "/shared/posts/seri.js";
+import { SERI_HOOKS, DESERI_HOOKS } from "./script.js";
 import { q$, $ } from "../jquery.js";
 import {
 	inlineCommands,
@@ -75,7 +76,7 @@ export function startEdit(el, init) {
 	});
 
 	if (type === EDIT_TYPE.EDITABLE) {
-		originalMap.set(el, JSON.stringify(seri(el)));
+		originalMap.set(el, JSON.stringify(seri(el, true, SERI_HOOKS)));
 		if (el.getAttribute("data-id") === null) {
 			el.setAttribute("data-id", editCnt++);
 			el.setAttribute("contenteditable", "plaintext-only");
@@ -233,7 +234,7 @@ function handleCancelKey(target) {
 		regainFocus(successor);
 	}
 	if (!manageConfirm(target, "will-cancel", "will-submit")) return;
-	target.innerHTML = deseri(JSON.parse(originalMap.get(target)), window.location.pathname, true);
+	target.innerHTML = deseri(JSON.parse(originalMap.get(target)), window.location.pathname, true, DESERI_HOOKS);
 	target.blur();
 }
 
@@ -292,7 +293,7 @@ function onEditableBlur(e) {
 	$(".will-cancel").removeClass("will-cancel");
 	inlineCleanup(e.target);
 	blurCleanup(e.target);
-	if (JSON.stringify(seri(e.target)) === originalMap.get(e.target)) {
+	if (JSON.stringify(seri(e.target, true, SERI_HOOKS)) === originalMap.get(e.target)) {
 		e.target.classList.remove("edited");
 	}
 }
@@ -302,7 +303,7 @@ function submit(el, makeData, splice) {
 	if (el.lastChild?.nodeName === "BR") el.removeChild(el.lastChild);
 	document.activeElement.blur();
 	const pos = positionMap.get(el);
-	const data = makeData ? seri(el) : undefined;
+	const data = makeData ? seri(el, false, SERI_HOOKS) : undefined;
 	fetch(window.location.pathname, {method: "PATCH", headers: {
 		'Content-type': 'application/json'
 	}, body: JSON.stringify({
@@ -439,7 +440,7 @@ function insertElement(after, isFirst) {
 	}
 
 	const pos = positionMap.get(newElement);
-	const newData = seri(newElement);
+	const newData = seri(newElement, false, SERI_HOOKS);
 	fetch(window.location.pathname, {method: "PATCH", headers: {
 		'Content-type': 'application/json'
 	}, body: JSON.stringify({
@@ -477,7 +478,7 @@ export function insertHgroup(target) {
 	positionStack = Array.from(positionMap.get(parent));
 	startEdit(parent);
 	const pos = positionMap.get(newElement);
-	const newData = seri(newElement);
+	const newData = seri(newElement, false, SERI_HOOKS);
 	fetch(window.location.pathname, {method: "PATCH", headers: {
 		'Content-type': 'application/json'
 	}, body: JSON.stringify({

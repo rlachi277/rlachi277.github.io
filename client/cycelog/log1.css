@@ -12,6 +12,11 @@
 #log1-skip.show { display: revert; }
 #log1-skip:focus { top: auto; }
 
+h1 {
+	position: relative;
+	z-index: 1;
+}
+
 table {
 	font-family: monospace;
 	font-family: "Pretendard GOV Variable", "Pretendard GOV", monospace;
@@ -20,13 +25,29 @@ table {
 	inline-size: 100%;
 }
 
-thead, tfoot {
-	position: sticky;
-	z-index: 2;
+table::before {
+	content: '';
+	position: fixed;
 	background-color: var(--c-bg);
+	inset-block-start: 0;
+	block-size: calc(1lh + 20px);
+	inset-inline: 0;
 }
-thead { inset-block-start: 0; cursor: pointer; }
-tfoot { inset-block-end: 0; }
+table.unfixed-before::before { position: absolute; inset-block-start: var(--unfixed-top); }
+
+table::after {
+	content: '';
+	position: fixed;
+	background-color: var(--c-bg);
+	inset-block-end: 0;
+	block-size: 20px;
+	inset-inline: 0;
+}
+table.unfixed-after::after { position: absolute; inset-block-end: 0; }
+
+thead th, tfoot td { background-color: var(--c-bg); position: sticky; }
+thead th { inset-block-start: calc(1lh + 20px); cursor: pointer; }
+tfoot td { inset-block-end: 20px; }
 
 table, th, td {
 	border: 0.5px solid currentColor;
@@ -48,19 +69,19 @@ th, td { padding: 0.5ic; }
 :is(th, td):nth-child(2) { inline-size: 2ic; text-align: center; }
 :is(th, td):nth-child(3) { inline-size: 12ch; }
 
-tr { background-color: var(--bg); --bg: var(--c-bg); --bgf: var(--c-bgh); }
+tr td { background-color: var(--bg); }
+tr { --bg: var(--c-bg); --bgf: var(--c-bgh); }
 tr[data-type="1"] { --bg: var(--c-1-bg); --bgf: var(--c-1-bgh); color: var(--c-1); }
 tr[data-type="2"] { --bg: var(--c-8-bg); --bgf: var(--c-8-bgh); color: var(--c-8); }
 tr[data-type="3"] { --bg: var(--c-3-bg); --bgf: var(--c-3-bgh); color: var(--c-3); }
 tr[data-type="4"] { --bg: var(--c-4-bg); --bgf: var(--c-4-bgh); color: var(--c-4); }
 tr[data-type="5"] { --bg: var(--c-6-bg); --bgf: var(--c-6-bgh); color: var(--c-6); }
 tr[data-type="6"] { --bg: var(--c-2-bg); --bgf: var(--c-2-bgh); color: var(--c-2); }
+tr:target { --bg: var(--bgf); outline: 1px auto currentColor; }
 
 td.log1-edited { text-decoration: currentColor dotted underline; }
 
 td:focus {
-	position: relative;
-	z-index: 3;
 	background-color: var(--bgf);
 	outline: 1px auto currentColor;
 }
@@ -74,12 +95,10 @@ td:focus {
 	inline-size: max-content;
 	padding-right: 1ic;
 	position: relative;
-	z-index: 1;
 	background-color: var(--bg);
 	box-shadow: 0 0 0 0.25ic var(--bg);
 }
-td:focus .log1-time-wrapper:hover {
-	z-index: 3;
+:is(tr:target td, td:focus) .log1-time-wrapper:hover {
 	background-color: var(--bgf);
 	box-shadow: 0 0 0 0.25ic var(--bgf);
 }

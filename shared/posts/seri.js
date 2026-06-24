@@ -4,7 +4,7 @@ const SIMPLE_TYPES = new Set([
 	"h1", "h2", "h3", "h4", "h5", "h6",
 	"figcaption", "legend",
 	"li", "summary",
-	"strong", "em", "b", "i", "u",
+	"strong", "em", "b", "i", "u", "s",
 	"ruby", "rt", "rp",
 	"sub", "sup", "ins", "del"
 ]);
