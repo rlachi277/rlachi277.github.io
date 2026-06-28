@@ -26,7 +26,7 @@ export const defaultMenu = {
 		window.location.href = path;
 	},
 
-	noFragment: () => {
+	removeMark: () => {
 		sessionStorage.setItem('scrollY', window.scrollY);
 		window.location.href = window.location.pathname + window.location.search;
 	}
