@@ -80,6 +80,7 @@ export function startEdit(el, init) {
 		if (el.getAttribute("data-id") === null) {
 			el.setAttribute("data-id", editCnt++);
 			el.setAttribute("contenteditable", "plaintext-only");
+			el.addEventListener("click", onEditableClick);
 			el.addEventListener("keydown", onEditableKeydown);
 			el.addEventListener("input", onEditableInput);
 			el.addEventListener("blur", onEditableBlur);
@@ -160,6 +161,7 @@ export function stopEdit() {
 		e.removeAttribute("data-id");
 		e.removeAttribute("data-old");
 		e.removeAttribute("contenteditable");
+		e.removeEventListener("click", onEditableClick);
 		e.removeEventListener("keydown", onEditableKeydown);
 		e.removeEventListener("input", onEditableInput);
 		e.removeEventListener("blur", onEditableBlur);
@@ -178,6 +180,25 @@ export function stopEdit() {
 	editCnt = positionMap = originalMap = null;
 	positionStack = [];
 	window.removeEventListener("beforeunload", beforeUnload);
+}
+
+function onEditableClick(e) {
+	const shortcut = e.ctrlKey || e.metaKey;
+	if (!shortcut) return;
+	const target = e.target.nodeType === Node.TEXT_NODE ? e.target.parentElement : e.target;
+	const link = target.closest("a");
+	if (link === null) return;
+	e.preventDefault();
+	let url = new URL(link.href);
+	if (url.host === window.location.host) {
+		let params = new URLSearchParams(url.search);
+		params.set("edit", "t");
+		url.search = params.toString();
+	}
+	// this will not work on iOS Safari, but like
+	// will you Ctrl-click a link while editing a post on iOS
+	if (e.shiftKey) window.open(url, "_blank", "noopener");
+	else window.open(url, "_self", "noopener");
 }
 
 function onEditableKeydown(e) {
@@ -276,6 +297,7 @@ function handlePInsertKey(target, key) {
 	const newP = document.createElement("p");
 	newP.classList.add("editable", "new");
 	newP.setAttribute("contenteditable", "plaintext-only");
+	newP.addEventListener("click", onEditableClick);
 	newP.addEventListener("keydown", onEditableKeydown);
 	newP.addEventListener("input", onEditableInput);
 	newP.addEventListener("blur", onEditableBlur);

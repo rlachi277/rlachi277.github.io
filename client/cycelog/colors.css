@@ -26,9 +26,9 @@
 	--c-45--4: light-dark(var(--c-45-d4),var(--c-45-l4));
 	--c-45--5: light-dark(var(--c-45-d5),var(--c-45-l5));
 
-	--c-45-bg: var(--c-45-5); --c-6-bgh: var(--c-45-4); --c-6-bga: var(--c-45-3);
-	--c-45-bd: var(--c-45-0); --c-6-bdh: var(--c-45--1); --c-6-bda: var(--c-45--2);
-	--c-45-bc: var(--c-45--1); --c-6-bch: var(--c-45--2); --c-6-bca: var(--c-45--3);
+	--c-45-bg: var(--c-45-5); --c-45-bgh: var(--c-45-4); --c-45-bga: var(--c-45-3);
+	--c-45-bd: var(--c-45-0); --c-45-bdh: var(--c-45--1); --c-45-bda: var(--c-45--2);
+	--c-45-bc: var(--c-45--1); --c-45-bch: var(--c-45--2); --c-45-bca: var(--c-45--3);
 
 	--c-67-l5: color-mix(in oklch, var(--c-7-l5) 70%, var(--c-6-l5));
 	--c-67-l4: color-mix(in oklch, var(--c-7-l4) 70%, var(--c-6-l4));
@@ -57,7 +57,7 @@
 	--c-67--4: light-dark(var(--c-67-d4),var(--c-67-l4));
 	--c-67--5: light-dark(var(--c-67-d5),var(--c-67-l5));
 
-	--c-67-bg: var(--c-67-5); --c-6-bgh: var(--c-67-4); --c-6-bga: var(--c-67-3);
-	--c-67-bd: var(--c-67-0); --c-6-bdh: var(--c-67--1); --c-6-bda: var(--c-67--2);
-	--c-67-bc: var(--c-67--1); --c-6-bch: var(--c-67--2); --c-6-bca: var(--c-67--3);
+	--c-67-bg: var(--c-67-5); --c-67-bgh: var(--c-67-4); --c-67-bga: var(--c-67-3);
+	--c-67-bd: var(--c-67-0); --c-67-bdh: var(--c-67--1); --c-67-bda: var(--c-67--2);
+	--c-67-bc: var(--c-67--1); --c-67-bch: var(--c-67--2); --c-67-bca: var(--c-67--3);
 }

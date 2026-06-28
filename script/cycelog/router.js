@@ -58,7 +58,7 @@ router.get('/log3/{:id}', (req, res) => {
 	const id = req.params.id ?? 'index.html';
 	withErrors(res, () => {
 		res.setHeader('Content-Type', 'text/html');
-		const types = [];
+		const types = {};
 		const data = getRawLog1(db, id);
 		for (const e of data) types[e.id] = e.type;
 
@@ -67,8 +67,8 @@ router.get('/log3/{:id}', (req, res) => {
 			notFound: log3NotFoundTemplate
 		}, [
 			renderNavHook(db, "/cycelog/log3/"),
-			entryDeseriHook(types, db, false)
-		]);
+			entryDeseriHook(types, false, db)
+		], types);
 	}, true);
 });
 

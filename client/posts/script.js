@@ -31,6 +31,7 @@ export function setup(defaultMenu, editMenu, noEdit) {
 	window.addEventListener('resize', onResize);
 
 	const scrollY = sessionStorage.getItem('scrollY');
+	console.log(scrollY);
 	if (scrollY !== null) {
 		window.scrollTo(0, scrollY);
 		sessionStorage.removeItem('scrollY');

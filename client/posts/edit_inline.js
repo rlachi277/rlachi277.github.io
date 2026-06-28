@@ -46,6 +46,7 @@ export function inlineCommands(shortcut, e) {
 			runCommand(e, command);
 		} catch (e) {
 			if (e !== -1) throw e;
+			return false;
 		}
 		return true;
 	}
@@ -54,6 +55,7 @@ export function inlineCommands(shortcut, e) {
 			tabCommand(e);
 		} catch (e) {
 			if (e !== -1) throw e;
+			return false;
 		}
 		return true;
 	}

@@ -15,6 +15,11 @@ export const defaultMenu = {
 	toLog1: () => {
 		const path = `../log1/${window.location.pathname.split('/').at(-1)}${window.location.search}`;
 		window.location.href = path;
+	},
+
+	noFragment: () => {
+		sessionStorage.setItem('scrollY', window.scrollY);
+		window.location.href = window.location.pathname + window.location.search;
 	}
 }
 

@@ -9,12 +9,9 @@
 	<link rel="stylesheet" href="/client/cycelog/colors.css">
 	<link rel="stylesheet" href="/client/cycelog/log1.css">
 	<script type="module">
-		import { setup } from "/client/posts/script.js";
+		import { setup } from "/client/cycelog/log1_script.js";
 		import { defaultMenu, editMenu } from "/client/cycelog/log1_menu.js";
-		import { setupLog1Edit } from "/client/cycelog/log1_edit.js";
-		setup(defaultMenu, editMenu, true);
-		const params = new URLSearchParams(window.location.search);
-		if (params.get("edit")) setupLog1Edit();
+		setup(defaultMenu, editMenu);
 	</script>
 </head>
 <body>
@@ -37,6 +34,7 @@
 			<li><button id="menu-record" popovertarget="menu-recordsub">기록</button>
 			<ul id="menu-recordsub" popover>
 				<li><button class="menu-action" data-menu="toLog3">3차 기록 보기</button></li>
+				<li><button class="menu-action" data-menu="noFragment">항목 강조 해제</button></li>
 			</ul>
 			</li>
 		</menu>

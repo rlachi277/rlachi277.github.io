@@ -13,7 +13,7 @@
 		import { defaultMenu, editMenu } from "/client/cycelog/log3_menu.js";
 		import { setupLog3Edit } from "/client/cycelog/log3_edit.js";
 		const params = new URLSearchParams(window.location.search);
-		if (params.get("edit")) await setupLog3Edit();
+		if (params.get("edit")) setupLog3Edit(`###여기까지가 템플릿임 3###`);
 		setup(defaultMenu, editMenu);
 	</script>
 </head>
@@ -48,6 +48,7 @@
 			<li><button id="menu-record" popovertarget="menu-recordsub">기록</button>
 			<ul id="menu-recordsub" popover>
 				<li><button class="menu-action" data-menu="toLog1">1차 기록 보기</button></li>
+				<li><button class="menu-action" data-menu="noFragment">항목 강조 해제</button></li>
 			</ul>
 			</li>
 		</menu>
@@ -62,13 +63,5 @@
 	</dialog>
 	<div id="warning" role="alert"></div>
 	###여기까지가 템플릿임###
-	<a class="entry">test</a>
-	 <a class="entry" data-type="0">test</a>
-	 <a class="entry" data-type="1">test</a>
-	 <a class="entry" data-type="6">test</a>
-	 <a class="entry" data-type="3">test</a>
-	 <a class="entry" data-type="4">test</a>
-	 <a class="entry" data-type="5">test</a>
-	 <a class="entry" data-type="2">test</a>
 </body>
 </html>

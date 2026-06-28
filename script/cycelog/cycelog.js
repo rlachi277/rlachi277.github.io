@@ -1,5 +1,6 @@
 import { buildLog1Table } from "../../shared/cycelog/log1.js";
 import {
+	getPost,
 	patchPost,
 	getPostFromData,
 	postExists,
@@ -7,7 +8,12 @@ import {
 	badRequest
 } from "../posts/posts.js";
 
-export { getPost as getLog3 } from "../posts/posts.js";
+const LOG3_TYPES_SLOT = "###여기까지가 템플릿임 3###";
+
+export function getLog3(db, root, path, template, renderHooks, types) {
+	return getPost(db, root, path, template, renderHooks).replace(LOG3_TYPES_SLOT, JSON.stringify(types));
+}
+
 export { putPost as putLog3 } from "../posts/posts.js";
 
 export function patchLog3(db, path, body) {

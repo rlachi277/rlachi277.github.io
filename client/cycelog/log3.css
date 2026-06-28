@@ -1,4 +1,4 @@
-.entry { color: var(--c); }
+.entry { color: var(--c); outline-offset: 2px; }
 .entry:hover, .entry:focus-visible { color: var(--ch); }
 .entry:active { color: var(--ca); }
 
@@ -12,3 +12,9 @@
 .entry[data-type="4"] { --c: var(--c-45); --ch: var(--c-45h); --ca: var(--c-45a); }
 .entry[data-type="5"] { --c: var(--c-67); --ch: var(--c-67h); --ca: var(--c-67a); }
 .entry[data-type="6"] { --c: var(--c-2); --ch: var(--c-2h); --ca: var(--c-2a); }
+
+.entry:target {
+	background-color: Mark;
+	color: MarkText;
+	outline: 1px auto var(--c);
+}

@@ -9,8 +9,8 @@ let curR, curC, isFocused;
 
 export function setupGrid() {
 	$("thead").on("click", () => window.scrollTo(0, 0));
-	window.addEventListener("scroll", onScroll, {passive: true});
-	window.addEventListener("resize", onScroll, {passive: true});
+	window.addEventListener("scroll", onScroll);
+	window.addEventListener("resize", onScroll);
 	onScroll();
 
 	$("tbody td, tfoot td").attr("tabindex", "-1");
@@ -124,7 +124,8 @@ function onTableKeydown(e) {
 		if (curC === 0 && e.shiftKey && row.hasAttribute("data-id")) {
 			onIdFieldClick({
 				target: e.target,
-				shiftKey: true
+				shiftKey: true,
+				altKey: false
 			});
 		} else if (curC === 0) return;
 		else e.target.click();
@@ -134,7 +135,8 @@ function onTableKeydown(e) {
 			e.stopPropagation();
 			onIdFieldClick({
 				target: e.target,
-				shiftKey: false
+				shiftKey: false,
+				altKey: true
 			});
 		}
 	}

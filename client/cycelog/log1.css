@@ -77,8 +77,12 @@ tr[data-type="3"] { --bg: var(--c-3-bg); --bgf: var(--c-3-bgh); color: var(--c-3
 tr[data-type="4"] { --bg: var(--c-45-bg); --bgf: var(--c-45-bgh); color: var(--c-45); }
 tr[data-type="5"] { --bg: var(--c-67-bg); --bgf: var(--c-67-bgh); color: var(--c-67); }
 tr[data-type="6"] { --bg: var(--c-2-bg); --bgf: var(--c-2-bgh); color: var(--c-2); }
-tr:target { --bg: var(--bgf); outline: 1px auto currentColor; }
 
+tr { scroll-margin-block: 50vb; }
+tr:target { --bg: var(--bgf); outline: 1px auto currentColor; }
+tr:target td:first-child { background-color: Mark; color: MarkText; }
+
+td.log1-td-id { cursor: pointer; }
 td.log1-edited { text-decoration: currentColor dotted underline; }
 
 td:focus {
