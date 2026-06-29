@@ -31,7 +31,7 @@
     }
 
     main {
-      width: min(1120px, calc(100% - 32px));
+      width: min(92%, calc(100% - 64px));
       min-height: 100vh;
       margin: 0 auto;
       display: grid;
@@ -180,6 +180,141 @@
       gap: 16px;
     }
 
+    .services {
+      display: grid;
+      gap: 16px;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: clamp(1.5rem, 4vw, 2.25rem);
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+
+    .section-heading p {
+      max-width: 520px;
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .service-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    @media (min-width: 620px) {
+      .service-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 900px) {
+      .service-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 1440px) {
+      .service-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    .service-card {
+      min-height: 100%;
+    }
+
+    .service-card a {
+      min-height: 100%;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper-strong);
+      color: inherit;
+      text-decoration: none;
+      box-shadow: 0 16px 44px rgba(32, 44, 55, 0.1);
+      transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .service-card a:hover,
+    .service-card a:focus-visible {
+      transform: translateY(-2px);
+      border-color: rgba(37, 99, 235, 0.38);
+      box-shadow: 0 20px 54px rgba(32, 44, 55, 0.16);
+    }
+
+    .service-card a:focus-visible {
+      outline: 3px solid rgba(37, 99, 235, 0.2);
+      outline-offset: 3px;
+    }
+
+    .service-thumb-frame {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      display: grid;
+      place-items: center;
+      background: #dfe8ef;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .service-thumb {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+    }
+
+    .service-body {
+      display: grid;
+      align-content: start;
+      gap: 10px;
+      padding: 18px;
+    }
+
+    .service-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .service-card h3 {
+      margin: 0;
+      font-size: 1.15rem;
+      letter-spacing: 0;
+    }
+
+    .service-status {
+      flex: 0 0 auto;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(15, 118, 110, 0.12);
+      color: var(--accent);
+      font-size: 0.74rem;
+      font-weight: 800;
+    }
+
+    .service-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
     .fact-card {
       min-height: 100%;
       padding: 22px;
@@ -243,14 +378,20 @@
 
     @media (max-width: 820px) {
       main {
-        width: min(100% - 24px, 640px);
+        width: calc(100% - 32px);
         padding: 32px 0;
         align-content: start;
       }
 
       .hero,
-      .facts {
+      .facts,
+      .section-heading {
         grid-template-columns: 1fr;
+      }
+
+      .section-heading {
+        display: grid;
+        align-items: start;
       }
 
       .visual {
@@ -285,6 +426,14 @@
 
       .fact-card {
         padding: 18px;
+      }
+
+      .service-body {
+        padding: 16px;
+      }
+
+      .service-thumb {
+        height: 100%;
       }
     }
   </style>
@@ -356,6 +505,30 @@ Korean and English."</pre>
       <a href="https://www.ibm.com/think/topics/vibe-coding">IBM</a>
       <a href="https://www.merriam-webster.com/slang/vibe-coding">Merriam-Webster</a>
     </p>
+
+    <section class="services" aria-labelledby="services-title">
+      <div class="section-heading">
+        <h2 id="services-title">Vibing Services</h2>
+        <p>Open the tools built in this workspace. More services can be added here as the collection grows.</p>
+      </div>
+
+      <ul class="service-grid">
+        <li class="service-card">
+          <a href="./chat/">
+            <span class="service-thumb-frame">
+              <img class="service-thumb" src="./assets/thumbnail/chat.png" alt="Vibing Chat thumbnail">
+            </span>
+            <div class="service-body">
+              <div class="service-meta">
+                <h3>Chat</h3>
+                <span class="service-status">Live</span>
+              </div>
+              <p>Talk with other visitors in real time, with each browser session shown as its own color.</p>
+            </div>
+          </a>
+        </li>
+      </ul>
+    </section>
   </main>
 </body>
 </html>
