@@ -4,15 +4,18 @@ import { startEdit } from "./edit.js";
 
 let isMobile = false;
 const navDetails = $("nav details");
+const menubar = $("#menubar");
 function onResize() {
 	if (window.matchMedia("(max-width: 480px)").matches) {
 		if (isMobile) return;
 		isMobile = true;
 		navDetails.removeAttr("open");
+		menubar.css("display", "none");
 	} else {
 		if (!isMobile) return;
 		isMobile = false;
 		navDetails.attr("open", "");
+		menubar.css("display", "");
 	}
 }
 
@@ -31,7 +34,6 @@ export function setup(defaultMenu, editMenu, noEdit) {
 	window.addEventListener('resize', onResize);
 
 	const scrollY = sessionStorage.getItem('scrollY');
-	console.log(scrollY);
 	if (scrollY !== null) {
 		window.scrollTo(0, scrollY);
 		sessionStorage.removeItem('scrollY');

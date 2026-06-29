@@ -30,7 +30,7 @@ db.prepare(`
 	)
 `).run();
 
-const template = fs.readFileSync(path.join(__dirname, 'client', 'posts', 'index.html'), 'utf8').replaceAll(/\n|\t/g, '');
+const template = fs.readFileSync(path.join(__dirname, 'client', 'posts', 'post.html'), 'utf8').replaceAll(/\n|\t/g, '');
 const notFoundTemplate = fs.readFileSync(path.join(__dirname, 'client', 'posts', '404.html'), 'utf8').replaceAll(/\n|\t/g, '');
 
 const router = express.Router();

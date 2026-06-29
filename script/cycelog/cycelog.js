@@ -10,6 +10,15 @@ import {
 
 const LOG3_TYPES_SLOT = "###여기까지가 템플릿임 3###";
 
+export function getIndex(root, template, renderNavHook) {
+	return getPostFromData({
+		type: "nav"
+	}, root, "index.html", {
+		normal: template,
+		notFound: template
+	}, [renderNavHook]);
+}
+
 export function getLog3(db, root, path, template, renderHooks, types) {
 	return getPost(db, root, path, template, renderHooks).replace(LOG3_TYPES_SLOT, JSON.stringify(types));
 }
