@@ -30,6 +30,11 @@ db.prepare(`
 		subdir TEXT NOT NULL
 	)
 `).run();
+db.prepare(`
+	INSERT INTO posts (path, data)
+	VALUES (?, ?)
+	ON CONFLICT DO NOTHING
+`).run("index.html", "dummy");
 
 const template = fs.readFileSync(path.join(__dirname, 'client', 'posts', 'post.html'), 'utf8').replaceAll(/\n|\t/g, '');
 const notFoundTemplate = fs.readFileSync(path.join(__dirname, 'client', 'posts', '404.html'), 'utf8').replaceAll(/\n|\t/g, '');
