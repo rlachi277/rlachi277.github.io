@@ -4,3 +4,4 @@ node_modules/
 
 # 테스트 중에는 민감 정보 같은 거 없으니 gitignore에서 제외
 # db/
+db2/
