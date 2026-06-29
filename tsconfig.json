@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022", "DOM"],
+    "strict": false,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "index.ts",
+    "dirname.ts",
+    "script/**/*.ts",
+    "shared/**/*.ts",
+    "client/**/*.ts",
+    "vibing/**/*.ts"
+  ],
+  "exclude": ["node_modules"]
+}
