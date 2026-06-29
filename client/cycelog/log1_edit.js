@@ -35,7 +35,7 @@ export async function onIdFieldClick($e) {
 		// this *will* work on iOS Safari. only _blank doesn't work.
 		if (e.ctrlKey || e.metaKey) window.open(path, "_blank", "noopener");
 		else window.open(path, "_self", "noopener");
-		e.preventDefault();
+		e.preventDefault?.();
 	}
 }
 
@@ -43,7 +43,7 @@ async function deleteEntryDialog(e, id) {
 	dialog(`${id}번 항목 삭제`, `
 		정말로 이 항목을 삭제하시겠습니까?<br>
 		이 작업은 되돌릴 수 없습니다.<br>
-		3차 기록의 언급 및 참조는 깨진 링크로 남습니다.
+		3차 기록에서의 반영 및 참조는 깨진 링크로 남습니다.
 	`, async () => {
 		try {
 			await sendDelete(id);
@@ -105,7 +105,8 @@ async function moveEntriesDialog(id) {
 			번호를 
 			<input id="dialog-delta" type="number" value="1">
 			만큼 변경합니다.
-		</label>
+		</label><br>
+		<strong>3차 기록의 반영 및 참조는 수동으로 바꿔야 합니다.</strong>
 	`, async () => {
 		const endIdStr = d$("dialog-end-id").value;
 		const deltaStr = d$("dialog-delta").value;

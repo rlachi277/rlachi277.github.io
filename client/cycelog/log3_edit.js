@@ -32,7 +32,7 @@ function onKeydown(e) {
 
 function insertEntry() {
 	const range = S.getRangeAt(0);
-	dialog("항목 언급", `
+	dialog("항목 반영", `
 		<label for="dialog-entry-id">번호: </label>
 		<input id="dialog-entry-id" type="number" placeholder="항목 번호 입력">
 	`, () => {
@@ -41,7 +41,7 @@ function insertEntry() {
 			showWarning("올바르지 않은 항목 번호입니다.");
 			return false;
 		} else if (d$(`entry${id}`) !== null) {
-			showWarning("해당 항목의 언급이 이미 존재합니다.");
+			showWarning("해당 항목은 이미 반영되었습니다.");
 			return false;
 		} else if (!Object.hasOwn(types, id)) {
 			showWarning("이 글에는 해당 번호의 항목이 없습니다.");

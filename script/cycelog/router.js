@@ -57,6 +57,9 @@ db.prepare(`
 const router = express.Router();
 export default router;
 
+const log1Hook = renderNavHook(db, "/cycelog/log1/");
+const log3Hook = renderNavHook(db, "/cycelog/log3/");
+
 router.get('/', (req, res) => {
 	res.redirect('log3/');
 });
@@ -68,7 +71,7 @@ const log1IndexTemplate = fs.readFileSync(path.join(__dirname, 'client', 'cycelo
 
 router.get('/log1/', (req, res) => {
 	withErrors(res, () => {
-		return getIndex("/cycelog/log1/", log1IndexTemplate, renderNavHook(db, "/cycelog/log1/"));
+		return getIndex("/cycelog/log1/", log1IndexTemplate, log1Hook);
 	}, true);
 });
 
@@ -79,7 +82,7 @@ router.get('/log1/:id', (req, res) => {
 		return getLog1(db, "/cycelog/log1/", id, {
 			normal: log1Template,
 			notFound: log1NotFoundTemplate
-		}, [renderNavHook(db, "/cycelog/log1/")]);
+		}, [log1Hook]);
 	}, true);
 });
 
@@ -135,7 +138,7 @@ const log3IndexTemplate = fs.readFileSync(path.join(__dirname, 'client', 'cycelo
 
 router.get('/log3/', (req, res) => {
 	withErrors(res, () => {
-		return getIndex("/cycelog/log3/", log3IndexTemplate, renderNavHook(db, "/cycelog/log3/"));
+		return getIndex("/cycelog/log3/", log3IndexTemplate, log3Hook);
 	}, true);
 });
 
@@ -151,7 +154,7 @@ router.get('/log3/:id', (req, res) => {
 			normal: log3Template,
 			notFound: log3NotFoundTemplate
 		}, [
-			renderNavHook(db, "/cycelog/log3/"),
+			log3Hook,
 			entryDeseriHook(types, false, db)
 		], types);
 	}, true);

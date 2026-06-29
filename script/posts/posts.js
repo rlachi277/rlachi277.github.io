@@ -90,6 +90,15 @@ export function deletePost(db, path) {
 	removePost(db, path.split('/'));
 }
 
+export function getIndex(root, template, renderNavHook) {
+	return getPostFromData({
+		type: "nav"
+	}, root, "index.html", {
+		normal: template,
+		notFound: template
+	}, [renderNavHook]);
+}
+
 export function postExists(db, path) {
 	const dbResult = db.prepare('SELECT COUNT(1) FROM posts WHERE path = ?').get(path);
 	return dbResult['COUNT(1)'] !== 0;

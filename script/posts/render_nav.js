@@ -48,21 +48,21 @@ function buildNav(db, root, path) {
 		data[0].children.push(path.split('/').at(-1));
 		return data;
 	}
-	for (const e of JSON.parse(dbResult.subdir)) {
+	for (const e of JSON.parse(dbResult.subdir).sort()) {
 		const cur = {name: e, children: []};
 		const curResult = db.prepare('SELECT posts,subdir FROM dir WHERE path = ?').get(e);
 		if (curResult === undefined) { // ???
 			data[0].children.push(e);
 			continue;
 		}
-		for (const ee of JSON.parse(curResult.subdir)) cur.children.push(ee);
-		for (const ee of JSON.parse(curResult.posts)) {
+		for (const ee of JSON.parse(curResult.subdir).sort()) cur.children.push(ee);
+		for (const ee of JSON.parse(curResult.posts).sort()) {
 			if (ee === "index.html") continue;
 			cur.children.push(ee);
 		}
 		data[0].children.push(cur);
 	}
-	for (const e of JSON.parse(dbResult.posts)) {
+	for (const e of JSON.parse(dbResult.posts).sort()) {
 		if (e === "index.html") continue;
 		data[0].children.push(e);
 	}

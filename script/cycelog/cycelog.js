@@ -10,14 +10,7 @@ import {
 
 const LOG3_TYPES_SLOT = "###여기까지가 템플릿임 3###";
 
-export function getIndex(root, template, renderNavHook) {
-	return getPostFromData({
-		type: "nav"
-	}, root, "index.html", {
-		normal: template,
-		notFound: template
-	}, [renderNavHook]);
-}
+export { getIndex } from "../posts/posts.js";
 
 export function getLog3(db, root, path, template, renderHooks, types) {
 	return getPost(db, root, path, template, renderHooks).replace(LOG3_TYPES_SLOT, JSON.stringify(types));
@@ -151,7 +144,6 @@ function getMoveTarget(db, postId, startId, endId, delta) {
 		WHERE id BETWEEN ? AND ?`).get(newRangeStart, newRangeEnd)?.['COUNT(1)'];
 	if (newRangeCount !== 0) throw badRequest("이 동작으로 인해 번호 충돌이 발생할 가능성이 있습니다.");
 
-	// TODO: 3차 기록 업데이트
 	return dbResult;
 }
 

@@ -80,7 +80,6 @@ export const editMenu = {
 		newElement.classList.add("week");
 		const hgroup = document.createElement("hgroup");
 
-		// TODO: 주차 정보 채우기
 		hgroup.append(document.createElement("h2"));
 		hgroup.append(document.createElement("p"));
 		

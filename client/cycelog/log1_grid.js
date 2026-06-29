@@ -121,13 +121,20 @@ function onTableKeydown(e) {
 	} else if (e.key === "Enter") {
 		e.preventDefault();
 		e.stopPropagation();
-		if (curC === 0 && e.shiftKey && row.hasAttribute("data-id")) {
-			onIdFieldClick({
+		if (curC === 0 && row.hasAttribute("data-id")) {
+			if (e.ctrlKey || e.metaKey) onIdFieldClick({
+				target: e.target,
+				shiftKey: e.shiftKey,
+				altKey: false,
+				ctrlKey: e.shiftKey
+			});
+			else if (e.shiftKey) onIdFieldClick({
 				target: e.target,
 				shiftKey: true,
 				altKey: false
 			});
-		} else if (curC === 0) return;
+			return;
+		}
 		else e.target.click();
 	} else if (e.key === "Backspace") {
 		if (curC === 0 && row.hasAttribute("data-id")) {
