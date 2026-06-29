@@ -36,7 +36,7 @@ export function buildLog1Table(data) {
 	const ids = data.map((e) => e.id);
 	const maxId = Math.max(...ids);
 	const minId = Math.min(...ids);
-	const dataById = [];
+	const dataById = {};
 	for (const e of data) dataById[e.id] = e;
 	let rows = '';
 	for (let i = minId; i <= maxId; i++) rows += buildLog1Row(i, dataById[i]);

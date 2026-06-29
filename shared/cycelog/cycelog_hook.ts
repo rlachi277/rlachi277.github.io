@@ -1,5 +1,5 @@
 let refCnt = 0;
-const whereCache = [];
+const whereCache = {};
 
 export function entryDeseriHook(types, isClient, param) {
 	return function (data, cur) {
