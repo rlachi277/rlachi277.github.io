@@ -1,12 +1,13 @@
 import { entrySeriHook, entryDeseriHook } from '../../shared/cycelog/cycelog_hook.js';
-import { $, d$ } from "../jquery.js";
+import { $, d$, d$n } from "../jquery.js";
 import { SERI_HOOKS, DESERI_HOOKS } from "../posts/script.js";
 import { dialog, showWarning } from "../posts/dialog.js";
+import { DeseriHook } from '../../shared/posts/seri.js';
 
-let types;
-let deseriHook;
+let types: Record<number,number>;
+let deseriHook: DeseriHook;
 
-export function setupLog3Edit(typesString) {
+export function setupLog3Edit(typesString: string) {
 	types = Object.freeze(JSON.parse(typesString));
 	deseriHook = entryDeseriHook(types, true, "/cycelog/");
 	SERI_HOOKS.push(entrySeriHook);
@@ -14,9 +15,9 @@ export function setupLog3Edit(typesString) {
 	document.body.addEventListener("keydown", onKeydown);
 }
 
-const S = window.getSelection();
+const S = window.getSelection() as Selection;
 
-function onKeydown(e) {
+function onKeydown(e: KeyboardEvent) {
 	if (!S.isCollapsed) return;
 	let curEl = S.anchorNode;
 	if (curEl === null) return;
@@ -37,7 +38,7 @@ function insertEntry() {
 		<label for="dialog-entry-id">번호: </label>
 		<input id="dialog-entry-id" type="number" placeholder="항목 번호 입력">
 	`, () => {
-		const id = parseInt(d$("dialog-entry-id").value);
+		const id = parseInt((d$n("dialog-entry-id") as HTMLInputElement).value);
 		if (Number.isNaN(id)) {
 			showWarning("올바르지 않은 항목 번호입니다.");
 			return false;
@@ -48,10 +49,11 @@ function insertEntry() {
 			showWarning("이 글에는 해당 번호의 항목이 없습니다.");
 			return false;
 		}
-		const newEl = deseriHook({
+		const newEl = (deseriHook({
 			type: 'entry',
-			variant: {id: id}
-		}, window.location.pathname)?.html;
+			variant: {id: id},
+			children: null
+		}, window.location.pathname) as {type: 'html', html: string}).html;
 		if (newEl == undefined) {
 			alert("오류: newEl == undefined");
 			return false;
@@ -67,15 +69,16 @@ function insertReference() {
 		<label for="dialog-entry-id">번호: </label>
 		<input id="dialog-entry-id" type="number" placeholder="항목 번호 입력">
 	`, () => {
-		const id = parseInt(d$("dialog-entry-id").value);
+		const id = parseInt((d$n("dialog-entry-id") as HTMLInputElement).value);
 		if (Number.isNaN(id)) {
 			showWarning("올바르지 않은 항목 번호입니다.");
 			return false;
 		}
-		const newEl = deseriHook({
+		const newEl = (deseriHook({
 			type: 'ref',
-			variant: {id: id}
-		}, window.location.pathname)?.html;
+			variant: {id: id},
+			children: null
+		}, window.location.pathname) as {type: 'html', html: string}).html;
 		if (newEl == undefined) {
 			alert("오류: newEl == undefined");
 			return false;
@@ -85,7 +88,7 @@ function insertReference() {
 	})();
 }
 
-function insertAtRange(range, html) {
+function insertAtRange(range: Range, html: string) {
 	const marker = document.createElement("span");
 	marker.classList.add("select-marker");
 	range.insertNode(marker);
@@ -94,5 +97,5 @@ function insertAtRange(range, html) {
 	range.collapse();
 	S.removeAllRanges();
 	S.addRange(range);
-	S.anchorNode.dispatchEvent(new Event("input", {bubbles: true}));
+	S.anchorNode?.dispatchEvent(new Event("input", {bubbles: true}));
 }

@@ -1,6 +1,9 @@
+import { DeseriHook, SeriHook } from "../../shared/posts/seri.js";
 import { $ } from "../jquery.js";
 import { setupDialog } from "./dialog.js";
 import { startEdit } from "./edit.js";
+
+export type MenuActions = Record<string,EventListener>;
 
 let isMobile = false;
 const navDetails = $("nav details");
@@ -9,7 +12,7 @@ function onResize() {
 	if (window.matchMedia("(max-width: 480px)").matches) {
 		if (isMobile) return;
 		isMobile = true;
-		navDetails.removeAttr("open");
+		navDetails.attr("open", null);
 		menubar.css("display", "none");
 	} else {
 		if (!isMobile) return;
@@ -19,17 +22,17 @@ function onResize() {
 	}
 }
 
-function setupMenu(menu) {
-	if (menu == undefined) return;
+function setupMenu(menu: MenuActions | null) {
+	if (menu === null) return;
 	for (const [k, v] of Object.entries(menu)) {
 		$(`[data-menu="${k}"]`).on("click", v);
 	}
 }
 
-export const SERI_HOOKS = [];
-export const DESERI_HOOKS = [];
+export const SERI_HOOKS: SeriHook[] = [];
+export const DESERI_HOOKS: DeseriHook[] = [];
 
-export function setup(defaultMenu, editMenu, noEdit) {
+export function setup(defaultMenu: MenuActions, editMenu: MenuActions | null = null, noEdit: boolean = false) {
 	onResize();
 	window.addEventListener('resize', onResize);
 
@@ -41,16 +44,16 @@ export function setup(defaultMenu, editMenu, noEdit) {
 
 	setupDialog();
 
-	$(".menu-action").on("click", (e) => {
-		const pparent = e.target.parentElement.parentElement;
-		if (pparent.matches(":popover-open")) pparent.hidePopover();
+	$(".menu-action").on("click", function () {
+		const pparent = this.parentElement?.parentElement;
+		if (pparent != undefined && pparent.matches(":popover-open")) pparent.hidePopover();
 	});
 	setupMenu(defaultMenu);
 	const params = new URLSearchParams(window.location.search);
 	if (params.get("edit")) {
-		if (!noEdit && !$(":root.notfound").length) startEdit($("body").get(0), true);
+		if (!noEdit && !$(":root.notfound").exists) startEdit($("body").list[0], true);
 		$("menu .menu-edit").css("display", "revert");
-		$("nav a").each((i, e) => {
+		$("nav a").each((e) => {
 			e.setAttribute("href", e.getAttribute("href") + "?edit=t");
 		});
 		setupMenu(editMenu);

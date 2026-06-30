@@ -1,7 +1,14 @@
-import { sani } from '../../shared/posts/seri.js';
-import { postExists } from './posts.js';
+import { Database } from 'better-sqlite3';
+import { DeseriHook, sani } from '../../shared/posts/seri.js';
+import { DirRow, postExists } from './posts.js';
 
-export function renderNavHook(db, root) {
+type NavDataObject = {
+	readonly name: string,
+	readonly children: readonly NavData[]
+};
+type NavData = string | NavDataObject;
+
+export function renderNavHook(db: Database, root: string): DeseriHook {
 	return function (data, cur) {
 		if (data.type === 'nav') return {
 			type: "html",
@@ -11,11 +18,11 @@ export function renderNavHook(db, root) {
 	};
 }
 
-function renderNav(db, root, cur) {
+function renderNav(db: Database, root: string, cur: string): string {
 	const data = buildNav(db, root, cur);
 
-	function makeNavEntry(base, data) {
-		const newData = (typeof data === 'string' || data instanceof String) ?
+	function makeNavEntry(base: string, data: NavData): string {
+		const newData = (typeof data === 'string') ?
 			{name: data, children: []} :
 			data;
 		const link = base + newData.name;
@@ -36,33 +43,33 @@ function renderNav(db, root, cur) {
 		return `<li>${anchor}<ul>${middle}</ul></li>`;
 	}
 	let middle = "";
-	for (let e of data) middle += makeNavEntry("", e);
+	for (const e of data) middle += makeNavEntry("", e);
 	return `<nav><details open><summary>둘러보기</summary><menu>${middle}</menu></details></nav>`;
 }
 
-function buildNav(db, root, path) {
-	const data = [];
-	const dbResult = db.prepare('SELECT posts,subdir FROM dir WHERE path = ?').get(new URL("./", `file://${path}`).pathname.substring(root.length));
+function buildNav(db: Database, root: string, path: string): NavData[] {
+	const data: {name: string, children: NavData[]}[] = [];
+	const dbResult = db.prepare<string,DirRow>('SELECT posts,subdir FROM dir WHERE path = ?').get(new URL("./", `file://${path}`).pathname.substring(root.length));
 	data.push({name: "", children: []});
 	if (dbResult === undefined) { // 404
-		data[0].children.push(path.split('/').at(-1));
+		data[0].children.push(path.split('/').at(-1) as string);
 		return data;
 	}
-	for (const e of JSON.parse(dbResult.subdir).sort()) {
-		const cur = {name: e, children: []};
-		const curResult = db.prepare('SELECT posts,subdir FROM dir WHERE path = ?').get(e);
+	for (const e of (JSON.parse(dbResult.subdir as string) as string[]).sort()) {
+		const cur: {name: string, children: NavData[]} = {name: e, children: []};
+		const curResult = db.prepare<string,DirRow>('SELECT posts,subdir FROM dir WHERE path = ?').get(e);
 		if (curResult === undefined) { // ???
 			data[0].children.push(e);
 			continue;
 		}
-		for (const ee of JSON.parse(curResult.subdir).sort()) cur.children.push(ee);
-		for (const ee of JSON.parse(curResult.posts).sort()) {
+		for (const ee of (JSON.parse(curResult.subdir as string) as string[]).sort()) cur.children.push(ee);
+		for (const ee of (JSON.parse(curResult.posts as string) as string[]).sort()) {
 			if (ee === "index.html") continue;
 			cur.children.push(ee);
 		}
 		data[0].children.push(cur);
 	}
-	for (const e of JSON.parse(dbResult.posts).sort()) {
+	for (const e of JSON.parse(dbResult.posts as string).sort()) {
 		if (e === "index.html") continue;
 		data[0].children.push(e);
 	}
@@ -70,11 +77,11 @@ function buildNav(db, root, path) {
 
 	const parent = new URL("../", `file://${path}`).pathname;
 	if (!parent.includes(root)) return data; // root
-	const parentResult = db.prepare('SELECT posts,subdir FROM dir WHERE path = ?').get(parent.substring(root.length));
+	const parentResult = db.prepare<string,DirRow>('SELECT posts,subdir FROM dir WHERE path = ?').get(parent.substring(root.length));
 	if (parentResult === undefined) return data; // ???
 	data.push({name: "../", children: []});
-	for (const e of JSON.parse(parentResult.subdir)) data[1].children.push(e);
-	for (const e of JSON.parse(parentResult.posts)) {
+	for (const e of JSON.parse(parentResult.subdir as string)) data[1].children.push(e);
+	for (const e of JSON.parse(parentResult.posts as string)) {
 		if (e === "index.html") continue;
 		data[1].children.push(e);
 	}
@@ -82,14 +89,14 @@ function buildNav(db, root, path) {
 	return data;
 }
 
-function linkExists(db, root, cur, p) {
+function linkExists(db: Database, root: string, cur: string, p: string): boolean {
 	const resolved = simulateLink(cur, p);
 	if (!resolved) return false;
 	if (!resolved.startsWith(root)) return false;
 	return postExists(db, resolved.substring(root.length));
 }
 
-function simulateLink(cur, p) {
+function simulateLink(cur: string, p: string): string {
 	let pathname = new URL(p, `file://${cur}`).pathname;
 	if (pathname.endsWith('/')) pathname += "index.html";
 	return pathname;

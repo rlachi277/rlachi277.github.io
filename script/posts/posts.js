@@ -5,7 +5,7 @@ const notFoundData = {
     type: "body",
     children: [
         { type: "h1", children: ["404 Not Found"] },
-        { type: "nav" }
+        { type: "nav", children: null }
     ]
 };
 export function getRawPost(db, path) {
@@ -29,14 +29,13 @@ export function getPostFromData(data, root, path, template, renderHooks) {
     }
 }
 export function getPost(db, root, path, template, renderHooks) {
-    let data;
+    let data = null;
     try {
         data = getRawPost(db, path);
     }
     catch (e) {
         if (e !== 404)
             throw e;
-        data = undefined;
     }
     return getPostFromData(data, root, path, template, renderHooks);
 }
@@ -72,10 +71,14 @@ export function patchPost(db, path, body) {
     let cur = dbData;
     pos.reverse();
     while (pos.length > 1) {
+        if (typeof cur === 'string' || cur.children === null)
+            throw badRequest("올바르지 않은 위치입니다.");
         cur = cur.children[pos.pop()];
         if (cur == undefined)
             throw badRequest("올바르지 않은 위치입니다.");
     }
+    if (typeof cur === 'string' || cur.children === null)
+        throw badRequest("올바르지 않은 위치입니다.");
     if (cur.children.length < pos[0])
         throw badRequest("올바르지 않은 위치입니다.");
     if (data != undefined)
@@ -96,7 +99,8 @@ export function deletePost(db, path) {
 }
 export function getIndex(root, template, renderNavHook) {
     return getPostFromData({
-        type: "nav"
+        type: "nav",
+        children: null
     }, root, "index.html", {
         normal: template,
         notFound: template
@@ -104,7 +108,7 @@ export function getIndex(root, template, renderNavHook) {
 }
 export function postExists(db, path) {
     const dbResult = db.prepare('SELECT COUNT(1) FROM posts WHERE path = ?').get(path);
-    return dbResult['COUNT(1)'] !== 0;
+    return (dbResult?.['COUNT(1)'] ?? 0) !== 0;
 }
 export function badRequest(reason) {
     return {

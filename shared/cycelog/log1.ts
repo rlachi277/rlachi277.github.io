@@ -26,17 +26,18 @@ const LOG1_TFOOT = `<tfoot><tr id="log1-new-entry">
 	<td id="log1-new-content"></td>
 </tr></tfoot>`.replaceAll(/\n|\t/g, '');
 
-export function buildLog1Table(data) {
-	if (data.length === 0) return `<table id="log1-table" role="grid">
-		${LOG1_THEAD}
-		<tbody></tbody>
-		${LOG1_TFOOT}
-	</table>`.replaceAll(/\n|\t/g, '');
+export type Log1RowData = {
+	readonly id: number,
+	readonly type: number,
+	readonly time: string,
+	readonly content: string
+};
 
+export function buildLog1Table(data: Log1RowData[]): string {
 	const ids = data.map((e) => e.id);
 	const maxId = Math.max(...ids);
 	const minId = Math.min(...ids);
-	const dataById = {};
+	const dataById: Record<number,Log1RowData> = {};
 	for (const e of data) dataById[e.id] = e;
 	let rows = '';
 	for (let i = minId; i <= maxId; i++) rows += buildLog1Row(i, dataById[i]);
@@ -47,7 +48,7 @@ export function buildLog1Table(data) {
 	</table>`.replaceAll(/\n|\t/g, '');
 }
 
-export function buildLog1Row(id, data) {
+export function buildLog1Row(id: number, data: Log1RowData): string {
 	return `<tr data-row="${id}"
 	${data?.id != undefined ? ` id="entry${data.id}" data-id="${data.id}"` : ''}
 	${data?.type != undefined ? ` data-type="${data.type}"` : ''}

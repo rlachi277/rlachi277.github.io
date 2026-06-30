@@ -1,4 +1,4 @@
-import { d$ } from "../jquery.js";
+import { d$, d$n } from "../jquery.js";
 import { dialog, showWarning } from "../posts/dialog.js";
 import { defaultMenu as superDefaultMenu, editMenu as superEditMenu } from "../posts/menu.js";
 
@@ -37,7 +37,7 @@ export const editMenu = {
 		<label for="dialog-new-id">식별자: </label>
 		<input id="dialog-new-id" placeholder="식별자 입력">
 	`, async () => {
-		const id = d$("dialog-new-id").value;
+		const id = (d$n("dialog-new-id") as HTMLInputElement).value;
 		const path = `../log3/${id}`;
 		if (!id || id.includes('/') || id.includes('.')) {
 			showWarning("식별자가 적절하지 않습니다.");
@@ -53,7 +53,7 @@ export const editMenu = {
 			const res2 = await fetch(path, {method: "PUT", body: JSON.stringify({
 				type: "body",
 				children: [
-					{type: "h1", children: [`cycelog: ${id}`]},
+					{type: "h1", children: [`끾기록: ${id}`]},
 					{type: "nav", children: null}
 				]
 			})});

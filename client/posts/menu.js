@@ -1,12 +1,12 @@
 import { seri } from "../../shared/posts/seri.js";
-import { $, d$ } from "../jquery.js";
+import { $, d$n, q$n } from "../jquery.js";
 import { SERI_HOOKS } from "./script.js";
 import { dialog, showWarning } from "./dialog.js";
 import { startTargeting, menuInsert, insertHgroup, deleteElement, header, stopTargeting } from "./edit.js";
 export const defaultMenu = {
     export: () => {
         try {
-            const data = seri($("body").get(0), true, SERI_HOOKS);
+            const data = seri(q$n("body"), true, SERI_HOOKS);
             const file = new Blob([JSON.stringify(data)], { type: "application/json" });
             const anchor = document.createElement("a");
             anchor.href = URL.createObjectURL(file);
@@ -32,10 +32,10 @@ export const editMenu = {
     new: dialog("새 글", `
 		<label for="dialog-new-path">경로: </label>
 		<input id="dialog-new-path" placeholder="경로 입력">
-	`, () => newPost(d$("dialog-new-path").value, {
+	`, () => newPost(d$n("dialog-new-path").value, {
         type: "body",
         children: [
-            { type: "h1", children: [`${d$("dialog-new-path").value} @ ${window.location.pathname}`] },
+            { type: "h1", children: [`${d$n("dialog-new-path").value} @ ${window.location.pathname}`] },
             { type: "nav", children: null },
             { type: "p", children: [] }
         ]
@@ -43,7 +43,7 @@ export const editMenu = {
     duplicate: dialog("이 글 복제", `
 		<label for="dialog-new-path">경로: </label>
 		<input id="dialog-new-path" placeholder="경로 입력">
-	`, () => newPost(d$("dialog-new-path").value, seri($("body").get(0), true, SERI_HOOKS)), false),
+	`, () => newPost(d$n("dialog-new-path").value, seri(q$n("body"), true, SERI_HOOKS)), false),
     delete: dialog("이 글 삭제", `
 		정말로 <strong>이 글 전체</strong>를 삭제하시겠습니까?<br>
 		이 작업은 되돌릴 수 없습니다.
@@ -69,7 +69,7 @@ export const editMenu = {
             await checkFetch(fetch(path, {
                 method: "PUT",
                 headers: { 'Content-Type': 'text/plain' },
-                body: d$("dialog-json-file").files[0]
+                body: d$n("dialog-json-file").files?.[0]
             }));
             $(".edited, .new").removeClass("edited new");
             window.location.reload();

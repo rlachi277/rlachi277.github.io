@@ -1,5 +1,5 @@
 import { entrySeriHook, entryDeseriHook } from '../../shared/cycelog/cycelog_hook.js';
-import { d$ } from "../jquery.js";
+import { d$, d$n } from "../jquery.js";
 import { SERI_HOOKS, DESERI_HOOKS } from "../posts/script.js";
 import { dialog, showWarning } from "../posts/dialog.js";
 let types;
@@ -38,7 +38,7 @@ function insertEntry() {
 		<label for="dialog-entry-id">번호: </label>
 		<input id="dialog-entry-id" type="number" placeholder="항목 번호 입력">
 	`, () => {
-        const id = parseInt(d$("dialog-entry-id").value);
+        const id = parseInt(d$n("dialog-entry-id").value);
         if (Number.isNaN(id)) {
             showWarning("올바르지 않은 항목 번호입니다.");
             return false;
@@ -53,8 +53,9 @@ function insertEntry() {
         }
         const newEl = deseriHook({
             type: 'entry',
-            variant: { id: id }
-        }, window.location.pathname)?.html;
+            variant: { id: id },
+            children: null
+        }, window.location.pathname).html;
         if (newEl == undefined) {
             alert("오류: newEl == undefined");
             return false;
@@ -69,15 +70,16 @@ function insertReference() {
 		<label for="dialog-entry-id">번호: </label>
 		<input id="dialog-entry-id" type="number" placeholder="항목 번호 입력">
 	`, () => {
-        const id = parseInt(d$("dialog-entry-id").value);
+        const id = parseInt(d$n("dialog-entry-id").value);
         if (Number.isNaN(id)) {
             showWarning("올바르지 않은 항목 번호입니다.");
             return false;
         }
         const newEl = deseriHook({
             type: 'ref',
-            variant: { id: id }
-        }, window.location.pathname)?.html;
+            variant: { id: id },
+            children: null
+        }, window.location.pathname).html;
         if (newEl == undefined) {
             alert("오류: newEl == undefined");
             return false;
@@ -95,5 +97,5 @@ function insertAtRange(range, html) {
     range.collapse();
     S.removeAllRanges();
     S.addRange(range);
-    S.anchorNode.dispatchEvent(new Event("input", { bubbles: true }));
+    S.anchorNode?.dispatchEvent(new Event("input", { bubbles: true }));
 }

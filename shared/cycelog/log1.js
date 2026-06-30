@@ -23,12 +23,6 @@ const LOG1_TFOOT = `<tfoot><tr id="log1-new-entry">
 	<td id="log1-new-content"></td>
 </tr></tfoot>`.replaceAll(/\n|\t/g, '');
 export function buildLog1Table(data) {
-    if (data.length === 0)
-        return `<table id="log1-table" role="grid">
-		${LOG1_THEAD}
-		<tbody></tbody>
-		${LOG1_TFOOT}
-	</table>`.replaceAll(/\n|\t/g, '');
     const ids = data.map((e) => e.id);
     const maxId = Math.max(...ids);
     const minId = Math.min(...ids);

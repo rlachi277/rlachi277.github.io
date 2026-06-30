@@ -23,8 +23,8 @@ const log1Header = (id) => {
     return {
         type: "body",
         children: [
-            { type: "h1", children: [`cycelog: ${id}`] },
-            { type: "nav" },
+            { type: "h1", children: [`끾기록: ${id}`] },
+            { type: "nav", children: null },
             LOG1_TEMPLATE_SLOT
         ]
     };
@@ -140,7 +140,7 @@ function getMoveTarget(db, postId, startId, endId, delta) {
 }
 export function log1Exists(db, id) {
     const cnt = db.prepare(`SELECT COUNT(1) FROM entries
-		WHERE id = ?`).get(id)['COUNT(1)'];
+		WHERE id = ?`).get(id)?.['COUNT(1)'] ?? 0;
     return cnt !== 0;
 }
 export { serverWhere as log1Where } from "../../shared/cycelog/cycelog_hook.js";

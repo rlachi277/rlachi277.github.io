@@ -1,45 +1,44 @@
+import { EntryRow } from "../../script/cycelog/cycelog.js";
 import { LOG1_TYPE_NAME } from "../../shared/cycelog/log1.js";
-import { $, d$, q$ } from "../jquery.js";
+import { $, d$, d$n, q$, q$n } from "../jquery.js";
 import { dialog, showWarning } from "../posts/dialog.js";
 import { sendDelete, sendMove, sendPatch } from "./log1_fetch.js";
 import { setupGrid, getFocusState, focusOn } from "./log1_grid.js";
 
-const S = window.getSelection();
-const SYMBOLS = {".": "·", "st": "★"};
+const S = window.getSelection() as Selection;
+const SYMBOLS: Record<string,string> = {".": "·", "st": "★"};
 
 export function setupLog1Edit() {
 	setupGrid();
-	for (const row of $("tbody tr")) setupRow(row);
+	for (const row of $("tbody tr").list) setupRow(row);
 }
 
-export function setupRow(row) {
+export function setupRow(row: HTMLElement) {
 	if (!row.hasAttribute("data-id")) return;
-	const $row = $(row);
-	$row.children(".log1-td-id").on("click", onIdFieldClick);
-	$row.children(".log1-td-type").on("click", onTypeFieldClick);
-	$row.children(".log1-td-time").on("click", onTimeFieldClick);
-	$row.children(".log1-td-content").on("click", onContentFieldClick);
-	$row.children(".log1-td-content").on("keydown", onContentFieldKeydown);
-	$row.children(".log1-td-content").on("input", onContentFieldInput);
+	q$n(".log1-td-id", row).addEventListener("click", onIdFieldClick);
+	q$n(".log1-td-type", row).addEventListener("click", onTypeFieldClick);
+	q$n(".log1-td-time", row).addEventListener("click", onTimeFieldClick);
+	q$n(".log1-td-content", row).addEventListener("click", onContentFieldClick);
+	q$n(".log1-td-content", row).addEventListener("keydown", onContentFieldKeydown);
+	q$n(".log1-td-content", row).addEventListener("input", onContentFieldInput);
 }
 
-export async function onIdFieldClick($e) {
-	const e = $e.originalEvent ?? $e;
-	const row = e.target.parentElement;
-	const id = parseInt(row.getAttribute("data-id"));
+export async function onIdFieldClick(this: HTMLElement, e: PointerEvent | Record<'shiftKey'|'ctrlKey'|'altKey'|'metaKey',boolean>) {
+	const row = this.parentElement as HTMLElement;
+	const id = parseInt(row.getAttribute("data-id") as string);
 	focusOn(id, 0, true);
-	if (e.altKey) deleteEntryDialog(e, id);
+	if (e.altKey) deleteEntryDialog.call(this, id);
 	else if (e.shiftKey && !(e.ctrlKey || e.metaKey)) moveEntriesDialog(id);
 	else {
 		const path = `../log3/${window.location.pathname.split("/").at(-1)}?edit=t#entry${id}`;
 		// this *will* work on iOS Safari. only _blank doesn't work.
 		if (e.ctrlKey || e.metaKey) window.open(path, "_blank", "noopener");
 		else window.open(path, "_self", "noopener");
-		e.preventDefault?.();
+		(e as PointerEvent).preventDefault?.();
 	}
 }
 
-async function deleteEntryDialog(e, id) {
+async function deleteEntryDialog(this: HTMLElement, id: number) {
 	dialog(`${id}번 항목 삭제`, `
 		정말로 이 항목을 삭제하시겠습니까?<br>
 		이 작업은 되돌릴 수 없습니다.<br>
@@ -47,7 +46,7 @@ async function deleteEntryDialog(e, id) {
 	`, async () => {
 		try {
 			await sendDelete(id);
-			const row = e.target.parentElement;
+			const row = this.parentElement as HTMLElement;
 			if (row.matches("tr:only-child")) {
 				row.remove();
 				focusOn(-1, 0, false);
@@ -57,7 +56,7 @@ async function deleteEntryDialog(e, id) {
 				row.remove();
 				const { row: curR, col: curC } = getFocusState();
 				let newR = curR + 1;
-				while ($("tbody tr:first-child").length !== 0 && $("tbody tr:first-child").attr("data-id") === undefined) {
+				while ($("tbody tr:first-child").exists && $("tbody tr:first-child").attr("data-id") === undefined) {
 					$("tbody tr:first-child").remove();
 					newR += 1;
 				}
@@ -67,7 +66,7 @@ async function deleteEntryDialog(e, id) {
 				row.remove();
 				const { row: curR, col: curC } = getFocusState();
 				let newR = curR - 1;
-				while ($("tbody tr:last-child").length !== 0 && $("tbody tr:last-child").attr("data-id") === undefined) {
+				while ($("tbody tr:last-child").exists && $("tbody tr:last-child").attr("data-id") === undefined) {
 					$("tbody tr:last-child").remove();
 					newR -= 1;
 				}
@@ -81,10 +80,12 @@ async function deleteEntryDialog(e, id) {
 			row.removeAttribute("data-type");
 			row.removeAttribute("data-time");
 
-			const $row = $(row);
-			$row.children(".log1-td-id, .log1-td-type, .log1-td-time, .log1-td-content").off("click");
-			$row.children(".log1-td-content").off("keydown");
-			$row.children(".log1-td-content").off("input");
+			q$n(".log1-td-id", row).removeEventListener("click", onIdFieldClick);
+			q$n(".log1-td-type", row).removeEventListener("click", onTypeFieldClick);
+			q$n(".log1-td-time", row).removeEventListener("click", onTimeFieldClick);
+			q$n(".log1-td-content", row).removeEventListener("click", onContentFieldClick);
+			q$n(".log1-td-content", row).removeEventListener("keydown", onContentFieldKeydown);
+			q$n(".log1-td-content", row).removeEventListener("input", onContentFieldInput);
 
 			return true;
 		} catch (e) {
@@ -94,7 +95,7 @@ async function deleteEntryDialog(e, id) {
 	}, true)();
 }
 
-async function moveEntriesDialog(id) {
+async function moveEntriesDialog(id: number) {
 	dialog(`번호 옮기기`, `
 		<label>
 			${id}번부터 
@@ -108,8 +109,8 @@ async function moveEntriesDialog(id) {
 		</label><br>
 		<strong>3차 기록의 반영 및 참조는 수동으로 바꿔야 합니다.</strong>
 	`, async () => {
-		const endIdStr = d$("dialog-end-id").value;
-		const deltaStr = d$("dialog-delta").value;
+		const endIdStr = (d$n("dialog-end-id") as HTMLInputElement).value;
+		const deltaStr = (d$n("dialog-delta") as HTMLInputElement).value;
 		if (endIdStr === '' || deltaStr === '') {
 			showWarning("값을 입력하세요.");
 			return false;
@@ -135,7 +136,7 @@ async function moveEntriesDialog(id) {
 			focusOn(curR + delta, curC, true);
 			window.location.reload();
 			return true;
-		} catch (e) {
+		} catch (e: any) {
 			if (e.status !== 400) throw e;
 			showWarning(e.reason);
 			return false;
@@ -143,12 +144,11 @@ async function moveEntriesDialog(id) {
 	})();
 }
 
-async function onTypeFieldClick($e) {
-	const e = $e.originalEvent ?? $e;
-	const row = e.target.parentElement;
-	const id = parseInt(row.getAttribute("data-id"));
+async function onTypeFieldClick(this: HTMLElement) {
+	const row = this.parentElement as HTMLElement;
+	const id = parseInt(row.getAttribute("data-id") as string);
 	focusOn(id, 1, true);
-	const cur = parseInt(row.getAttribute("data-type") ?? 0);
+	const cur = parseInt(row.getAttribute("data-type") ?? "0");
 	dialog(`${id}번 항목 유형 변경`, `
 		<label><input type="radio" name="log1-type" value="1"${cur===1 ? " checked autofocus" : ""}>공부</label>
 		<label><input type="radio" name="log1-type" value="2"${cur===2 ? " checked autofocus" : ""}>대화</label>
@@ -158,15 +158,15 @@ async function onTypeFieldClick($e) {
 		<label><input type="radio" name="log1-type" value="5"${cur===5 ? " checked autofocus" : ""}>작업</label>
 		<label><input type="radio" name="log1-type" value="6"${cur===6 ? " checked autofocus" : ""}>정보</label>
 	`, async () => {
-		const type = q$(`input[name="log1-type"]:checked`)[0]?.value;
+		const type = parseInt((q$n(`input[name="log1-type"]:checked`) as HTMLInputElement).value);
 		if (type == undefined) { // ???
 			showWarning("값을 입력하세요.");
 			return false;
 		}
 		try {
 			await sendPatch({id: id, type: type});
-			e.target.textContent = LOG1_TYPE_NAME[type];
-			row.setAttribute("data-type", type);
+			this.textContent = LOG1_TYPE_NAME[type];
+			row.setAttribute("data-type", type.toString());
 			return true;
 		} catch (e) {
 			alert(`오류: ${e}`);
@@ -175,18 +175,17 @@ async function onTypeFieldClick($e) {
 	})();
 }
 
-async function onTimeFieldClick($e) {
-	const e = $e.originalEvent ?? $e;
-	const row = e.currentTarget.parentElement;
-	const id = parseInt(row.getAttribute("data-id"));
+async function onTimeFieldClick(this: HTMLElement) {
+	const row = this.parentElement as HTMLElement;
+	const id = parseInt(row.getAttribute("data-id") as string);
 	focusOn(id, 2, true);
 	const cur = row.getAttribute("data-time") ?? "";
-	const wrapper = e.currentTarget.firstChild;
+	const wrapper = this.firstChild as HTMLElement;
 	dialog(`${id}번 항목 시간 변경`, `
 		<label for="dialog-new-time">새 시간: </label>
 		<input id="dialog-new-time" placeholder="${cur}">
 	`, async () => {
-		const time = d$("dialog-new-time").value;
+		const time = (d$n("dialog-new-time") as HTMLInputElement).value;
 		if (time == undefined || time === '') {
 			showWarning("값을 입력하세요.");
 			return false;
@@ -203,34 +202,32 @@ async function onTimeFieldClick($e) {
 	})();
 }
 
-async function onContentFieldClick($e) {
-	const e = $e.originalEvent ?? $e;
-	focusOn(parseInt(e.target.parentElement.getAttribute("data-id")), 3, true);
-	e.target.setAttribute("contenteditable", "plaintext-only");
-	if (!e.target.contains(S.anchorNode)) {
-		S.selectAllChildren(e.target);
+async function onContentFieldClick(this: HTMLElement) {
+	focusOn(parseInt((this.parentElement as HTMLElement).getAttribute("data-id") as string), 3, true);
+	this.setAttribute("contenteditable", "plaintext-only");
+	if (!this.contains(S.anchorNode)) {
+		S.selectAllChildren(this);
 		S.collapseToEnd();
 	}
 }
 
-async function onContentFieldKeydown($e) {
-	const e = $e.originalEvent ?? $e;
-	if (e.target.getAttribute("contenteditable") !== "plaintext-only") return;
+async function onContentFieldKeydown(this: HTMLElement, e: KeyboardEvent) {
+	if (this.getAttribute("contenteditable") !== "plaintext-only") return;
 	e.stopPropagation();
 	if (e.key === "Enter") {
 		e.preventDefault();
-		submitContent(e.target);
+		submitContent(this);
 		return;
 	} else if (e.key === "Escape") {
 		e.preventDefault();
-		cancelContent(e.target);
+		cancelContent(this);
 		S.removeAllRanges();
 		return;
 	} else if (e.key === "Tab") {
 		e.preventDefault();
 		if (!S.isCollapsed) return;
-		if (S.anchorNode.nodeType !== Node.TEXT_NODE) return;
-		const text = e.target.textContent.substring(0, S.anchorOffset);
+		if (!(S.anchorNode instanceof Text)) return;
+		const text = this.textContent.substring(0, S.anchorOffset);
 		const cmd = text.match(/\]([^\]]*)\]$/)?.[1];
 		if (cmd == undefined || !Object.hasOwn(SYMBOLS, cmd)) {
 			showWarning("잘못된 기호 명령어입니다.");
@@ -247,20 +244,19 @@ async function onContentFieldKeydown($e) {
 		S.addRange(range);
 		S.collapseToEnd();
 
-		e.target.normalize();
-		onContentFieldInput(e);
+		this.normalize();
+		onContentFieldInput.call(this);
 		return;
 	}
 }
 
-async function onContentFieldInput($e) {
-	const e = $e.originalEvent ?? $e;
-	e.target.classList.add("log1-edited");
+async function onContentFieldInput(this: HTMLElement) {
+	this.classList.add("log1-edited");
 }
 
-async function submitContent(target) {
-	const id = parseInt(target.parentElement.getAttribute("data-id"));
-	if (target.getAttribute("contenteditable") !== "plaintext-only") return;
+async function submitContent(target: HTMLElement): Promise<boolean> {
+	const id = parseInt((target.parentElement as HTMLElement).getAttribute("data-id") as string);
+	if (target.getAttribute("contenteditable") !== "plaintext-only") return false;
 	target.classList.remove("log1-edited");
 	target.removeAttribute("contenteditable");
 	const content = target.textContent;
@@ -273,14 +269,14 @@ async function submitContent(target) {
 	}
 }
 
-async function cancelContent(target) {
-	const id = parseInt(target.parentElement.getAttribute("data-id"));
-	if (target.getAttribute("contenteditable") !== "plaintext-only") return;
+async function cancelContent(target: HTMLElement): Promise<boolean> {
+	const id = parseInt((target.parentElement as HTMLElement).getAttribute("data-id") as string);
+	if (target.getAttribute("contenteditable") !== "plaintext-only") return false;
 	target.classList.remove("log1-edited");
 	target.removeAttribute("contenteditable");
 	try {
-		const data = await sendPatch({id: id}, true);
-		target.textContent = data.content;
+		const data = await sendPatch({id: id}, true) as EntryRow;
+		target.textContent = data.content as string;
 		return true;
 	} catch (e) {
 		alert(`오류: ${e}`);

@@ -1,19 +1,30 @@
-import { seri, deseri, getColor } from "../../shared/posts/seri.js";
-import { $ } from "../jquery.js";
+import { seri, deseri, getColor, SeriData } from "../../shared/posts/seri.js";
 import { k2e } from "../k2e.js";
 import { SERI_HOOKS, DESERI_HOOKS } from "./script.js";
 import { showWarning } from "./dialog.js";
+import { $ } from "../jquery.js";
 
-const S = window.getSelection();
-let undoBuffer = [];
-let redoBuffer = [];
+type Affected = {
+	node: Text | Element,
+	startOffset?: number,
+	endOffset?: number
+};
+type AffectedWithFormats  = Affected & {
+	formats: string[],
+	on: boolean,
+	zero: boolean
+};
+
+const S = window.getSelection() as Selection;
+let undoBuffer: SeriData[] = [];
+let redoBuffer: SeriData[] = [];
 
 function clearHistory() {
 	undoBuffer = [];
 	redoBuffer = [];
 }
 
-export function inlineCommands(shortcut, e) {
+export function inlineCommands(this: Element, shortcut: boolean, e: KeyboardEvent) {
 	if (shortcut) {
 		let command = null;
 		if (e.key === "b") command = "strong";
@@ -31,19 +42,19 @@ export function inlineCommands(shortcut, e) {
 		
 		if (command === "undo") {
 			if (undoBuffer.length === 0) return false;
-			redoBuffer.push(seri(e.target, true, SERI_HOOKS));
-			e.target.innerHTML = deseri(undoBuffer.pop(), window.location.pathname, true, DESERI_HOOKS);
+			redoBuffer.push(seri(this, true, SERI_HOOKS) as SeriData);
+			this.innerHTML = deseri(undoBuffer.pop() as SeriData, window.location.pathname, true, DESERI_HOOKS) as string;
 			e.preventDefault();
 			return true;
 		} else if (command === "redo") {
 			if (redoBuffer.length === 0) return false;
-			undoBuffer.push(seri(e.target, true, SERI_HOOKS));
-			e.target.innerHTML = deseri(redoBuffer.pop(), window.location.pathname, true, DESERI_HOOKS);
+			undoBuffer.push(seri(this, true, SERI_HOOKS) as SeriData);
+			this.innerHTML = deseri(redoBuffer.pop() as SeriData, window.location.pathname, true, DESERI_HOOKS) as string;
 			e.preventDefault();
 			return true;
 		}
 		try {
-			runCommand(e, command);
+			runCommand.call(this, e, command);
 		} catch (e) {
 			if (e !== -1) throw e;
 			return false;
@@ -52,7 +63,7 @@ export function inlineCommands(shortcut, e) {
 	}
 	if (e.key === "Tab") {
 		try {
-			tabCommand(e);
+			tabCommand.call(this, e);
 		} catch (e) {
 			if (e !== -1) throw e;
 			return false;
@@ -63,20 +74,21 @@ export function inlineCommands(shortcut, e) {
 	return false;
 }
 
-function runCommand(e, command) {
+function runCommand(this: Element, e: KeyboardEvent, command: string) {
 	const range = S.getRangeAt(0);
 	if (range.collapsed) throw -1;
 
 	e.preventDefault();
-	undoBuffer.push(seri(e.target, true, SERI_HOOKS));
+	undoBuffer.push(seri(this, true, SERI_HOOKS) as SeriData);
 
-	$(e.target).find('.select-marker:not(.tab-select-marker)').remove();
+	$('.select-marker:not(.tab-select-marker)', this).remove();
 	
-	const affected = collectAffected(range, e.target);
-	const allOn = annotateFormats(affected, e.target, command);
+	const affected = collectAffected(range, this);
+	const allOn = annotateFormats(affected, this, command);
 
-	const startMarker = insertMarker(affected, e.target);
-	const applied = applyCommand(affected, command, allOn);
+	const annotated = affected as AffectedWithFormats[];
+	const startMarker = insertMarker(annotated, this);
+	const applied = applyCommand(annotated, command, allOn);
 	const endMarker = document.createElement("span");
 	endMarker.classList.add("select-marker");
 
@@ -84,36 +96,36 @@ function runCommand(e, command) {
 	startMarker.after(applied);
 
 	returnToMarker(startMarker, endMarker)
-	normalizeEditable(e.target);
+	normalizeEditable(this);
 }
 
-function collectAffected(range, root) {
-	function ascendEdge(affected, idx, root, prev, forgive) {
+function collectAffected(range: Range, root: Element): Affected[] {
+	function ascendEdge(idx: number, prev: boolean, forgive: boolean) {
 		let node = affected[idx].node;
 		const key = prev ? "previousSibling" : "nextSibling";
-		while (node != root && node.parentElement) {
+		while (node !== root && node.parentElement) {
 			if (toCommand(node) === 'keep') {
 				if (!forgive) {
 					showWarning("부분적 서식 적용이 불가합니다.");
 					throw -1;
 				}
-				affected[idx] = {node: node};
+				affected[idx] = {node: node as Element};
 			};
 			if (node[key]) forgive = false;
 			node = node.parentElement;
 		}
 	}
 	
-	const affected = [];
+	const affected: Affected[] = [];
 	let cur = null;
-	if (range.startContainer.nodeType === Node.TEXT_NODE) {
+	if (range.startContainer instanceof Text) {
 		cur = range.startContainer;
 		affected.push({node: cur, startOffset: range.startOffset});
 	} else {
-		cur = descendRight(range.startContainer, range.startOffset);
+		cur = descendRight(range.startContainer, range.startOffset) as Text;
 		affected.push({node: cur});
 	}
-	ascendEdge(affected, 0, root, true, range.startContainer.nodeType !== Node.TEXT_NODE || range.startOffset === 0);
+	ascendEdge(0, true, range.startContainer.nodeType !== Node.TEXT_NODE || range.startOffset === 0);
 
 	cur = descendRight(nextNode(affected[0].node));
 	while (cur !== null && range.intersectsNode(cur)) {
@@ -121,53 +133,55 @@ function collectAffected(range, root) {
 		cur = descendRight(nextNode(cur));
 	}
 
-	if (range.endContainer.nodeType === Node.TEXT_NODE) {
+	if (range.endContainer instanceof Text) {
 		const startOffset = affected.pop()?.startOffset;
 		if (startOffset) {
 			affected.push({node: range.endContainer, startOffset: startOffset, endOffset: range.endOffset});
 		} else affected.push({node: range.endContainer, endOffset: range.endOffset});
 	}
-	ascendEdge(affected, affected.length - 1, root, false, range.endContainer.nodeType !== Node.TEXT_NODE || range.endOffset === range.endContainer.textContent.length);
+	ascendEdge(affected.length - 1, false, range.endContainer.nodeType !== Node.TEXT_NODE || range.endOffset === range.endContainer.textContent?.length);
 
 	return affected;
 }
 
-function annotateFormats(affected, root, command) {
+function annotateFormats(affected: Affected[], root: Element, command: string): boolean {
 	let allOn = true;
-	for (const e of affected) {
-		if ((e.startOffset !== undefined && e.startOffset === e.node.textContent.length) || e.endOffset === 0) {
+	const annotated = affected as AffectedWithFormats[];
+	for (const e of annotated) {
+		if ((e.startOffset !== undefined && e.startOffset === e.node.textContent?.length) || e.endOffset === 0) {
 			e.zero = true;
 			continue;
 		}
-		let node = e.node.parentNode;
 		e.on = false;
-		if (node.nodeType !== Node.ELEMENT_NODE) continue;
-
+		const node = e.node.parentNode;
+		if (!(node instanceof Element)) continue;
+		let nodeEl: Element = node;
+	
 		e.formats = [];
-		while (node != root) {
-			const cmd = toCommand(node);
+		while (nodeEl !== root) {
+			const cmd = toCommand(nodeEl);
 			if (cmd === command) e.on = true;
 			if (cmd === 'keep') {
 				showWarning("부분적 서식 적용이 불가합니다.");
 				throw -1;
 			}
 			e.formats.push(cmd);
-			node = node.parentElement;
+			nodeEl = nodeEl.parentElement as HTMLElement;
 		}
 		if (!e.on) allOn = false;
 	}
 
-	if (command === 'a' && affected.length !== 1) return true;
+	if (command === 'a' && annotated.length !== 1) return true;
 	return allOn;
 }
 
-function insertMarker(affected, root) {
+function insertMarker(affected: AffectedWithFormats[], root: Element): HTMLSpanElement {
 	const range = document.createRange();
 	const last = affected[affected.length-1];
 
 	if (last.endOffset !== undefined) range.setStart(last.node, last.endOffset);
 	else range.setStartAfter(last.node);
-	range.setEndAfter(root.lastChild);
+	range.setEndAfter(root.lastChild as Node);
 	const extracted = range.extractContents();
 
 	const marker = document.createElement("span");
@@ -178,7 +192,7 @@ function insertMarker(affected, root) {
 	return marker;
 }
 
-function applyCommand(affected, command, allOn) {
+function applyCommand(affected: AffectedWithFormats[], command: string, allOn: boolean): DocumentFragment {
 	const result = document.createDocumentFragment();
 
 	for (const e of affected) {
@@ -203,7 +217,7 @@ function applyCommand(affected, command, allOn) {
 				el.remove();
 				el = newElement;
 			} else if (allOn && el.nodeName === 'A') {
-				const link = el.getAttribute("href");
+				const link = (el as Element).getAttribute("href");
 				const display = document.createDocumentFragment();
 				display.append(...el.childNodes);
 				if (display.childNodes.length === 1 && display.textContent === link) {
@@ -212,7 +226,7 @@ function applyCommand(affected, command, allOn) {
 				} else {
 					display.prepend(`${link}|`);
 					el.remove();
-					el = display;
+					el = display as unknown as Element; // trust me bro
 				}
 			}
 		}
@@ -237,19 +251,19 @@ function applyCommand(affected, command, allOn) {
 	return result;
 }
 
-function nextNode(node) {
+function nextNode(node: Node | null): Node | null {
 	if (node === null) return null;
 	return node.nextSibling ?? nextNode(node.parentNode);
 }
 
-function descendRight(node, offset = undefined) {
+function descendRight(node: Node | null, offset: number | undefined = undefined): Text | Element | null {
 	if (node === null) return null;
 	if (offset !== undefined) {
-		if (node.childNodes[offset] === undefined) node = nextNode(node);
-		node = node.childNodes[offset];
+		if (node.childNodes[offset] === undefined) node = nextNode(node) as Node;
+		node = node.childNodes[offset] ?? null;
 	}
-	while (node.nodeType !== Node.TEXT_NODE) {
-		if (toCommand(node) === 'keep') return node;
+	while (node !== null && !(node instanceof Text)) {
+		if (toCommand(node as Element) === 'keep') return node as Element;
 		if (node.firstChild === null) node = nextNode(node);
 		if (node === null) return null;
 		if (node.firstChild !== null) node = node.firstChild;
@@ -257,9 +271,9 @@ function descendRight(node, offset = undefined) {
 	return node;
 }
 
-const SYMBOLS = {".": "·", "st": "★"};
+const SYMBOLS: Record<string,string> = {".": "·", "st": "★"};
 
-function tabCommand(e) {
+function tabCommand(this: Element, e: KeyboardEvent) {
 	if (
 		!S.rangeCount ||
 		(S.anchorNode == S.focusNode &&
@@ -273,9 +287,9 @@ function tabCommand(e) {
 		throw -1;
 	}
 
-	undoBuffer.push(seri(e.target, true, SERI_HOOKS));
+	undoBuffer.push(seri(this, true, SERI_HOOKS) as SeriData);
 
-	const cdata = findCloseBracket(e.target);
+	const cdata = findCloseBracket(this);
 	const closeTextNode = cdata.text;
 	const closeFlag = cdata.flag;
 	const closeFront = cdata.front;
@@ -297,13 +311,13 @@ function tabCommand(e) {
 		const { startMarker, endMarker } = markCursor();
 
 		range.insertNode(document.createTextNode(SYMBOLS[cmd]));
-		normalizeEditable(e.target);
+		normalizeEditable(this);
 		returnToMarker(startMarker, endMarker);
 		e.preventDefault();
 		return;
 	}
 
-	const odata = findOpenBracket(closeTextNode, e.target);
+	const odata = findOpenBracket(closeTextNode, this);
 	const openTextNode = odata.text;
 	const openFlag = odata.flag;
 
@@ -317,13 +331,13 @@ function tabCommand(e) {
 	else if (cmd === "d") command = "del";
 	else if (cmd === "e") command = "ins";
 	else if (cmd === "s") command = "s";
-	else if (0 <= cmd && cmd <= 10) command = `color${cmd}`; // cursed JS moment
+	else if (0 <= parseInt(cmd) && parseInt(cmd) <= 10) command = `color${cmd}`; // goodbye cursed JS moment
 	else if (cmd.startsWith("cb")) {
 		const color = cmd.substring(2);
-		if (0 <= color && color <= 10) command = `colorbox${color}`;
+		if (0 <= parseInt(color) && parseInt(color) <= 10) command = `colorbox${color}`;
 	}
 	else if (cmd === "a" || cmd == "k") command = "a";
-	else {
+	if (command === null) {
 		showWarning("올바르지 않은 탭 명령어입니다.");
 		throw -1;
 	}
@@ -349,15 +363,15 @@ function tabCommand(e) {
 	S.removeAllRanges();
 	S.addRange(range);
 
-	runCommand(e, command);
+	runCommand.call(this, e, command);
 	returnToMarker(startMarker, endMarker);
 }
 
-function findCloseBracket(root) {
-	let cur = S.anchorNode;
-	let cmd = null, flag = 0;
+function findCloseBracket(root: Element): {text: Text, cmd: string, flag: number, front: number} {
+	let cur = S.anchorNode as Text | Element | null;
+	let cmd: string | null = null, flag = 0;
 	let front = 0;
-	if (cur.nodeType !== Node.TEXT_NODE) {
+	if (!(cur instanceof Text)) {
 		cur = descendLeft(cur, S.anchorOffset);
 	} else if (S.anchorOffset === 0) {
 		cur = descendLeft(prevNode(cur));
@@ -365,24 +379,24 @@ function findCloseBracket(root) {
 		if (S.anchorOffset === 1) throw -1;
 		const text = cur.textContent.substring(0, S.anchorOffset).split(']');
 		if (text.length < 3) throw -1;
-		cmd = k2e(text.at(-2)).toLowerCase();
+		cmd = k2e(text.at(-2) as string).toLowerCase();
 		if (cmd.length === 0) throw -1;
 		flag = 2;
-		front = text.at(-1).length;
+		front = (text.at(-1) as string).length;
 	}
-	while (!flag && cur) {
+	while (!flag && (cur instanceof Text)) {
 		const text = cur.textContent.split(']');
 		if (text.length < 3) {
 			cur = descendLeft(prevNode(cur));
 			if (!root.contains(cur)) throw -1;
 			continue;
 		}
-		cmd = k2e(text.at(-2)).toLowerCase();
+		cmd = k2e(text.at(-2) as string).toLowerCase();
 		if (cmd.length === 0) throw -1;
 		flag = 1;
-		front = text.at(-1).length;
+		front = (text.at(-1) as string).length;
 	}
-	if (cmd === null) throw -1;
+	if (!(cur instanceof Text) || cmd === null) throw -1;
 
 	return {
 		text: cur,
@@ -392,35 +406,35 @@ function findCloseBracket(root) {
 	};
 }
 
-function findOpenBracket(closeText, root) {
-	let cur = closeText;
+function findOpenBracket(closeText: Text, root: Element): {text: Text, flag: number} {
+	let cur: Text | Element | null = closeText;
 	let flag = 1;
-	while (cur) {
+	while (cur instanceof Text) {
 		if (cur.textContent.includes("[")) break;
 		cur = descendLeft(prevNode(cur));
 		if (!root.contains(cur)) throw -1;
 		flag = 0;
 	}
-	if (!cur || !cur.textContent.includes("[")) throw -1;
+	if (!(cur instanceof Text) || !cur.textContent.includes("[")) throw -1;
 	return {
 		text: cur,
 		flag: flag
 	};
 }
 
-function prevNode(node) {
+function prevNode(node: Node | null): Node | null {
 	if (node === null) return null;
 	return node.previousSibling ?? prevNode(node.parentNode);
 }
 
-function descendLeft(node, offset = undefined) {
+function descendLeft(node: Node | null, offset: number | undefined = undefined): Text | Element | null {
 	if (node === null) return null;
 	if (offset !== undefined) {
-		if (offset === 0 || node.childNodes[offset-1] === undefined) node = prevNode(node);
+		if (offset === 0 || node.childNodes[offset-1] === undefined) node = prevNode(node) as Node;
 		node = node.childNodes[offset-1];
 	}
-	while (node.nodeType !== Node.TEXT_NODE) {
-		if (toCommand(node) === 'keep') return node;
+	while (node !== null && !(node instanceof Text)) {
+		if (toCommand(node as Element) === 'keep') return node as Element;
 		if (node.lastChild === null) node = prevNode(node);
 		if (node === null) return null;
 		if (node.lastChild !== null) node = node.lastChild;
@@ -428,7 +442,7 @@ function descendLeft(node, offset = undefined) {
 	return node;
 }
 
-function markCursor() {
+function markCursor(): {startMarker: HTMLSpanElement, endMarker: HTMLSpanElement} {
 	const startMarker = document.createElement("span");
 	startMarker.classList.add("select-marker", "tab-select-marker");
 	const endMarker = document.createElement("span");
@@ -443,7 +457,7 @@ function markCursor() {
 	};
 }
 
-function returnToMarker(startMarker, endMarker) {
+function returnToMarker(startMarker: Node, endMarker: Node) {
 	const cursor = document.createRange();
 	cursor.setStartAfter(startMarker);
 	cursor.setEndBefore(endMarker);
@@ -451,19 +465,19 @@ function returnToMarker(startMarker, endMarker) {
 	S.addRange(cursor);
 }
 
-function normalizeEditable(el) {
+function normalizeEditable(el: Element) {
 	if (el.classList.contains("select-marker")) return;
 
 	let cur = el.firstChild;
 
-	function removeNode(n) {
+	function removeNode(n: Node) {
 		const next = n.nextSibling;
 		el.removeChild(n);
 		return next;
 	}
 
 	while (cur !== null) {
-		if (cur.nodeType === Node.TEXT_NODE) {
+		if (cur instanceof Text) {
 			if (
 				cur.textContent === '' ||
 				(cur.textContent === '\n' &&
@@ -474,7 +488,7 @@ function normalizeEditable(el) {
 				continue;
 			}
 			const prev = cur.previousSibling;
-			if (prev !== null && prev.nodeType === Node.TEXT_NODE) {
+			if (prev !== null && prev instanceof Text) {
 				prev.textContent += cur.textContent;
 				cur = removeNode(cur);
 				continue;
@@ -482,15 +496,14 @@ function normalizeEditable(el) {
 			cur = cur.nextSibling;
 			continue;
 		}
-		if (cur.nodeType !== Node.ELEMENT_NODE || toCommand(cur) === 'keep') {
+		if (!(cur instanceof Element) || toCommand(cur) === 'keep') {
 			cur = cur.nextSibling;
 			continue;
 		}
 		normalizeEditable(cur);
 		const prev = cur.previousSibling;
 		if (
-			prev !== null &&
-			prev.nodeType === Node.ELEMENT_NODE &&
+			prev instanceof Element &&
 			toCommand(prev) === toCommand(cur)
 		) {
 			while (cur.firstChild) prev.appendChild(cur.firstChild);
@@ -505,8 +518,8 @@ function normalizeEditable(el) {
 	el.normalize();
 }
 
-function toCommand(node) {
-	if (node.nodeType === Node.TEXT_NODE) return 'text';
+function toCommand(node: Text | Element): string {
+	if (node instanceof Text) return 'text';
 	if (node.tagName === "SPAN") {
 		if (node.classList.contains('color')) {
 			return `color${getColor(node.classList)}`;
@@ -520,7 +533,7 @@ function toCommand(node) {
 	return node.tagName.toLowerCase();
 }
 
-function toElement(cmd) {
+function toElement(cmd: string): Element {
 	if (cmd === 'keep') {
 		showWarning("부분적 서식 적용이 불가합니다.");
 		throw -1;
@@ -538,18 +551,18 @@ function toElement(cmd) {
 	return document.createElement(cmd);
 }
 
-export function inlineCleanup(target) {
+export function inlineCleanup(target: Element) {
 	if (target.innerHTML === '<br>' || target.innerHTML === '\n') target.innerHTML = '';
-	const remove = target.querySelectorAll("font, span:not(.color, .colorbox, .select-marker)");
-	if (remove.length !== 0) {
+	const remove = $("font, span:not(.color, .colorbox, .select-marker)", target);
+	if (remove.exists) {
 		const { startMarker, endMarker } = markCursor();
-		for (const e of remove) e.replaceWith(...e.childNodes);
+		for (const e of remove.list) e.replaceWith(...e.childNodes);
 		returnToMarker(startMarker, endMarker);
 	}
 }
 
-export function blurCleanup(target) {
-	$(target).find('.select-marker').remove();
+export function blurCleanup(target: Element) {
+	$('.select-marker', target).remove();
 	normalizeEditable(target);
 	clearHistory();
 }

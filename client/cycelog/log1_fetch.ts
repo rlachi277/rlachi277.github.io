@@ -1,21 +1,23 @@
-export async function sendPatch(body, getData = false) {
+import { EntryRow } from "../../script/cycelog/cycelog.js";
+
+export async function sendPatch(body: EntryRow, getData: boolean = false): Promise<EntryRow | void> {
 	const res = await fetch(window.location.href, {
 		method: "PATCH",
 		headers: {'Content-type': 'application/json'},
 		body: JSON.stringify(body)
 	});
 	if (!res.ok) throw res.status;
-	if (!getData) return undefined;
+	if (!getData) return;
 	return await res.json();
 }
 
-export async function sendExists(id) {
+export async function sendExists(id: number): Promise<boolean> {
 	const res = await fetch(`./exists/${id}`);
 	if (!res.ok) throw res.status;
 	return await res.json();
 }
 
-export async function sendDelete(id) {
+export async function sendDelete(id: number) {
 	const res = await fetch(window.location.href, {
 		method: "DELETE",
 		headers: {'Content-type': 'application/json'},
@@ -24,7 +26,7 @@ export async function sendDelete(id) {
 	if (!res.ok) throw res.status;
 }
 
-export async function sendMove(startId, endId, delta) {
+export async function sendMove(startId: number, endId: number, delta: number) {
 	const res = await fetch(`${window.location.origin}${window.location.pathname}/move`, {
 		method: "POST",
 		headers: {'Content-type': 'application/json'},

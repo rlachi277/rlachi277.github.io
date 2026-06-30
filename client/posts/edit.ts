@@ -1,6 +1,6 @@
 import { seri, deseri } from "../../shared/posts/seri.js";
 import { SERI_HOOKS, DESERI_HOOKS } from "./script.js";
-import { q$, $ } from "../jquery.js";
+import { $, q$n } from "../jquery.js";
 import {
 	inlineCommands,
 	inlineCleanup,
@@ -8,15 +8,13 @@ import {
 } from "./edit_inline.js";
 import { showWarning } from "./dialog.js";
 
-const EDIT_TYPE = Object.freeze({
-	DETAILS: 6,
-	LIST: 5,
-	LI: 4,
-	EDITABLE: 3,
-	CONTAINER: 2,
-	UNIT: 1,
-	NONE: 0
-});
+enum EDIT_TYPE {
+	NONE, UNIT, CONTAINER, EDITABLE, LI, LIST, DETAILS
+}
+
+export type TargetHandler = (after: Element, isFirst: boolean) => boolean;
+
+export type ElementFactory = (after: Element, isFirst: boolean) => Element | null;
 
 const EDITABLES = new Set([
 	"H1", "H2", "H3", "H4", "H5", "H6",
@@ -35,34 +33,27 @@ const UNITS = new Set([
 	"TRACK", "SOURCE", "NAV"
 ]);
 
-let editing = false;
-let editCnt = null;
-let positionMap = null;
-let positionStack = [];
-let originalMap = null;
+let editing: boolean = false;
+let editCnt: number = 0;
+let positionMap: WeakMap<Element,number[]> = new WeakMap();
+let positionStack: number[] = [];
+let originalMap: WeakMap<Element,string> = new WeakMap();
 
-export function startEdit(el, init = false) {
+export function startEdit(el: Node, init = false): boolean {
 	if (init) {
 		if (editing) stopEdit();
-		editing = true; editCnt = 0;
-		positionStack = [];
-		positionMap = new WeakMap();
-		originalMap = new WeakMap();
+		editing = true;
 		window.addEventListener("beforeunload", beforeUnload);
-	} else if (!editing) return null;
+	} else if (!editing) return false;
 
-	if (el.nodeType === Node.TEXT_NODE) {
-		if (/^\n\s*$/.test(el.textContent)) return null;
-		return false;
-	}
-	if (el.nodeName.startsWith("#")) return null;
-	if (el.classList.contains("new")) return null;
+	if (!(el instanceof Element)) return false;
+	if (el.classList.contains("new")) return false;
 
 	let type = getEditType(el);
-	if (type === null) return null;
+	if (type === null) return false;
 	if (el.nodeName === "FIELDSET" && el.matches("fieldset:has(> legend)")) type = EDIT_TYPE.DETAILS;
 	if (el.nodeName === "FIELDSET" && el.getAttribute("data-old") !== null) {
-		el.querySelectorAll(".container-bar, .middle-bar").forEach((e) => e.remove());
+		$(".container-bar, .middle-bar", el).remove();
 		el.removeAttribute("data-old");
 	}
 	type = applyEditType(el, type);
@@ -78,19 +69,20 @@ export function startEdit(el, init = false) {
 	if (type === EDIT_TYPE.EDITABLE) {
 		originalMap.set(el, JSON.stringify(seri(el, true, SERI_HOOKS)));
 		if (el.getAttribute("data-id") === null) {
-			el.setAttribute("data-id", editCnt++);
-			el.setAttribute("contenteditable", "plaintext-only");
-			el.addEventListener("click", onEditableClick);
-			el.addEventListener("keydown", onEditableKeydown);
-			el.addEventListener("input", onEditableInput);
-			el.addEventListener("blur", onEditableBlur);
+			const htmlEl = el as HTMLElement;
+			htmlEl.setAttribute("data-id", (editCnt++).toString());
+			htmlEl.setAttribute("contenteditable", "plaintext-only");
+			htmlEl.addEventListener("click", onEditableClick);
+			htmlEl.addEventListener("keydown", onEditableKeydown);
+			htmlEl.addEventListener("input", onEditableInput);
+			htmlEl.addEventListener("blur", onEditableBlur);
 		}
 	}
 
 	return true;
 }
 
-function getEditType(el) {
+function getEditType(el: Element): EDIT_TYPE | null {
 	switch (el.nodeName) {
 	case 'BODY':
 		return EDIT_TYPE.NONE;
@@ -112,11 +104,10 @@ function getEditType(el) {
 			} else return null;
 		}
 	}
-	return null;
 }
 
-function applyEditType(el, type) {
-	function markContainer(el, first, last) {
+function applyEditType(el: Element, type: EDIT_TYPE): EDIT_TYPE {
+	function markContainer(el: Element, first: boolean, last: boolean) {
 		el.classList.add("container");
 		if (first) {
 			const fbar = document.createElement("span");
@@ -151,13 +142,13 @@ function applyEditType(el, type) {
 		}
 		else if (type === EDIT_TYPE.UNIT && !el.closest(".unit")) el.classList.add("unit");
 	}
-	el.setAttribute("data-old", true);
+	el.setAttribute("data-old", "");
 	return type;
 }
 
 export function stopEdit() {
 	submitAll();
-	q$(".editable").forEach((e) => {
+	$(".editable").each((e) => {
 		e.removeAttribute("data-id");
 		e.removeAttribute("data-old");
 		e.removeAttribute("contenteditable");
@@ -167,25 +158,29 @@ export function stopEdit() {
 		e.removeEventListener("blur", onEditableBlur);
 		e.classList.remove("editable");
 	});
-	q$(".unit").forEach((e) => {
+	$(".unit").each((e) => {
 		e.removeAttribute("data-old");
 		e.classList.remove("unit");
 	});
-	q$(".container").forEach((e) => {
+	$(".container").each((e) => {
 		e.removeAttribute("data-old");
 		e.classList.remove("container");
 	})
 	$(".container-bar").remove();
 	editing = false;
-	editCnt = positionMap = originalMap = null;
+	editCnt = 0;
+	positionMap = new WeakMap();
+	originalMap = new WeakMap();
 	positionStack = [];
 	window.removeEventListener("beforeunload", beforeUnload);
 }
 
-function onEditableClick(e) {
+function onEditableClick(e: PointerEvent) {
 	const shortcut = e.ctrlKey || e.metaKey;
 	if (!shortcut) return;
-	const target = e.target.nodeType === Node.TEXT_NODE ? e.target.parentElement : e.target;
+	if (!(e.target instanceof Text || e.target instanceof Element)) return;
+	const target = e.target instanceof Text ? e.target.parentElement : e.target;
+	if (target === null) return;
 	const link = target.closest("a");
 	if (link === null) return;
 	e.preventDefault();
@@ -201,34 +196,34 @@ function onEditableClick(e) {
 	else window.open(url, "_self", "noopener");
 }
 
-function onEditableKeydown(e) {
+function onEditableKeydown(this: HTMLElement, e: KeyboardEvent) {
 	if (e.isComposing) return;
 	const shortcut = e.ctrlKey || e.metaKey;
 	if (e.key === "Enter" && !e.shiftKey) {
 		e.preventDefault();
-		handleSubmitKey(e.target);
+		handleSubmitKey(this);
 		return;
 	} else if (e.key === "Escape") {
 		e.preventDefault();
-		handleCancelKey(e.target);
+		handleCancelKey(this);
 		return;
 	} else if (shortcut && e.key == "Backspace") {
 		e.preventDefault();
-		handlePDeleteKey(e.target);
+		handlePDeleteKey(this);
 		return;
 	} else if (shortcut && (e.key == "ArrowUp" || e.key == "ArrowDown") && !e.shiftKey) {
 		e.preventDefault();
-		handlePNavigateKey(e.target, e.key);
+		handlePNavigateKey(this, e.key);
 		return;
 	} else if (shortcut && (e.key == "ArrowUp" || e.key == "ArrowDown") && e.shiftKey) {
 		e.preventDefault();
-		handlePInsertKey(e.target, e.key);
+		handlePInsertKey(this, e.key);
 		return;
 	}
-	if (inlineCommands(shortcut, e)) onEditableInput(e);
+	if (inlineCommands.call(this, shortcut, e)) onEditableInput.call(this);
 }
 
-function handleSubmitKey(target) {
+function handleSubmitKey(target: HTMLElement) {
 	if (target.classList.contains("deleted")) {
 		submitDelete(target);
 		return;
@@ -240,14 +235,14 @@ function handleSubmitKey(target) {
 	submitChanges(target);
 }
 
-function handleCancelKey(target) {
+function handleCancelKey(target: HTMLElement) {
 	if (target.classList.contains("deleted")) {
 		target.classList.remove("deleted");
 		return;
 	} else if (target.classList.contains("new")) {
-		const successor = (target.previousSibling?.matches(".editable")) ?
-		target.previousSibling :
-		(target.nextSibling?.matches(".editable") ? target.nextSibling : null);
+		const successor = ((target.previousElementSibling?.matches(".editable")) ?
+		target.previousElementSibling :
+		(target.nextElementSibling?.matches(".editable") ? target.nextElementSibling : null)) as HTMLElement;
 
 		target.remove();
 		
@@ -255,14 +250,14 @@ function handleCancelKey(target) {
 		regainFocus(successor);
 	}
 	if (!manageConfirm(target, "will-cancel", "will-submit")) return;
-	target.innerHTML = deseri(JSON.parse(originalMap.get(target)), window.location.pathname, true, DESERI_HOOKS);
+	target.innerHTML = deseri(JSON.parse(originalMap.get(target) as string), window.location.pathname, true, DESERI_HOOKS) ?? "";
 	target.blur();
 }
 
-function manageConfirm(el, confirmClass, stopClass) {
+function manageConfirm(el: HTMLElement, confirmClass: string, stopClass: string): boolean {
 	if (el.classList.contains(confirmClass)) return true;
 
-	if ($(`.${stopClass}`).length !== 0) {
+	if ($(`.${stopClass}`).exists) {
 		$(`.${stopClass}`).removeClass(stopClass);
 		return false;
 	}
@@ -273,14 +268,14 @@ function manageConfirm(el, confirmClass, stopClass) {
 	return false;
 }
 
-function handlePDeleteKey(target) {
+function handlePDeleteKey(target: HTMLElement) {
 	if (!target.matches("p:not(hgroup p)")) return;
 	target.classList.add("deleted");
 }
 
-function handlePNavigateKey(target, key) {
+function handlePNavigateKey(target: HTMLElement, key: string) {
 	if (!target.matches("p:not(hgroup p)")) return;
-	const sibling = (key === "ArrowUp") ? "previousSibling" : "nextSibling";
+	const sibling = (key === "ArrowUp") ? "previousElementSibling" : "nextElementSibling";
 	if (!target[sibling]?.matches("p:not(hgroup p)")) return;
 	
 	target.blur();
@@ -288,10 +283,10 @@ function handlePNavigateKey(target, key) {
 		if (target.classList.contains("new")) submitNew(target);
 		else if (target.classList.contains("edited")) submitChanges(target);
 	}
-	target[sibling].focus();
+	(target[sibling] as HTMLElement).focus();
 }
 
-function handlePInsertKey(target, key) {
+function handlePInsertKey(target: HTMLElement, key: string) {
 	if (!target.matches("p:not(hgroup p)")) return;
 
 	const newP = document.createElement("p");
@@ -305,22 +300,22 @@ function handlePInsertKey(target, key) {
 	target.insertAdjacentElement(pos, newP);
 }
 
-function onEditableInput(e) {
-	e.target.classList.add("edited");
-	inlineCleanup(e.target);
+function onEditableInput(this: HTMLElement) {
+	this.classList.add("edited");
+	inlineCleanup(this);
 }
 
-function onEditableBlur(e) {
+function onEditableBlur(this: HTMLElement) {
 	$(".will-submit").removeClass("will-submit");
 	$(".will-cancel").removeClass("will-cancel");
-	inlineCleanup(e.target);
-	blurCleanup(e.target);
-	if (JSON.stringify(seri(e.target, true, SERI_HOOKS)) === originalMap.get(e.target)) {
-		e.target.classList.remove("edited");
+	inlineCleanup(this);
+	blurCleanup(this);
+	if (JSON.stringify(seri(this, true, SERI_HOOKS)) === originalMap.get(this)) {
+		this.classList.remove("edited");
 	}
 }
 
-function submit(el, makeData, splice) {
+function submit(el: HTMLElement, makeData: boolean, splice: number) {
 	el.innerHTML = el.innerHTML.replaceAll("\n", "<br>");
 	if (el.lastChild?.nodeName === "BR") el.removeChild(el.lastChild);
 	(document.activeElement as HTMLElement | null)?.blur();
@@ -336,22 +331,22 @@ function submit(el, makeData, splice) {
 	originalMap.set(el, JSON.stringify(data));
 }
 
-const S = window.getSelection();
+const S = window.getSelection() as Selection;
 
-function submitChanges(el) {
+function submitChanges(el: HTMLElement) {
 	submit(el, true, 1);
 	el.classList.remove("edited");
 	regainFocus(el);
 }
 
-function submitDelete(el) {
+function submitDelete(el: HTMLElement) {
 	submit(el, false, 1);
-	const parent = el.parentElement;
-	positionStack = Array.from(positionMap.get(parent));
+	const parent = el.parentElement as Element;
+	positionStack = Array.from(positionMap.get(parent) as number[]);
 
-	const successor = (el.previousSibling?.matches(".editable")) ?
-		el.previousSibling :
-		(el.nextSibling?.matches(".editable") ? el.nextSibling : null);
+	const successor = ((el.previousElementSibling?.matches(".editable")) ?
+		el.previousElementSibling :
+		(el.nextElementSibling?.matches(".editable") ? el.nextElementSibling : null)) as HTMLElement;
 
 	el.remove();
 	startEdit(parent);
@@ -360,15 +355,15 @@ function submitDelete(el) {
 	regainFocus(successor);
 }
 
-function submitNew(el) {
+function submitNew(el: HTMLElement) {
 	el.classList.remove("new", "edited");
-	positionStack = Array.from(positionMap.get(el.parentElement));
-	startEdit(el.parentElement);
+	positionStack = Array.from(positionMap.get(el.parentElement as Element) as number[]);
+	startEdit(el.parentElement as Element);
 	submit(el, true, 0);
 	regainFocus(el);
 }
 
-function regainFocus(el) {
+function regainFocus(el: HTMLElement) {
 	el.focus();
 	const range = document.createRange();
 	range.selectNodeContents(el);
@@ -379,23 +374,23 @@ function regainFocus(el) {
 
 function submitAll() {
 	(document.activeElement as HTMLElement | null)?.blur();
-	q$(".edited").forEach((e) => submitChanges(e));
-	q$(".new").forEach((e) => submitNew(e));
+	$(".edited").each((e) => submitChanges(e));
+	$(".new").each((e) => submitNew(e));
 	// q$(".deleted").forEach((e) => submitDelete(e));
 }
 
-function beforeUnload(e) {
-	if ($(".edited").length != 0 || $(".new").length != 0) e.preventDefault();
+function beforeUnload(e: BeforeUnloadEvent) {
+	if ($(".edited").exists || $(".new").exists) e.preventDefault();
 }
 
-let targetingAbort = null;
+let targetingAbort: AbortController | null = null;
 
-export function startTargeting(f) {
+export function startTargeting(f: TargetHandler) {
 	if (targetingAbort !== null) stopTargeting();
 	document.body.classList.add("targeting");
 	targetingAbort = new AbortController();
 
-	$(".unit.editable").removeAttr("contenteditable");
+	$(".unit.editable").attr("contenteditable", null);
 	addTargetListeners("unit", f, false, false);
 	addTargetListeners("first-bar", f, true, true);
 	addTargetListeners("last-bar", f, true, false);
@@ -405,12 +400,12 @@ export function startTargeting(f) {
 	}, {signal: targetingAbort?.signal});
 }
 
-function addTargetListeners(cls, f, parent, isFirst) {
+function addTargetListeners(cls: string, f: TargetHandler, parent: boolean, isFirst: boolean) {
 	for (const el of document.getElementsByClassName(cls)) {
 		el.addEventListener("click", (e) => {
 			e.preventDefault();
 			(el as HTMLElement).blur();
-			const after = parent ? el.parentElement : el;
+			const after = parent ? (el.parentElement as Element) : el;
 			if (!f(after, isFirst)) return;
 			stopTargeting();
 		}, {signal: targetingAbort?.signal});
@@ -425,10 +420,10 @@ export function stopTargeting() {
 	(document.activeElement as HTMLElement | null)?.blur();
 }
 
-let newElementFactory = null;
-let newElementAddHeader = null;
-function insertElement(after, isFirst) {
-	if (after.nextSibling?.tagName === 'NAV') after = after.nextSibling;
+let newElementFactory: null | string | ElementFactory = null;
+let newElementAddHeader: null | boolean = null;
+function insertElement(after: Element, isFirst: boolean) {
+	if (after.nextSibling instanceof Element && after.nextSibling.tagName === 'NAV') after = after.nextSibling;
 	if (newElementFactory === null) {
 		alert("오류: newElementFactory === null");
 		return false;
@@ -451,13 +446,13 @@ function insertElement(after, isFirst) {
 	if (isFirst) {
 		after.insertAdjacentElement("afterbegin", newElement);
 		if (newElementAddHeader) newElement.append(header(newElement, true));
-		positionStack = Array.from(positionMap.get(after));
+		positionStack = Array.from(positionMap.get(after) as number[]);
 		startEdit(after);
 	} else {
 		after.insertAdjacentElement("afterend", newElement);
 		if (newElementAddHeader) newElement.append(header(newElement, true));
-		const parent = after.parentElement;
-		positionStack = Array.from(positionMap.get(parent));
+		const parent = after.parentElement as Element;
+		positionStack = Array.from(positionMap.get(parent) as number[]);
 		startEdit(parent);
 	}
 
@@ -473,15 +468,15 @@ function insertElement(after, isFirst) {
 	return true;
 }
 
-export function insertHgroup(target) {
+export function insertHgroup(target: Element) {
 	if (!/^H[1-6]$/.test(target.tagName) && target.tagName !== "HGROUP") {
 		showWarning("삽입 위치가 적절하지 않습니다.");
 		return false;
 	}
 
-	let newElement = null;
+	let newElement: null | Element = null;
 	if (target.tagName === "HGROUP") {
-		newElement = target.querySelector("h1, h2, h3, h4, h5, h6");
+		newElement = q$n("h1, h2, h3, h4, h5, h6", target);
 		target.insertAdjacentElement("beforebegin", newElement);
 		newElement.classList.add("unit");
 		target.remove();
@@ -496,8 +491,8 @@ export function insertHgroup(target) {
 		showWarning("삽입 위치가 적절하지 않습니다.");
 		return false;
 	}
-	const parent = newElement.parentElement;
-	positionStack = Array.from(positionMap.get(parent));
+	const parent = newElement.parentElement as Element;
+	positionStack = Array.from(positionMap.get(parent) as number[]);
 	startEdit(parent);
 	const pos = positionMap.get(newElement);
 	const newData = seri(newElement, false, SERI_HOOKS);
@@ -511,9 +506,9 @@ export function insertHgroup(target) {
 	return true;
 }
 
-export function deleteElement(target) {
-	if (target.nextSibling?.tagName === 'NAV' || target.tagName === 'NAV') return;
-	const parent = target.parentElement;
+export function deleteElement(target: Element) {
+	if (target.tagName === 'NAV' || (target.nextSibling instanceof Element && target.nextSibling.tagName === 'NAV')) return;
+	const parent = target.parentElement as Element;
 	const pos = positionMap.get(target);
 	fetch(window.location.pathname, {method: "PATCH", headers: {
 		'Content-type': 'application/json'
@@ -526,8 +521,8 @@ export function deleteElement(target) {
 	startEdit(parent);
 }
 
-export function header(after, isFirst) {
-	const parent = isFirst ? after : after.parentElement;
+export function header(after: Element, isFirst: boolean) {
+	const parent = isFirst ? after : (after.parentElement as Element);
 	if (parent === document.body || parent.firstChild === document.body) {
 		return document.createElement("h1");
 	}
@@ -536,15 +531,15 @@ export function header(after, isFirst) {
 	let cur = parent;
 	while (cur != document.body) {
 		if (cur.matches("section, article")) depth++;
-		cur = cur.parentElement;
+		cur = cur.parentElement as Element;
 	}
 	if (depth > 6) depth = 6;
 	return document.createElement(`h${depth}`);
 }
 
-export function menuInsert(el, addHeader) {
+export function menuInsert(factory: string | ElementFactory, addHeader: boolean) {
 	return function () {
-		newElementFactory = el;
+		newElementFactory = factory;
 		newElementAddHeader = addHeader;
 		startTargeting(insertElement);
 	}

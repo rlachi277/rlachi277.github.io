@@ -4,7 +4,7 @@ export function entryDeseriHook(types, isClient, param) {
     return function (data, cur) {
         const postId = cur.split('/').at(-1);
         if (data.type === 'entry') {
-            const id = data.variant?.id;
+            const id = (data.variant?.id ?? 0);
             const type = types?.[id] ?? 0;
             const path = id != undefined ?
                 `../log1/${postId}#entry${id}` : '';
@@ -16,7 +16,7 @@ export function entryDeseriHook(types, isClient, param) {
             };
         }
         else if (data.type === 'ref') {
-            const id = data.variant?.id;
+            const id = (data.variant?.id ?? 0);
             let entryData;
             refCnt += 1;
             const refId = `ref${refCnt}`;
@@ -58,21 +58,23 @@ export function entryDeseriHook(types, isClient, param) {
         return undefined;
     };
 }
-export function entrySeriHook(data) {
+export const entrySeriHook = function (data, _) {
     if (data.classList.contains("ref")) {
         return {
             type: 'ref',
-            variant: { id: data.getAttribute("data-id") } // NaN -> null
+            variant: { id: data.getAttribute("data-id") }, // NaN -> null
+            children: null
         };
     }
     else if (data.classList.contains("entry")) {
         return {
             type: 'entry',
-            variant: { id: data.getAttribute("data-id") } // NaN -> null
+            variant: { id: data.getAttribute("data-id") }, // NaN -> null
+            children: null
         };
     }
     return undefined;
-}
+};
 async function clientWhere(root, id) {
     const res = await fetch(`${root}log1/where/${id}`);
     if (!res.ok)

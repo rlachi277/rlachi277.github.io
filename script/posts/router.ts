@@ -12,6 +12,7 @@ import {
 	getIndex
 } from "./posts.js";
 import { renderNavHook } from './render_nav.js';
+import { Response } from 'express-serve-static-core';
 
 const db = new Database('db/posts.db');
 db.pragma('journal_mode = WAL');
@@ -45,7 +46,7 @@ export default router;
 
 const hook = renderNavHook(db, "/posts/");
 
-router.get('/', (req, res) => {
+router.get('/', (_, res) => {
 	withErrors(res, () => {
 		return getIndex("/posts/", indexTemplate, hook);
 	}, true);
@@ -90,13 +91,13 @@ router.delete('/*path', (req, res) => {
 	}, false);
 });
 
-function getPath(path = []) {
+function getPath(path: string[] = []): string {
 	let result = path.join('/');
 	if (result === "" || result.endsWith("/")) result += "index.html";
 	return result;
 }
 
-export function withErrors(res, func, sendResult = false) {
+export function withErrors(res: Response<any, Record<string,any>, number>, func: () => any | void, sendResult: boolean = false) {
 	try {
 		if (sendResult) {
 			res.status(200).send(func());
@@ -104,12 +105,11 @@ export function withErrors(res, func, sendResult = false) {
 			func();
 			res.sendStatus(204);
 		}
-	} catch (e) {
-		if (Number.isInteger(e)) {
+	} catch (e: any) {
+		if (typeof e === 'number') {
 			res.setHeader('Content-Type', 'text/plain');
 			res.sendStatus(e);
-		}
-		else if (e.status != undefined) {
+		} else if (e.status !== undefined) {
 			if (e.reason != undefined) {
 				res.setHeader('Content-Type', 'text/plain');
 				res.status(e.status).send(e.reason);

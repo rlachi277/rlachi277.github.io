@@ -1,6 +1,6 @@
-import { seri } from "../../shared/posts/seri.js";
-import { $, d$ } from "../jquery.js";
-import { SERI_HOOKS, DESERI_HOOKS } from "./script.js";
+import { seri, SeriData } from "../../shared/posts/seri.js";
+import { $, d$, d$n, q$n } from "../jquery.js";
+import { MenuActions, SERI_HOOKS } from "./script.js";
 import { dialog, showWarning } from "./dialog.js";
 import {
 	startTargeting,
@@ -11,10 +11,10 @@ import {
 	stopTargeting
 } from "./edit.js";
 
-export const defaultMenu = {
+export const defaultMenu: MenuActions = {
 	export: () => {
 		try {
-			const data = seri($("body").get(0), true, SERI_HOOKS);
+			const data = seri(q$n("body"), true, SERI_HOOKS);
 			const file = new Blob([JSON.stringify(data)], {type: "application/json"});
 			const anchor = document.createElement("a");
 			anchor.href = URL.createObjectURL(file);
@@ -36,14 +36,14 @@ export const defaultMenu = {
 	}
 };
 
-export const editMenu = {
+export const editMenu: MenuActions = {
 	new: dialog("새 글", `
 		<label for="dialog-new-path">경로: </label>
 		<input id="dialog-new-path" placeholder="경로 입력">
-	`, () => newPost(d$("dialog-new-path").value, {
+	`, () => newPost((d$n("dialog-new-path") as HTMLInputElement).value, {
 		type: "body",
 		children: [
-			{type: "h1", children: [`${d$("dialog-new-path").value} @ ${window.location.pathname}`]},
+			{type: "h1", children: [`${(d$n("dialog-new-path") as HTMLInputElement).value} @ ${window.location.pathname}`]},
 			{type: "nav",children: null},
 			{type: "p",children: []}
 		]
@@ -51,7 +51,7 @@ export const editMenu = {
 	duplicate: dialog("이 글 복제", `
 		<label for="dialog-new-path">경로: </label>
 		<input id="dialog-new-path" placeholder="경로 입력">
-	`, () => newPost(d$("dialog-new-path").value, seri($("body").get(0), true, SERI_HOOKS)), false),
+	`, () => newPost((d$n("dialog-new-path") as HTMLInputElement).value, seri(q$n("body"), true, SERI_HOOKS)), false),
 	delete: dialog("이 글 삭제", `
 		정말로 <strong>이 글 전체</strong>를 삭제하시겠습니까?<br>
 		이 작업은 되돌릴 수 없습니다.
@@ -76,7 +76,7 @@ export const editMenu = {
 			await checkFetch(fetch(path, {
 				method: "PUT",
 				headers: {'Content-Type': 'text/plain'},
-				body: d$("dialog-json-file").files[0]
+				body: (d$n("dialog-json-file") as HTMLInputElement).files?.[0]
 			}));
 			$(".edited, .new").removeClass("edited new");
 			window.location.reload();
@@ -132,12 +132,12 @@ export const editMenu = {
 	stopTargeting: stopTargeting
 };
 
-async function checkFetch(promise) {
+async function checkFetch(promise: Promise<Response>) {
 	const res = await promise;
 	if (!res.ok) throw res.status;
 }
 
-async function newPost(path, data) {
+async function newPost(path: string, data: SeriData | null) {
 	const absPath = new URL(path, `file://${window.location.pathname}`).pathname;
 	if (!absPath || !absPath.startsWith("/posts/")) {
 		showWarning("경로가 적절하지 않습니다.");

@@ -2,8 +2,8 @@ const chcode = ['r','R','s','e','E','f','a','q','Q','t','T','d','w','W','c','z',
 const jucode = ['k','o','i','O','j','p','u','P','h','hk','ho','hl','y','n','nj','np','nl','b','m','ml','l']
 const jocode = ['','r','R','rt','s','sw','sg','e','f','fr','fa','fq','ft','fx','fv','fg','a','q','qt','t','T','d','w','c','z','x','v','g']
 const cscode = ['','r','R','rt','s','sw','sg','e','E','f','fr','fa','fq','ft','fx','fv','fg','a','q','Q','qt','t','T','d','w','W','c','z','x','v','g']
-export function k2e(str) {
-	if (!str) return null;
+export function k2e(str: string): string {
+	if (!str) return "";
 	let result = '';
 	for (const ch of str) {
 		let c = ch.charCodeAt(0);

@@ -21,10 +21,10 @@ export function removePost(db, path) {
     if (path.length === 0)
         path = ["index.html"];
     const parent = path.length === 1 ? '' : path.slice(0, -1).join('/') + '/';
-    const dbResult = db.prepare('SELECT posts FROM dir WHERE path = ?').get(parent)?.posts;
+    const dbResult = db.prepare('SELECT posts, subdir FROM dir WHERE path = ?').get(parent);
     if (dbResult === undefined)
         return; // ???
-    const data = JSON.parse(dbResult);
+    const data = JSON.parse(dbResult.posts);
     if (!data.includes(path.at(-1)))
         return; // ???
     data.splice(data.indexOf(path.at(-1)), 1);
@@ -34,8 +34,7 @@ export function removePost(db, path) {
 		WHERE path = ?;
 	`).run(JSON.stringify(data), parent);
     if (data.length === 0) {
-        const parentSubdirs = db.prepare('SELECT subdir FROM dir WHERE path = ?').get(parent)?.subdir;
-        if (JSON.parse(parentSubdirs).length === 0)
+        if (JSON.parse(dbResult.subdir).length === 0)
             removeDirectory(db, path.slice(0, -1));
     }
 }
@@ -79,10 +78,10 @@ function removeDirectory(db, path) {
     if (path.length === 0)
         return;
     const parent = path.length === 1 ? '' : path.slice(0, -1).join('/') + '/';
-    const dbResult = db.prepare('SELECT subdir FROM dir WHERE path = ?').get(parent)?.subdir;
+    const dbResult = db.prepare('SELECT posts, subdir FROM dir WHERE path = ?').get(parent);
     if (dbResult === undefined)
         return; // ???
-    const data = JSON.parse(dbResult);
+    const data = JSON.parse(dbResult.subdir);
     if (!data.includes(path.at(-1)))
         return; // ???
     data.splice(data.indexOf(path.at(-1)), 1);
@@ -92,8 +91,7 @@ function removeDirectory(db, path) {
 		WHERE path = ?;
 	`).run(JSON.stringify(data), parent);
     if (data.length === 0) {
-        const parentPosts = db.prepare('SELECT posts FROM dir WHERE path = ?').get(parent)?.posts;
-        if (JSON.parse(parentPosts).length === 0)
+        if (JSON.parse(dbResult.posts).length === 0)
             removeDirectory(db, path.slice(0, -1));
     }
 }

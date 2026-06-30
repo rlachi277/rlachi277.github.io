@@ -9,7 +9,7 @@ function onResize() {
         if (isMobile)
             return;
         isMobile = true;
-        navDetails.removeAttr("open");
+        navDetails.attr("open", null);
         menubar.css("display", "none");
     }
     else {
@@ -21,7 +21,7 @@ function onResize() {
     }
 }
 function setupMenu(menu) {
-    if (menu == undefined)
+    if (menu === null)
         return;
     for (const [k, v] of Object.entries(menu)) {
         $(`[data-menu="${k}"]`).on("click", v);
@@ -29,7 +29,7 @@ function setupMenu(menu) {
 }
 export const SERI_HOOKS = [];
 export const DESERI_HOOKS = [];
-export function setup(defaultMenu, editMenu, noEdit) {
+export function setup(defaultMenu, editMenu = null, noEdit = false) {
     onResize();
     window.addEventListener('resize', onResize);
     const scrollY = sessionStorage.getItem('scrollY');
@@ -38,18 +38,18 @@ export function setup(defaultMenu, editMenu, noEdit) {
         sessionStorage.removeItem('scrollY');
     }
     setupDialog();
-    $(".menu-action").on("click", (e) => {
-        const pparent = e.target.parentElement.parentElement;
-        if (pparent.matches(":popover-open"))
+    $(".menu-action").on("click", function () {
+        const pparent = this.parentElement?.parentElement;
+        if (pparent != undefined && pparent.matches(":popover-open"))
             pparent.hidePopover();
     });
     setupMenu(defaultMenu);
     const params = new URLSearchParams(window.location.search);
     if (params.get("edit")) {
-        if (!noEdit && !$(":root.notfound").length)
-            startEdit($("body").get(0), true);
+        if (!noEdit && !$(":root.notfound").exists)
+            startEdit($("body").list[0], true);
         $("menu .menu-edit").css("display", "revert");
-        $("nav a").each((i, e) => {
+        $("nav a").each((e) => {
             e.setAttribute("href", e.getAttribute("href") + "?edit=t");
         });
         setupMenu(editMenu);

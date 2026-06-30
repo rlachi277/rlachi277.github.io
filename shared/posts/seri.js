@@ -8,98 +8,101 @@ const SIMPLE_TYPES = new Set([
     "ruby", "rt", "rp",
     "sub", "sup", "ins", "del"
 ]);
-export function seri(data, init, hooks = []) {
-    if (data.nodeType === Node.TEXT_NODE) {
-        if (/^\n\s*$/.test(data.textContent))
+export function seri(el, init = false, hooks = []) {
+    if (el instanceof Text) {
+        if (/^\n\s*$/.test(el.textContent))
             return null;
-        return data.textContent.replaceAll(/\n\s*/g, "");
+        return el.textContent.replaceAll(/\n\s*/g, "");
     }
-    if (data.nodeName.startsWith("#"))
+    if (!(el instanceof Element))
         return null;
-    if (data.classList.contains("new") && !init)
+    if (el.classList.contains("new") && !init)
         return null;
     const children = [];
-    data.childNodes.forEach((e) => {
+    el.childNodes.forEach((e) => {
         const child = seri(e, false, hooks);
         if (child !== null)
             children.push(child);
     });
     for (const e of hooks) {
-        const hookResult = e(data, init);
+        const hookResult = e(el, init);
         if (hookResult !== undefined) {
-            if (hookResult?.children != null)
-                hookResult.children = children;
-            return hookResult;
+            if (hookResult === null || typeof hookResult === 'string')
+                return hookResult;
+            return {
+                type: hookResult.type,
+                ...(hookResult.variant !== undefined && { variant: hookResult.variant }),
+                children: (hookResult.children === null) ? null : children
+            };
         }
     }
     const result = {
-        type: null,
-        variant: undefined,
+        type: "",
         children: children
     };
-    if (SIMPLE_TYPES.has(data.nodeName.toLowerCase())) {
-        result.type = data.nodeName.toLowerCase();
+    if (SIMPLE_TYPES.has(el.nodeName.toLowerCase())) {
+        result.type = el.nodeName.toLowerCase();
         return result;
     }
-    switch (init ? 'BODY' : data.nodeName) {
+    switch (init ? 'BODY' : el.nodeName) {
         case 'BODY':
             result.type = "body";
             break;
         case 'NAV':
             result.children = null;
-            result.type = 'nav';
+            result.type = "nav";
             break;
         case 'ARTICLE':
             result.type = "article";
             result.variant = { float: null };
-            if (data.classList.contains('float-right'))
+            if (el.classList.contains('float-right'))
                 result.variant.float = "right";
-            else if (data.classList.contains('float-left'))
+            else if (el.classList.contains('float-left'))
                 result.variant.float = "left";
             break;
         case 'HR':
             result.variant = { rule: null };
-            if (data.classList.contains('rule'))
+            if (el.classList.contains('rule'))
                 result.variant.rule = true;
         case 'BR':
             result.children = null;
-            result.type = data.nodeName.toLowerCase();
+            result.type = el.nodeName.toLowerCase();
             break;
         case 'P':
             result.type = "p";
-            result.variant = getAttributes(data, ["lang"]);
+            result.variant = getAttributes(el, ["lang"]);
             break;
         case 'FIGURE':
             result.type = "figure";
             result.variant = { float: null };
-            if (data.classList.contains('float-right'))
+            if (el.classList.contains('float-right'))
                 result.variant.float = "right";
-            else if (data.classList.contains('float-left'))
+            else if (el.classList.contains('float-left'))
                 result.variant.float = "left";
             break;
         case 'IMG':
             result.type = "img";
             result.variant = {
-                size: seriSize(data),
-                ...getAttributes(data, ["src", "alt"])
+                size: seriSize(el),
+                ...getAttributes(el, ["src", "alt"])
             };
             result.children = null;
             break;
         case 'OL':
             result.type = 'ol';
-            result.variant = getAttributes(data, ["start"]);
+            result.variant = getAttributes(el, ["start"]);
             break;
         case 'AUDIO':
             result.type = "audio";
-            result.variant = getAttributes(data, [
+            result.variant = getAttributes(el, [
                 "src", "controls", "crossorigin", "loop", "muted", "preload"
             ]);
             break;
         case 'VIDEO':
             result.type = "video";
             result.variant = {
-                size: seriSize(data),
-                ...getAttributes(data, [
+                size: seriSize(el),
+                ...getAttributes(el, [
                     "src", "autoplay", "controls", "crossorigin", "loop",
                     "muted", "poster", "preload"
                 ])
@@ -107,53 +110,53 @@ export function seri(data, init, hooks = []) {
             break;
         case 'TRACK':
             result.type = "track";
-            result.variant = getAttributes(data, [
+            result.variant = getAttributes(el, [
                 "src", "srclang", "default", "kind", "label"
             ]);
             break;
         case 'SOURCE':
             // currently <audio>, <video> only
             result.type = "source";
-            result.variant = getAttributes(data, ["src", "media"]);
+            result.variant = getAttributes(el, ["src", "media"]);
             break;
         case 'A':
             result.type = "a";
-            result.variant = getAttributes(data, [
+            result.variant = getAttributes(el, [
                 "href", "target", "download", "rel"
             ]);
             result.variant.shape = null;
-            if (data.classList.contains("broken")) {
+            if (el.classList.contains("broken")) {
                 result.variant.shape = "broken";
             }
-            else if (data.classList.contains("color")) {
+            else if (el.classList.contains("color")) {
                 result.variant.shape = "color";
-                result.variant.color = getColor(data.classList);
+                result.variant.color = getColor(el.classList);
             }
-            else if (data.classList.contains("colorbox")) {
+            else if (el.classList.contains("colorbox")) {
                 result.variant.shape = "colorbox";
-                result.variant.color = getColor(data.classList);
+                result.variant.color = getColor(el.classList);
             }
             break;
         case 'BUTTON':
             result.type = "button";
             // todo: button attributes
             result.variant = {};
-            if (data.classList.contains("colorbox")) {
+            if (el.classList.contains("colorbox")) {
                 result.variant.shape = "colorbox";
-                result.variant.color = getColor(data.classList);
+                result.variant.color = getColor(el.classList);
             }
             break;
         default:
-            if (data.classList.contains("columns")) {
+            if (el.classList.contains("columns")) {
                 result.type = "columns";
             }
-            else if (data.classList.contains("color")) {
+            else if (el.classList.contains("color")) {
                 result.type = "color";
-                result.variant = { color: getColor(data.classList), click: data.classList.contains("click") };
+                result.variant = { color: getColor(el.classList), click: el.classList.contains("click") };
             }
-            else if (data.classList.contains("colorbox")) {
+            else if (el.classList.contains("colorbox")) {
                 result.type = "colorbox";
-                result.variant = { color: getColor(data.classList), click: data.classList.contains("click") };
+                result.variant = { color: getColor(el.classList), click: el.classList.contains("click") };
             }
             else {
                 return null;
@@ -184,17 +187,17 @@ export function getColor(classList) {
     }
     return -1;
 }
-export function deseri(el, cur, init, hooks = []) {
-    if (typeof el === 'string' || el instanceof String)
-        return sani(el);
+export function deseri(data, cur, init = false, hooks = []) {
+    if (typeof data === 'string')
+        return sani(data);
     let children = "";
-    el.children?.forEach((e) => {
+    data.children?.forEach((e) => {
         const child = deseri(e, cur, false, hooks);
         if (child !== null)
             children += child;
     });
     for (const e of hooks) {
-        const hookResult = e(el, cur, init);
+        const hookResult = e(data, cur, init);
         if (hookResult !== undefined) {
             if (hookResult === null)
                 return null;
@@ -211,25 +214,25 @@ export function deseri(el, cur, init, hooks = []) {
     let tagName = null;
     let attrs = "";
     let isVoid = false;
-    if (init || el.type === 'body')
+    if (init || data.type === 'body')
         return children;
-    if (SIMPLE_TYPES.has(el.type))
-        return `<${el.type}>${children}</${el.type}>`;
-    switch (el.type) {
+    if (SIMPLE_TYPES.has(data.type))
+        return `<${data.type}>${children}</${data.type}>`;
+    switch (data.type) {
         case 'nav':
         case 'br':
             isVoid = true;
-            tagName = el.type;
+            tagName = data.type;
             break;
         case 'hr':
             tagName = "hr";
-            if (el.variant?.rule)
+            if (data.variant?.rule)
                 attrs = ` class="rule"`;
             break;
         case 'article':
         case 'figure':
-            tagName = el.type;
-            switch (el.variant?.float) {
+            tagName = data.type;
+            switch (data.variant?.float) {
                 case 'right':
                     attrs = ` class="float-right"`;
                     break;
@@ -240,78 +243,78 @@ export function deseri(el, cur, init, hooks = []) {
             break;
         case 'p':
             tagName = "p";
-            attrs += setAttributes(el.variant, ["lang"]);
+            attrs += setAttributes(data.variant, ["lang"]);
             break;
         case 'img':
             tagName = "img";
             isVoid = true;
-            if (el.variant?.src != null)
-                attrs += ` src="${sani(assets(el.variant?.src, cur))}"`;
-            attrs += setAttributes(el.variant, ["alt"]);
-            attrs += deseriSize(el.variant?.size);
+            if (data.variant?.src != null)
+                attrs += ` src="${sani(assets(data.variant?.src, cur))}"`;
+            attrs += setAttributes(data.variant, ["alt"]);
+            attrs += deseriSize(data.variant?.size);
             break;
         case 'ol':
             tagName = "ol";
-            if (el.variant?.start != null)
-                attrs = ` start="${sani(el.variant?.start)}"`;
+            if (data.variant?.start != null)
+                attrs = ` start="${sani(data.variant?.start)}"`;
             break;
         case 'audio':
             tagName = "audio";
-            if (el.variant?.src != null)
-                attrs += ` src="${sani(assets(el.variant?.src, cur))}"`;
-            attrs += setAttributes(el.variant, [
+            if (data.variant?.src != null)
+                attrs += ` src="${sani(assets(data.variant?.src, cur))}"`;
+            attrs += setAttributes(data.variant, [
                 "controls", "crossorigin", "loop", "muted", "preload"
             ]);
             break;
         case 'video':
             tagName = "video";
-            if (el.variant?.src != null)
-                attrs += ` src="${sani(assets(el.variant?.src, cur))}"`;
-            attrs += setAttributes(el.variant, [
+            if (data.variant?.src != null)
+                attrs += ` src="${sani(assets(data.variant?.src, cur))}"`;
+            attrs += setAttributes(data.variant, [
                 "autoplay", "controls", "crossorigin", "loop",
                 "muted", "poster", "preload"
             ]);
-            attrs += deseriSize(el.variant?.size);
+            attrs += deseriSize(data.variant?.size);
             break;
         case 'track':
             tagName = "track";
-            if (el.variant?.src != null)
-                attrs += ` src="${sani(assets(el.variant?.src, cur))}"`;
-            attrs += setAttributes(el.variant, [
+            if (data.variant?.src != null)
+                attrs += ` src="${sani(assets(data.variant?.src, cur))}"`;
+            attrs += setAttributes(data.variant, [
                 "srclang", "default", "kind", "label"
             ]);
             break;
         case 'source':
             // currently <audio>, <video> only
             tagName = "source";
-            if (el.variant?.src != null)
-                attrs += ` src="${sani(assets(el.variant?.src, cur))}"`;
-            attrs += setAttributes(el.variant, ["media"]);
+            if (data.variant?.src != null)
+                attrs += ` src="${sani(assets(data.variant?.src, cur))}"`;
+            attrs += setAttributes(data.variant, ["media"]);
             break;
         case 'a':
             tagName = "a";
-            attrs += setAttributes(el.variant, ["href", "target", "download", "rel"]);
-            switch (el.variant?.shape) {
+            attrs += setAttributes(data.variant, ["href", "target", "download", "rel"]);
+            switch (data.variant?.shape) {
                 case 'broken':
                     attrs += ` class="broken"`;
                     break;
                 case 'color':
-                    attrs += ` class="color c${el.variant?.color}"`;
+                    attrs += ` class="color c${data.variant?.color}"`;
                     break;
                 case 'colorbox':
-                    attrs += ` class="colorbox c${el.variant?.color}"`;
+                    attrs += ` class="colorbox c${data.variant?.color}"`;
                     break;
             }
             break;
         case 'button':
             tagName = "button";
             // todo: button attributes
-            switch (el.variant?.shape) {
+            switch (data.variant?.shape) {
                 case 'color':
-                    attrs += ` class="color c${el.variant?.color}"`;
+                    attrs += ` class="color c${data.variant?.color}"`;
                     break;
                 case 'colorbox':
-                    attrs += ` class="colorbox c${el.variant?.color}"`;
+                    attrs += ` class="colorbox c${data.variant?.color}"`;
                     break;
             }
             break;
@@ -321,11 +324,11 @@ export function deseri(el, cur, init, hooks = []) {
             break;
         case 'color':
             tagName = "span";
-            attrs = ` class="color c${el.variant?.color}${el.variant?.click ? " click" : ""}"`;
+            attrs = ` class="color c${data.variant?.color}${data.variant?.click ? " click" : ""}"`;
             break;
         case 'colorbox':
             tagName = "span";
-            attrs = ` class="colorbox c${el.variant?.color}${el.variant?.click ? " click" : ""}"`;
+            attrs = ` class="colorbox c${data.variant?.color}${data.variant?.click ? " click" : ""}"`;
             break;
         default:
             return null;

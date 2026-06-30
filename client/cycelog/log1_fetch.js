@@ -7,7 +7,7 @@ export async function sendPatch(body, getData = false) {
     if (!res.ok)
         throw res.status;
     if (!getData)
-        return undefined;
+        return;
     return await res.json();
 }
 export async function sendExists(id) {

@@ -13,7 +13,7 @@ export function renderNavHook(db, root) {
 function renderNav(db, root, cur) {
     const data = buildNav(db, root, cur);
     function makeNavEntry(base, data) {
-        const newData = (typeof data === 'string' || data instanceof String) ?
+        const newData = (typeof data === 'string') ?
             { name: data, children: [] } :
             data;
         const link = base + newData.name;
@@ -32,7 +32,7 @@ function renderNav(db, root, cur) {
         return `<li>${anchor}<ul>${middle}</ul></li>`;
     }
     let middle = "";
-    for (let e of data)
+    for (const e of data)
         middle += makeNavEntry("", e);
     return `<nav><details open><summary>둘러보기</summary><menu>${middle}</menu></details></nav>`;
 }

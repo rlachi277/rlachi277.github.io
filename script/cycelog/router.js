@@ -41,13 +41,13 @@ const router = express.Router();
 export default router;
 const log1Hook = renderNavHook(db, "/cycelog/log1/");
 const log3Hook = renderNavHook(db, "/cycelog/log3/");
-router.get('/', (req, res) => {
+router.get('/', (_, res) => {
     res.redirect('log3/');
 });
 const log1Template = fs.readFileSync(path.join(__dirname, 'client', 'cycelog', 'log1.html'), 'utf8').replaceAll(/\n|\t/g, '');
 const log1NotFoundTemplate = fs.readFileSync(path.join(__dirname, 'client', 'cycelog', 'log1_404.html'), 'utf8').replaceAll(/\n|\t/g, '');
 const log1IndexTemplate = fs.readFileSync(path.join(__dirname, 'client', 'cycelog', 'log1_index.html'), 'utf8').replaceAll(/\n|\t/g, '');
-router.get('/log1/', (req, res) => {
+router.get('/log1/', (_, res) => {
     withErrors(res, () => {
         return getIndex("/cycelog/log1/", log1IndexTemplate, log1Hook);
     }, true);
@@ -92,12 +92,12 @@ router.get('/log1/:id/raw', (req, res) => {
 });
 router.get('/log1/exists/:id', (req, res) => {
     withErrors(res, () => {
-        return log1Exists(db, req.params.id);
+        return log1Exists(db, parseInt(req.params.id));
     }, true);
 });
 router.get('/log1/where/:id', (req, res) => {
     withErrors(res, () => {
-        return log1Where(db, req.params.id);
+        return log1Where(db, parseInt(req.params.id));
     }, true);
 });
 const log3Template = fs.readFileSync(path.join(__dirname, 'client', 'cycelog', 'log3.html'), 'utf8').replaceAll(/\n|\t/g, '');

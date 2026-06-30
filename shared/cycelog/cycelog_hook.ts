@@ -1,11 +1,20 @@
-let refCnt = 0;
-const whereCache = {};
+import { Database } from "better-sqlite3";
+import { DeseriHook, SeriHook } from "../posts/seri.js";
+import { EntryRow } from "../../script/cycelog/cycelog.js";
 
-export function entryDeseriHook(types, isClient, param) {
+type WhereData = {
+	readonly where: string,
+	readonly type: number
+};
+
+let refCnt = 0;
+const whereCache: Record<number,WhereData> = {};
+
+export function entryDeseriHook(types: Record<number,number>, isClient: boolean, param: string | Database): DeseriHook {
 	return function (data, cur) {
 		const postId = cur.split('/').at(-1);
 		if (data.type === 'entry') {
-			const id = data.variant?.id;
+			const id = (data.variant?.id ?? 0) as number;
 			const type = types?.[id] ?? 0;
 			const path = id != undefined ?
 				`../log1/${postId}#entry${id}` : '';
@@ -14,9 +23,9 @@ export function entryDeseriHook(types, isClient, param) {
 				html: `<a class="entry"${id != undefined ? ` href="${path}" id="entry${id}" data-id="${id}"` : ''} data-type="${type}">
 					#${id ?? "?"}
 				</a>`.replaceAll(/\n|\t/g, '')
-			};
+			} as const;
 		} else if (data.type === 'ref') {
-			const id = data.variant?.id;
+			const id = (data.variant?.id ?? 0) as number;
 			let entryData;
 			refCnt += 1;
 			const refId = `ref${refCnt}`;
@@ -31,7 +40,7 @@ export function entryDeseriHook(types, isClient, param) {
 						entryData = {where: postId, type: types?.[id] ?? 0};
 					} else {
 						entryData = {where: "tmp", type: 0};
-						clientWhere(param, id).then((newData) => {
+						clientWhere(param as string, id).then((newData) => {
 							whereCache[id] = newData;
 							const target = document.getElementById(refId);
 							if (target === null) return;
@@ -41,7 +50,7 @@ export function entryDeseriHook(types, isClient, param) {
 					}
 				}
 			} else {
-				entryData = serverWhere(param, id);
+				entryData = serverWhere(param as Database, id);
 			}
 			const path = id != undefined ? `./${entryData.where}#entry${id}` : '';
 			return {
@@ -49,38 +58,40 @@ export function entryDeseriHook(types, isClient, param) {
 				html: `<a class="entry ref" id="${refId}"${id != undefined ? ` href="${path}"` : ''} data-id="${id}" data-type="${entryData.type}">
 					ref. #${id ?? "?"}
 				</a>`.replaceAll(/\n|\t/g, '')
-			};
+			} as const;
 		}
 		return undefined;
 	};
 }
 
-export function entrySeriHook(data) {
+export const entrySeriHook: SeriHook = function (data, _) {
 	if (data.classList.contains("ref")) {
 		return {
 			type: 'ref',
-			variant: {id: data.getAttribute("data-id")} // NaN -> null
-		};
+			variant: {id: data.getAttribute("data-id")}, // NaN -> null
+			children: null
+		} as const;
 	} else if (data.classList.contains("entry")) {
 		return {
 			type: 'entry',
-			variant: {id: data.getAttribute("data-id")} // NaN -> null
-		};
+			variant: {id: data.getAttribute("data-id")}, // NaN -> null
+			children: null
+		} as const;
 	}
 	return undefined;
 }
 
-async function clientWhere(root, id) {
+async function clientWhere(root: string, id: number): Promise<WhereData> {
 	const res = await fetch(`${root}log1/where/${id}`);
 	if (!res.ok) throw res.status;
 	return await res.json();
 }
 
-export function serverWhere(db, id) {
-	const dbResult = db.prepare(`SELECT post, type FROM entries WHERE id = ?`).get(id);
+export function serverWhere(db: Database, id: number): WhereData {
+	const dbResult = db.prepare<number,EntryRow>(`SELECT post, type FROM entries WHERE id = ?`).get(id);
 	if (dbResult === undefined) throw 404;
 	return {
-		where: dbResult.post,
-		type: dbResult.type
+		where: dbResult.post as string,
+		type: dbResult.type as number
 	};
 }

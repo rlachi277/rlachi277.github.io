@@ -33,7 +33,7 @@ const indexTemplate = fs.readFileSync(path.join(__dirname, 'client', 'posts', 'i
 const router = express.Router();
 export default router;
 const hook = renderNavHook(db, "/posts/");
-router.get('/', (req, res) => {
+router.get('/', (_, res) => {
     withErrors(res, () => {
         return getIndex("/posts/", indexTemplate, hook);
     }, true);
@@ -89,11 +89,11 @@ export function withErrors(res, func, sendResult = false) {
         }
     }
     catch (e) {
-        if (Number.isInteger(e)) {
+        if (typeof e === 'number') {
             res.setHeader('Content-Type', 'text/plain');
             res.sendStatus(e);
         }
-        else if (e.status != undefined) {
+        else if (e.status !== undefined) {
             if (e.reason != undefined) {
                 res.setHeader('Content-Type', 'text/plain');
                 res.status(e.status).send(e.reason);
