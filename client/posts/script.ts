@@ -1,4 +1,4 @@
-import { DeseriHook, SeriHook } from "../../shared/posts/seri.js";
+import type { DeseriHook, SeriHook } from "../../shared/posts/seri.js";
 import { $ } from "../jquery.js";
 import { setupDialog } from "./dialog.js";
 import { startEdit } from "./edit.js";

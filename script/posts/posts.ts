@@ -1,5 +1,6 @@
-import { Database } from 'better-sqlite3';
-import { deseri, DeseriHook, MutableSeriData, SeriData } from '../../shared/posts/seri.js';
+import type { Database } from 'better-sqlite3';
+import { deseri } from '../../shared/posts/seri.js';
+import type { DeseriHook, MutableSeriData, SeriData } from '../../shared/posts/seri.js';
 import { addPost, removePost } from "./manage_nav.js";
 
 export type PostRow = {
@@ -25,7 +26,7 @@ export type PostTemplate = {
 };
 
 export type PatchBody = {
-	readonly pos?: number,
+	readonly pos?: number[],
 	readonly data?: SeriData,
 	readonly splice?: number
 }
@@ -41,20 +42,20 @@ const notFoundData = {
 
 export function getRawPost(db: Database, path: string): SeriData {
 	const dbResult = db.prepare<string,PostRow>('SELECT data FROM posts WHERE path = ?').get(path);
-	if (dbResult === undefined) throw 404;
-	return JSON.parse(dbResult.data as string) as SeriData;
+	if (dbResult === undefined || dbResult.data === undefined) throw 404;
+	return JSON.parse(dbResult.data) as SeriData;
 }
 
 export function getPostFromData(data: SeriData | null | undefined, root: string, path: string, template: PostTemplate, renderHooks: DeseriHook[]): string {
 	const { normal, notFound } = template;
 	if (data != undefined) {
 		const rendered = deseri(data, `${root}${path}`, true, renderHooks);
-		return normal.replace(TEMPLATE_SLOT, rendered as string);
+		return normal.replace(TEMPLATE_SLOT, rendered ?? "");
 	} else {
 		const rendered = deseri(notFoundData, `${root}${path}`, true, renderHooks);
 		throw {
 			status: 404,
-			html: notFound.replace(TEMPLATE_SLOT, rendered as string)
+			html: notFound.replace(TEMPLATE_SLOT, rendered ?? "")
 		};
 	}
 }
@@ -100,9 +101,10 @@ export function patchPost(db: Database, path: string, body: PatchBody) {
 	pos.reverse();
 	while (pos.length > 1) {
 		if (typeof cur === 'string' || cur.children === null) throw badRequest("올바르지 않은 위치입니다.");
-		cur = cur.children[pos.pop()] as MutableSeriData;
+		cur = cur.children[pos.pop() as number] as MutableSeriData;
 		if (cur == undefined) throw badRequest("올바르지 않은 위치입니다.");
 	}
+	if (pos.length === 0) throw badRequest("올바르지 않은 위치입니다.");
 	if (typeof cur === 'string' || cur.children === null) throw badRequest("올바르지 않은 위치입니다.");
 	if (cur.children.length < pos[0]) throw badRequest("올바르지 않은 위치입니다.");
 	if (data != undefined) cur.children.splice(pos[0], splice, data);
@@ -131,7 +133,7 @@ export function getIndex(root: string, template: string, renderNavHook: DeseriHo
 }
 
 export function postExists(db: Database, path: string): boolean {
-	const dbResult = db.prepare<string,CountRow>('SELECT COUNT(1) FROM posts WHERE path = ?').get(path) as CountRow;
+	const dbResult = db.prepare<string,CountRow>('SELECT COUNT(1) FROM posts WHERE path = ?').get(path);
 	return (dbResult?.['COUNT(1)'] ?? 0) !== 0;
 }
 

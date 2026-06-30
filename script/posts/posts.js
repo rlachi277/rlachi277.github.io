@@ -10,7 +10,7 @@ const notFoundData = {
 };
 export function getRawPost(db, path) {
     const dbResult = db.prepare('SELECT data FROM posts WHERE path = ?').get(path);
-    if (dbResult === undefined)
+    if (dbResult === undefined || dbResult.data === undefined)
         throw 404;
     return JSON.parse(dbResult.data);
 }
@@ -18,13 +18,13 @@ export function getPostFromData(data, root, path, template, renderHooks) {
     const { normal, notFound } = template;
     if (data != undefined) {
         const rendered = deseri(data, `${root}${path}`, true, renderHooks);
-        return normal.replace(TEMPLATE_SLOT, rendered);
+        return normal.replace(TEMPLATE_SLOT, rendered ?? "");
     }
     else {
         const rendered = deseri(notFoundData, `${root}${path}`, true, renderHooks);
         throw {
             status: 404,
-            html: notFound.replace(TEMPLATE_SLOT, rendered)
+            html: notFound.replace(TEMPLATE_SLOT, rendered ?? "")
         };
     }
 }
@@ -77,6 +77,8 @@ export function patchPost(db, path, body) {
         if (cur == undefined)
             throw badRequest("올바르지 않은 위치입니다.");
     }
+    if (pos.length === 0)
+        throw badRequest("올바르지 않은 위치입니다.");
     if (typeof cur === 'string' || cur.children === null)
         throw badRequest("올바르지 않은 위치입니다.");
     if (cur.children.length < pos[0])

@@ -40,16 +40,16 @@ export function inlineCommands(shortcut, e) {
         if (command === "undo") {
             if (undoBuffer.length === 0)
                 return false;
-            redoBuffer.push(seri(this, true, SERI_HOOKS));
-            this.innerHTML = deseri(undoBuffer.pop(), window.location.pathname, true, DESERI_HOOKS);
+            redoBuffer.push(seri(this, true, SERI_HOOKS) ?? "오류");
+            this.innerHTML = deseri(undoBuffer.pop() ?? "오류", window.location.pathname, true, DESERI_HOOKS) ?? "오류";
             e.preventDefault();
             return true;
         }
         else if (command === "redo") {
             if (redoBuffer.length === 0)
                 return false;
-            undoBuffer.push(seri(this, true, SERI_HOOKS));
-            this.innerHTML = deseri(redoBuffer.pop(), window.location.pathname, true, DESERI_HOOKS);
+            undoBuffer.push(seri(this, true, SERI_HOOKS) ?? "오류");
+            this.innerHTML = deseri(redoBuffer.pop() ?? "오류", window.location.pathname, true, DESERI_HOOKS) ?? "오류";
             e.preventDefault();
             return true;
         }
@@ -82,7 +82,7 @@ function runCommand(e, command) {
     if (range.collapsed)
         throw -1;
     e.preventDefault();
-    undoBuffer.push(seri(this, true, SERI_HOOKS));
+    undoBuffer.push(seri(this, true, SERI_HOOKS) ?? "오류");
     $('.select-marker:not(.tab-select-marker)', this).remove();
     const affected = collectAffected(range, this);
     const allOn = annotateFormats(affected, this, command);
@@ -100,7 +100,7 @@ function collectAffected(range, root) {
     function ascendEdge(idx, prev, forgive) {
         let node = affected[idx].node;
         const key = prev ? "previousSibling" : "nextSibling";
-        while (node !== root && node.parentElement) {
+        while (node !== root && node.parentElement !== null) {
             if (toCommand(node) === 'keep') {
                 if (!forgive) {
                     showWarning("부분적 서식 적용이 불가합니다.");
@@ -122,6 +122,10 @@ function collectAffected(range, root) {
     }
     else {
         cur = descendRight(range.startContainer, range.startOffset);
+        if (cur === null) {
+            showWarning("오류");
+            throw -1;
+        }
         affected.push({ node: cur });
     }
     ascendEdge(0, true, range.startContainer.nodeType !== Node.TEXT_NODE || range.startOffset === 0);
@@ -155,7 +159,7 @@ function annotateFormats(affected, root, command) {
             continue;
         let nodeEl = node;
         e.formats = [];
-        while (nodeEl !== root) {
+        while (nodeEl !== root && nodeEl.parentElement !== null) {
             const cmd = toCommand(nodeEl);
             if (cmd === command)
                 e.on = true;
@@ -180,7 +184,7 @@ function insertMarker(affected, root) {
         range.setStart(last.node, last.endOffset);
     else
         range.setStartAfter(last.node);
-    range.setEndAfter(root.lastChild);
+    range.setEndAfter(root.lastChild ?? last.node);
     const extracted = range.extractContents();
     const marker = document.createElement("span");
     marker.classList.add("select-marker");
@@ -213,7 +217,7 @@ function applyCommand(affected, command, allOn) {
                 el.remove();
                 el = newElement;
             }
-            else if (allOn && el.nodeName === 'A') {
+            else if (allOn && el instanceof Element && el.nodeName === 'A') {
                 const link = el.getAttribute("href");
                 const display = document.createDocumentFragment();
                 display.append(...el.childNodes);
@@ -260,7 +264,7 @@ function descendRight(node, offset = undefined) {
     if (offset !== undefined) {
         if (node.childNodes[offset] === undefined)
             node = nextNode(node);
-        node = node.childNodes[offset] ?? null;
+        node = node?.childNodes[offset] ?? null;
     }
     while (node !== null && !(node instanceof Text)) {
         if (toCommand(node) === 'keep')
@@ -286,11 +290,10 @@ function tabCommand(e) {
         e.preventDefault();
         throw -1;
     }
-    undoBuffer.push(seri(this, true, SERI_HOOKS));
+    undoBuffer.push(seri(this, true, SERI_HOOKS) ?? "오류");
     const cdata = findCloseBracket(this);
     const closeTextNode = cdata.text;
     const closeFlag = cdata.flag;
-    const closeFront = cdata.front;
     const cmd = cdata.cmd;
     let closeIdx = closeFlag === 2 ?
         closeTextNode.textContent.lastIndexOf("]", S.anchorOffset - 1) - cmd.length - 1 :
@@ -365,7 +368,6 @@ function tabCommand(e) {
 function findCloseBracket(root) {
     let cur = S.anchorNode;
     let cmd = null, flag = 0;
-    let front = 0;
     if (!(cur instanceof Text)) {
         cur = descendLeft(cur, S.anchorOffset);
     }
@@ -382,7 +384,6 @@ function findCloseBracket(root) {
         if (cmd.length === 0)
             throw -1;
         flag = 2;
-        front = text.at(-1).length;
     }
     while (!flag && (cur instanceof Text)) {
         const text = cur.textContent.split(']');
@@ -396,15 +397,13 @@ function findCloseBracket(root) {
         if (cmd.length === 0)
             throw -1;
         flag = 1;
-        front = text.at(-1).length;
     }
     if (!(cur instanceof Text) || cmd === null)
         throw -1;
     return {
         text: cur,
         cmd: cmd,
-        flag: flag,
-        front: front
+        flag: flag
     };
 }
 function findOpenBracket(closeText, root) {
@@ -436,7 +435,7 @@ function descendLeft(node, offset = undefined) {
     if (offset !== undefined) {
         if (offset === 0 || node.childNodes[offset - 1] === undefined)
             node = prevNode(node);
-        node = node.childNodes[offset - 1];
+        node = node?.childNodes[offset - 1] ?? null;
     }
     while (node !== null && !(node instanceof Text)) {
         if (toCommand(node) === 'keep')
@@ -519,6 +518,8 @@ function normalizeEditable(el) {
 function toCommand(node) {
     if (node instanceof Text)
         return 'text';
+    if (!(node instanceof Element))
+        return 'keep';
     if (node.tagName === "SPAN") {
         if (node.classList.contains('color')) {
             return `color${getColor(node.classList)}`;

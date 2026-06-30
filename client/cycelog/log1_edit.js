@@ -1,3 +1,4 @@
+import { isHttpError } from "../../script/posts/router.js";
 import { LOG1_TYPE_NAME } from "../../shared/cycelog/log1.js";
 import { $, d$n, q$n } from "../jquery.js";
 import { dialog, showWarning } from "../posts/dialog.js";
@@ -140,9 +141,9 @@ async function moveEntriesDialog(id) {
             return true;
         }
         catch (e) {
-            if (e.status !== 400)
+            if (!isHttpError(e) || e.status !== 400)
                 throw e;
-            showWarning(e.reason);
+            showWarning(e.reason ?? "오류");
             return false;
         }
     })();

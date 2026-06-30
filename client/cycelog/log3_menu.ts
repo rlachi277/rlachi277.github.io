@@ -1,4 +1,4 @@
-import { d$, d$n } from "../jquery.js";
+import { d$n } from "../jquery.js";
 import { dialog, showWarning } from "../posts/dialog.js";
 import {
 	menuInsert,

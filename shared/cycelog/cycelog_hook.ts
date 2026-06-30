@@ -1,11 +1,13 @@
-import { Database } from "better-sqlite3";
-import { DeseriHook, SeriHook } from "../posts/seri.js";
+import type { Database } from "better-sqlite3";
+import type { DeseriHook, SeriHook } from "../posts/seri.js";
 import { EntryRow } from "../../script/cycelog/cycelog.js";
 
 type WhereData = {
 	readonly where: string,
 	readonly type: number
 };
+
+type WhereRow = Required<Pick<EntryRow, "post"|"type">>;
 
 let refCnt = 0;
 const whereCache: Record<number,WhereData> = {};
@@ -14,48 +16,52 @@ export function entryDeseriHook(types: Record<number,number>, isClient: boolean,
 	return function (data, cur) {
 		const postId = cur.split('/').at(-1);
 		if (data.type === 'entry') {
-			const id = (data.variant?.id ?? 0) as number;
-			const type = types?.[id] ?? 0;
-			const path = id != undefined ?
-				`../log1/${postId}#entry${id}` : '';
+			const id = (data.variant?.id ?? undefined) as number | undefined;
+			const type = id !== undefined ? (types?.[id] ?? 0) : 0;
+			const path = id !== undefined ? `../log1/${postId}#entry${id}` : '';
 			return {
 				type: 'html',
-				html: `<a class="entry"${id != undefined ? ` href="${path}" id="entry${id}" data-id="${id}"` : ''} data-type="${type}">
+				html: `<a class="entry"${id !== undefined ? ` href="${path}" id="entry${id}" data-id="${id}"` : ''} data-type="${type}">
 					#${id ?? "?"}
 				</a>`.replaceAll(/\n|\t/g, '')
 			} as const;
 		} else if (data.type === 'ref') {
-			const id = (data.variant?.id ?? 0) as number;
+			const id = (data.variant?.id ?? undefined) as number | undefined;
 			let entryData;
 			refCnt += 1;
 			const refId = `ref${refCnt}`;
 			if (isClient) {
+				if (typeof param !== "string") throw "param <- root";
 				// it is assumed that the log1 data doesn't change while the client is on the same page.
 				// this assumption is valid, because the whole posts system assumes that there's only one session,
 				// and if it's on log3, it's not on log1.
 				if (typeof document === "undefined") throw "이거 서버에서 쓰지 마세요";
-				entryData = whereCache[id];
+				entryData = id !== undefined ? whereCache[id] : undefined;
 				if (entryData === undefined) {
-					if (Object.hasOwn(types, id)) {
+					if (id !== undefined && Object.hasOwn(types, id)) {
 						entryData = {where: postId, type: types?.[id] ?? 0};
-					} else {
+					} else if (id !== undefined) {
 						entryData = {where: "tmp", type: 0};
-						clientWhere(param as string, id).then((newData) => {
+						clientWhere(param, id).then((newData) => {
 							whereCache[id] = newData;
 							const target = document.getElementById(refId);
 							if (target === null) return;
 							target.setAttribute("href", `./${newData.where}#entry${id}`);
 							target.setAttribute("data-type", `${newData.type}`);
 						});
+					} else {
+						entryData = {where: "void", type: 0};
 					}
 				}
 			} else {
-				entryData = serverWhere(param as Database, id);
+				if (typeof param === "string") throw "param <- db";
+				if (id === undefined) entryData = {where: "void", type: 0};
+				else entryData = serverWhere(param, id);
 			}
-			const path = id != undefined ? `./${entryData.where}#entry${id}` : '';
+			const path = id !== undefined ? `./${entryData.where}#entry${id}` : '';
 			return {
 				type: 'html',
-				html: `<a class="entry ref" id="${refId}"${id != undefined ? ` href="${path}"` : ''} data-id="${id}" data-type="${entryData.type}">
+				html: `<a class="entry ref" id="${refId}"${id !== undefined ? ` href="${path}" data-id="${id}"` : ''} data-type="${entryData.type}">
 					ref. #${id ?? "?"}
 				</a>`.replaceAll(/\n|\t/g, '')
 			} as const;
@@ -68,13 +74,13 @@ export const entrySeriHook: SeriHook = function (data, _) {
 	if (data.classList.contains("ref")) {
 		return {
 			type: 'ref',
-			variant: {id: data.getAttribute("data-id")}, // NaN -> null
+			variant: {id: parseInt(data.getAttribute("data-id") ?? "")}, // NaN -> null
 			children: null
 		} as const;
 	} else if (data.classList.contains("entry")) {
 		return {
 			type: 'entry',
-			variant: {id: data.getAttribute("data-id")}, // NaN -> null
+			variant: {id: parseInt(data.getAttribute("data-id") ?? "")}, // NaN -> null
 			children: null
 		} as const;
 	}
@@ -88,10 +94,10 @@ async function clientWhere(root: string, id: number): Promise<WhereData> {
 }
 
 export function serverWhere(db: Database, id: number): WhereData {
-	const dbResult = db.prepare<number,EntryRow>(`SELECT post, type FROM entries WHERE id = ?`).get(id);
-	if (dbResult === undefined) throw 404;
+	const dbResult = db.prepare<number,WhereRow>(`SELECT post, type FROM entries WHERE id = ?`).get(id);
+	if (dbResult === undefined) return {where: "void", type: 0};
 	return {
-		where: dbResult.post as string,
-		type: dbResult.type as number
+		where: dbResult.post,
+		type: dbResult.type
 	};
 }

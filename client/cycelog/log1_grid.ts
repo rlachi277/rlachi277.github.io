@@ -16,12 +16,13 @@ export function setupGrid() {
 	$("tbody td, tfoot td").attr("tabindex", "-1");
 	if (sessionStorage.getItem("log1Page") !== window.location.pathname) sessionStorage.clear();
 	sessionStorage.setItem("log1Page", window.location.pathname);
-	curR = sessionStorage.getItem("curR") !== null ?
-		parseInt(sessionStorage.getItem("curR") as string) :
-		parseInt($("tbody > tr:first-child").attr("data-row") as string);
-	curC = sessionStorage.getItem("curC") !== null ?
-		parseInt(sessionStorage.getItem("curC") as string) : 0;
-	isFocused = JSON.parse(sessionStorage.getItem("isFocused") as string) ?? false;
+	const sessionR = sessionStorage.getItem("curR");
+	const sessionC = sessionStorage.getItem("curC");
+	const sessionF = sessionStorage.getItem("isFocused");
+	curR = sessionR !== null ?
+		parseInt(sessionR) : parseInt($("tbody > tr:first-child").attr("data-row") as string);
+	curC = sessionC !== null ? parseInt(sessionC) : 0;
+	isFocused = sessionF !== null ? JSON.parse(sessionF) : false;
 	if (Number.isNaN(curR)) {
 		curR = -1; isFocused = false;
 	}

@@ -136,7 +136,7 @@ const log3Template = fs.readFileSync(path.join(__dirname, 'client', 'cycelog', '
 const log3NotFoundTemplate = fs.readFileSync(path.join(__dirname, 'client', 'cycelog', 'log3_404.html'), 'utf8').replaceAll(/\n|\t/g, '');
 const log3IndexTemplate = fs.readFileSync(path.join(__dirname, 'client', 'cycelog', 'log3_index.html'), 'utf8').replaceAll(/\n|\t/g, '');
 
-router.get('/log3/', (req, res) => {
+router.get('/log3/', (_, res) => {
 	withErrors(res, () => {
 		return getIndex("/cycelog/log3/", log3IndexTemplate, log3Hook);
 	}, true);

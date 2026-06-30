@@ -12,7 +12,7 @@ import {
 	getIndex
 } from "./posts.js";
 import { renderNavHook } from './render_nav.js';
-import { Response } from 'express-serve-static-core';
+import type { Response } from 'express-serve-static-core';
 
 const db = new Database('db/posts.db');
 db.pragma('journal_mode = WAL');
@@ -97,7 +97,13 @@ function getPath(path: string[] = []): string {
 	return result;
 }
 
-export function withErrors(res: Response<any, Record<string,any>, number>, func: () => any | void, sendResult: boolean = false) {
+export type HttpError = {
+	readonly status: number,
+	readonly reason?: string,
+	readonly html?: string
+};
+
+export function withErrors(res: Response<unknown, Record<string,unknown>, number>, func: () => unknown | void, sendResult: boolean = false) {
 	try {
 		if (sendResult) {
 			res.status(200).send(func());
@@ -105,11 +111,11 @@ export function withErrors(res: Response<any, Record<string,any>, number>, func:
 			func();
 			res.sendStatus(204);
 		}
-	} catch (e: any) {
+	} catch (e) {
 		if (typeof e === 'number') {
 			res.setHeader('Content-Type', 'text/plain');
 			res.sendStatus(e);
-		} else if (e.status !== undefined) {
+		} else if (isHttpError(e)) {
 			if (e.reason != undefined) {
 				res.setHeader('Content-Type', 'text/plain');
 				res.status(e.status).send(e.reason);
@@ -119,4 +125,8 @@ export function withErrors(res: Response<any, Record<string,any>, number>, func:
 			} else res.sendStatus(e.status);
 		} else throw e;
 	}
+}
+
+export function isHttpError(e: unknown): e is HttpError {
+	return typeof e === "object" && e !== null && typeof (e as {status?: unknown}).status === "number";
 }

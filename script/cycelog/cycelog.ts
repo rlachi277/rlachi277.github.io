@@ -1,17 +1,17 @@
-import { Database } from "better-sqlite3";
-import { buildLog1Table, Log1RowData } from "../../shared/cycelog/log1.js";
+import type { Database } from "better-sqlite3";
+import { buildLog1Table } from "../../shared/cycelog/log1.js";
+import type { Log1RowData } from "../../shared/cycelog/log1.js";
 import {
 	getPost,
 	patchPost,
 	getPostFromData,
 	postExists,
 	deletePost,
-	badRequest,
-	PostTemplate,
-	PatchBody,
-	CountRow
+	badRequest
 } from "../posts/posts.js";
-import { DeseriHook } from "../../shared/posts/seri.js";
+import type { CountRow, PatchBody, PostTemplate } from "../posts/posts.js";
+import type { DeseriHook } from "../../shared/posts/seri.js";
+import { isHttpError } from "../posts/router.js";
 
 export type EntryRow = {
 	readonly id?: number,
@@ -20,6 +20,15 @@ export type EntryRow = {
 	readonly content?: string,
 	readonly post?: string
 }
+
+type StoredEntryRow = {
+	readonly id: number,
+	readonly type: number,
+	readonly time: string,
+	readonly content: string,
+	readonly post: string
+};
+type StoredEntryData = Omit<StoredEntryRow, "id">;
 
 type MoveData = {
 	readonly startId: number,
@@ -86,23 +95,27 @@ export function postLog1(db: Database, postId: string, body: EntryRow) {
 			INSERT INTO entries (id, type, time, content, post)
 			VALUES (?, ?, ?, ?, ?)
 		`).run(body.id, body.type, body.time, body.content, postId);
-	} catch (e: any) {
-		if (e.code === "SQLITE_CONSTRAINT_PRIMARYKEY") throw badRequest("해당 번호의 항목이 이미 존재합니다.");
-		else if (e.code === "SQLITE_CONSTRAINT_NOTNULL") throw badRequest("데이터가 충분히 주어지지 않았습니다.");
+	} catch (e) {
+		if (isSqliteError(e, "SQLITE_CONSTRAINT_PRIMARYKEY")) throw badRequest("해당 번호의 항목이 이미 존재합니다.");
+		else if (isSqliteError(e, "SQLITE_CONSTRAINT_NOTNULL")) throw badRequest("데이터가 충분히 주어지지 않았습니다.");
 		throw e;
 	}
 }
 
+function isSqliteError(e: unknown, code: string): boolean {
+	return typeof e === "object" && e !== null && (e as {code?: unknown}).code === code;
+}
+
 export function patchLog1(db: Database, postId: string, body: EntryRow): EntryRow {
 	if (body.id == undefined) throw badRequest("데이터가 충분히 주어지지 않았습니다.");
-	let dbResult = db.prepare<number,EntryRow>(`SELECT type, time, content, post FROM entries
+	let dbResult = db.prepare<number,StoredEntryData>(`SELECT type, time, content, post FROM entries
 		WHERE id = ?`).get(body.id);
-	if (dbResult === undefined) dbResult = {type: 0, time: '', content: ''};
+	if (dbResult === undefined) dbResult = {type: 0, time: '', content: '', post: postId};
 	else if (dbResult.post !== postId) throw badRequest("해당 항목은 다른 글의 1차 기록입니다.");
 	const newData = {
-		type: body.type || dbResult.type as number,
-		time: body.time || dbResult.time as string,
-		content: body.content || dbResult.content as string
+		type: body.type || dbResult.type,
+		time: body.time || dbResult.time,
+		content: body.content || dbResult.content
 	}; // body에서의 0 또는 빈 문자열은 무시
 	if (!(0 <= newData.type && newData.type <= 6)) throw badRequest("데이터의 형식이 잘못되었습니다.");
 	db.prepare(`
@@ -133,34 +146,34 @@ export function moveLog1(db: Database, postId: string, body: MoveData) {
 			db.prepare(`DELETE FROM entries WHERE id BETWEEN ? AND ?`).run(startId, endId);
 			for (const e of dbResult) {
 				postLog1(db, postId, {
-					id: (e.id as number) + delta,
+					id: e.id + delta,
 					type: e.type,
 					time: e.time,
 					content: e.content
 				});
 			}
-		} catch (e: any) {
-			if (e.status === 404) throw "oh no"; // ???
+		} catch (e) {
+			if (isHttpError(e) && e.status === 404) throw "oh no"; // ???
 			throw e;
 		}
 	})();
 }
 
-function getMoveTarget(db: Database, postId: string, startId: number, endId: number, delta: number): EntryRow[] {
+function getMoveTarget(db: Database, postId: string, startId: number, endId: number, delta: number): StoredEntryRow[] {
 	if (startId == undefined || endId == undefined || delta == undefined) throw badRequest("데이터가 충분히 주어지지 않았습니다.");
 	else if (startId > endId || delta === 0 || startId + delta <= 0) throw badRequest("데이터의 형식이 잘못되었습니다.");
 
-	const dbResult = db.prepare<[string,number,number], EntryRow>(`SELECT id, type, time, content, post FROM entries
+	const dbResult = db.prepare<[string,number,number],StoredEntryRow>(`SELECT id, type, time, content, post FROM entries
 		WHERE post = ? AND id BETWEEN ? AND ?`).all(postId, startId, endId);
 	if (dbResult.length === 0) throw 404;
-	const allCount = db.prepare<[number,number], CountRow>(`SELECT COUNT(1) FROM entries
+	const allCount = db.prepare<[number,number],CountRow>(`SELECT COUNT(1) FROM entries
 		WHERE id BETWEEN ? AND ?`).get(startId, endId)?.['COUNT(1)'];
 	if (dbResult.length !== allCount) throw badRequest("적용 범위에 다른 글의 1차 기록이 포함됩니다.");
 	
 	const newRangeStart = (delta > 0) ? endId+1 : startId+delta;
 	const newRangeEnd = (delta > 0) ? endId+delta : startId-1;
-	const newRangeCount = db.prepare<[number,number], CountRow>(`SELECT COUNT(1) FROM entries
-		WHERE id BETWEEN ? AND ?`).get(newRangeStart, newRangeEnd)?.['COUNT(1)'];
+	const newRangeCount = db.prepare<[number,number],CountRow>(`SELECT COUNT(1) FROM entries
+		WHERE id BETWEEN ? AND ?`).get(newRangeStart,newRangeEnd)?.['COUNT(1)'];
 	if (newRangeCount !== 0) throw badRequest("이 동작으로 인해 번호 충돌이 발생할 가능성이 있습니다.");
 
 	return dbResult;

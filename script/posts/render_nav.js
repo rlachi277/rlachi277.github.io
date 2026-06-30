@@ -27,7 +27,7 @@ function renderNav(db, root, cur) {
         if (newData.children.length === 0)
             return `<li>${anchor}</li>`;
         let middle = "";
-        for (let e of newData.children)
+        for (const e of newData.children)
             middle += makeNavEntry(link, e);
         return `<li>${anchor}<ul>${middle}</ul></li>`;
     }

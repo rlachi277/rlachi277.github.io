@@ -1,5 +1,6 @@
 import { buildLog1Table } from "../../shared/cycelog/log1.js";
 import { getPost, patchPost, getPostFromData, postExists, deletePost, badRequest } from "../posts/posts.js";
+import { isHttpError } from "../posts/router.js";
 const LOG3_TYPES_SLOT = "###여기까지가 템플릿임 3###";
 export { getIndex } from "../posts/posts.js";
 export function getLog3(db, root, path, template, renderHooks, types) {
@@ -53,12 +54,15 @@ export function postLog1(db, postId, body) {
 		`).run(body.id, body.type, body.time, body.content, postId);
     }
     catch (e) {
-        if (e.code === "SQLITE_CONSTRAINT_PRIMARYKEY")
+        if (isSqliteError(e, "SQLITE_CONSTRAINT_PRIMARYKEY"))
             throw badRequest("해당 번호의 항목이 이미 존재합니다.");
-        else if (e.code === "SQLITE_CONSTRAINT_NOTNULL")
+        else if (isSqliteError(e, "SQLITE_CONSTRAINT_NOTNULL"))
             throw badRequest("데이터가 충분히 주어지지 않았습니다.");
         throw e;
     }
+}
+function isSqliteError(e, code) {
+    return typeof e === "object" && e !== null && e.code === code;
 }
 export function patchLog1(db, postId, body) {
     if (body.id == undefined)
@@ -66,7 +70,7 @@ export function patchLog1(db, postId, body) {
     let dbResult = db.prepare(`SELECT type, time, content, post FROM entries
 		WHERE id = ?`).get(body.id);
     if (dbResult === undefined)
-        dbResult = { type: 0, time: '', content: '' };
+        dbResult = { type: 0, time: '', content: '', post: postId };
     else if (dbResult.post !== postId)
         throw badRequest("해당 항목은 다른 글의 1차 기록입니다.");
     const newData = {
@@ -111,7 +115,7 @@ export function moveLog1(db, postId, body) {
             }
         }
         catch (e) {
-            if (e.status === 404)
+            if (isHttpError(e) && e.status === 404)
                 throw "oh no"; // ???
             throw e;
         }

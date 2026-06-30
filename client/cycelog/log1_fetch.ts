@@ -1,4 +1,4 @@
-import { EntryRow } from "../../script/cycelog/cycelog.js";
+import type { EntryRow } from "../../script/cycelog/cycelog.js";
 
 export async function sendPatch(body: EntryRow, getData: boolean = false): Promise<EntryRow | void> {
 	const res = await fetch(window.location.href, {

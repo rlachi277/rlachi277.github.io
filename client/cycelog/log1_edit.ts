@@ -1,6 +1,7 @@
-import { EntryRow } from "../../script/cycelog/cycelog.js";
+import type { EntryRow } from "../../script/cycelog/cycelog.js";
+import { isHttpError } from "../../script/posts/router.js";
 import { LOG1_TYPE_NAME } from "../../shared/cycelog/log1.js";
-import { $, d$, d$n, q$, q$n } from "../jquery.js";
+import { $, d$n, q$n } from "../jquery.js";
 import { dialog, showWarning } from "../posts/dialog.js";
 import { sendDelete, sendMove, sendPatch } from "./log1_fetch.js";
 import { setupGrid, getFocusState, focusOn } from "./log1_grid.js";
@@ -136,9 +137,9 @@ async function moveEntriesDialog(id: number) {
 			focusOn(curR + delta, curC, true);
 			window.location.reload();
 			return true;
-		} catch (e: any) {
-			if (e.status !== 400) throw e;
-			showWarning(e.reason);
+		} catch (e) {
+			if (!isHttpError(e) || e.status !== 400) throw e;
+			showWarning(e.reason ?? "오류");
 			return false;
 		}
 	})();

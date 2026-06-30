@@ -1,6 +1,7 @@
 export function addPost(db, path) {
     if (path.length === 0)
         path = ["index.html"];
+    const postId = path.at(-1);
     const parent = path.length === 1 ? '' : path.slice(0, -1).join('/') + '/';
     let dbResult = db.prepare('SELECT posts FROM dir WHERE path = ?').get(parent)?.posts;
     if (dbResult === undefined) {
@@ -8,9 +9,9 @@ export function addPost(db, path) {
         dbResult = "[]";
     }
     const data = JSON.parse(dbResult);
-    if (data.includes(path.at(-1)))
+    if (data.includes(postId))
         return;
-    data.push(path.at(-1));
+    data.push(postId);
     db.prepare(`
 		UPDATE dir
 		SET posts = ?
@@ -20,14 +21,15 @@ export function addPost(db, path) {
 export function removePost(db, path) {
     if (path.length === 0)
         path = ["index.html"];
+    const postId = path.at(-1);
     const parent = path.length === 1 ? '' : path.slice(0, -1).join('/') + '/';
     const dbResult = db.prepare('SELECT posts, subdir FROM dir WHERE path = ?').get(parent);
     if (dbResult === undefined)
         return; // ???
     const data = JSON.parse(dbResult.posts);
-    if (!data.includes(path.at(-1)))
+    if (!data.includes(postId))
         return; // ???
-    data.splice(data.indexOf(path.at(-1)), 1);
+    data.splice(data.indexOf(postId), 1);
     db.prepare(`
 		UPDATE dir
 		SET posts = ?
@@ -50,6 +52,7 @@ function addDirectory(db, path) {
 	`).run(joined);
     if (path.length === 0)
         return;
+    const postId = path.at(-1);
     const parent = path.length === 1 ? '' : path.slice(0, -1).join('/') + '/';
     let dbResult = db.prepare('SELECT subdir FROM dir WHERE path = ?').get(parent)?.subdir;
     if (dbResult === undefined) {
@@ -57,9 +60,9 @@ function addDirectory(db, path) {
         dbResult = "[]";
     }
     const data = JSON.parse(dbResult);
-    if (data.includes(path.at(-1)))
+    if (data.includes(postId))
         return;
-    data.push(path.at(-1));
+    data.push(postId);
     db.prepare(`
 		UPDATE dir
 		SET subdir = ?
@@ -77,14 +80,15 @@ function removeDirectory(db, path) {
 	`).run(joined);
     if (path.length === 0)
         return;
+    const postId = path.at(-1);
     const parent = path.length === 1 ? '' : path.slice(0, -1).join('/') + '/';
     const dbResult = db.prepare('SELECT posts, subdir FROM dir WHERE path = ?').get(parent);
     if (dbResult === undefined)
         return; // ???
     const data = JSON.parse(dbResult.subdir);
-    if (!data.includes(path.at(-1)))
+    if (!data.includes(postId))
         return; // ???
-    data.splice(data.indexOf(path.at(-1)), 1);
+    data.splice(data.indexOf(postId), 1);
     db.prepare(`
 		UPDATE dir
 		SET subdir = ?

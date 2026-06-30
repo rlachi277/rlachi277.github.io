@@ -93,7 +93,7 @@ export function withErrors(res, func, sendResult = false) {
             res.setHeader('Content-Type', 'text/plain');
             res.sendStatus(e);
         }
-        else if (e.status !== undefined) {
+        else if (isHttpError(e)) {
             if (e.reason != undefined) {
                 res.setHeader('Content-Type', 'text/plain');
                 res.status(e.status).send(e.reason);
@@ -108,4 +108,7 @@ export function withErrors(res, func, sendResult = false) {
         else
             throw e;
     }
+}
+export function isHttpError(e) {
+    return typeof e === "object" && e !== null && typeof e.status === "number";
 }

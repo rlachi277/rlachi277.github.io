@@ -241,8 +241,8 @@ function handleCancelKey(target: HTMLElement) {
 		return;
 	} else if (target.classList.contains("new")) {
 		const successor = ((target.previousElementSibling?.matches(".editable")) ?
-		target.previousElementSibling :
-		(target.nextElementSibling?.matches(".editable") ? target.nextElementSibling : null)) as HTMLElement;
+			target.previousElementSibling :
+			(target.nextElementSibling?.matches(".editable") ? target.nextElementSibling : null)) as HTMLElement | null;
 
 		target.remove();
 		
@@ -346,7 +346,7 @@ function submitDelete(el: HTMLElement) {
 
 	const successor = ((el.previousElementSibling?.matches(".editable")) ?
 		el.previousElementSibling :
-		(el.nextElementSibling?.matches(".editable") ? el.nextElementSibling : null)) as HTMLElement;
+		(el.nextElementSibling?.matches(".editable") ? el.nextElementSibling : null)) as HTMLElement | null;
 
 	el.remove();
 	startEdit(parent);
