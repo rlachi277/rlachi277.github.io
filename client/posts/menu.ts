@@ -1,8 +1,9 @@
-import { seri } from "../../shared/posts/seri.js";
 import type { SeriData } from "../../shared/posts/seri.js";
-import { $, d$n, q$n } from "../jquery.js";
-import { SERI_HOOKS } from "./script.js";
 import type { MenuActions } from "./script.js";
+
+import { seri } from "../../shared/posts/seri.js";
+import { $, d$n, q$n } from "../query.js";
+import { SERI_HOOKS } from "./script.js";
 import { dialog, showWarning } from "./dialog.js";
 import {
 	startTargeting,

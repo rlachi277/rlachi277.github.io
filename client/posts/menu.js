@@ -1,5 +1,5 @@
 import { seri } from "../../shared/posts/seri.js";
-import { $, d$n, q$n } from "../jquery.js";
+import { $, d$n, q$n } from "../query.js";
 import { SERI_HOOKS } from "./script.js";
 import { dialog, showWarning } from "./dialog.js";
 import { startTargeting, menuInsert, insertHgroup, deleteElement, header, stopTargeting } from "./edit.js";

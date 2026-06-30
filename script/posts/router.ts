@@ -1,3 +1,5 @@
+import type { Response } from 'express-serve-static-core';
+
 import fs from 'fs';
 import path from 'path';
 import express from "express";
@@ -12,7 +14,6 @@ import {
 	getIndex
 } from "./posts.js";
 import { renderNavHook } from './render_nav.js';
-import type { Response } from 'express-serve-static-core';
 
 const db = new Database('db/posts.db');
 db.pragma('journal_mode = WAL');

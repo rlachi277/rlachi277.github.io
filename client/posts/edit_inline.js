@@ -2,7 +2,7 @@ import { seri, deseri, getColor } from "../../shared/posts/seri.js";
 import { k2e } from "../k2e.js";
 import { SERI_HOOKS, DESERI_HOOKS } from "./script.js";
 import { showWarning } from "./dialog.js";
-import { $ } from "../jquery.js";
+import { $ } from "../query.js";
 const S = window.getSelection();
 let undoBuffer = [];
 let redoBuffer = [];

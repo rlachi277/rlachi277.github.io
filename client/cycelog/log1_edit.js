@@ -1,6 +1,5 @@
-import { isHttpError } from "../../script/posts/router.js";
 import { LOG1_TYPE_NAME } from "../../shared/cycelog/log1.js";
-import { $, d$n, q$n } from "../jquery.js";
+import { $, d$n, q$n } from "../query.js";
 import { dialog, showWarning } from "../posts/dialog.js";
 import { sendDelete, sendMove, sendPatch } from "./log1_fetch.js";
 import { setupGrid, getFocusState, focusOn } from "./log1_grid.js";
@@ -147,6 +146,9 @@ async function moveEntriesDialog(id) {
             return false;
         }
     })();
+}
+function isHttpError(e) {
+    return typeof e === "object" && e !== null && typeof e.status === "number";
 }
 async function onTypeFieldClick() {
     const row = this.parentElement;

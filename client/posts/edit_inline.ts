@@ -1,9 +1,10 @@
-import { seri, deseri, getColor } from "../../shared/posts/seri.js";
 import type { SeriData } from "../../shared/posts/seri.js";
+
+import { seri, deseri, getColor } from "../../shared/posts/seri.js";
 import { k2e } from "../k2e.js";
 import { SERI_HOOKS, DESERI_HOOKS } from "./script.js";
 import { showWarning } from "./dialog.js";
-import { $ } from "../jquery.js";
+import { $ } from "../query.js";
 
 type Affected = {
 	node: Text | Element,

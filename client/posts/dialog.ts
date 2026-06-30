@@ -1,4 +1,4 @@
-import { d$, d$n } from "../jquery.js";
+import { d$, d$n } from "../query.js";
 
 type DialogAction = (() => boolean) | (() => Promise<boolean>);
 

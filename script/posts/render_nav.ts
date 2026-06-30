@@ -1,8 +1,9 @@
 import type { Database } from 'better-sqlite3';
-import { sani } from '../../shared/posts/seri.js';
 import type { DeseriHook } from '../../shared/posts/seri.js';
-import { postExists } from './posts.js';
 import type { DirData } from './manage_nav.js';
+
+import { sani } from '../../shared/posts/seri.js';
+import { postExists } from './posts.js';
 
 type NavDataObject = {
 	readonly name: string,

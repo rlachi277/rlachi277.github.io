@@ -1,8 +1,9 @@
+import type { DeseriHook } from '../../shared/posts/seri.js';
+
 import { entrySeriHook, entryDeseriHook } from '../../shared/cycelog/cycelog_hook.js';
-import { d$, d$n } from "../jquery.js";
+import { d$, d$n } from "../query.js";
 import { SERI_HOOKS, DESERI_HOOKS } from "../posts/script.js";
 import { dialog, showWarning } from "../posts/dialog.js";
-import type { DeseriHook } from '../../shared/posts/seri.js';
 
 let types: Record<number,number>;
 let deseriHook: DeseriHook;

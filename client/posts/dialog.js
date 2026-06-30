@@ -1,4 +1,4 @@
-import { d$, d$n } from "../jquery.js";
+import { d$, d$n } from "../query.js";
 let dialogAction = null;
 export function dialog(title, main, action, danger = false) {
     return function () {

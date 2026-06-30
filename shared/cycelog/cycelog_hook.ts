@@ -1,6 +1,6 @@
 import type { Database } from "better-sqlite3";
 import type { DeseriHook, SeriHook } from "../posts/seri.js";
-import { EntryRow } from "../../script/cycelog/cycelog.js";
+import type { EntryRow } from "../../script/cycelog/cycelog.js";
 
 type WhereData = {
 	readonly where: string,

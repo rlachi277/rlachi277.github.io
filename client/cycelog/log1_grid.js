@@ -1,5 +1,5 @@
 import { LOG1_TYPE_NAME, buildLog1Row } from "../../shared/cycelog/log1.js";
-import { $, d$, d$n, q$, q$n } from "../jquery.js";
+import { $, d$, d$n, q$, q$n } from "../query.js";
 import { k2e } from "../k2e.js";
 import { showWarning } from "../posts/dialog.js";
 import { sendPatch, sendExists } from "./log1_fetch.js";

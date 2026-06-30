@@ -1,6 +1,7 @@
 import type { Database } from 'better-sqlite3';
-import { deseri } from '../../shared/posts/seri.js';
 import type { DeseriHook, MutableSeriData, SeriData } from '../../shared/posts/seri.js';
+
+import { deseri } from '../../shared/posts/seri.js';
 import { addPost, removePost } from "./manage_nav.js";
 
 export type PostRow = {

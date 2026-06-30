@@ -1,6 +1,6 @@
 import { seri, deseri } from "../../shared/posts/seri.js";
 import { SERI_HOOKS, DESERI_HOOKS } from "./script.js";
-import { $, q$n } from "../jquery.js";
+import { $, q$n } from "../query.js";
 import { inlineCommands, inlineCleanup, blurCleanup } from "./edit_inline.js";
 import { showWarning } from "./dialog.js";
 var EDIT_TYPE;
