@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="ko" class="notfound">
 <head>
-	<title>cycelog 404</title>
+	<title>cycweb posts 404</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="/client/bundles/posts/post.css">
-	<script type="module" src="/client/bundles/cycelog/log3.js"></script>
 </head>
 <body>
 	<div id="menubar"> <!-- TODO: implement keyboard navigation and add role="menubar" -->
@@ -22,11 +20,6 @@
 				<li class="menu-edit"><button class="menu-action" data-menu="stopEdit">편집 종료</button></li>
 			</ul>
 			</li>
-			<li><button id="menu-record" popovertarget="menu-recordsub">기록</button>
-			<ul id="menu-recordsub" popover>
-				<li><button class="menu-action" data-menu="toLog1">1차 기록 보기</button></li>
-			</ul>
-			</li>
 		</menu>
 	</div>
 	<dialog id="dialog">
@@ -37,7 +30,7 @@
 			<button id="dialog-confirm">확인</button>
 		</div>
 	</dialog>
-	<div id="warning" role="alert"></div>
+	<div id="warning"></div>
 	###여기까지가 템플릿임###
 </body>
 </html>

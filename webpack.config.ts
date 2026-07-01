@@ -3,6 +3,7 @@ import { fileURLToPath } from "url";
 import webpack from "webpack";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import CssMinimizerPlugin from "css-minimizer-webpack-plugin";
+import HTMLWebpackPlugin from "html-webpack-plugin";
 
 // in case you run into any TypeScript error when configuring `devServer`
 // import "webpack-dev-server";
@@ -14,12 +15,13 @@ const config: webpack.Configuration = {
   mode: "production",
   target: ["web", "es2022"],
   entry: {
-    "posts/index": "./client/posts/entries/index.ts",
-    "posts/post": "./client/posts/entries/post.ts",
-    "cycelog/log1_index": "./client/cycelog/entries/log1_index.ts",
-    "cycelog/log1": "./client/cycelog/entries/log1.ts",
-    "cycelog/log3_index": "./client/cycelog/entries/log3_index.ts",
-    "cycelog/log3": "./client/cycelog/entries/log3.ts"
+    "index": "./src/index.ts",
+    "posts/index": "./src/posts/entries/index.ts",
+    "posts/post": "./src/posts/entries/post.ts",
+    "cycelog/log1_index": "./src/cycelog/entries/log1_index.ts",
+    "cycelog/log1": "./src/cycelog/entries/log1.ts",
+    "cycelog/log3_index": "./src/cycelog/entries/log3_index.ts",
+    "cycelog/log3": "./src/cycelog/entries/log3.ts"
   },
   module: {
     rules: [
@@ -41,6 +43,18 @@ const config: webpack.Configuration = {
   plugins: [
     new MiniCssExtractPlugin({
       filename: "[name].css"
+    }),
+    ...getHtmlPlugin({
+      "index": "index",
+      "posts/index": "posts/index",
+      "posts/post": "posts/post",
+      "posts/404": "posts/post",
+      "cycelog/log1_index": "cycelog/log1_index",
+      "cycelog/log1": "cycelog/log1",
+      "cycelog/log1_404": "cycelog/log1",
+      "cycelog/log3_index": "cycelog/log3_index",
+      "cycelog/log3": "cycelog/log3",
+      "cycelog/log3_404": "cycelog/log3"
     })
   ],
   optimization: {
@@ -50,7 +64,7 @@ const config: webpack.Configuration = {
     ]
   },
   output: {
-    path: path.resolve(__dirname, "client/bundles"),
+    path: path.resolve(__dirname, "dist"),
     filename: "[name].js",
     clean: true
   },
@@ -61,5 +75,19 @@ const config: webpack.Configuration = {
     }
   },
 };
+
+function getHtmlPlugin(files: Record<string,string>): HTMLWebpackPlugin[] {
+  const result: HTMLWebpackPlugin[] = [];
+  for (const [k, v] of Object.entries(files)) {
+    result.push(new HTMLWebpackPlugin({
+      template: `src/${k}.html`,
+      filename: `${k}.html`,
+      publicPath: "/dist/",
+      scriptLoading: "module",
+      chunks: [v]
+    }))
+  }
+  return result;
+}
 
 export default config;

@@ -38,9 +38,9 @@ db.prepare(`
 	ON CONFLICT DO NOTHING
 `).run("index.html", "dummy");
 
-const template = fs.readFileSync(path.join(__dirname, 'client', 'posts', 'post.html'), 'utf8').replaceAll(/\n|\t/g, '');
-const notFoundTemplate = fs.readFileSync(path.join(__dirname, 'client', 'posts', '404.html'), 'utf8').replaceAll(/\n|\t/g, '');
-const indexTemplate = fs.readFileSync(path.join(__dirname, 'client', 'posts', 'index.html'), 'utf8').replaceAll(/\n|\t/g, '');
+const template = fs.readFileSync(path.join(__dirname, 'dist', 'posts', 'post.html'), 'utf8');
+const notFoundTemplate = fs.readFileSync(path.join(__dirname, 'dist', 'posts', '404.html'), 'utf8');
+const indexTemplate = fs.readFileSync(path.join(__dirname, 'dist', 'posts', 'index.html'), 'utf8');
 
 const router = express.Router();
 export default router;

@@ -65,9 +65,9 @@ router.get('/', (_, res) => {
 });
 
 
-const log1Template = fs.readFileSync(path.join(__dirname, 'client', 'cycelog', 'log1.html'), 'utf8').replaceAll(/\n|\t/g, '');
-const log1NotFoundTemplate = fs.readFileSync(path.join(__dirname, 'client', 'cycelog', 'log1_404.html'), 'utf8').replaceAll(/\n|\t/g, '');
-const log1IndexTemplate = fs.readFileSync(path.join(__dirname, 'client', 'cycelog', 'log1_index.html'), 'utf8').replaceAll(/\n|\t/g, '');
+const log1Template = fs.readFileSync(path.join(__dirname, 'dist', 'cycelog', 'log1.html'), 'utf8');
+const log1NotFoundTemplate = fs.readFileSync(path.join(__dirname, 'dist', 'cycelog', 'log1_404.html'), 'utf8');
+const log1IndexTemplate = fs.readFileSync(path.join(__dirname, 'dist', 'cycelog', 'log1_index.html'), 'utf8');
 
 router.get('/log1/', (_, res) => {
 	withErrors(res, () => {
@@ -132,9 +132,9 @@ router.get('/log1/where/:id', (req, res) => {
 });
 
 
-const log3Template = fs.readFileSync(path.join(__dirname, 'client', 'cycelog', 'log3.html'), 'utf8').replaceAll(/\n|\t/g, '');
-const log3NotFoundTemplate = fs.readFileSync(path.join(__dirname, 'client', 'cycelog', 'log3_404.html'), 'utf8').replaceAll(/\n|\t/g, '');
-const log3IndexTemplate = fs.readFileSync(path.join(__dirname, 'client', 'cycelog', 'log3_index.html'), 'utf8').replaceAll(/\n|\t/g, '');
+const log3Template = fs.readFileSync(path.join(__dirname, 'dist', 'cycelog', 'log3.html'), 'utf8');
+const log3NotFoundTemplate = fs.readFileSync(path.join(__dirname, 'dist', 'cycelog', 'log3_404.html'), 'utf8');
+const log3IndexTemplate = fs.readFileSync(path.join(__dirname, 'dist', 'cycelog', 'log3_index.html'), 'utf8');
 
 router.get('/log3/', (_, res) => {
 	withErrors(res, () => {

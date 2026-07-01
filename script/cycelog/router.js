@@ -44,9 +44,9 @@ const log3Hook = renderNavHook(db, "/cycelog/log3/");
 router.get('/', (_, res) => {
     res.redirect('log3/');
 });
-const log1Template = fs.readFileSync(path.join(__dirname, 'client', 'cycelog', 'log1.html'), 'utf8').replaceAll(/\n|\t/g, '');
-const log1NotFoundTemplate = fs.readFileSync(path.join(__dirname, 'client', 'cycelog', 'log1_404.html'), 'utf8').replaceAll(/\n|\t/g, '');
-const log1IndexTemplate = fs.readFileSync(path.join(__dirname, 'client', 'cycelog', 'log1_index.html'), 'utf8').replaceAll(/\n|\t/g, '');
+const log1Template = fs.readFileSync(path.join(__dirname, 'dist', 'cycelog', 'log1.html'), 'utf8');
+const log1NotFoundTemplate = fs.readFileSync(path.join(__dirname, 'dist', 'cycelog', 'log1_404.html'), 'utf8');
+const log1IndexTemplate = fs.readFileSync(path.join(__dirname, 'dist', 'cycelog', 'log1_index.html'), 'utf8');
 router.get('/log1/', (_, res) => {
     withErrors(res, () => {
         return getIndex("/cycelog/log1/", log1IndexTemplate, log1Hook);
@@ -100,9 +100,9 @@ router.get('/log1/where/:id', (req, res) => {
         return log1Where(db, parseInt(req.params.id));
     }, true);
 });
-const log3Template = fs.readFileSync(path.join(__dirname, 'client', 'cycelog', 'log3.html'), 'utf8').replaceAll(/\n|\t/g, '');
-const log3NotFoundTemplate = fs.readFileSync(path.join(__dirname, 'client', 'cycelog', 'log3_404.html'), 'utf8').replaceAll(/\n|\t/g, '');
-const log3IndexTemplate = fs.readFileSync(path.join(__dirname, 'client', 'cycelog', 'log3_index.html'), 'utf8').replaceAll(/\n|\t/g, '');
+const log3Template = fs.readFileSync(path.join(__dirname, 'dist', 'cycelog', 'log3.html'), 'utf8');
+const log3NotFoundTemplate = fs.readFileSync(path.join(__dirname, 'dist', 'cycelog', 'log3_404.html'), 'utf8');
+const log3IndexTemplate = fs.readFileSync(path.join(__dirname, 'dist', 'cycelog', 'log3_index.html'), 'utf8');
 router.get('/log3/', (_, res) => {
     withErrors(res, () => {
         return getIndex("/cycelog/log3/", log3IndexTemplate, log3Hook);

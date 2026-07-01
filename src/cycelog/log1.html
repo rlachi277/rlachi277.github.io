@@ -1,26 +1,31 @@
 <!DOCTYPE html>
-<html lang="ko" class="notfound">
+<html lang="ko">
 <head>
-	<title>cycweb posts 404</title>
+	<title>cycelog log 1</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="/client/colors.css">
-	<link rel="stylesheet" href="/client/posts/style.css">
-	<script type="module" src="/client/bundles/posts/post.js"></script>
 </head>
 <body>
+	<button id="log1-skip">표로 건너뛰기</button>
 	<div id="menubar"> <!-- TODO: implement keyboard navigation and add role="menubar" -->
 		<menu>
-			<li class="menu-edit"><button id="menu-file" popovertarget="menu-filesub">파일</button>
+			<li><button id="menu-file" popovertarget="menu-filesub">파일</button>
 			<ul id="menu-filesub" popover>
-				<li><button class="menu-action" data-menu="new">새 글...</button></li>
-				<li><button class="menu-action" data-menu="load">JSON에서 불러오기...</button></li>
+				<li><button class="menu-action" data-menu="export">JSON으로 저장</button></li>
+				<li class="menu-edit"><button class="menu-action" data-menu="new">새 글...</button></li>
+				<li class="menu-edit"><button class="menu-action" data-menu="delete">이 글 삭제...</button></li>
 			</ul>
 			</li>
 			<li><button id="menu-edit" popovertarget="menu-editsub">편집</button>
 			<ul id="menu-editsub" popover>
 				<li><button class="menu-action" data-menu="startEdit">편집 시작</button></li>
 				<li class="menu-edit"><button class="menu-action" data-menu="stopEdit">편집 종료</button></li>
+			</ul>
+			</li>
+			<li><button id="menu-record" popovertarget="menu-recordsub">기록</button>
+			<ul id="menu-recordsub" popover>
+				<li><button class="menu-action" data-menu="toLog3">3차 기록 보기</button></li>
+				<li><button class="menu-action" data-menu="removeMark">항목 강조 해제</button></li>
 			</ul>
 			</li>
 		</menu>
@@ -33,7 +38,7 @@
 			<button id="dialog-confirm">확인</button>
 		</div>
 	</dialog>
-	<div id="warning"></div>
+	<div id="warning" role="alert"></div>
 	###여기까지가 템플릿임###
 </body>
 </html>

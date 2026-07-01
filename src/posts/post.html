@@ -1,12 +1,9 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-	<title>cycelog log 3</title>
+	<title>cycweb posts</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="/client/bundles/cycelog/log3.css">
-	<script>window.LOG3_TYPES = `###여기까지가 템플릿임 3###`;</script>
-	<script type="module" src="/client/bundles/cycelog/log3.js"></script>
 </head>
 <body>
 	<div id="menubar"> <!-- TODO: implement keyboard navigation and add role="menubar" -->
@@ -16,6 +13,7 @@
 				<li><button class="menu-action" data-menu="export">JSON으로 저장</button></li>
 				<li class="menu-edit"><button class="menu-action" data-menu="load">JSON에서 불러오기...</button></li>
 				<li class="menu-edit"><button class="menu-action" data-menu="new">새 글...</button></li>
+				<li class="menu-edit"><button class="menu-action" data-menu="duplicate">이 글 복제...</button></li>
 				<li class="menu-edit"><button class="menu-action" data-menu="delete">이 글 삭제...</button></li>
 			</ul>
 			</li>
@@ -27,19 +25,16 @@
 			</li>
 			<li class="menu-edit"><button id="menu-insert" popovertarget="menu-insertsub">삽입</button>
 			<ul id="menu-insertsub" popover>
-				<li><button class="menu-action" data-menu="insertWeek">주차 추가</button></li>
 				<li><button class="menu-action" data-menu="insertP">문단 삽입</button></li>
 				<li><button class="menu-action" data-menu="insertSection">&lt;section&gt; 삽입</button></li>
+				<li><button class="menu-action" data-menu="insertArticle">&lt;article&gt; 삽입</button></li>
 				<li><button class="menu-action" data-menu="insertFieldset">&lt;fieldset&gt; 삽입</button></li>
+				<li><button class="menu-action" data-menu="insertLegend">&lt;legend&gt; 삽입</button></li>
 				<li><button class="menu-action" data-menu="insertColumns">다단 레이아웃 삽입</button></li>
+				<li><button class="menu-action" data-menu="insertHeader">제목 삽입</button></li>
+				<li><button class="menu-action" data-menu="insertHgroup">부제 추가/삭제</button></li>
 				<li><button class="menu-action" data-menu="deleteElement">요소 삭제</button></li>
 				<li><button class="menu-action" data-menu="stopTargeting">삽입/삭제 중단</button></li>
-			</ul>
-			</li>
-			<li><button id="menu-record" popovertarget="menu-recordsub">기록</button>
-			<ul id="menu-recordsub" popover>
-				<li><button class="menu-action" data-menu="toLog1">1차 기록 보기</button></li>
-				<li><button class="menu-action" data-menu="removeMark">항목 강조 해제</button></li>
 			</ul>
 			</li>
 		</menu>
@@ -52,7 +47,7 @@
 			<button id="dialog-confirm">확인</button>
 		</div>
 	</dialog>
-	<div id="warning" role="alert"></div>
+	<div id="warning"></div>
 	###여기까지가 템플릿임###
 </body>
 </html>
