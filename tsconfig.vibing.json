@@ -9,8 +9,7 @@
     "outDir": "./dist/"
   },
   "include": [
-    "src/server/**/*.ts",
-    "src/shared/**/*.ts"
+    "src/vibing/**/*.ts"
   ],
   "exclude": ["node_modules"],
 }

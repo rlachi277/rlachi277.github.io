@@ -7,9 +7,9 @@
     "types": []
   },
   "include": [
-    "src/**/*.d.ts",
-    "src/**/*.ts",
-    "shared/**/*.ts"
+    "src/client/**/*.d.ts",
+    "src/client/**/*.ts",
+    "src/shared/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }

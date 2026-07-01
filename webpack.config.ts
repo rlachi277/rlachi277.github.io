@@ -11,18 +11,36 @@ import HTMLWebpackPlugin from "html-webpack-plugin";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const entries = {
+  "index": "index",
+  "posts/index": "posts/entries/index",
+  "posts/post": "posts/entries/post",
+  "cycelog/log1_index": "cycelog/entries/log1_index",
+  "cycelog/log1": "cycelog/entries/log1",
+  "cycelog/log3_index": "cycelog/entries/log3_index",
+  "cycelog/log3": "cycelog/entries/log3"
+} as const;
+
+const html: Record<string, keyof typeof entries> = {
+  "index": "index",
+  "posts/index": "posts/index",
+  "posts/post": "posts/post",
+  "posts/404": "posts/post",
+  "cycelog/log1_index": "cycelog/log1_index",
+  "cycelog/log1": "cycelog/log1",
+  "cycelog/log1_404": "cycelog/log1",
+  "cycelog/log3_index": "cycelog/log3_index",
+  "cycelog/log3": "cycelog/log3",
+  "cycelog/log3_404": "cycelog/log3"
+};
+
 const config: webpack.Configuration = {
   mode: "production",
   target: ["web", "es2022"],
-  entry: {
-    "index": "./src/index.ts",
-    "posts/index": "./src/posts/entries/index.ts",
-    "posts/post": "./src/posts/entries/post.ts",
-    "cycelog/log1_index": "./src/cycelog/entries/log1_index.ts",
-    "cycelog/log1": "./src/cycelog/entries/log1.ts",
-    "cycelog/log3_index": "./src/cycelog/entries/log3_index.ts",
-    "cycelog/log3": "./src/cycelog/entries/log3.ts"
-  },
+  entry: Object.entries(entries).reduce((acc: Record<string,string>, [k, v]) => {
+    acc[k] = `./src/client/${v}.ts`;
+    return acc;
+  }, {}),
   module: {
     rules: [
       {
@@ -44,27 +62,26 @@ const config: webpack.Configuration = {
     new MiniCssExtractPlugin({
       filename: "[name].css"
     }),
-    ...getHtmlPlugin({
-      "index": "index",
-      "posts/index": "posts/index",
-      "posts/post": "posts/post",
-      "posts/404": "posts/post",
-      "cycelog/log1_index": "cycelog/log1_index",
-      "cycelog/log1": "cycelog/log1",
-      "cycelog/log1_404": "cycelog/log1",
-      "cycelog/log3_index": "cycelog/log3_index",
-      "cycelog/log3": "cycelog/log3",
-      "cycelog/log3_404": "cycelog/log3"
-    })
+    ...Object.entries(html).reduce((acc: HTMLWebpackPlugin[], [k, v]) => {
+      acc.push(new HTMLWebpackPlugin({
+        template: `src/client/${k}.html`,
+        filename: `${k}.html`,
+        publicPath: "/dist/client/",
+        scriptLoading: "module",
+        chunks: [v]
+      }));
+      return acc;
+    }, [])
   ],
   optimization: {
+    splitChunks: {chunks: "all"},
     minimizer: [
       "...",
       new CssMinimizerPlugin()
     ]
   },
   output: {
-    path: path.resolve(__dirname, "dist"),
+    path: path.resolve(__dirname, "dist", "client"),
     filename: "[name].js",
     clean: true
   },
@@ -75,19 +92,5 @@ const config: webpack.Configuration = {
     }
   },
 };
-
-function getHtmlPlugin(files: Record<string,string>): HTMLWebpackPlugin[] {
-  const result: HTMLWebpackPlugin[] = [];
-  for (const [k, v] of Object.entries(files)) {
-    result.push(new HTMLWebpackPlugin({
-      template: `src/${k}.html`,
-      filename: `${k}.html`,
-      publicPath: "/dist/",
-      scriptLoading: "module",
-      chunks: [v]
-    }))
-  }
-  return result;
-}
 
 export default config;

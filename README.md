@@ -2,10 +2,17 @@
 
 hello
 
-how long will this last
+## dev
 
 ```zsh
 npm install # install
 npm run build # build
-node index.js # run
+npm run test # run
+```
+
+## prod
+
+```zsh
+npm install --omit=dev
+npm run test
 ```

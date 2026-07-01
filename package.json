@@ -10,12 +10,13 @@
     "check:server": "tsc -p tsconfig.server.json --noEmit",
     "check:client": "tsc -p tsconfig.client.json --noEmit",
     "check:webpack": "tsc -p tsconfig.webpack.json --noEmit",
-    "check": "npm run check:server && npm run check:client && npm run check::webpack",
+    "check": "npm run check:server && npm run check:client && npm run check:webpack",
     "build:server": "tsc -p tsconfig.server.json",
     "build:client": "webpack --config webpack.config.ts",
-    "build": "npm run build:server && npm run build:client",
-    "test": "npm run build && node index.js",
-    "dev": "nodemon -e ts,json,html,css --exec \"npm run test\""
+    "build:vibing": "cpx \"src/vibing/**/*\" dist/vibing --ignore \"src/vibing/**/*.ts\" && tsc -p tsconfig.vibing.json",
+    "build": "npm run build:server && npm run build:client && npm run build:vibing",
+    "test": "node dist/server/index.js",
+    "dev": "nodemon -e ts,json,html,css --exec \"npm run build && npm run test\""
   },
   "dependencies": {
     "better-sqlite3": "^12.6.2",
@@ -25,6 +26,7 @@
     "@types/better-sqlite3": "^7.6.13",
     "@types/express": "^5.0.6",
     "@types/node": "^26.0.1",
+    "cpx2": "^9.0.0",
     "css-loader": "^7.1.4",
     "css-minimizer-webpack-plugin": "^8.0.0",
     "html-webpack-plugin": "^5.6.7",
