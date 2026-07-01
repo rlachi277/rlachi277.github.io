@@ -5,7 +5,7 @@ import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import CssMinimizerPlugin from "css-minimizer-webpack-plugin";
 import HTMLWebpackPlugin from "html-webpack-plugin";
 
-// in case you run into any TypeScript error when configuring `devServer`
+// in case you run into any TypeScript error when configuring `devServer` // THIS IS NOT AI this was copy-pasted from https://webpack.js.org/guides/typescript/
 // import "webpack-dev-server";
 
 const __filename = fileURLToPath(import.meta.url);
