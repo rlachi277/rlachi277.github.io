@@ -157,7 +157,6 @@ export function seri(el: Node, init: boolean = false, hooks: SeriHook[] = []): S
 		break;
 	case 'BUTTON':
 		result.type = "button";
-		// todo: button attributes
 		result.variant = {};
 		if (el.classList.contains("colorbox")) {
 			result.variant.shape = "colorbox";
@@ -312,7 +311,6 @@ export function deseri(data: SeriData, cur: string, init: boolean = false, hooks
 		break;
 	case 'button':
 		tagName = "button";
-		// todo: button attributes
 		switch (data.variant?.shape) {
 		case 'color':
 			attrs += ` class="color c${data.variant?.color}"`;

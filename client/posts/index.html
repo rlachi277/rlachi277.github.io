@@ -4,13 +4,8 @@
 	<title>cycweb posts</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="/client/colors.css">
-	<link rel="stylesheet" href="/client/posts/style.css">
-	<script type="module">
-		import { setup } from "/client/posts/script.js";
-		import { defaultMenu, editMenu } from "/client/posts/menu.js";
-		setup(defaultMenu, editMenu, true);
-	</script>
+	<link rel="stylesheet" href="/client/bundles/posts/post.css">
+	<script type="module" src="/client/bundles/posts/index.js"></script>
 </head>
 <body>
 	<div id="menubar"> <!-- TODO: implement keyboard navigation and add role="menubar" -->

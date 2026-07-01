@@ -1,4 +1,6 @@
-import { MenuActions, setup as postsSetup } from "../posts/script.js";
+import type { MenuActions } from "../posts/script.js";
+
+import { setup as postsSetup } from "../posts/script.js";
 import { setupLog1Edit } from "./log1_edit.js";
 
 export function setup(defaultMenu: MenuActions, editMenu: MenuActions) {

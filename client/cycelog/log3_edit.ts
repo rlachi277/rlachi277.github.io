@@ -22,7 +22,7 @@ function onKeydown(e: KeyboardEvent) {
 	if (!S.isCollapsed) return;
 	let curEl = S.anchorNode;
 	if (curEl === null) return;
-	if (curEl.nodeType === Node.TEXT_NODE) curEl = curEl.parentElement;
+	if (curEl instanceof Text) curEl = curEl.parentElement;
 	if (!(curEl instanceof Element)) return;
 	if (curEl.closest(".editable") === null || curEl.closest("hgroup") !== null) return;
 	const shortcut = e.ctrlKey || e.metaKey;

@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ESNext", "DOM"],
+    "types": ["node"]
+  },
+  "include": [
+    "index.ts",
+    "dirname.ts",
+    "script/**/*.ts",
+    "shared/**/*.ts",
+    "vibing/**/*.ts"
+  ],
+  "exclude": ["node_modules"]
+}

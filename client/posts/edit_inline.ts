@@ -131,7 +131,7 @@ function collectAffected(range: Range, root: Element): Affected[] {
 		}
 		affected.push({node: cur});
 	}
-	ascendEdge(0, true, range.startContainer.nodeType !== Node.TEXT_NODE || range.startOffset === 0);
+	ascendEdge(0, true, !(range.startContainer instanceof Text) || range.startOffset === 0);
 
 	cur = descendRight(nextNode(affected[0].node));
 	while (cur !== null && range.intersectsNode(cur)) {
@@ -145,7 +145,7 @@ function collectAffected(range: Range, root: Element): Affected[] {
 			affected.push({node: range.endContainer, startOffset: startOffset, endOffset: range.endOffset});
 		} else affected.push({node: range.endContainer, endOffset: range.endOffset});
 	}
-	ascendEdge(affected.length - 1, false, range.endContainer.nodeType !== Node.TEXT_NODE || range.endOffset === range.endContainer.textContent?.length);
+	ascendEdge(affected.length - 1, false, !(range.endContainer instanceof Text) || range.endOffset === range.endContainer.textContent?.length);
 
 	return affected;
 }

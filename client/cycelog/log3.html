@@ -4,18 +4,9 @@
 	<title>cycelog log 3</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="/client/colors.css">
-	<link rel="stylesheet" href="/client/posts/style.css">
-	<link rel="stylesheet" href="/client/cycelog/colors.css">
-	<link rel="stylesheet" href="/client/cycelog/log3.css">
-	<script type="module">
-		import { setup } from "/client/posts/script.js";
-		import { defaultMenu, editMenu } from "/client/cycelog/log3_menu.js";
-		import { setupLog3Edit } from "/client/cycelog/log3_edit.js";
-		const params = new URLSearchParams(window.location.search);
-		if (params.get("edit")) setupLog3Edit(`###여기까지가 템플릿임 3###`);
-		setup(defaultMenu, editMenu);
-	</script>
+	<link rel="stylesheet" href="/client/bundles/cycelog/log3.css">
+	<script>window.LOG3_TYPES = `###여기까지가 템플릿임 3###`;</script>
+	<script type="module" src="/client/bundles/cycelog/log3.js"></script>
 </head>
 <body>
 	<div id="menubar"> <!-- TODO: implement keyboard navigation and add role="menubar" -->

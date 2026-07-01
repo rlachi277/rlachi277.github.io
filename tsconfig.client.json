@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "lib": ["ESNext", "DOM"],
+    "types": []
+  },
+  "include": [
+    "client/**/*.d.ts",
+    "client/**/*.ts",
+    "shared/**/*.ts"
+  ],
+  "exclude": ["node_modules"]
+}
