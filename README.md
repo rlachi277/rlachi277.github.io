@@ -4,7 +4,7 @@ hello
 
 ## dev
 
-```zsh
+```shell
 npm install # install
 npm run build # build
 npm run test # run
@@ -12,7 +12,7 @@ npm run test # run
 
 ## prod
 
-```zsh
+```shell
 npm install --omit=dev
 npm run test
 ```
