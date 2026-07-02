@@ -52,6 +52,19 @@
       gap: 22px;
     }
 
+    .home-link {
+      width: fit-content;
+      color: #274060;
+      font-weight: 800;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 4px;
+    }
+
+    .home-link:hover,
+    .home-link:focus-visible {
+      color: var(--accent);
+    }
+
     .eyebrow {
       width: fit-content;
       margin: 0;
@@ -442,6 +455,7 @@
   <main>
     <section class="hero" aria-labelledby="page-title">
       <div class="intro">
+        <a class="home-link" href="/">Root</a>
         <p class="eyebrow">AI-assisted programming</p>
         <h1 id="page-title">Vibe Coding</h1>
         <p class="lede">

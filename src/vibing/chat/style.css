@@ -64,6 +64,28 @@ textarea {
 	min-width: 0;
 }
 
+.back-link {
+	display: inline-flex;
+	width: fit-content;
+	margin-bottom: 8px;
+	color: var(--accent);
+	font-size: 0.86rem;
+	font-weight: 800;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 4px;
+}
+
+.back-link:hover,
+.back-link:focus-visible {
+	color: #0b5f58;
+}
+
+.back-link:focus-visible {
+	outline: 3px solid rgba(15, 118, 110, 0.18);
+	outline-offset: 3px;
+	border-radius: 4px;
+}
+
 h1 {
 	margin: 0;
 	font-size: clamp(1.35rem, 4vw, 2rem);

@@ -65,8 +65,8 @@ const config: webpack.Configuration = {
     ...Object.entries(html).reduce((acc: HTMLWebpackPlugin[], [k, v]) => {
       acc.push(new HTMLWebpackPlugin({
         template: `src/client/${k}.html`,
-        filename: `${k}.html`,
-        publicPath: "/dist/client/",
+        filename: `../template/${k}.html`,
+        publicPath: "/public/",
         scriptLoading: "module",
         chunks: [v]
       }));
@@ -81,7 +81,7 @@ const config: webpack.Configuration = {
     ]
   },
   output: {
-    path: path.resolve(__dirname, "dist", "client"),
+    path: path.resolve(__dirname, "dist", "public"),
     filename: "[name].js",
     clean: true
   },
