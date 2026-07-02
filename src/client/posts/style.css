@@ -5,7 +5,7 @@
 }
 
 body {
-	padding-inline: max(2%, 1rem);
+	padding-inline: max(4%, 1rem);
 	margin: 0;
 	margin-block-end: 3rem;
 }
@@ -61,8 +61,8 @@ p[lang=en] { hyphens: auto; }
 hr { color: inherit; border: none; margin-block: 0.5lh; }
 
 .columns { columns: 20em; }
-.columns:has( > :is(p, figure):first-child) { margin-block-start: 0.4lh; }
-.columns > :is(p, figure):first-child { margin-block-start: 0; }
+.columns:has( > :is(p, figure):first-child, > .first-bar + :is(p, figure)) { margin-block-start: 0.4lh; }
+.columns > :is(p, figure):first-child, .columns > .first-bar + :is(p, figure) { margin-block-start: 0; }
 
 .columns.container:not(:has(> *:not(.container-bar, .middle-bar))):after {
 	content: '### 비어 있음 :O ###';
@@ -316,6 +316,11 @@ nav menu {
 	border: 1px solid currentColor;
 	background-color: var(--c-bg);
 	list-style: none;
+}
+
+#menubar menu ul ul {
+	inset-block-start: calc(anchor(inside) - 1px);
+	inset-inline-start: anchor(outside);
 }
 
 #menubar menu ul > li { margin: 0; }

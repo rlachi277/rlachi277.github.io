@@ -1,6 +1,6 @@
 import type { Database } from "better-sqlite3";
 import type { Log1RowData } from "../../shared/cycelog/log1.js";
-import type { CountRow, PatchBody, PostTemplate } from "../posts/posts.js";
+import type { CountRow, PatchBody } from "../posts/posts.js";
 import type { DeseriHook } from "../../shared/posts/seri.js";
 import type { WhereData, WhereFunc } from "../../shared/cycelog/cycelog_hook.js";
 
@@ -40,12 +40,14 @@ type MoveData = {
 
 type WhereRow = Required<Pick<EntryRow, "post"|"type">>;
 
-const LOG3_TYPES_SLOT = "###여기까지가 템플릿임 3###";
-
 export { getIndex } from "../posts/posts.js";
 
-export function getLog3(db: Database, root: string, path: string, template: PostTemplate, renderHooks: DeseriHook[], types: Record<number,number>): string {
-	return getPost(db, root, path, template, renderHooks).replace(LOG3_TYPES_SLOT, JSON.stringify(types));
+export function getLog3(db: Database, root: string, path: string, renderHooks: DeseriHook[], types: Record<number,number>): [boolean, Record<string,string>] {
+	const result = getPost(db, root, path, renderHooks);
+	return [result[0], {
+		...result[1],
+		types: JSON.stringify(types)
+	}];
 }
 
 export { putPost as putLog3 } from "../posts/posts.js";
@@ -64,33 +66,29 @@ export function deleteLog3(db: Database, path: string) {
 	db.prepare(`DELETE FROM entries WHERE post = ?`).run(path);
 }
 
-const LOG1_TEMPLATE_SLOT = "###여기까지가 템플릿임 2###";
 const log1Header = (id: string) => {
 	return {
 		type: "body",
 		children: [
 			{type: "h1", children: [`끾기록: ${id}`]},
-			{type: "nav", children: null},
-			LOG1_TEMPLATE_SLOT
+			{type: "nav", children: null}
 		]
 	};
 };
 
 export function getRawLog1(db: Database, postId: string): Log1RowData[] {
 	const dbResult = db.prepare<string,Log1RowData>("SELECT id,type,time,content FROM entries WHERE post = ? ORDER BY id").all(postId);
-	if (dbResult === undefined) throw 404;
 	return dbResult;
 }
 
-export function getLog1(db: Database, root: string, postId: string, template: PostTemplate, renderHooks: DeseriHook[]): string {
+export function getLog1(db: Database, root: string, postId: string, renderHooks: DeseriHook[]): [boolean, Record<string,string>] {
 	const data = postExists(db, postId) ? log1Header(postId) : undefined;
-	const rendered = getPostFromData(data, root, postId, {
-		normal: template.normal,
-		notFound: template.notFound
-	}, renderHooks);
-	if (data === undefined) return rendered;
-
-	return rendered.replace(LOG1_TEMPLATE_SLOT, buildLog1Table(getRawLog1(db, postId)));
+	const result = getPostFromData(data, root, postId, renderHooks);
+	if (data === undefined) return result;
+	return [result[0],{
+		...result[1],
+		table: buildLog1Table(getRawLog1(db, postId))
+	}];
 }
 
 export function postLog1(db: Database, postId: string, body: EntryRow) {

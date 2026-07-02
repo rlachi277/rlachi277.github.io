@@ -1,49 +1,50 @@
 import type { DeseriHook, SeriHook } from "../../shared/posts/seri.js";
+import type { MenubarData } from "./menubar.js";
 
 import { $ } from "../query.js";
 import { setupDialog } from "./dialog.js";
 import { startEdit } from "./edit.js";
+import { setupMenubar } from "./menubar.js";
 
 export type MenuActions = Record<string,EventListener>;
 
 let isMobile = false;
-const navDetails = $("nav details");
-const menubar = $("#menubar");
 function onResize() {
 	if (window.matchMedia("(max-width: 480px)").matches) {
 		if (isMobile) return;
 		isMobile = true;
-		navDetails.attr("open", null);
-		menubar.css("display", "none");
+		$("nav details").attr("open", null);
+		$("#menubar").css("display", "none");
 	} else {
 		if (!isMobile) return;
 		isMobile = false;
-		navDetails.attr("open", "");
-		menubar.css("display", "");
+		$("nav details").attr("open", "");
+		$("#menubar").css("display", "");
 	}
 }
 
 function setupMenu(menu: MenuActions | null) {
 	if (menu === null) return;
 	for (const [k, v] of Object.entries(menu)) {
-		$(`[data-menu="${k}"]`).on("click", v);
+		$(`[data-action="${k}"]`).on("click", v);
 	}
 }
 
 export const SERI_HOOKS: SeriHook[] = [];
 export const DESERI_HOOKS: DeseriHook[] = [];
 
-export function setup(defaultMenu: MenuActions, editMenu: MenuActions | null = null, noEdit: boolean = false) {
-	onResize();
-	window.addEventListener('resize', onResize);
-
+export function setup(menuBar: MenubarData[], defaultMenu: MenuActions, editMenu: MenuActions | null = null, noEdit: boolean = false) {
 	const scrollY = sessionStorage.getItem('scrollY');
 	if (scrollY !== null) {
 		window.scrollTo(0, parseInt(scrollY));
 		sessionStorage.removeItem('scrollY');
 	}
-
+	
+	setupMenubar(menuBar);
 	setupDialog();
+
+	onResize();
+	window.addEventListener('resize', onResize);
 
 	$(".menu-action").on("click", function () {
 		const pparent = this.parentElement?.parentElement;
@@ -52,7 +53,7 @@ export function setup(defaultMenu: MenuActions, editMenu: MenuActions | null = n
 	setupMenu(defaultMenu);
 	const params = new URLSearchParams(window.location.search);
 	if (params.get("edit")) {
-		if (!noEdit && !$(":root.notfound").exists) startEdit($("body").list[0], true);
+		if (!noEdit && !$(":root.notfound, :root.index").exists) startEdit($("body").list[0], true);
 		$("menu .menu-edit").css("display", "revert");
 		$("nav a").each((e) => {
 			e.setAttribute("href", e.getAttribute("href") + "?edit=t");

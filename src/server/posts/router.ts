@@ -1,10 +1,7 @@
 import type { Response } from 'express-serve-static-core';
 
-import fs from 'fs';
-import path from 'path';
 import express from "express";
 import Database from 'better-sqlite3';
-import root from '../root.js';
 import {
 	getRawPost,
 	getPost,
@@ -38,9 +35,9 @@ db.prepare(`
 	ON CONFLICT DO NOTHING
 `).run("index.html", "dummy");
 
-const template = fs.readFileSync(path.join(root, 'template', 'posts', 'post.html'), 'utf8');
-const notFoundTemplate = fs.readFileSync(path.join(root, 'template', 'posts', '404.html'), 'utf8');
-const indexTemplate = fs.readFileSync(path.join(root, 'template', 'posts', 'index.html'), 'utf8');
+const template = "posts/post.ejs";
+const notFoundTemplate = "posts/404.ejs";
+const indexTemplate = "posts/index.ejs";
 
 const router = express.Router();
 export default router;
@@ -48,9 +45,8 @@ export default router;
 const hook = renderNavHook(db, "/posts/");
 
 router.get('/', (_, res) => {
-	withErrors(res, () => {
-		return getIndex("/posts/", indexTemplate, hook);
-	}, true);
+	const result = getIndex("/posts/", hook);
+	res.status(200).render(indexTemplate, result);
 });
 
 router.get('/raw/*path', (req, res) => {
@@ -62,13 +58,9 @@ router.get('/raw/*path', (req, res) => {
 
 router.get('/*path', (req, res) => {
 	const path = getPath(req.params.path);
-	withErrors(res, () => {
-		res.setHeader('Content-Type', 'text/html');
-		return getPost(db, "/posts/", path, {
-			normal: template,
-			notFound: notFoundTemplate
-		}, [hook]);
-	}, true);
+	const result = getPost(db, "/posts/", path, [hook]);
+	if (result[0]) res.status(200).render(template, result[1]);
+	else res.status(404).render(notFoundTemplate, result[1]);
 });
 
 router.put('/*path', (req, res) => {

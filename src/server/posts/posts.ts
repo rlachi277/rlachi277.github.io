@@ -21,18 +21,12 @@ export type CountRow = {
 	readonly 'COUNT(1)': number
 };
 
-export type PostTemplate = {
-	readonly normal: string,
-	readonly notFound: string
-};
-
 export type PatchBody = {
 	readonly pos?: number[],
 	readonly data?: SeriData,
 	readonly splice?: number
 }
 
-const TEMPLATE_SLOT = "###여기까지가 템플릿임###";
 const notFoundData = {
 	type: "body",
 	children: [
@@ -47,28 +41,24 @@ export function getRawPost(db: Database, path: string): SeriData {
 	return JSON.parse(dbResult.data) as SeriData;
 }
 
-export function getPostFromData(data: SeriData | null | undefined, root: string, path: string, template: PostTemplate, renderHooks: DeseriHook[]): string {
-	const { normal, notFound } = template;
+export function getPostFromData(data: SeriData | null | undefined, root: string, path: string, renderHooks: DeseriHook[]): [boolean, Record<string,string>] {
 	if (data != undefined) {
-		const rendered = deseri(data, `${root}${path}`, true, renderHooks);
-		return normal.replace(TEMPLATE_SLOT, rendered ?? "");
+		const rendered = deseri(data, `${root}${path}`, true, renderHooks) ?? "";
+		return [true, {content: rendered}];
 	} else {
-		const rendered = deseri(notFoundData, `${root}${path}`, true, renderHooks);
-		throw {
-			status: 404,
-			html: notFound.replace(TEMPLATE_SLOT, rendered ?? "")
-		};
+		const rendered = deseri(notFoundData, `${root}${path}`, true, renderHooks) ?? "";
+		return [false, {content: rendered}]
 	}
 }
 
-export function getPost(db: Database, root: string, path: string, template: PostTemplate, renderHooks: DeseriHook[]): string {
+export function getPost(db: Database, root: string, path: string, renderHooks: DeseriHook[]): [boolean, Record<string,string>] {
 	let data: SeriData | null = null;
 	try {
 		data = getRawPost(db, path);
 	} catch (e) {
 		if (e !== 404) throw e;
 	}
-	return getPostFromData(data, root, path, template, renderHooks);
+	return getPostFromData(data, root, path, renderHooks);
 }
 
 export function putPost(db: Database, path: string, body: string) {
@@ -123,14 +113,13 @@ export function deletePost(db: Database, path: string) {
 	removePost(db, path.split('/'));
 }
 
-export function getIndex(root: string, template: string, renderNavHook: DeseriHook): string {
-	return getPostFromData({
-		type: "nav",
-		children: null
-	}, root, "index.html", {
-		normal: template,
-		notFound: template
-	}, [renderNavHook]);
+export function getIndex(root: string, renderNavHook: DeseriHook): Record<string,string> {
+	return {
+		nav: getPostFromData({
+			type: "nav",
+			children: null
+		}, root, "index.html", [renderNavHook])[1].content
+	};
 }
 
 export function postExists(db: Database, path: string): boolean {

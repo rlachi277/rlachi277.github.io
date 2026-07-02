@@ -19,6 +19,15 @@ export function dialog(title: string, main: string, action: DialogAction, danger
 }
 
 export function setupDialog() {
+	document.body.insertAdjacentHTML("afterbegin", `<dialog id="dialog">
+		<h6 id="dialog-title"></h6>
+		<div id="dialog-main"></div>
+		<div id="dialog-buttons">
+			<button id="dialog-cancel" command="close" commandfor="dialog">취소</button>
+			<button id="dialog-confirm">확인</button>
+		</div>
+	</dialog>
+	<div id="warning"></div>`.replaceAll(/\n|\t/g, ''));
 	d$("dialog-confirm")?.addEventListener("click", async function () {
 		if (dialogAction === null) return;
 		if (await dialogAction()) (d$("dialog") as HTMLDialogElement).close();

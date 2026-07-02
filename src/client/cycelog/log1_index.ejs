@@ -1,53 +1,24 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" class="index">
 <head>
 	<title>끾기록: 1차 기록</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-	<div id="menubar"> <!-- TODO: implement keyboard navigation and add role="menubar" -->
-		<menu>
-			<li class="menu-edit"><button id="menu-file" popovertarget="menu-filesub">파일</button>
-			<ul id="menu-filesub" popover>
-				<li><button class="menu-action" data-menu="new">새 글...</button></li>
-			</ul>
-			</li>
-			<li><button id="menu-edit" popovertarget="menu-editsub">편집</button>
-			<ul id="menu-editsub" popover>
-				<li><button class="menu-action" data-menu="startEdit">편집 시작</button></li>
-				<li class="menu-edit"><button class="menu-action" data-menu="stopEdit">편집 종료</button></li>
-			</ul>
-			</li>
-			<li><button id="menu-record" popovertarget="menu-recordsub">기록</button>
-			<ul id="menu-recordsub" popover>
-				<li><button class="menu-action" data-menu="toLog3">3차 기록 보기</button></li>
-			</ul>
-			</li>
-		</menu>
-	</div>
-	<dialog id="dialog">
-		<h6 id="dialog-title"></h6>
-		<div id="dialog-main"></div>
-		<div id="dialog-buttons">
-			<button id="dialog-cancel" command="close" commandfor="dialog">취소</button>
-			<button id="dialog-confirm">확인</button>
-		</div>
-	</dialog>
-	<div id="warning" role="alert"></div>
 	<h1>끾기록: 1차 기록</h1>
-	###여기까지가 템플릿임###
+	<%%- nav %>
 	<a href="/">루트로 돌아가기</a>
 	<section>
 		<h2>키보드 기반 1차 기록</h2>
 		<p>cycelog의 1차 기록은 마우스를 거의 이용하지 않고도 모든 작업을 할 수 있어 편리합니다. 이곳에서는 이를 위한 조작법을 설명합니다.</p>
-		<p>편집 중이며 페이지에 막 들어왔을 때, Tab을 누른다면 '표로 건너뛰기' 버튼이 드러납니다. Enter 키로 이 버튼을 누른다면 표의 셀 하나가 포커스됩니다. 지금부터 설명할 거의 모든 작업은 이 상황에서 이루어집니다.</p>
+		<p>편집 중이며 페이지에 막 들어왔을 때, Tab을 2번 정도 누르면 '표로 건너뛰기' 버튼이 드러납니다. Enter 키로 이 버튼을 누른다면 표의 셀 하나가 포커스됩니다. 지금부터 설명할 거의 모든 작업은 이 상황에서 이루어집니다.</p>
 	</section>
 	<section>
 		<h2>포커스 이동</h2>
 		<p>셀 하나에 포커스가 잡혔다면, 방향키를 이용해 포커스를 이동할 수 있습니다.</p>
 		<p>가장 아래쪽 줄의 '유형' 열에 포커스가 있다면, '아래' 키를 눌러 '새 항목' 모드를 시작할 수 있습니다. 이때 초기 유형은 가장 아래쪽 줄의 유형과 동일하게 됩니다. 반대로, '새 항목' 모드 중 '위' 키를 누른다면 '새 항목' 모드는 취소되고 포커스는 가장 아래쪽 줄로 이동합니다.</p>
-		<p>Escape 키를 누른다면 포커스가 풀립니다. 왜 그런지는 모르겠지만, Escape 키를 다시 누른다면 포커스가 다시 잡힙니다. Tab 키를 누르면 포커스는 표에서 벗어나 다시 '표로 건너뛰기' 버튼으로 이동합니다. Tab 키를 계속 누른다면 '파일' 메뉴, '둘러보기'의 링크 등 일반적인 부분에 접근할 수 있습니다.</p>
+		<p>Escape 키를 누른다면 포커스가 풀립니다. 왜 그런지는 모르겠지만, Escape 키를 다시 누른다면 포커스가 다시 잡힙니다. Tab 키를 누르면 포커스는 표에서 벗어나며, 다시 페이지의 처음으로 이동합니다.</p>
 	</section>
 	<section>
 		<h2>Enter 키</h2>

@@ -112,7 +112,7 @@ function applyEditType(el: Element, type: EDIT_TYPE): EDIT_TYPE {
 		if (first) {
 			const fbar = document.createElement("span");
 			fbar.classList.add("container-bar", "first-bar");
-			el.append(fbar);
+			el.prepend(fbar);
 		}
 		const mbar = document.createElement("span");
 		mbar.classList.add("container-bar", "middle-bar");
@@ -390,6 +390,7 @@ export function startTargeting(f: TargetHandler) {
 	document.body.classList.add("targeting");
 	targetingAbort = new AbortController();
 
+	$("*:not(#menubar):not(#menubar *)").attr("tabindex", "-1");
 	$(".unit.editable").attr("contenteditable", null);
 	addTargetListeners("unit", f, false, false);
 	addTargetListeners("first-bar", f, true, true);
@@ -402,6 +403,7 @@ export function startTargeting(f: TargetHandler) {
 
 function addTargetListeners(cls: string, f: TargetHandler, parent: boolean, isFirst: boolean) {
 	for (const el of document.getElementsByClassName(cls)) {
+		el.setAttribute("tabindex", "0");
 		el.addEventListener("click", (e) => {
 			e.preventDefault();
 			(el as HTMLElement).blur();
@@ -415,6 +417,7 @@ function addTargetListeners(cls: string, f: TargetHandler, parent: boolean, isFi
 export function stopTargeting() {
 	document.body.classList.remove("targeting");
 	$(".unit.editable").attr("contenteditable", "plaintext-only");
+	$("*:not(#menubar):not(#menubar *)").attr("tabindex", null);
 	targetingAbort?.abort();
 	targetingAbort = null;
 	(document.activeElement as HTMLElement | null)?.blur();

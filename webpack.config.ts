@@ -1,4 +1,6 @@
 import path from "path";
+import fs from 'fs';
+import ejs from "ejs";
 import { fileURLToPath } from "url";
 import webpack from "webpack";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
@@ -13,25 +15,47 @@ const __dirname = path.dirname(__filename);
 
 const entries = {
   "index": "index",
-  "posts/index": "posts/entries/index",
   "posts/post": "posts/entries/post",
-  "cycelog/log1_index": "cycelog/entries/log1_index",
+  "posts/style": "posts/entries/style",
   "cycelog/log1": "cycelog/entries/log1",
-  "cycelog/log3_index": "cycelog/entries/log3_index",
-  "cycelog/log3": "cycelog/entries/log3"
-} as const;
+  "cycelog/log3": "cycelog/entries/log3",
+  "cycelog/log1_style": "cycelog/entries/log1_style",
+  "cycelog/log3_style": "cycelog/entries/log3_style",
+} satisfies Record<string, string>;
 
-const html: Record<string, keyof typeof entries> = {
-  "index": "index",
-  "posts/index": "posts/index",
-  "posts/post": "posts/post",
-  "posts/404": "posts/post",
-  "cycelog/log1_index": "cycelog/log1_index",
-  "cycelog/log1": "cycelog/log1",
-  "cycelog/log1_404": "cycelog/log1",
-  "cycelog/log3_index": "cycelog/log3_index",
-  "cycelog/log3": "cycelog/log3",
-  "cycelog/log3_404": "cycelog/log3"
+type HtmlTemplate = {
+  template: string,
+  templateParameters?: Record<string,string>,
+  chunks: (keyof typeof entries)[]
+};
+
+const html: Record<string, HtmlTemplate> = {
+  "index": {template: "index.html", chunks: ["index"]},
+  "posts/index": {template: "posts/index.ejs", chunks: ["posts/post", "posts/style"]},
+  "posts/post": {
+    template: "posts/post.ejs",
+    templateParameters: {title: "끾웹 글쓰기", rootclass: ""},
+    chunks: ["posts/post", "posts/style"]
+  },
+  "posts/404": {
+    template: "posts/post.ejs",
+    templateParameters: {title: "끾웹 글쓰기(404)", rootclass: "notfound"},
+    chunks: ["posts/post", "posts/style"]
+  },
+  "cycelog/log1_index": {template: "cycelog/log1_index.ejs", chunks: ["cycelog/log1", "posts/style"]},
+  "cycelog/log1": {template: "cycelog/log1.ejs", chunks: ["cycelog/log1", "cycelog/log1_style"]},
+  "cycelog/log1_404": {
+    template: "posts/post.ejs",
+    templateParameters: {title: "끾기록: 1차 기록(404)", rootclass: "notfound"},
+    chunks: ["cycelog/log1", "posts/style"]
+  },
+  "cycelog/log3_index": {template: "cycelog/log3_index.ejs", chunks: ["cycelog/log3", "posts/style"]},
+  "cycelog/log3": {template: "cycelog/log3.ejs", chunks: ["cycelog/log3", "cycelog/log3_style"]},
+  "cycelog/log3_404": {
+    template: "posts/post.ejs",
+    templateParameters: {title: "끾기록: 3차 기록(404)", rootclass: "notfound"},
+    chunks: ["cycelog/log3", "posts/style"]
+  }
 };
 
 const config: webpack.Configuration = {
@@ -63,12 +87,17 @@ const config: webpack.Configuration = {
       filename: "[name].css"
     }),
     ...Object.entries(html).reduce((acc: HTMLWebpackPlugin[], [k, v]) => {
+      const template = path.resolve(__dirname, "src/client", v.template);
       acc.push(new HTMLWebpackPlugin({
-        template: `src/client/${k}.html`,
-        filename: `../template/${k}.html`,
+        templateContent: v.template.endsWith(".ejs") ?
+          () => ejs.render(fs.readFileSync(template, "utf8"), v.templateParameters ?? {}) :
+          false,
+        template: v.template.endsWith(".ejs") ? '' : template,
+        templateParameters: v.templateParameters ?? false,
+        filename: `../template/${k}.ejs`,
         publicPath: "/public/",
         scriptLoading: "module",
-        chunks: [v]
+        chunks: v.chunks
       }));
       return acc;
     }, [])

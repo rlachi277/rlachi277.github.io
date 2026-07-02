@@ -1,8 +1,5 @@
-import fs from 'fs';
-import path from 'path';
 import express from "express";
 import Database from 'better-sqlite3';
-import root from '../root.js';
 import {
 	getLog3,
 	putLog3,
@@ -66,25 +63,20 @@ router.get('/', (_, res) => {
 });
 
 
-const log1Template = fs.readFileSync(path.join(root, 'template', 'cycelog', 'log1.html'), 'utf8');
-const log1NotFoundTemplate = fs.readFileSync(path.join(root, 'template', 'cycelog', 'log1_404.html'), 'utf8');
-const log1IndexTemplate = fs.readFileSync(path.join(root, 'template', 'cycelog', 'log1_index.html'), 'utf8');
+const log1Template = "cycelog/log1.ejs";
+const log1NotFoundTemplate = "cycelog/log1_404.ejs";
+const log1IndexTemplate = "cycelog/log1_index.ejs";
 
 router.get('/log1/', (_, res) => {
-	withErrors(res, () => {
-		return getIndex("/cycelog/log1/", log1IndexTemplate, log1Hook);
-	}, true);
+	const result = getIndex("/cycelog/log1/", log1Hook);
+	res.status(200).render(log1IndexTemplate, result);
 });
 
 router.get('/log1/:id', (req, res) => {
 	const id = req.params.id;
-	withErrors(res, () => {
-		res.setHeader('Content-Type', 'text/html');
-		return getLog1(db, "/cycelog/log1/", id, {
-			normal: log1Template,
-			notFound: log1NotFoundTemplate
-		}, [log1Hook]);
-	}, true);
+	const result = getLog1(db, "/cycelog/log1/", id, [log1Hook]);
+	if (result[0]) res.status(200).render(log1Template, result[1]);
+	else res.status(404).render(log1NotFoundTemplate, result[1]);
 });
 
 router.post('/log1/:id', (req, res) => {
@@ -133,32 +125,24 @@ router.get('/log1/where/:id', (req, res) => {
 });
 
 
-const log3Template = fs.readFileSync(path.join(root, 'template', 'cycelog', 'log3.html'), 'utf8');
-const log3NotFoundTemplate = fs.readFileSync(path.join(root, 'template', 'cycelog', 'log3_404.html'), 'utf8');
-const log3IndexTemplate = fs.readFileSync(path.join(root, 'template', 'cycelog', 'log3_index.html'), 'utf8');
+const log3Template = "cycelog/log3.ejs";
+const log3NotFoundTemplate = "cycelog/log3_404.ejs";
+const log3IndexTemplate = "cycelog/log3_index.ejs";
 
 router.get('/log3/', (_, res) => {
-	withErrors(res, () => {
-		return getIndex("/cycelog/log3/", log3IndexTemplate, log3Hook);
-	}, true);
+	const result = getIndex("/cycelog/log3/", log3Hook);
+	res.status(200).render(log3IndexTemplate, result);
 });
 
 router.get('/log3/:id', (req, res) => {
 	const id = req.params.id;
-	withErrors(res, () => {
-		res.setHeader('Content-Type', 'text/html');
-		const types: Record<number,number> = {};
-		const data = getRawLog1(db, id);
-		for (const e of data) types[e.id] = e.type;
+	const types: Record<number,number> = {};
+	const data = getRawLog1(db, id);
+	for (const e of data) types[e.id] = e.type;
 
-		return getLog3(db, "/cycelog/log3/", id, {
-			normal: log3Template,
-			notFound: log3NotFoundTemplate
-		}, [
-			log3Hook,
-			entryDeseriHook(types, serverWhere(db))
-		], types);
-	}, true);
+	const result = getLog3(db, "/cycelog/log3/", id, [log3Hook, entryDeseriHook(types, serverWhere(db))], types);
+	if (result[0]) res.status(200).render(log3Template, result[1]);
+	else res.status(404).render(log3NotFoundTemplate, result[1]);
 });
 
 router.put('/log3/:id', (req, res) => {

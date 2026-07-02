@@ -1,10 +1,13 @@
 import type { MenuActions } from "../posts/script.js";
+import type { MenubarData } from "../posts/menubar.js";
 
 import { setup as postsSetup } from "../posts/script.js";
+import { $ } from "../query.js";
 import { setupLog1Edit } from "./log1_edit.js";
 
-export function setup(defaultMenu: MenuActions, editMenu: MenuActions) {
-	postsSetup(defaultMenu, editMenu, true);
+export function setup(menuBar: MenubarData[], defaultMenu: MenuActions, editMenu: MenuActions) {
+	postsSetup(menuBar, defaultMenu, editMenu, true);
+	if ($(":root.notfound, :root.index").exists) return;
 	const params = new URLSearchParams(window.location.search);
 	if (params.get("edit")) setupLog1Edit();
 	else {
