@@ -1,4 +1,4 @@
-import type { Response } from 'express-serve-static-core';
+import type { Response } from "express-serve-static-core";
 
 import express from "express";
 import Database from 'better-sqlite3';
