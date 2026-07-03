@@ -12,10 +12,10 @@ export const q$n = (q: string, e: Element | null = null): HTMLElement => {
 export const $ = (q: string, e: Element | null = null) => new JQuerish(q, e);
 
 class JQuerish {
-	list: NodeListOf<HTMLElement>;
+	list: HTMLElement[];
 	constructor(query: string, element: Element | null) {
-		if (element === null) this.list = document.querySelectorAll<HTMLElement>(query);
-		else this.list = element.querySelectorAll<HTMLElement>(query);
+		if (element === null) this.list = Array.from(document.querySelectorAll<HTMLElement>(query));
+		else this.list = Array.from(element.querySelectorAll<HTMLElement>(query));
 	}
 
 	get exists() { return this.list.length !== 0; }

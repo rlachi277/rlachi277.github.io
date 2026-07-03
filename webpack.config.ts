@@ -59,7 +59,7 @@ const html: Record<string, HtmlTemplate> = {
 };
 
 const config: webpack.Configuration = {
-  mode: "production",
+  mode: "development",
   target: ["web", "es2022"],
   entry: Object.entries(entries).reduce((acc: Record<string,string>, [k, v]) => {
     acc[k] = `./src/client/${v}.ts`;

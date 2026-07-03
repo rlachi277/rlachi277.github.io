@@ -17,7 +17,9 @@
     "clean": "rimraf dist",
     "build": "npm run clean && npm run build:server && npm run build:client && npm run build:vibing",
     "test": "node dist/server/index.js",
-    "dev": "nodemon -e ts,json,html,css --exec \"npm run build && npm run test\""
+    "dev": "nodemon -e ts,json,html,css --exec \"npm run build && npm run test\"",
+    "dev:server": "nodemon -e ts,json,html,css --exec \"npm run build:server && npm run test\"",
+    "dev:client": "nodemon -e ts,json,html,css --exec \"npm run build:client && npm run test\""
   },
   "dependencies": {
     "better-sqlite3": "^12.6.2",

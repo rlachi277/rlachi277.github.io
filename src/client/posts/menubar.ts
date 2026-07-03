@@ -8,10 +8,14 @@ export type MenubarData = {
 	submenu?: MenubarData[]
 };
 
+const params = new URLSearchParams(window.location.search);
+const edit = params.get("edit");
+
 export function setupMenubar(data: MenubarData[]) {
 	document.body.insertAdjacentHTML("afterbegin", `<div id="menubar"></div>`);
 	popoverCnt = 0; first = true;
 	d$("menubar")?.append(buildMenubar(data));
+	$("#menubar menu").on("keydown", onMenubarKeydown);
 }
 
 const filterIndex = $(":root.index").exists ? 1 :
@@ -27,7 +31,7 @@ function buildMenubar(data: MenubarData[], submenu: boolean = false): HTMLElemen
 		const li = document.createElement("li");
 		li.setAttribute("role", "none");
 		if (e.edit !== undefined &&
-			(Array.isArray(e.edit) ? e.edit[filterIndex] : e.edit)) li.classList.add("menu-edit");
+			(Array.isArray(e.edit) ? e.edit[filterIndex] : e.edit) && !edit) continue;
 		const button = document.createElement("button");
 		button.setAttribute("role", "menuitem");
 		button.textContent = e.text;
@@ -49,4 +53,118 @@ function buildMenubar(data: MenubarData[], submenu: boolean = false): HTMLElemen
 		wrapper.append(li);
 	}
 	return wrapper;
+}
+
+function onMenubarKeydown(this: HTMLElement, e: KeyboardEvent) {
+	const target = e.target as HTMLButtonElement;
+	const li = target.parentElement as HTMLLIElement;
+	let newTarget: HTMLButtonElement;
+	switch (e.key) {
+	case 'Enter': case ' ': return; // default interaction already covers
+	case 'ArrowDown':
+		if (li.parentElement === this && target.getAttribute("popovertarget") !== null) {
+			const submenu = d$(target.getAttribute("popovertarget") as string) as HTMLUListElement;
+			submenu.togglePopover({force: true, source: target});
+			newTarget = submenu.firstElementChild?.firstChild as HTMLButtonElement;
+			break;
+		}
+		newTarget = (li.nextElementSibling ?? li.parentElement?.firstElementChild)?.firstElementChild as HTMLButtonElement;
+		break;
+	case 'ArrowUp':
+		if (li.parentElement === this && target.getAttribute("popovertarget") !== null) {
+			const submenu = d$(target.getAttribute("popovertarget") as string) as HTMLUListElement;
+			submenu.togglePopover({force: true, source: target});
+			newTarget = submenu.lastElementChild?.firstChild as HTMLButtonElement;
+			break;
+		}
+		newTarget = (li.previousElementSibling ?? li.parentElement?.lastElementChild)?.firstElementChild as HTMLButtonElement;
+		break;
+	case 'ArrowRight':
+		if (li.parentElement === this) {
+			newTarget = (li.nextElementSibling ?? this.firstElementChild)?.firstElementChild as HTMLButtonElement;
+			if (target.getAttribute("popovertarget") !== null) {
+				const submenu = d$(target.getAttribute("popovertarget") as string) as HTMLUListElement;
+				if (submenu.matches(":popover-open") && newTarget.getAttribute("popovertarget") !== null) {
+					const newSubmenu = d$(newTarget.getAttribute("popovertarget") as string) as HTMLUListElement;
+					newSubmenu.togglePopover({force: true, source: newTarget});
+				}
+				submenu.togglePopover({force: false});
+			}
+		} else if (target.getAttribute("popovertarget") !== null) {
+			const submenu = d$(target.getAttribute("popovertarget") as string) as HTMLUListElement;
+			submenu.togglePopover({force: true, source: target});
+			newTarget = submenu.firstElementChild?.firstChild as HTMLButtonElement;
+		} else {
+			newTarget = target;
+			while (newTarget.parentElement?.parentElement !== this) {
+				// the submenu <ul> comes directly after the button that opens it
+				newTarget = newTarget.parentElement?.parentElement?.previousElementSibling as HTMLButtonElement;
+			}
+			const newLi = newTarget.parentElement as HTMLLIElement;
+			newTarget = (newLi.nextElementSibling ?? this.firstElementChild)?.firstElementChild as HTMLButtonElement;
+			if (newTarget.getAttribute("popovertarget") !== null) {
+				const newSubmenu = d$(newTarget.getAttribute("popovertarget") as string) as HTMLUListElement;
+				newSubmenu.togglePopover({force: true, source: newTarget});
+			}
+		}
+		break;
+	case 'ArrowLeft':
+		if (li.parentElement === this) {
+			newTarget = (li.previousElementSibling ?? this.lastElementChild)?.firstElementChild as HTMLButtonElement;
+			if (target.getAttribute("popovertarget") !== null) {
+				const submenu = d$(target.getAttribute("popovertarget") as string) as HTMLUListElement;
+				if (submenu.matches(":popover-open") && newTarget.getAttribute("popovertarget") !== null) {
+					const newSubmenu = d$(newTarget.getAttribute("popovertarget") as string) as HTMLUListElement;
+					newSubmenu.togglePopover({force: true, source: newTarget});
+				}
+				submenu.togglePopover({force: false});
+			}
+		} else {
+			newTarget = target;
+			while (newTarget.parentElement?.parentElement !== this) {
+				// the submenu <ul> comes directly after the button that opens it
+				newTarget = newTarget.parentElement?.parentElement?.previousElementSibling as HTMLButtonElement;
+			}
+			const newLi = newTarget.parentElement as HTMLLIElement;
+			newTarget = (newLi.previousElementSibling ?? this.lastElementChild)?.firstElementChild as HTMLButtonElement;
+			if (newTarget.getAttribute("popovertarget") !== null) {
+				const newSubmenu = d$(newTarget.getAttribute("popovertarget") as string) as HTMLUListElement;
+				newSubmenu.togglePopover({force: true, source: newTarget});
+			}
+		}
+		break;
+	case 'Escape':
+		if (li.parentElement === this) {
+			if (target.getAttribute("popovertarget") !== null) {
+				const submenu = d$(target.getAttribute("popovertarget") as string) as HTMLUListElement;
+				if (submenu.matches(":popover-open")) {
+					submenu.togglePopover(false);
+					return;
+				}
+			}
+			target.blur();
+			return;
+		}
+		// the submenu <ul> comes directly after the button that opens it
+		newTarget = li.parentElement?.previousElementSibling as HTMLButtonElement;
+		const curSubmenu = li.parentElement as HTMLUListElement;
+		curSubmenu.togglePopover(false);
+		break;
+	case 'Tab':
+		newTarget = target;
+		while (newTarget.parentElement?.parentElement !== this) {
+			// the submenu <ul> comes directly after the button that opens it
+			newTarget = newTarget.parentElement?.parentElement?.previousElementSibling as HTMLButtonElement;
+		}
+		target.setAttribute("tabindex", "-1");
+		newTarget.setAttribute("tabindex", "0");
+		$("#menubar :popover-open").each((e) => e.hidePopover());
+		return;
+	default: return;
+	}
+	newTarget?.setAttribute("tabindex", "0");
+	newTarget?.focus();
+	target.setAttribute("tabindex", "-1");
+	e.preventDefault();
+	e.stopPropagation();
 }

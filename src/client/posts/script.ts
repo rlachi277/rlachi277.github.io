@@ -1,7 +1,7 @@
 import type { DeseriHook, SeriHook } from "../../shared/posts/seri.js";
 import type { MenubarData } from "./menubar.js";
 
-import { $ } from "../query.js";
+import { $, d$n } from "../query.js";
 import { setupDialog } from "./dialog.js";
 import { startEdit } from "./edit.js";
 import { setupMenubar } from "./menubar.js";
@@ -46,6 +46,10 @@ export function setup(menuBar: MenubarData[], defaultMenu: MenuActions, editMenu
 	onResize();
 	window.addEventListener('resize', onResize);
 
+	d$n("nav-skip").addEventListener("click", () => {
+		$("nav a").list.at(-1)?.focus();
+	});
+
 	$(".menu-action").on("click", function () {
 		const pparent = this.parentElement?.parentElement;
 		if (pparent != undefined && pparent.matches(":popover-open")) pparent.hidePopover();
@@ -54,7 +58,6 @@ export function setup(menuBar: MenubarData[], defaultMenu: MenuActions, editMenu
 	const params = new URLSearchParams(window.location.search);
 	if (params.get("edit")) {
 		if (!noEdit && !$(":root.notfound, :root.index").exists) startEdit($("body").list[0], true);
-		$("menu .menu-edit").css("display", "revert");
 		$("nav a").each((e) => {
 			e.setAttribute("href", e.getAttribute("href") + "?edit=t");
 		});

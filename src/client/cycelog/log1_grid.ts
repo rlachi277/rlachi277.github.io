@@ -29,8 +29,6 @@ export function setupGrid() {
 	d$("dialog")?.addEventListener("close", () => focusOn(curR, curC, isFocused));
 	focusOn(curR, curC, isFocused);
 
-	d$n("log1-skip").classList.add("show");
-	d$n("log1-skip").addEventListener("click", () => focusOn(curR, curC, true));
 	q$n("#log1-table tbody").addEventListener("keydown", onTableKeydown);
 	$("tbody td").on("blur", onTableBlur);
 
@@ -271,7 +269,9 @@ async function advanceNewEntry(e: KeyboardEvent | {key: string}) {
 function cancelNewEntry() {
 	if (newEntryPhase === 0) return;
 	$("#log1-new-id, #log1-new-type, #log1-new-time, #log1-new-content").each((e) => {e.textContent = '';});
-	$("#log1-new-entry").attr("data-id data-type data-time", null);
+	$("#log1-new-entry").attr("data-id", null);
+	$("#log1-new-entry").attr("data-type", null);
+	$("#log1-new-entry").attr("data-time", null);
 	$("#log1-new-time, #log1-new-content").attr("contenteditable", null)
 	switch (newEntryPhase) {
 		case 1: d$n("log1-new-type").blur(); break;

@@ -47,7 +47,7 @@ function renderNav(db: Database, root: string, cur: string): string {
 	}
 	let middle = "";
 	for (const e of data) middle += makeNavEntry("", e);
-	return `<nav><details open><summary>둘러보기</summary><menu>${middle}</menu></details></nav>`;
+	return `<button id="nav-skip">탐색 건너뛰기</button><nav><details open><summary>둘러보기</summary><menu>${middle}</menu></details></nav>`;
 }
 
 function buildNav(db: Database, root: string, path: string): NavData[] {
