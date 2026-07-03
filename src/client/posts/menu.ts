@@ -2,7 +2,7 @@ import type { SeriData } from "../../shared/posts/seri.js";
 import type { MenuActions } from "./script.js";
 
 import { seri } from "../../shared/posts/seri.js";
-import { $, d$n, q$n } from "../query.js";
+import { $, d$n } from "../query.js";
 import { SERI_HOOKS } from "./script.js";
 import { dialog, showWarning } from "./dialog.js";
 import {
@@ -16,12 +16,13 @@ import {
 
 export const defaultMenu: MenuActions = {
 	export: () => {
+		console.log(SERI_HOOKS);
 		try {
-			const data = seri(q$n("body"), true, SERI_HOOKS);
+			const data = seri(d$n("main"), true, SERI_HOOKS);
 			const file = new Blob([JSON.stringify(data)], {type: "application/json"});
 			const anchor = document.createElement("a");
 			anchor.href = URL.createObjectURL(file);
-			anchor.download = "export.json";
+			anchor.download = `export${window.location.pathname.replace(/.html$/,'')}.json`;
 			anchor.click();
 			URL.revokeObjectURL(anchor.href);
 		} catch (e) {
@@ -47,14 +48,13 @@ export const editMenu: MenuActions = {
 		type: "body",
 		children: [
 			{type: "h1", children: [`${(d$n("dialog-new-path") as HTMLInputElement).value} @ ${window.location.pathname}`]},
-			{type: "nav",children: null},
 			{type: "p",children: []}
 		]
 	}), false),
 	duplicate: dialog("이 글 복제", `
 		<label for="dialog-new-path">경로: </label>
 		<input id="dialog-new-path" placeholder="경로 입력">
-	`, () => newPost((d$n("dialog-new-path") as HTMLInputElement).value, seri(q$n("body"), true, SERI_HOOKS)), false),
+	`, () => newPost((d$n("dialog-new-path") as HTMLInputElement).value, seri(d$n("main"), true, SERI_HOOKS)), false),
 	delete: dialog("이 글 삭제", `
 		정말로 <strong>이 글 전체</strong>를 삭제하시겠습니까?<br>
 		이 작업은 되돌릴 수 없습니다.

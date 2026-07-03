@@ -30,8 +30,8 @@ export type PatchBody = {
 const notFoundData = {
 	type: "body",
 	children: [
+		{type: "nav", children: null},
 		{type: "h1", children: ["404 Not Found"]},
-		{type: "nav", children: null}
 	]
 } as const;
 
@@ -41,24 +41,24 @@ export function getRawPost(db: Database, path: string): SeriData {
 	return JSON.parse(dbResult.data) as SeriData;
 }
 
-export function getPostFromData(data: SeriData | null | undefined, root: string, path: string, renderHooks: DeseriHook[]): [boolean, Record<string,string>] {
+export function getPostFromData(data: SeriData | null | undefined, root: string, path: string, renderHooks: DeseriHook[], nav: string): [boolean, Record<string,string>] {
 	if (data != undefined) {
 		const rendered = deseri(data, `${root}${path}`, true, renderHooks) ?? "";
-		return [true, {content: rendered}];
+		return [true, {content: rendered, nav: nav}];
 	} else {
 		const rendered = deseri(notFoundData, `${root}${path}`, true, renderHooks) ?? "";
-		return [false, {content: rendered}]
+		return [false, {content: rendered, nav: nav}];
 	}
 }
 
-export function getPost(db: Database, root: string, path: string, renderHooks: DeseriHook[]): [boolean, Record<string,string>] {
+export function getPost(db: Database, root: string, path: string, renderHooks: DeseriHook[], nav: string): [boolean, Record<string,string>] {
 	let data: SeriData | null = null;
 	try {
 		data = getRawPost(db, path);
 	} catch (e) {
 		if (e !== 404) throw e;
 	}
-	return getPostFromData(data, root, path, renderHooks);
+	return getPostFromData(data, root, path, renderHooks, nav);
 }
 
 export function putPost(db: Database, path: string, body: string) {
@@ -111,15 +111,6 @@ export function deletePost(db: Database, path: string) {
 	const info = db.prepare('DELETE FROM posts WHERE path = ?').run(path);
 	if (info.changes === 0) throw 404;
 	removePost(db, path.split('/'));
-}
-
-export function getIndex(root: string, renderNavHook: DeseriHook): Record<string,string> {
-	return {
-		nav: getPostFromData({
-			type: "nav",
-			children: null
-		}, root, "index.html", [renderNavHook])[1].content
-	};
 }
 
 export function postExists(db: Database, path: string): boolean {

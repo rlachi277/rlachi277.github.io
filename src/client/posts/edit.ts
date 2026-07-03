@@ -1,6 +1,6 @@
 import { seri, deseri } from "../../shared/posts/seri.js";
 import { SERI_HOOKS, DESERI_HOOKS } from "./script.js";
-import { $, q$n } from "../query.js";
+import { $, d$n, q$n } from "../query.js";
 import {
 	inlineCommands,
 	inlineCleanup,
@@ -30,7 +30,7 @@ const CONTAINERS = new Set([
 const UNITS = new Set([
 	"HGROUP", "IMG", "AUDIO", "VIDEO",
 	"FIGURE", "HR", "BR",
-	"TRACK", "SOURCE", "NAV"
+	"TRACK", "SOURCE"
 ]);
 
 let editing: boolean = false;
@@ -84,7 +84,7 @@ export function startEdit(el: Node, init = false): boolean {
 
 function getEditType(el: Element): EDIT_TYPE | null {
 	switch (el.nodeName) {
-	case 'BODY':
+	case 'BODY': case 'MAIN':
 		return EDIT_TYPE.NONE;
 	case 'UL': case 'OL':
 		return EDIT_TYPE.LIST;
@@ -426,7 +426,6 @@ export function stopTargeting() {
 let newElementFactory: null | string | ElementFactory = null;
 let newElementAddHeader: null | boolean = null;
 function insertElement(after: Element, isFirst: boolean) {
-	if (after.nextSibling instanceof Element && after.nextSibling.tagName === 'NAV') after = after.nextSibling;
 	if (newElementFactory === null) {
 		alert("오류: newElementFactory === null");
 		return false;
@@ -510,7 +509,7 @@ export function insertHgroup(target: Element) {
 }
 
 export function deleteElement(target: Element) {
-	if (target.tagName === 'NAV' || (target.nextSibling instanceof Element && target.nextSibling.tagName === 'NAV')) return;
+	if (target.tagName === 'NAV') return;
 	const parent = target.parentElement as Element;
 	const pos = positionMap.get(target);
 	fetch(window.location.pathname, {method: "PATCH", headers: {
@@ -526,13 +525,13 @@ export function deleteElement(target: Element) {
 
 export function header(after: Element, isFirst: boolean) {
 	const parent = isFirst ? after : (after.parentElement as Element);
-	if (parent === document.body || parent.firstChild === document.body) {
+	if (parent === d$n("main") || parent === document.body) {
 		return document.createElement("h1");
 	}
 	
 	let depth = 1;
 	let cur = parent;
-	while (cur != document.body) {
+	while (cur != d$n("main")) {
 		if (cur.matches("section, article")) depth++;
 		cur = cur.parentElement as Element;
 	}

@@ -40,10 +40,8 @@ type MoveData = {
 
 type WhereRow = Required<Pick<EntryRow, "post"|"type">>;
 
-export { getIndex } from "../posts/posts.js";
-
-export function getLog3(db: Database, root: string, path: string, renderHooks: DeseriHook[], types: Record<number,number>): [boolean, Record<string,string>] {
-	const result = getPost(db, root, path, renderHooks);
+export function getLog3(db: Database, root: string, path: string, renderHooks: DeseriHook[], nav: string, types: Record<number,number>): [boolean, Record<string,string>] {
+	const result = getPost(db, root, path, renderHooks, nav);
 	return [result[0], {
 		...result[1],
 		types: JSON.stringify(types)
@@ -70,8 +68,8 @@ const log1Header = (id: string) => {
 	return {
 		type: "body",
 		children: [
+			{type: "nav", children: null},
 			{type: "h1", children: [`끾기록: ${id}`]},
-			{type: "nav", children: null}
 		]
 	};
 };
@@ -81,12 +79,12 @@ export function getRawLog1(db: Database, postId: string): Log1RowData[] {
 	return dbResult;
 }
 
-export function getLog1(db: Database, root: string, postId: string, renderHooks: DeseriHook[]): [boolean, Record<string,string>] {
+export function getLog1(db: Database, root: string, postId: string, renderHooks: DeseriHook[], nav: string): [boolean, Record<string,string>] {
 	const data = postExists(db, postId) ? log1Header(postId) : undefined;
-	const result = getPostFromData(data, root, postId, renderHooks);
+	const result = getPostFromData(data, root, postId, renderHooks, nav);
 	if (data === undefined) return result;
 	return [result[0],{
-		...result[1],
+		header: result[1].content,
 		table: buildLog1Table(getRawLog1(db, postId))
 	}];
 }

@@ -7,10 +7,9 @@ import {
 	getPost,
 	putPost,
 	patchPost,
-	deletePost,
-	getIndex
+	deletePost
 } from "./posts.js";
-import { renderNavHook } from './render_nav.js';
+import { renderNav } from './render_nav.js';
 
 const db = new Database('db/posts.db');
 db.pragma('journal_mode = WAL');
@@ -42,11 +41,16 @@ const indexTemplate = "posts/index.ejs";
 const router = express.Router();
 export default router;
 
-const hook = renderNavHook(db, "/posts/");
-
 router.get('/', (_, res) => {
-	const result = getIndex("/posts/", hook);
-	res.status(200).render(indexTemplate, result);
+	res.status(200).render(indexTemplate, {
+		nav: renderNav(db, "/posts/", "index.html")
+	});
+});
+
+router.get('/index.html', (_, res) => {
+	res.status(200).render(indexTemplate, {
+		nav: renderNav(db, "/posts/", "index.html")
+	});
 });
 
 router.get('/raw/*path', (req, res) => {
@@ -58,7 +62,7 @@ router.get('/raw/*path', (req, res) => {
 
 router.get('/*path', (req, res) => {
 	const path = getPath(req.params.path);
-	const result = getPost(db, "/posts/", path, [hook]);
+	const result = getPost(db, "/posts/", path, [], renderNav(db, "/posts/", path));
 	if (result[0]) res.status(200).render(template, result[1]);
 	else res.status(404).render(notFoundTemplate, result[1]);
 });

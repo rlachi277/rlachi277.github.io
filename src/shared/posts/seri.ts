@@ -70,12 +70,8 @@ export function seri(el: Node, init: boolean = false, hooks: SeriHook[] = []): S
 	}
 
 	switch (init ? 'BODY' : el.nodeName) {
-	case 'BODY':
+	case 'BODY': case 'MAIN':
 		result.type = "body";
-		break;
-	case 'NAV':
-		result.children = null;
-		result.type = "nav";
 		break;
 	case 'ARTICLE':
 		result.type = "article";
@@ -156,12 +152,11 @@ export function seri(el: Node, init: boolean = false, hooks: SeriHook[] = []): S
 		}
 		break;
 	case 'BUTTON':
+		if (!el.classList.contains("colorbox")) return null;
 		result.type = "button";
 		result.variant = {};
-		if (el.classList.contains("colorbox")) {
-			result.variant.shape = "colorbox";
-			result.variant.color = getColor(el.classList);
-		}
+		result.variant.shape = "colorbox";
+		result.variant.color = getColor(el.classList);
 		break;
 	default:
 		if (el.classList.contains("columns")) {
@@ -235,7 +230,7 @@ export function deseri(data: SeriData, cur: string, init: boolean = false, hooks
 	if (SIMPLE_TYPES.has(data.type)) return `<${data.type}>${children}</${data.type}>`;
 
 	switch (data.type) {
-	case 'nav': case 'br':
+	case 'br':
 		isVoid = true;
 		tagName = data.type;
 		break;

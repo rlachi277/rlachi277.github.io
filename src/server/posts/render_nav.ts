@@ -1,5 +1,4 @@
 import type { Database } from 'better-sqlite3';
-import type { DeseriHook } from '../../shared/posts/seri.js';
 import type { DirData } from './manage_nav.js';
 
 import { sani } from '../../shared/posts/seri.js';
@@ -11,17 +10,8 @@ type NavDataObject = {
 };
 type NavData = string | NavDataObject;
 
-export function renderNavHook(db: Database, root: string): DeseriHook {
-	return function (data, cur) {
-		if (data.type === 'nav') return {
-			type: "html",
-			html: renderNav(db, root, cur)
-		};
-		return undefined;
-	};
-}
-
-function renderNav(db: Database, root: string, cur: string): string {
+export function renderNav(db: Database, root: string, cur: string): string {
+	cur = `${root}${cur}`;
 	const data = buildNav(db, root, cur);
 
 	function makeNavEntry(base: string, data: NavData): string {

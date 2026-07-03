@@ -42,17 +42,17 @@ export function entryDeseriHook(types: Record<number,number>, whereFunc: WhereFu
 	};
 }
 
-export const entrySeriHook: SeriHook = function (data, _) {
-	if (data.classList.contains("ref")) {
+export const entrySeriHook: SeriHook = function (el, _) {
+	if (el.classList.contains("ref")) {
 		return {
 			type: 'ref',
-			variant: {id: parseInt(data.getAttribute("data-id") ?? "")}, // NaN -> null
+			variant: {id: parseInt(el.getAttribute("data-id") ?? "")}, // NaN -> null
 			children: null
 		} as const;
-	} else if (data.classList.contains("entry")) {
+	} else if (el.classList.contains("entry")) {
 		return {
 			type: 'entry',
-			variant: {id: parseInt(data.getAttribute("data-id") ?? "")}, // NaN -> null
+			variant: {id: parseInt(el.getAttribute("data-id") ?? "")}, // NaN -> null
 			children: null
 		} as const;
 	}

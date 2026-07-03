@@ -57,7 +57,7 @@ export function setup(menuBar: MenubarData[], defaultMenu: MenuActions, editMenu
 	setupMenu(defaultMenu);
 	const params = new URLSearchParams(window.location.search);
 	if (params.get("edit")) {
-		if (!noEdit && !$(":root.notfound, :root.index").exists) startEdit($("body").list[0], true);
+		if (!noEdit && !$(":root.notfound, :root.index").exists) startEdit(d$n("main"), true);
 		$("nav a").each((e) => {
 			e.setAttribute("href", e.getAttribute("href") + "?edit=t");
 		});

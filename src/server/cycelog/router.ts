@@ -13,11 +13,10 @@ import {
 	log1Exists,
 	getRawLog1,
 	log1Where,
-	getIndex,
 	serverWhere
 } from "./cycelog.js";
 import { withErrors } from "../posts/router.js";
-import { renderNavHook } from '../posts/render_nav.js';
+import { renderNav } from '../posts/render_nav.js';
 import { entryDeseriHook } from '../../shared/cycelog/cycelog_hook.js';
 
 const db = new Database('db/cycelog.db');
@@ -55,9 +54,6 @@ db.prepare(`
 const router = express.Router();
 export default router;
 
-const log1Hook = renderNavHook(db, "/cycelog/log1/");
-const log3Hook = renderNavHook(db, "/cycelog/log3/");
-
 router.get('/', (_, res) => {
 	res.redirect('log3/');
 });
@@ -68,13 +64,20 @@ const log1NotFoundTemplate = "cycelog/log1_404.ejs";
 const log1IndexTemplate = "cycelog/log1_index.ejs";
 
 router.get('/log1/', (_, res) => {
-	const result = getIndex("/cycelog/log1/", log1Hook);
-	res.status(200).render(log1IndexTemplate, result);
+	res.status(200).render(log1IndexTemplate, {
+		nav: renderNav(db, "/cycelog/log1/", "index.html")
+	});
+});
+
+router.get('/log1/index.html', (_, res) => {
+	res.status(200).render(log1IndexTemplate, {
+		nav: renderNav(db, "/cycelog/log1/", "index.html")
+	});
 });
 
 router.get('/log1/:id', (req, res) => {
 	const id = req.params.id;
-	const result = getLog1(db, "/cycelog/log1/", id, [log1Hook]);
+	const result = getLog1(db, "/cycelog/log1/", id, [], renderNav(db, "/cycelog/log1/", id));
 	if (result[0]) res.status(200).render(log1Template, result[1]);
 	else res.status(404).render(log1NotFoundTemplate, result[1]);
 });
@@ -130,8 +133,15 @@ const log3NotFoundTemplate = "cycelog/log3_404.ejs";
 const log3IndexTemplate = "cycelog/log3_index.ejs";
 
 router.get('/log3/', (_, res) => {
-	const result = getIndex("/cycelog/log3/", log3Hook);
-	res.status(200).render(log3IndexTemplate, result);
+	res.status(200).render(log3IndexTemplate, {
+		nav: renderNav(db, "/cycelog/log3/", "index.html")
+	});
+});
+
+router.get('/log3/index.html', (_, res) => {
+	res.status(200).render(log3IndexTemplate, {
+		nav: renderNav(db, "/cycelog/log3/", "index.html")
+	});
 });
 
 router.get('/log3/:id', (req, res) => {
@@ -140,7 +150,7 @@ router.get('/log3/:id', (req, res) => {
 	const data = getRawLog1(db, id);
 	for (const e of data) types[e.id] = e.type;
 
-	const result = getLog3(db, "/cycelog/log3/", id, [log3Hook, entryDeseriHook(types, serverWhere(db))], types);
+	const result = getLog3(db, "/cycelog/log3/", id, [entryDeseriHook(types, serverWhere(db))], renderNav(db, "/cycelog/log3/", id), types);
 	if (result[0]) res.status(200).render(log3Template, result[1]);
 	else res.status(404).render(log3NotFoundTemplate, result[1]);
 });

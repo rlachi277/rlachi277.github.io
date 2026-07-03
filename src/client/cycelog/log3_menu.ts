@@ -43,8 +43,7 @@ export const editMenu = {
 			const res2 = await fetch(id, {method: "PUT", body: JSON.stringify({
 				type: "body",
 				children: [
-					{type: "h1", children: [`끾기록: ${id}`]},
-					{type: "nav", children: null}
+					{type: "h1", children: [`끾기록: ${id}`]}
 				]
 			})});
 			if (!res2.ok) throw res2.status;
@@ -75,7 +74,7 @@ export const editMenu = {
 	stopEdit: superEditMenu.stopEdit,
 
 	insertWeek: menuInsert((after, isFirst) => {
-		if (isFirst || after.parentElement !== document.body) return null;
+		if (isFirst || after.parentElement !== d$n("main")) return null;
 		const newElement = document.createElement("section");
 		newElement.classList.add("week");
 		const hgroup = document.createElement("hgroup");
@@ -88,19 +87,19 @@ export const editMenu = {
 		return newElement;
 	}, false),
 	insertP: menuInsert((after, isFirst) => {
-		if (!isFirst && after.parentElement === document.body) return null;
+		if (!isFirst && after.parentElement === d$n("main")) return null;
 		return document.createElement("p");
 	}, false),
 	insertSection: menuInsert((after, isFirst) => {
-		if (!isFirst && after.parentElement === document.body) return null;
+		if (!isFirst && after.parentElement === d$n("main")) return null;
 		return document.createElement("section");
 	}, true),
 	insertFieldset: menuInsert((after, isFirst) => {
-		if (!isFirst && after.parentElement === document.body) return null;
+		if (!isFirst && after.parentElement === d$n("main")) return null;
 		return document.createElement("fieldset");
 	}, false),
 	insertColumns: menuInsert((after, isFirst) => {
-		if (!isFirst && after.parentElement === document.body) return null;
+		if (!isFirst && after.parentElement === d$n("main")) return null;
 		const el = document.createElement("div");
 		el.classList.add("columns");
 		return el;

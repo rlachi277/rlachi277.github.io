@@ -53,8 +53,7 @@ export const editMenu = {
 			const res2 = await fetch(path, {method: "PUT", body: JSON.stringify({
 				type: "body",
 				children: [
-					{type: "h1", children: [`끾기록: ${id}`]},
-					{type: "nav", children: null}
+					{type: "h1", children: [`끾기록: ${id}`]}
 				]
 			})});
 			if (!res2.ok) throw res2.status;
