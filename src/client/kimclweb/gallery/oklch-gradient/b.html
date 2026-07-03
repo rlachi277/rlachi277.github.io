@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>OKLab color grid</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+		body {
+			display:flex; justify-content:center; align-items:center;
+			height:100vh; margin:0; background:#111;
+		}
+		canvas {
+			width:300px;
+			height: 300px;
+			border:1px solid #333;
+			display:block;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="grid"></canvas>
+	<script>
+		(function() {
+			const canvas = document.getElementById("grid");
+			const W = 1000, H = 1000;
+			canvas.width = W;
+			canvas.height = H;
+			const ctx = canvas.getContext("2d", { colorSpace: "display-p3" });
+			const img = ctx.createImageData(W, H);
+			const data = img.data;
+			
+			const L = 0.7; // fixed lightness
+			
+			// define four corners in OKLab
+			const TL = [L, -0.25,  0.25]; // top-left
+			const TR = [L,  0.25,  0.25]; // top-right
+			const BL = [L, -0.25, -0.25]; // bottom-left
+			const BR = [L,  0.25, -0.25]; // bottom-right
+			
+			function lerp(a, b, t) { return a + (b - a) * t; }
+			
+			function lerpOklab(c1, c2, t) {
+				return [
+				lerp(c1[0], c2[0], t),
+				lerp(c1[1], c2[1], t),
+				lerp(c1[2], c2[2], t)
+				];
+			}
+			
+			function oklabToRgb([L, a, b]) {
+				// OKLab -> LMS
+				const l_ = L + 0.3963377774 * a + 0.2158037573 * b;
+				const m_ = L - 0.1055613458 * a - 0.0638541728 * b;
+				const s_ = L - 0.0894841775 * a - 1.2914855480 * b;
+				
+				const l = l_ ** 3;
+				const m = m_ ** 3;
+				const s = s_ ** 3;
+				
+				// LMS → XYZ
+				const X = ( 1.2268798733741557 * l - 0.5578149965554813 * m + 0.28139105017721583 * s );
+				const Y = (-0.04057574521480085 * l + 1.1122868293970594 * m - 0.07171106666151701 * s );
+				const Z = (-0.0763729366746601  * l - 0.4214933239627914 * m + 1.5869240244272418  * s );
+				
+				// XYZ → linear Display-P3
+				let R = ( 2.49349691 * X - 0.93138362 * Y - 0.40271078 * Z );
+				let G = (-0.82948897 * X + 1.76266406 * Y + 0.02362469 * Z );
+				let B = ( 0.03584583 * X - 0.07617239 * Y + 0.95688452 * Z );
+				
+				// gamma encode
+				return [
+				srgbEncode(R),
+				srgbEncode(G),
+				srgbEncode(B)
+				];
+			}
+			
+			function srgbEncode(x) {
+				//if (x!=Math.min(1, Math.max(0, x))) return -1;
+				x = Math.min(1, Math.max(0, x)); // clamp
+				return Math.round(
+				255 * (x <= 0.0031308
+				? 12.92 * x
+				: 1.055 * Math.pow(x, 1/2.4) - 0.055)
+				);
+			}
+			
+			// fill image
+			for (let y = 0; y < H; y++) {
+				const ty_ = y / (H-1);
+				for (let x = 0; x < W; x++) {
+					const tx_ = x / (W-1);
+					
+					const ty = 0.5 + (tx_-0.5)*Math.SQRT1_2 + (ty_-0.5)*Math.SQRT1_2
+					const tx = 0.5 - (tx_-0.5)*Math.SQRT1_2 + (ty_-0.5)*Math.SQRT1_2
+					
+					if ((ty-0.5)**2 + (tx-0.5)**2 > 0.25) continue;
+					
+					const top = lerpOklab(TL, TR, tx);
+					const bot = lerpOklab(BL, BR, tx);
+					const mid = lerpOklab(top, bot, ty);
+					
+					const [r,g,b] = oklabToRgb(mid);
+					const idx = (y*W + x) * 4;
+					if (r==-1||g==-1||b==-1) continue;
+					data[idx]   = r;
+					data[idx+1] = g;
+					data[idx+2] = b;
+					data[idx+3] = 255;
+				}
+			}
+			
+			ctx.putImageData(img, 0, 0);
+		})();
+	</script>
+</body>
+</html>

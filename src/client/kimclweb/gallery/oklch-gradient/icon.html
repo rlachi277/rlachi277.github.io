@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>그라디언트 연습장</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+		@import url('https://fonts.googleapis.com/css2?family=Monomaniac+One&display=swap');
+		.dongle {
+			font-family: "Monomaniac One", sans-serif;
+			font-weight: 400;
+			font-style: normal;
+			font-size: 350px;
+			max-height: 500px;
+			margin: 0;
+			position: relative;
+			z-index: 2;
+			top: -0.11em;
+			color: #bbb;
+			mix-blend-mode: overlay;
+		}
+		
+		div {
+			vertical-align: top;
+		}
+		
+		.stack {
+			display: inline-grid;
+			place-items: center;
+			grid-template-areas: "center";
+			grid-template-rows: 1fr;
+			grid-template-columns: 1fr;
+			background-color: white;
+			border: 1px solid green;
+		}
+		
+		.stack * {
+			grid-area: center;
+		}
+		
+		.hexagon {
+			clip-path: url("#hexagon");
+			width: 500px;
+			height: 500px;
+		}
+		
+		.neg-hexagon {
+			clip-path: url("#neg-hexagon");
+			background: #bbb;
+			width: 420px;
+			height: 420px;
+			mix-blend-mode: overlay;
+		}
+		
+		.border-extra {
+			width: 420px;
+			height: 420px;
+			border: 40px solid #bbb;
+			position: relative;
+			z-index: 1;
+			mix-blend-mode: overlay;
+		}
+
+		@media screen and (max-width: 480px) {
+			.stack { overflow: hidden; }
+			.stack::before {
+				content: '화면이 너무 좁아요';
+			}
+		}
+		
+		.plus {
+			font-size: 0.65em;
+			vertical-align: text-top;
+			position: relative;
+			top: 0.1em;
+		}
+	</style>
+	<svg style="position: fixed;" width="0" height="0">
+		<clipPath id="hexagon" clipPathUnits="objectBoundingBox">
+			<path d="M0.435 0.017527767497326a0.13 0.13 0 0 1 0.13 0l0.32033320996791 0.18494446500535a0.13 0.13 0 0 1 0.065 0.11258330249198l0 0.3698889300107a0.13 0.13 0 0 1 -0.065 0.11258330249198l-0.32033320996791 0.18494446500535a0.13 0.13 0 0 1 -0.13 0l-0.32033320996791 -0.18494446500535a0.13 0.13 0 0 1 -0.065 -0.11258330249198l0 -0.3698889300107a0.13 0.13 0 0 1 0.065 -0.11258330249198" />
+		</clipPath>
+		<clipPath id="neg-hexagon" clipPathUnits="objectBoundingBox">
+			<path d="M0.435 0.017527767497326a0.13 0.13 0 0 1 0.13 0l0.32033320996791 0.18494446500535a0.13 0.13 0 0 1 0.065 0.11258330249198l0 0.3698889300107a0.13 0.13 0 0 1 -0.065 0.11258330249198l-0.32033320996791 0.18494446500535a0.13 0.13 0 0 1 -0.13 0l-0.32033320996791 -0.18494446500535a0.13 0.13 0 0 1 -0.065 -0.11258330249198l0 -0.3698889300107a0.13 0.13 0 0 1 0.065 -0.11258330249198 z M0 0 0 1 1 1 1 0 z" />
+		</clipPath>
+	</svg>
+</head>
+<body>
+	<h1>icon</h1>
+	<figure>
+		<figcaption>l = 0.7, c = 0.1687(Rec2020 한계)</figcaption>
+		<div role="img" aria-label="무지개 oklch 그라디언트, l=0.7, c=0.1687, h:22~382, 우하단에서 좌상단으로" style="background:linear-gradient(-45deg in oklch longer hue, oklch(0.7 0.1687 22), oklch(0.7 0.1687 382)); width:500px; height:500px;"></div>
+	</figure>
+	<figure>
+		<figcaption>qpi</figcaption>
+		<div role="img" aria-label="QPI에서 사용하는 그라디언트, 좌상단에서 우하단으로" style="background:linear-gradient(150deg, oklch(20.069% 0.12409 277.142) 0%, oklch(51.368% 0.04975 275.997) 100%); width:500px; height:500px;"></div>
+	</figure>
+	<figure>
+		<figcaption>hue=0</figcaption>
+		<div role="img" aria-label="위의 그라디언트 색상들의 h 값을 0으로 설정한 것" style="background:linear-gradient(150deg, oklch(20.069% 0.12409 0) 0%, oklch(51.368% 0.04975 0) 100%); width:500px; height:500px;"></div>
+	</figure>
+	<figure>
+		<figcaption>hue=0 135deg</figcaption>
+		<div role="img" aria-label="위의 그라디언트를 180도 회전시킨 것" style="background:linear-gradient(135deg, oklch(51.368% 0.04975 0) 0%, oklch(20.069% 0.12409 0) 100%); width:500px; height:500px;"></div>
+	</figure>
+	<figure>
+		<figcaption>hexagon</figcaption>
+		<div role="img" aria-label="위의 그라디언트를 배경으로 하는 육각형" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(51.368% 0.04975 0) 0%, oklch(20.069% 0.12409 0) 100%);"></div>
+		</div>
+	</figure>
+	<figure>
+		<figcaption>border</figcaption>
+		<div role="img" aria-label="위의 육각형의 바깥쪽의 밝기를 높여 테두리를 만든 것" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(51.368% 0.04975 0) 0%, oklch(20.069% 0.12409 0) 100%);"></div>
+			<div class="neg-hexagon" style="background: white; width: 450px; height: 450px;"></div>
+			<div class="border-extra" style="width: 450px; height: 450px; border: 25px solid white;"></div>
+		</div>
+	</figure>
+	<figure>
+		<figcaption>text</figcaption>
+		<div role="img" aria-label="위의 육각형의 중앙에 텍스트를 삽입한 것" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(51.368% 0.04975 0) 0%, oklch(20.069% 0.12409 0) 100%);"></div>
+			<div class="neg-hexagon" style="background:white;"></div>
+			<div class="border-extra" style="border: 40px solid white;"></div>
+			<p class="dongle" style="color: white;">9<span class="plus">+</span></p>
+		</div>
+	</figure>
+	<figure>
+		<figcaption>color</figcaption>
+		<div role="img" aria-label="위의 육각형의 밝기를 현저히 높인 것" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 0) 0%, oklch(50.069% 0.20409 0) 100%);"></div>
+			<div class="neg-hexagon"></div>
+			<div class="border-extra"></div>
+			<p class="dongle">9<span class="plus">+</span></p>
+		</div>
+	</figure>
+	
+	<h2>result</h2>
+	<figure>
+		<div role="img" aria-label="0 아이콘" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(41.368% 0 0) 0%, oklch(15.069% 0 0) 100%);"></div>
+			<div class="neg-hexagon" style="background:#ddd; width: 420px; height: 420px; mix-blend-mode: overlay;"></div>
+			<div style="width: 420px; height: 420px; border: 40px solid #ddd; position: relative; z-index: 1; mix-blend-mode: overlay;"></div>
+			<p class="dongle" style="color: #ddd;">0</p>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="0+ 아이콘" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(56.368% 0 0) 0%, oklch(30.069% 0 0) 100%);"></div>
+			<div class="neg-hexagon"></div>
+			<div class="border-extra"></div>
+			<p class="dongle">0<span class="plus">+</span></p>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="1 아이콘" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 7.5) 0%, oklch(50.069% 0.20409 7.5) 100%);"></div>
+			<div class="neg-hexagon"></div>
+			<div class="border-extra"></div>
+			<p class="dongle" style="right: 0.03em;">1</p>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="1+ 아이콘" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 20) 0%, oklch(50.069% 0.20409 20) 100%);"></div>
+			<div class="neg-hexagon"></div>
+			<div class="border-extra"></div>
+			<p class="dongle" style="right: 0.03em;">1<span class="plus" style="right: 0.12em;">+</span></p>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="2 아이콘" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 40) 0%, oklch(50.069% 0.20409 40) 100%);"></div>
+			<div class="neg-hexagon"></div>
+			<div class="border-extra"></div>
+			<p class="dongle">2</p>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="2+ 아이콘" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 60) 0%, oklch(50.069% 0.20409 60) 100%);"></div>
+			<div class="neg-hexagon"></div>
+			<div class="border-extra"></div>
+			<p class="dongle">2<span class="plus">+</span></p>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="3 아이콘" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 80) 0%, oklch(50.069% 0.20409 80) 100%);"></div>
+			<div class="neg-hexagon"></div>
+			<div class="border-extra"></div>
+			<p class="dongle">3</p>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="3+ 아이콘" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 100) 0%, oklch(50.069% 0.20409 100) 100%);"></div>
+			<div class="neg-hexagon"></div>
+			<div class="border-extra"></div>
+			<p class="dongle">3<span class="plus">+</span></p>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="4 아이콘" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 120) 0%, oklch(50.069% 0.20409 120) 100%);"></div>
+			<div class="neg-hexagon"></div>
+			<div class="border-extra"></div>
+			<p class="dongle">4</p>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="4+ 아이콘" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 140) 0%, oklch(50.069% 0.20409 140) 100%);"></div>
+			<div class="neg-hexagon"></div>
+			<div class="border-extra"></div>
+			<p class="dongle">4<span class="plus">+</span></p>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="5 아이콘" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 160) 0%, oklch(50.069% 0.20409 160) 100%);"></div>
+			<div class="neg-hexagon"></div>
+			<div class="border-extra"></div>
+			<p class="dongle">5</p>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="5+ 아이콘" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 180) 0%, oklch(50.069% 0.20409 180) 100%);"></div>
+			<div class="neg-hexagon"></div>
+			<div class="border-extra"></div>
+			<p class="dongle">5<span class="plus">+</span></p>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="6 아이콘" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 200) 0%, oklch(50.069% 0.20409 200) 100%);"></div>
+			<div class="neg-hexagon"></div>
+			<div class="border-extra"></div>
+			<p class="dongle">6</p>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="6+ 아이콘" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 220) 0%, oklch(50.069% 0.20409 220) 100%);"></div>
+			<div class="neg-hexagon"></div>
+			<div class="border-extra"></div>
+			<p class="dongle">6<span class="plus">+</span></p>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="7 아이콘" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 240) 0%, oklch(50.069% 0.20409 240) 100%);"></div>
+			<div class="neg-hexagon"></div>
+			<div class="border-extra"></div>
+			<p class="dongle">7</p>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="7+ 아이콘" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 260) 0%, oklch(50.069% 0.20409 260) 100%);"></div>
+			<div class="neg-hexagon"></div>
+			<div class="border-extra"></div>
+			<p class="dongle">7<span class="plus">+</span></p>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="8 아이콘" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 280) 0%, oklch(50.069% 0.20409 280) 100%);"></div>
+			<div class="neg-hexagon"></div>
+			<div class="border-extra"></div>
+			<p class="dongle">8</p>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="8+ 아이콘" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 300) 0%, oklch(50.069% 0.20409 300) 100%);"></div>
+			<div class="neg-hexagon"></div>
+			<div class="border-extra"></div>
+			<p class="dongle">8<span class="plus">+</span></p>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="0 아이콘" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 320) 0%, oklch(50.069% 0.20409 320) 100%);"></div>
+			<div class="neg-hexagon"></div>
+			<div class="border-extra"></div>
+			<p class="dongle">9</p>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="9+ 아이콘" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 340) 0%, oklch(50.069% 0.20409 340) 100%);"></div>
+			<div class="neg-hexagon"></div>
+			<div class="border-extra"></div>
+			<p class="dongle">9<span class="plus">+</span></p>
+		</div>
+	</figure>
+	<p>7+, 8+, 9+ is dummy data btw</p>
+	
+	<h3>hexagon only</h3>
+	<figure>
+		<div role="img" aria-label="0 아이콘 배경" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(41.368% 0 0) 0%, oklch(15.069% 0 0) 100%);"></div>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="0+ 아이콘 배경" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(56.368% 0 0) 0%, oklch(30.069% 0 0) 100%);"></div>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="1 아이콘 배경" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 7.5) 0%, oklch(50.069% 0.20409 7.5) 100%);"></div>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="1+ 아이콘 배경" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 20) 0%, oklch(50.069% 0.20409 20) 100%);"></div>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="2 아이콘 배경" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 40) 0%, oklch(50.069% 0.20409 40) 100%);"></div>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="2+ 아이콘 배경" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 60) 0%, oklch(50.069% 0.20409 60) 100%);"></div>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="3 아이콘 배경" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 80) 0%, oklch(50.069% 0.20409 80) 100%);"></div>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="3+ 아이콘 배경" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 100) 0%, oklch(50.069% 0.20409 100) 100%);"></div>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="4 아이콘 배경" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 120) 0%, oklch(50.069% 0.20409 120) 100%);"></div>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="4+ 아이콘 배경" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 140) 0%, oklch(50.069% 0.20409 140) 100%);"></div>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="5 아이콘 배경" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 160) 0%, oklch(50.069% 0.20409 160) 100%);"></div>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="5+ 아이콘 배경" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 180) 0%, oklch(50.069% 0.20409 180) 100%);"></div>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="6 아이콘 배경" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 200) 0%, oklch(50.069% 0.20409 200) 100%);"></div>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="6+ 아이콘 배경" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 220) 0%, oklch(50.069% 0.20409 220) 100%);"></div>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="7 아이콘 배경" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 240) 0%, oklch(50.069% 0.20409 240) 100%);"></div>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="7+ 아이콘 배경" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 260) 0%, oklch(50.069% 0.20409 260) 100%);"></div>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="8 아이콘 배경" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 280) 0%, oklch(50.069% 0.20409 280) 100%);"></div>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="8+ 아이콘 배경" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 300) 0%, oklch(50.069% 0.20409 300) 100%);"></div>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="0 아이콘 배경" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 320) 0%, oklch(50.069% 0.20409 320) 100%);"></div>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="9+ 아이콘 배경" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(76.368% 0.12975 340) 0%, oklch(50.069% 0.20409 340) 100%);"></div>
+		</div>
+	</figure>
+	
+	<h2>???</h2>
+	<figure>
+		<div class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg in oklch longer hue, oklch(61.368% 0.12975 0) 18%, oklch(55.069% 0.20409 360) 85%);"></div>
+			<div class="neg-hexagon"></div>
+			<div class="border-extra"></div>
+			<p class="dongle" style="right: 0.05em;">10</p>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="-1 아이콘" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(51.368% 0.04975 0) 0%, oklch(20.069% 0.12409 0) 100%);"></div>
+			<div class="neg-hexagon" style="background:#ddd;"></div>
+			<div class="border-extra" style="border: 40px solid #ddd;"></div>
+			<p class="dongle" style="color: #ddd; right: 0.06em;"><span style="position: relative; right: -0.12em; top: -0.035em;">-</span>1</p>
+		</div>
+	</figure>
+	<figure>
+		<div role="img" aria-label="-1 아이콘 배경" class="stack">
+			<div class="hexagon" style="background:linear-gradient(135deg, oklch(51.368% 0.04975 0) 0%, oklch(20.069% 0.12409 0) 100%);"></div>
+		</div>
+	</figure>
+	<p>
+		https://weareoutman.github.io/rounded-polygon/ | side length 52, radius 13 -> 100x100에서 소수점 2칸씩 옮김<br>
+		https://fonts.google.com/specimen/Monomaniac+On
+	</p>
+	<!--
+	Copyright 2020 The Monomaniac Project Authors (https://github.com/ManiackersDesign/monomaniac), all rights reserved.
+	
+	This Font Software is licensed under the SIL Open Font License, Version 1.1.
+	This license is copied below, and is also available with a FAQ at:
+	https://openfontlicense.org
+	
+	
+	-----------------------------------------------------------
+	SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+	-----------------------------------------------------------
+	
+	PREAMBLE
+	The goals of the Open Font License (OFL) are to stimulate worldwide
+	development of collaborative font projects, to support the font creation
+	efforts of academic and linguistic communities, and to provide a free and
+	open framework in which fonts may be shared and improved in partnership
+	with others.
+	
+	The OFL allows the licensed fonts to be used, studied, modified and
+	redistributed freely as long as they are not sold by themselves. The
+	fonts, including any derivative works, can be bundled, embedded,
+	redistributed and/or sold with any software provided that any reserved
+	names are not used by derivative works. The fonts and derivatives,
+	however, cannot be released under any other type of license. The
+	requirement for fonts to remain under this license does not apply
+	to any document created using the fonts or their derivatives.
+	
+	DEFINITIONS
+	"Font Software" refers to the set of files released by the Copyright
+	Holder(s) under this license and clearly marked as such. This may
+	include source files, build scripts and documentation.
+	
+	"Reserved Font Name" refers to any names specified as such after the
+	copyright statement(s).
+	
+	"Original Version" refers to the collection of Font Software components as
+	distributed by the Copyright Holder(s).
+	
+	"Modified Version" refers to any derivative made by adding to, deleting,
+	or substituting -- in part or in whole -- any of the components of the
+	Original Version, by changing formats or by porting the Font Software to a
+	new environment.
+	
+	"Author" refers to any designer, engineer, programmer, technical
+	writer or other person who contributed to the Font Software.
+	
+	PERMISSION & CONDITIONS
+	Permission is hereby granted, free of charge, to any person obtaining
+	a copy of the Font Software, to use, study, copy, merge, embed, modify,
+	redistribute, and sell modified and unmodified copies of the Font
+	Software, subject to the following conditions:
+	
+	1) Neither the Font Software nor any of its individual components,
+	in Original or Modified Versions, may be sold by itself.
+	
+	2) Original or Modified Versions of the Font Software may be bundled,
+	redistributed and/or sold with any software, provided that each copy
+	contains the above copyright notice and this license. These can be
+	included either as stand-alone text files, human-readable headers or
+	in the appropriate machine-readable metadata fields within text or
+	binary files as long as those fields can be easily viewed by the user.
+	
+	3) No Modified Version of the Font Software may use the Reserved Font
+	Name(s) unless explicit written permission is granted by the corresponding
+	Copyright Holder. This restriction only applies to the primary font name as
+	presented to the users.
+	
+	4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font
+	Software shall not be used to promote, endorse or advertise any
+	Modified Version, except to acknowledge the contribution(s) of the
+	Copyright Holder(s) and the Author(s) or with their explicit written
+	permission.
+	
+	5) The Font Software, modified or unmodified, in part or in whole,
+	must be distributed entirely under this license, and must not be
+	distributed under any other license. The requirement for fonts to
+	remain under this license does not apply to any document created
+	using the Font Software.
+	
+	TERMINATION
+	This license becomes null and void if any of the above conditions are
+	not met.
+	
+	DISCLAIMER
+	THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+	EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF
+	MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
+	OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE
+	COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+	INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
+	DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+	FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
+	OTHER DEALINGS IN THE FONT SOFTWARE.
+	-->
+</body>
+</html>

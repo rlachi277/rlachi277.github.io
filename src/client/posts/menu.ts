@@ -16,13 +16,12 @@ import {
 
 export const defaultMenu: MenuActions = {
 	export: () => {
-		console.log(SERI_HOOKS);
 		try {
 			const data = seri(d$n("main"), true, SERI_HOOKS);
 			const file = new Blob([JSON.stringify(data)], {type: "application/json"});
 			const anchor = document.createElement("a");
 			anchor.href = URL.createObjectURL(file);
-			anchor.download = `export${window.location.pathname.replace(/.html$/,'')}.json`;
+			anchor.download = `export${window.location.pathname.replace(/\.html$/,'')}.json`;
 			anchor.click();
 			URL.revokeObjectURL(anchor.href);
 		} catch (e) {

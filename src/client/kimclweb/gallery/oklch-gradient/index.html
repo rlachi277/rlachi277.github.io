@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>그라디언트 연습장</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+	<h1>그라디언트 연습장</h1>
+	<figure>
+		<figcaption>l = 0.7, c = 0.1687(Rec2020 한계)</figcaption>
+		<div role="img" aria-label="무지개 oklch 그라디언트, l=0.7, c=0.1687, h:22~382, 우하단에서 좌상단으로" style="background:linear-gradient(-45deg in oklch longer hue, oklch(0.7 0.1687 22), oklch(0.7 0.1687 382)); width:800px; height:450px;"></div>
+	</figure>
+	<figure>
+		<figcaption>c = 0.2</figcaption>
+		<div role="img" aria-label="무지개 oklch 그라디언트, l=0.7, c=0.2, h:22~382, 우하단에서 좌상단으로" style="background:linear-gradient(-45deg in oklch longer hue, oklch(0.7 0.2 22), oklch(0.7 0.2 382)); width:800px; height:450px;"></div>
+	</figure>
+	<figure>
+		<figcaption>c = 0.3</figcaption>
+		<div role="img" aria-label="무지개 oklch 그라디언트, l=0.7, c=0.3, h:22~382, 우하단에서 좌상단으로, P3 디스플레이 기준으로 perceptually uniform하지 않음이 보인다." style="background:linear-gradient(-45deg in oklch longer hue, oklch(0.7 0.3 22), oklch(0.7 0.3 382)); width:800px; height:450px;"></div>
+	</figure>
+	<figure>
+		<figcaption>c = 0.4</figcaption>
+		<div role="img" aria-label="무지개 oklch 그라디언트, l=0.7, c=0.4, h:22~382, 우하단에서 좌상단으로, P3 디스플레이 기준으로 perceptually uniform하지 않음이 보인다." style="background:linear-gradient(-45deg in oklch longer hue, oklch(0.7 0.4 22), oklch(0.7 0.4 382)); width:800px; height:450px;"></div>
+	</figure>
+	<figure>
+		<figcaption>HSL</figcaption>
+		<div role="img" aria-label="무지개 hsl 그라디언트, l=50, s=100, h:0~360, 우하단에서 좌상단으로" style="background:linear-gradient(-45deg in hsl longer hue, hsl(0 100 50), hsl(360 100 50)); width:800px; height:450px;"></div>
+	</figure>
+	<figure>
+		<figcaption>l = 0.7, c = 0.1592(P3 한계)</figcaption>
+		<div role="img" aria-label="무지개 oklch 그라디언트, l=0.7, c=0.1592, h:22~382, 우하단에서 좌상단으로" style="background:linear-gradient(-45deg in oklch longer hue, oklch(0.7 0.1592 22), oklch(0.7 0.1592 382)); width:800px; height:450px;"></div>
+	</figure>
+	<figure>
+		<figcaption>세로(900x1600)(450x800이긴 한데 Retina 어쩌고 때매 스샷 찍으면 900x1600임)</figcaption>
+		<div role="img" aria-label="같은 그라디언트를 900px 곱하기 1600px의 공간에 표시한 것" style="background:linear-gradient(-45deg in oklch longer hue, oklch(0.7 0.1592 22), oklch(0.7 0.1592 382)); height:800px; width:450px;"></div>
+	</figure>
+	<figure>
+		<figcaption>정방형(1000x1000)</figcaption>
+		<div role="img" aria-label="같은 그라디언트를 1000px 곱하기 1000px의 공간에 표시한 것" style="background:linear-gradient(-45deg in oklch longer hue, oklch(0.7 0.1592 22), oklch(0.7 0.1592 382)); width:500px; height:500px;"></div>
+	</figure>
+	<figure>
+		<figcaption>oklab 그리드(a,b=-0.25~0.25, L=0.7)(canvas갖고 만듦)(챗지피티가 만듦)(P3임)(P3으로 변환하는 행렬 정확한지 확인 안 했는데 SRGB로 변환하는 거(확인함)랑 잘 맞는 거 같아서 그냥 확인 안 하기로 함)</figcaption>
+		<img alt="oklab 그리드, 오른쪽으로 갈수록 a 값이, 위로 갈수록 b 값이 커진다. l=0.7, a,b:-0.25~0.25" style="zoom:0.5" src="/assets/gallery/1.png"></img>
+	</figure>
+	<figure>
+		<figcaption>SRGB</figcaption>
+		<img alt="위의 그리드와 같으나 srgb 이미지여서 색상이 제한된 것" style="zoom:0.5" src="/assets/gallery/2.png"></img>
+	</figure>
+	<figure>
+		<figcaption>-0.2~0.2 정방형</figcaption>
+		<img alt="위의 그리드에서 a와 b의 범위를 -0.2~0.2로 줄인 것" style="zoom:0.5" src="/assets/gallery/3.png"></img>
+	</figure>
+	<figure>
+		<figcaption>가로</figcaption>
+		<img alt="위의 그리드를 1600px 곱하기 900px의 공간에서 만든 것" style="zoom:0.5" src="/assets/gallery/4.png"></img>
+	</figure>
+	<figure>
+		<figcaption>세로</figcaption>
+		<img alt="위의 그리드를 900px 곱하기 1600px의 공간에서 만든 것" style="zoom:0.5" src="/assets/gallery/5.png"></img>
+	</figure>
+	<figure>
+		<figcaption>원</figcaption>
+		<img alt="1000px 곱하기 1000px 그리드 중 지름이 1000px인 원 안의 영역만 남긴 것" style="zoom:0.5" src="/assets/gallery/6.png"></img>
+	</figure>
+	<figure>
+		<figcaption>원(-0.25~0.25)</figcaption>
+		<img alt="위 원에서 a와 b의 범위를 다시 -0.25~0.25로 늘린 것" style="zoom:0.5" src="/assets/gallery/7.png"></img>
+	</figure>
+	<figure>
+		<figcaption>원(빨-파=상-하)</figcaption>
+		<img alt="위 원을 회전시켜 빨간색이 위, 파란색이 아래로 오게 한 것" style="zoom:0.5" src="/assets/gallery/8.png"></img>
+	</figure>
+	<figure>
+		<figcaption>원(빨-파=우-좌)</figcaption>
+		<img alt="위 원을 회전시켜 빨간색이 오른쪽, 파란색이 왼쪽으로 오게 한 것" style="zoom:0.5" src="/assets/gallery/9.png"></img>
+	</figure>
+	<figure>
+		<figcaption>원(빨-파=좌-우)</figcaption>
+		<img alt="위 원을 회전시켜 빨간색이 왼쪽, 파란색이 오른쪽으로 오게 한 것" style="zoom:0.5" src="/assets/gallery/10.png"></img>
+	</figure>
+	<figure>
+		<figcaption>다이아몬드(빨-파=좌-우)</figcaption>
+		<img alt="위 이미지와 같으나 원 대신 다이아몬드 안의 영역만 남긴 것" style="zoom:0.5" src="/assets/gallery/11.png"></img>
+	</figure>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>OKLab color grid</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+		body {
+			display:flex; justify-content:center; align-items:center;
+			height:100vh; margin:0; background:#111;
+		}
+		canvas {
+			width:300px;
+			height: 300px;
+			border:1px solid #333;
+			display:block;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="grid"></canvas>
+	<script>
+		(function() {
+			const canvas = document.getElementById("grid");
+			const W = 1000, H = 1000;
+			canvas.width = W;
+			canvas.height = H;
+			const ctx = canvas.getContext("2d", { colorSpace: "display-p3" });
+			const COLORS = ["#0f0", "color(display-p3 0 1 0)"];
+			for (let y = 0; y < H; y += 20) {
+				ctx.fillStyle = COLORS[(y / 20) % 2];
+				ctx.fillRect(0, y, W, 20);
+			}
+		})();
+	</script>
+</body>
+</html>

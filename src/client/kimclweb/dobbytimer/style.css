@@ -1,0 +1,283 @@
+/* 눈누가 망했거나 jsdelivr가 망했거나 하면 뭐 알아서 하세요 */
+@font-face {
+    font-family: 'thatfont';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/BMDOHYEON.woff') format('woff');
+    font-weight: normal;
+    font-display: swap;
+}
+
+:root {
+	--test-background: transparent;
+	--background-color: #F1E4D2;
+	--dark-color: var(--background-color);
+	--darker-color: var(--background-color);
+	--darkest-color: var(--background-color);
+	/*--dark-color: #DBCFBF;
+	--darker-color: #C2B7A9;
+	--darkest-color: #403C38;*/
+	--base-width: min(90vw,180vh);
+	--base-height: min(30vw,60vh);
+}
+
+body {
+	background-color: var(--background-color);
+}
+
+#logo {
+	width: min(8vw, 8vh);
+	height: min(8vw, 8vh);
+}
+
+#name {
+	color: var(--dark-color);
+	font-weight: 600;
+	font-family: thatfont;
+	font-size: calc(var(--base-width) / 90);
+	margin: 0;
+}
+
+#middle-container {
+	position: absolute;
+	top: 50vh;
+	left: 50vw;
+	transform: translate(-50%,-50%);
+	width: var(--base-width);
+	height: var(--base-height);
+	background-color: var(--test-background);
+}
+
+#timer {
+	display: flex;
+	justify-content: center;
+	width: 100%;
+	height: 60%;
+	position: absolute;
+	top: 20%;
+	background-color: var(--test-background);
+}
+
+#day-display {
+	width: 33%;
+	height: 20%;
+	position: absolute;
+	left: 11.6%;
+	top: 12.5%;
+	background-color: var(--test-background);
+}
+
+#hour-progress {
+	width: 43%;
+	height: 20%;
+	position: absolute;
+	right: 11.6%;
+	top: 8%;
+	background-color: var(--test-background);
+}
+
+#vacation-timer {
+	width: 33%;
+	height: 20%;
+	left: 10.95%;
+	bottom: 8%;
+	border-top: calc(var(--base-height) / 50) solid var(--darkest-color);
+	padding-left: 1%;
+	position: absolute;
+	background-color: var(--test-background);;
+}
+
+#second-display {
+	width: 33%;
+	height: 20%;
+	bottom: 10%;
+	right: 10.95%;
+	position: absolute;
+	background-color: var(--test-background);
+}
+
+.timer-text-container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 10%;
+	height: 100%;
+	margin: 0;
+	background-color: var(--test-background);
+}
+
+.timer-colon-container {
+	width: 4%;
+}
+
+.timer-text {
+	width: 100%;
+	font-size: calc(var(--base-width) / 7);
+	font-family: thatfont;
+	text-align: center;
+	color: var(--darkest-color);
+	transform: translate(0%,5%);
+	background-color: var(--test-background);
+}
+
+.timer-colon {
+	transform: none;
+}
+
+#day-display-text {
+	position: absolute;
+	bottom: 0%;
+	font-family: thatfont;
+	color: var(--darkest-color);
+	font-size: calc(var(--base-width) / 20);
+	text-align: left;
+}
+
+#vacation-timer-text {
+	position: absolute;
+	top: 5%;
+	font-family: thatfont;
+	color: var(--darkest-color);
+	font-size: calc(var(--base-width) / 20);
+	text-align: left;
+}
+
+#second-display-text {
+	position: absolute;
+	top: 5%;
+	right: 3%;
+	font-family: thatfont;
+	color: var(--darkest-color);
+	font-size: calc(var(--base-width) / 20);
+	text-align: right;
+}
+
+#hour-progress-bg {
+	display: inline-block;
+	background-color: var(--dark-color);
+	width: 100%;
+	height: 10%;
+	position: absolute;
+	bottom: 3%;
+}
+
+#hour-progress-fg {
+	display: inline-block;
+	background-color: var(--darkest-color);
+	height: 10%;
+	position: absolute;
+	bottom: 3%;
+}
+
+
+#bottom-container {
+	position: absolute;
+	bottom: 0;
+	left: 50vw;
+	transform: translate(-50%,0%);
+	width: var(--base-width);
+	height: calc(var(--base-height) / 4);
+	background-color: var(--test-background);
+}
+
+.progress-bar {
+	position: absolute;
+	width: 100%;
+	height: 50%;
+	background-color: var(--test-background);
+}
+
+.actual-bar {
+	width: 100%;
+	height: 16%;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%,-50%);
+	z-index: 1;
+	background-color: var(--dark-color);
+}
+
+.dark-bar {
+	z-index: 2;
+	background-color: var(--darker-color);
+	height: 16%;
+	position: absolute;
+	top: 50%;
+	transform: translate(0%,-50%);
+}
+
+.past-bar {
+	z-index: 3;
+	background-color: var(--darkest-color);
+	height: 16%;
+	position: absolute;
+	top: 50%;
+	transform: translate(0%,-50%);
+}
+
+.circle {
+	z-index: 4;
+	position: absolute;
+	top: 50%;
+	transform: translate(-50%,-50%);
+	width: calc(var(--base-height) / 40);
+	height: calc(var(--base-height) / 40);
+	border-radius: 100%;
+	border: calc(var(--base-height) / 50) solid var(--background-color);
+	background-color: var(--background-color);
+}
+
+.circle-bright-before {
+	border-left-color: var(--dark-color);
+	border-top-color: var(--dark-color);
+}
+
+.circle-dark-before {
+	border-left-color: var(--darker-color);
+	border-top-color: var(--darker-color);
+}
+
+.circle-bright-after {
+	border-right-color: var(--dark-color);
+	border-bottom-color: var(--dark-color);
+}
+
+.circle-dark-after {
+	border-right-color: var(--darker-color);
+	border-bottom-color: var(--darker-color);
+}
+
+.circle-cursor , .circle-past {
+	border-color: var(--darkest-color);
+	background-color: var(--darkest-color);
+}
+
+.progress {
+	font-family: thatfont;
+	font-size: calc(var(--base-width) / 75);
+	color: var(--darkest-color);
+	position: absolute;
+	transform: translate(-50%,-50%);
+}
+
+#top-container {
+	position: absolute;
+	top: 0;
+	right: 0;
+	margin: calc(var(--base-width)/150);
+}
+
+#date-display {
+	font-family: thatfont;
+	font-size: calc(var(--base-width) / 25);
+	color: var(--dark-color);
+	margin: 0;
+	text-align: right;
+}
+
+#week-display {
+	font-family: thatfont;
+	font-size: calc(var(--base-width) / 25);
+	color: var(--dark-color);
+	margin: 0;
+	text-align: right;
+}

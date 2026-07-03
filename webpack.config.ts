@@ -15,12 +15,17 @@ const __dirname = path.dirname(__filename);
 
 const entries = {
   "index": "index",
+
   "posts/post": "posts/entries/post",
   "posts/style": "posts/entries/style",
   "cycelog/log1": "cycelog/entries/log1",
   "cycelog/log3": "cycelog/entries/log3",
   "cycelog/log1_style": "cycelog/entries/log1_style",
   "cycelog/log3_style": "cycelog/entries/log3_style",
+
+  "notfont/entry": "kimclweb/notfont/entries/entry",
+  "gallery/entry": "kimclweb/gallery/entries/entry",
+  "dobbytimer/entry": "kimclweb/dobbytimer/entries/entry",
 } satisfies Record<string, string>;
 
 type HtmlTemplate = {
@@ -31,6 +36,7 @@ type HtmlTemplate = {
 
 const html: Record<string, HtmlTemplate> = {
   "index": {template: "index.html", chunks: ["index"]},
+
   "posts/index": {template: "posts/index.ejs", chunks: ["posts/post", "posts/style"]},
   "posts/post": {
     template: "posts/post.ejs",
@@ -55,7 +61,33 @@ const html: Record<string, HtmlTemplate> = {
     template: "posts/post.ejs",
     templateParameters: {title: "끾기록: 3차 기록(404)", rootclass: "notfound"},
     chunks: ["cycelog/log3", "posts/style"]
-  }
+  },
+
+  "kimclweb/notfont/index": {template: "kimclweb/notfont/index.html", chunks: ["notfont/entry"]},
+  ...[
+    "kimclweb/gallery/index",
+    "kimclweb/gallery/dobby_topic",
+    "kimclweb/gallery/newcolors",
+    "kimclweb/gallery/newnewcolors",
+    "kimclweb/gallery/infolevel",
+    "kimclweb/gallery/read_mode_test",
+    "kimclweb/gallery/oklch-gradient/index",
+    "kimclweb/gallery/oklch-gradient/icon"
+  ].reduce((acc: Record<string, HtmlTemplate>, name) => {
+    acc[name] = {template: `${name}.html`, chunks: ["gallery/entry"]};
+    return acc;
+  }, {}),
+  ...[
+    "kimclweb/gallery/oklch-gradient/a",
+    "kimclweb/gallery/oklch-gradient/a copy",
+    "kimclweb/gallery/oklch-gradient/b",
+    "kimclweb/gallery/oklch-gradient/b copy",
+    "kimclweb/gallery/oklch-gradient/c"
+  ].reduce((acc: Record<string, HtmlTemplate>, name) => {
+    acc[name] = {template: `${name}.html`, chunks: []};
+    return acc;
+  }, {}),
+  "kimclweb/dobbytimer/index": {template: "kimclweb/dobbytimer/index.html", chunks: ["dobbytimer/entry"]},
 };
 
 const config: webpack.Configuration = {
@@ -80,6 +112,10 @@ const config: webpack.Configuration = {
         },
         exclude: /node_modules/,
       },
+      {
+        test: /\.png,\.svg,\.jpe?g/,
+        type: 'asset/resource',
+      }
     ],
   },
   plugins: [

@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>colors.css</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+		:root, :host {
+			color-scheme: light dark;
+
+			--c-lbg: oklch(98.5% 0 0);
+			--c-dbg: oklch(25% 0 0);
+			--c-ltext: oklch(98.5% 0 0);
+			--c-dtext: oklch(20% 0 0);
+			--c-grayl4: oklch(95.5% 0 0);
+			--c-grayl3: oklch(91.25% 0 0);
+			--c-grayl2: oklch(82.5% 0 0);
+			--c-grayl1: oklch(73.75% 0 0);
+			--c-gray: oklch(65% 0 0);
+			--c-grayd1: oklch(56.25% 0 0);
+			--c-grayd2: oklch(47.5% 0 0);
+			--c-grayd3: oklch(38.75% 0 0);
+			--c-grayd4: oklch(33.5% 0 0);
+			--c-black: black;
+			--c-white: white;
+
+			--c-bg: light-dark(var(--c-lbg),var(--c-dbg));
+			--c-antibg: light-dark(var(--c-dbg),var(--c-lbg));
+			--c-text: light-dark(var(--c-dtext),var(--c-ltext));
+			--c-antitext: light-dark(var(--c-ltext),var(--c-dtext));
+			--c-gray0: light-dark(var(--c-grayl4),var(--c-grayd4));
+			--c-gray1: light-dark(var(--c-grayl3),var(--c-grayd3));
+			--c-gray2: light-dark(var(--c-grayl2),var(--c-grayd2));
+			--c-gray3: light-dark(var(--c-grayl1),var(--c-grayd1));
+			--c-gray4: light-dark(var(--c-gray),var(--c-gray));
+			--c-gray5: light-dark(var(--c-grayd1),var(--c-grayl1));
+			--c-gray6: light-dark(var(--c-grayd2),var(--c-grayl2));
+			--c-gray7: light-dark(var(--c-grayd3),var(--c-grayl3));
+			--c-gray8: light-dark(var(--c-grayd4),var(--c-grayl4));
+			--c-extreme: light-dark(var(--c-white),var(--c-black));
+			--c-antiextreme: light-dark(var(--c-black),var(--c-white));
+
+			--c-link: var(--c-b-text, light-dark(oklch(53% 0.16 260),oklch(71.5% 0.1 260)));
+			--c-linkh: var(--c-b-texth, light-dark(oklch(47% 0.14 260),oklch(80% 0.085 260)));
+			--c-linka: var(--c-b-texta, light-dark(oklch(34% 0.08 260),oklch(87.5% 0.06 260)));
+
+			--c-w-text: var(--c-gray5);
+			--c-w-texth: var(--c-gray6);
+			--c-w-texta: var(--c-gray7);
+			--c-w-bg: var(--c-gray0);
+			--c-w-bgh: var(--c-gray1);
+			--c-w-bga: var(--c-gray2);
+			--c-w-invbg: var(--c-grayd1);
+			--c-w-invbgh: var(--c-grayd2);
+			--c-w-invbga: var(--c-grayd3);
+			--c-w-border: var(--c-gray4);
+			--c-w-borderh: var(--c-gray5);
+			--c-w-bordera: var(--c-gray6);
+
+			--c-blued3: oklch(26% 0.05 260);
+			--c-blued2: oklch(34% 0.08 260);
+			--c-blued1: oklch(47% 0.14 260);
+			--c-blue: oklch(53% 0.16 260);
+			--c-bluel1: oklch(63% 0.12 260);
+			--c-bluel2: oklch(71.5% 0.1 260);
+			--c-bluel3: oklch(80% 0.085 260);
+			--c-bluel4: oklch(87.5% 0.06 260);
+			--c-bluel5: oklch(91.5% 0.04 260);
+			--c-bluel6: oklch(95.5% 0.02 260);
+			--c-b-text: light-dark(var(--c-blue),var(--c-bluel2));
+			--c-b-texth: light-dark(var(--c-blued1),var(--c-bluel3));
+			--c-b-texta: light-dark(var(--c-blued2),var(--c-bluel4));
+			--c-b-bg: light-dark(var(--c-bluel6),var(--c-blued3));
+			--c-b-bgh: light-dark(var(--c-bluel5),var(--c-blued2));
+			--c-b-bga: light-dark(var(--c-bluel4),var(--c-blued1));
+			--c-b-invbg: var(--c-blue);
+			--c-b-invbgh: var(--c-blued1);
+			--c-b-invbga: var(--c-blued2);
+			--c-b-border: var(--c-bluel1);
+			--c-b-borderh: light-dark(var(--c-blue),var(--c-bluel2));
+			--c-b-bordera: light-dark(var(--c-blued1),var(--c-bluel3));
+			--c-b-bright: oklch(65% 0.19 260);
+			--c-b-brighth: oklch(59% 0.175 260);
+			--c-b-brighta: var(--c-blue);
+
+			--c-purpled3: oklch(26% 0.05 287);
+			--c-purpled2: oklch(34% 0.08 287);
+			--c-purpled1: oklch(47% 0.14 287);
+			--c-purple: oklch(53% 0.16 287);
+			--c-purplel1: oklch(63% 0.12 292);
+			--c-purplel2: oklch(71.5% 0.08 297);
+			--c-purplel3: oklch(80% 0.05 297);
+			--c-purplel4: oklch(87.5% 0.035 297);
+			--c-purplel5: oklch(91.5% 0.02 297);
+			--c-purplel6: oklch(95.5% 0.01 297);
+			--c-p-text: light-dark(var(--c-purple),var(--c-purplel2));
+			--c-p-texth: light-dark(var(--c-purpled1),var(--c-purplel3));
+			--c-p-texta: light-dark(var(--c-purpled2),var(--c-purplel4));
+			--c-p-bg: light-dark(var(--c-purplel6),var(--c-purpled3));
+			--c-p-bgh: light-dark(var(--c-purplel5),var(--c-purpled2));
+			--c-p-bga: light-dark(var(--c-purplel4),var(--c-purpled1));
+			--c-p-invbg: var(--c-purple);
+			--c-p-invbgh: var(--c-purpled1);
+			--c-p-invbga: var(--c-purpled2);
+			--c-p-border: var(--c-purplel1);
+			--c-p-borderh: light-dark(var(--c-purple),var(--c-purplel2));
+			--c-p-bordera: light-dark(var(--c-purpled1),var(--c-purplel3));
+
+			--c-redd3: oklch(26% 0.05 25);
+			--c-redd2: oklch(34% 0.08 25);
+			--c-redd1: oklch(47% 0.14 25);
+			--c-red: oklch(53% 0.17 25);
+			--c-redl0: oklch(58% 0.18 25);
+			--c-redl1: oklch(63% 0.2 25);
+			--c-redl2: oklch(71.5% 0.16 25);
+			--c-redl3: oklch(80% 0.12 25);
+			--c-redl4: oklch(87.5% 0.065 25);
+			--c-redl5: oklch(91.5% 0.04 25);
+			--c-redl6: oklch(95.5% 0.02 25);
+			--c-r-text: light-dark(var(--c-red),var(--c-redl2));
+			--c-r-texth: light-dark(var(--c-redd1),var(--c-redl3));
+			--c-r-texta: light-dark(var(--c-redd2),var(--c-redl4));
+			--c-r-bg: light-dark(var(--c-redl6),var(--c-redd3));
+			--c-r-bgh: light-dark(var(--c-redl5),var(--c-redd2));
+			--c-r-bga: light-dark(var(--c-redl4),var(--c-redd1));
+			--c-r-invbg: var(--c-red);
+			--c-r-invbgh: var(--c-redd1);
+			--c-r-invbga: var(--c-redd2);
+			--c-r-border: var(--c-redl1);
+			--c-r-borderh: light-dark(var(--c-red),var(--c-redl2));
+			--c-r-bordera: light-dark(var(--c-redd1),var(--c-redl3));
+			--c-r-bright: var(--c-redl1);
+			--c-r-brighth: var(--c-redl0);
+			--c-r-brighta: var(--c-red);
+
+			--c-oranged3: oklch(26% 0.05 50);
+			--c-oranged2: oklch(36% 0.08 50);
+			--c-oranged1: oklch(51% 0.12 50);
+			--c-orange: oklch(59% 0.14 50);
+			--c-orangel1: oklch(69% 0.17 50);
+			--c-orangel2: oklch(76.5% 0.13 50);
+			--c-orangel3: oklch(81% 0.1 50);
+			--c-orangel4: oklch(88.5% 0.065 50);
+			--c-orangel5: oklch(91.5% 0.04 50);
+			--c-orangel6: oklch(95.5% 0.02 50);
+			--c-o-text: light-dark(var(--c-orange),var(--c-orangel2));
+			--c-o-texth: light-dark(var(--c-oranged1),var(--c-orangel3));
+			--c-o-texta: light-dark(var(--c-oranged2),var(--c-orangel4));
+			--c-o-bg: light-dark(var(--c-orangel6),var(--c-oranged3));
+			--c-o-bgh: light-dark(var(--c-orangel5),var(--c-oranged2));
+			--c-o-bga: light-dark(var(--c-orangel4),var(--c-oranged1));
+			--c-o-invbg: var(--c-orange);
+			--c-o-invbgh: var(--c-oranged1);
+			--c-o-invbga: var(--c-oranged2);
+			--c-o-border: var(--c-orangel1);
+			--c-o-borderh: light-dark(var(--c-orange),var(--c-orangel2));
+			--c-o-bordera: light-dark(var(--c-oranged1),var(--c-orangel3));
+
+			--c-yellowd3: oklch(26% 0.05 80);
+			--c-yellowd2: oklch(36% 0.08 80);
+			--c-yellowd1: oklch(51% 0.1 80);
+			--c-yellow: oklch(59% 0.12 80);
+			--c-yellowl1: oklch(69% 0.14 80);
+			--c-yellowl2: oklch(76.5% 0.1 80);
+			--c-yellowl3: oklch(81% 0.08 80);
+			--c-yellowl4: oklch(88.5% 0.065 80);
+			--c-yellowl5: oklch(91.5% 0.04 80);
+			--c-yellowl6: oklch(95.5% 0.02 80);
+			--c-y-text: light-dark(var(--c-yellow),var(--c-yellowl2));
+			--c-y-texth: light-dark(var(--c-yellowd1),var(--c-yellowl3));
+			--c-y-texta: light-dark(var(--c-yellowd2),var(--c-yellowl4));
+			--c-y-bg: light-dark(var(--c-yellowl6),var(--c-yellowd3));
+			--c-y-bgh: light-dark(var(--c-yellowl5),var(--c-yellowd2));
+			--c-y-bga: light-dark(var(--c-yellowl4),var(--c-yellowd1));
+			--c-y-invbg: var(--c-yellow);
+			--c-y-invbgh: var(--c-yellowd1);
+			--c-y-invbga: var(--c-yellowd2);
+			--c-y-border: var(--c-yellowl1);
+			--c-y-borderh: light-dark(var(--c-yellow),var(--c-yellowl2));
+			--c-y-bordera: light-dark(var(--c-yellowd1),var(--c-yellowl3));
+			--c-y-bright: oklch(82% 0.16 80);
+			--c-y-brighth: oklch(75.5% 0.15 80);
+			--c-y-brighta: var(--c-yellowl1);
+
+			--c-greend3: oklch(26% 0.03 170);
+			--c-greend2: oklch(34% 0.06 170);
+			--c-greend1: oklch(47% 0.09 170);
+			--c-green: oklch(53% 0.12 170);
+			--c-greenl1: oklch(63% 0.12 170);
+			--c-greenl2: oklch(71.5% 0.1 170);
+			--c-greenl3: oklch(80% 0.08 170);
+			--c-greenl4: oklch(87.5% 0.06 170);
+			--c-greenl5: oklch(91.5% 0.04 170);
+			--c-greenl6: oklch(95.5% 0.02 170);
+			--c-g-text: light-dark(var(--c-green),var(--c-greenl2));
+			--c-g-texth: light-dark(var(--c-greend1),var(--c-greenl3));
+			--c-g-texta: light-dark(var(--c-greend2),var(--c-greenl4));
+			--c-g-bg: light-dark(var(--c-greenl6),var(--c-greend3));
+			--c-g-bgh: light-dark(var(--c-greenl5),var(--c-greend2));
+			--c-g-bga: light-dark(var(--c-greenl4),var(--c-greend1));
+			--c-g-invbg: var(--c-green);
+			--c-g-invbgh: var(--c-greend1);
+			--c-g-invbga: var(--c-greend2);
+			--c-g-border: var(--c-greenl1);
+			--c-g-borderh: light-dark(var(--c-green),var(--c-greenl2));
+			--c-g-bordera: light-dark(var(--c-greend1),var(--c-greenl3));
+			--c-g-bright: oklch(72% 0.22 145);
+			--c-g-brighth: oklch(67.5% 0.19 145);
+			--c-g-brighta: oklch(63% 0.16 145);
+
+			--c-ins-text: light-dark(#006400,oklch(70% 0.1 140));
+			--c-ins-bg: light-dark(oklch(85% 0.1 140),oklch(35% 0.1 140));
+			--c-del-text: light-dark(#8b0000,oklch(70% 0.15 30));
+			--c-del-bg: light-dark(oklch(85% 0.1 30),oklch(35% 0.1 30));
+		}
+
+		@media print {
+			:root, :host {
+				print-color-adjust: exact !important;
+				--c-lbg: white;
+				--c-ltext: white;
+			}
+		}
+
+		.row {
+			border-collapse: separate;
+			border-spacing: 5px;
+		}
+
+		.tile {
+			width: 10vw;
+			height: 10vw;
+			border-radius: 2vw;
+			display: table-cell;
+			color: var(--c, var(--c-text));
+			background-color: var(--bg, transparent);
+			border: 2px solid var(--b, none);
+			vertical-align: middle;
+			margin: 5px;
+		}
+
+		.int { cursor: pointer; }
+
+		.white { --c: var(--c-w-text); }
+		.white.int:hover { text-decoration: underline; --c: var(--c-w-texth); }
+		.white.int:active { text-decoration: underline; --c: var(--c-w-texta); }
+		.blue { --c: var(--c-b-text); }
+		.blue.int:hover { text-decoration: underline; --c: var(--c-b-texth); }
+		.blue.int:active { text-decoration: underline; --c: var(--c-b-texta); }
+		.purple { --c: var(--c-p-text); }
+		.purple.int:hover { text-decoration: underline; --c: var(--c-p-texth); }
+		.purple.int:active { text-decoration: underline; --c: var(--c-p-texta); }
+		.red { --c: var(--c-r-text); }
+		.red.int:hover { text-decoration: underline; --c: var(--c-r-texth); }
+		.red.int:active { text-decoration: underline; --c: var(--c-r-texta); }
+		.yellow { --c: var(--c-y-text); }
+		.yellow.int:hover { text-decoration: underline; --c: var(--c-y-texth); }
+		.yellow.int:active { text-decoration: underline; --c: var(--c-y-texta); }
+		.green { --c: var(--c-g-text); }
+		.green.int:hover { text-decoration: underline; --c: var(--c-g-texth); }
+		.green.int:active { text-decoration: underline; --c: var(--c-g-texta); }
+		.orange { --c: var(--c-o-text); }
+		.orange.int:hover { text-decoration: underline; --c: var(--c-o-texth); }
+		.orange.int:active { text-decoration: underline; --c: var(--c-o-texta); }
+
+		.whitebox { --bg: var(--c-w-bg); --b: var(--c-w-border); }
+		.whitebox.int:hover { text-decoration: underline; --bg: var(--c-w-bgh); --b: var(--c-w-borderh); }
+		.whitebox.int:active { text-decoration: underline; --bg: var(--c-w-bga); --b: var(--c-w-bordera); }
+		.bluebox { --bg: var(--c-b-bg); --b: var(--c-b-border); }
+		.bluebox.int:hover { text-decoration: underline; --bg: var(--c-b-bgh); --b: var(--c-b-borderh); }
+		.bluebox.int:active { text-decoration: underline; --bg: var(--c-b-bga); --b: var(--c-b-bordera); }
+		.purplebox { --bg: var(--c-p-bg); --b: var(--c-p-border); }
+		.purplebox.int:hover { text-decoration: underline; --bg: var(--c-p-bgh); --b: var(--c-p-borderh); }
+		.purplebox.int:active { text-decoration: underline; --bg: var(--c-p-bga); --b: var(--c-p-bordera); }
+		.redbox { --bg: var(--c-r-bg); --b: var(--c-r-border); }
+		.redbox.int:hover { text-decoration: underline; --bg: var(--c-r-bgh); --b: var(--c-r-borderh); }
+		.redbox.int:active { text-decoration: underline; --bg: var(--c-r-bga); --b: var(--c-r-bordera); }
+		.yellowbox { --bg: var(--c-y-bg); --b: var(--c-y-border); }
+		.yellowbox.int:hover { text-decoration: underline; --bg: var(--c-y-bgh); --b: var(--c-y-borderh); }
+		.yellowbox.int:active { text-decoration: underline; --bg: var(--c-y-bga); --b: var(--c-y-bordera); }
+		.greenbox { --bg: var(--c-g-bg); --b: var(--c-g-border); }
+		.greenbox.int:hover { text-decoration: underline; --bg: var(--c-g-bgh); --b: var(--c-g-borderh); }
+		.greenbox.int:active { text-decoration: underline; --bg: var(--c-g-bga); --b: var(--c-g-bordera); }
+		.orangebox { --bg: var(--c-o-bg); --b: var(--c-o-border); }
+		.orangebox.int:hover { text-decoration: underline; --bg: var(--c-o-bgh); --b: var(--c-o-borderh); }
+		.orangebox.int:active { text-decoration: underline; --bg: var(--c-o-bga); --b: var(--c-o-bordera); }
+
+		.whiteboxinv { --c: var(--c-ltext); font-weight: bold; --bg: var(--c-w-invbg); --b: var(--c-w-border); }
+		.whiteboxinv.int:hover { text-decoration: underline; --bg: var(--c-w-invbgh); --b: var(--c-w-borderh); }
+		.whiteboxinv.int:active { text-decoration: underline; --bg: var(--c-w-invbga); --b: var(--c-w-bordera); }
+		.blueboxinv { --c: var(--c-ltext); font-weight: bold; --bg: var(--c-b-invbg); --b: var(--c-b-border); }
+		.blueboxinv.int:hover { text-decoration: underline; --bg: var(--c-b-invbgh); --b: var(--c-b-borderh); }
+		.blueboxinv.int:active { text-decoration: underline; --bg: var(--c-b-invbga); --b: var(--c-b-bordera); }
+		.purpleboxinv { --c: var(--c-ltext); font-weight: bold; --bg: var(--c-p-invbg); --b: var(--c-p-border); }
+		.purpleboxinv.int:hover { text-decoration: underline; --bg: var(--c-p-invbgh); --b: var(--c-p-borderh); }
+		.purpleboxinv.int:active { text-decoration: underline; --bg: var(--c-p-invbga); --b: var(--c-p-bordera); }
+		.redboxinv { --c: var(--c-ltext); font-weight: bold; --bg: var(--c-r-invbg); --b: var(--c-r-border); }
+		.redboxinv.int:hover { text-decoration: underline; --bg: var(--c-r-invbgh); --b: var(--c-r-borderh); }
+		.redboxinv.int:active { text-decoration: underline; --bg: var(--c-r-invbga); --b: var(--c-r-bordera); }
+		.yellowboxinv { --c: var(--c-ltext); font-weight: bold; --bg: var(--c-y-invbg); --b: var(--c-y-border); }
+		.yellowboxinv.int:hover { text-decoration: underline; --bg: var(--c-y-invbgh); --b: var(--c-y-borderh); }
+		.yellowboxinv.int:active { text-decoration: underline; --bg: var(--c-y-invbga); --b: var(--c-y-bordera); }
+		.greenboxinv { --c: var(--c-ltext); font-weight: bold; --bg: var(--c-g-invbg); --b: var(--c-g-border); }
+		.greenboxinv.int:hover { text-decoration: underline; --bg: var(--c-g-invbgh); --b: var(--c-g-borderh); }
+		.greenboxinv.int:active { text-decoration: underline; --bg: var(--c-g-invbga); --b: var(--c-g-bordera); }
+		.orangeboxinv { --c: var(--c-ltext); font-weight: bold; --bg: var(--c-o-invbg); --b: var(--c-o-border); }
+		.orangeboxinv.int:hover { text-decoration: underline; --bg: var(--c-o-invbgh); --b: var(--c-o-borderh); }
+		.orangeboxinv.int:active { text-decoration: underline; --bg: var(--c-o-invbga); --b: var(--c-o-bordera); }
+
+		.redbright { --c: var(--c-ltext); font-weight: bold; --bg: var(--c-r-bright); }
+		.redbright.int:hover { text-decoration: underline; --bg: var(--c-r-brighth); }
+		.redbright.int:active { text-decoration: underline; --bg: var(--c-r-brighta); }
+		.bluebright { --c: var(--c-ltext); font-weight: bold; --bg: var(--c-b-bright); }
+		.bluebright.int:hover { text-decoration: underline; --bg: var(--c-b-brighth); }
+		.bluebright.int:active { text-decoration: underline; --bg: var(--c-b-brighta); }
+		.yellowbright { --c: var(--c-ltext); font-weight: bold; --bg: var(--c-y-bright); }
+		.yellowbright.int:hover { text-decoration: underline; --bg: var(--c-y-brighth); }
+		.yellowbright.int:active { text-decoration: underline; --bg: var(--c-y-brighta); }
+		.greenbright { --c: var(--c-ltext); font-weight: bold; --bg: var(--c-g-bright); }
+		.greenbright.int:hover { text-decoration: underline; --bg: var(--c-g-brighth); }
+		.greenbright.int:active { text-decoration: underline; --bg: var(--c-g-brighta); }
+	</style>
+</head>
+<body>
+	<hgroup>
+		<h1>kimcl web 색상</h1>
+		<p>위키백과 색상에서 따 온 다음 많이 수정함</p>
+	</hgroup>
+	<section>
+		<h2>파랑</h2>
+		<div>
+			<span class="row">
+				<div class="tile blue">파란색 글자</div>
+				<div class="tile blue int">클릭 가능 글자</div>
+				<div class="tile blue bluebox">파란색 상자</div>
+				<div class="tile blue bluebox int">클릭 가능 상자</div>
+				<div class="tile blueboxinv">파란색 버튼</div>
+				<div class="tile blueboxinv int">클릭 가능 버튼</div>
+			</span>
+		</div>
+	</section>
+	<section>
+		<h2>보라</h2>
+		<div>
+			<span class="row">
+				<div class="tile purple">보라색 글자</div>
+				<div class="tile purple int">클릭 가능 글자</div>
+				<div class="tile purple purplebox">보라색 상자</div>
+				<div class="tile purple purplebox int">클릭 가능 상자</div>
+				<div class="tile purpleboxinv">보라색 버튼</div>
+				<div class="tile purpleboxinv int">클릭 가능 버튼</div>
+			</span>
+		</div>
+	</section>
+	<section>
+		<h2>빨강</h2>
+		<div>
+			<span class="row">
+				<div class="tile red">빨간색 글자</div>
+				<div class="tile red int">클릭 가능 글자</div>
+				<div class="tile red redbox">빨간색 상자</div>
+				<div class="tile red redbox int">클릭 가능 상자</div>
+				<div class="tile redboxinv">빨간색 버튼</div>
+				<div class="tile redboxinv int">클릭 가능 버튼</div>
+			</span>
+		</div>
+	</section>
+	<section>
+		<h2>주황</h2>
+		<div>
+			<span class="row">
+				<div class="tile orange">주황색 글자</div>
+				<div class="tile orange int">클릭 가능 글자</div>
+				<div class="tile orange orangebox">주황색 상자</div>
+				<div class="tile orange orangebox int">클릭 가능 상자</div>
+				<div class="tile orangeboxinv">주황색 버튼</div>
+				<div class="tile orangeboxinv int">클릭 가능 버튼</div>
+			</span>
+		</div>
+	</section>
+	<section>
+		<h2>노랑</h2>
+		<div>
+			<span class="row">
+				<div class="tile yellow">노란색 글자</div>
+				<div class="tile yellow int">클릭 가능 글자</div>
+				<div class="tile yellow yellowbox">노란색 상자</div>
+				<div class="tile yellow yellowbox int">클릭 가능 상자</div>
+				<div class="tile yellowboxinv">노란색 버튼</div>
+				<div class="tile yellowboxinv int">클릭 가능 버튼</div>
+			</span>
+		</div>
+	</section>
+	<section>
+		<h2>초록</h2>
+		<div>
+			<span class="row">
+				<div class="tile green">초록색 글자</div>
+				<div class="tile green int">클릭 가능 글자</div>
+				<div class="tile green greenbox">초록색 상자</div>
+				<div class="tile green greenbox int">클릭 가능 상자</div>
+				<div class="tile greenboxinv">초록색 버튼</div>
+				<div class="tile greenboxinv int">클릭 가능 버튼</div>
+			</span>
+		</div>
+	</section>
+	<section>
+		<h2>회색</h2>
+		<div>
+			<span class="row">
+				<div class="tile white">회색 글자</div>
+				<div class="tile white int">클릭 가능 글자</div>
+				<div class="tile white whitebox">회색 상자</div>
+				<div class="tile white whitebox int">클릭 가능 상자</div>
+				<div class="tile whiteboxinv">회색 버튼</div>
+				<div class="tile whiteboxinv int">클릭 가능 버튼</div>
+			</span>
+		</div>
+	</section>
+	<section>
+		<h2>기타</h2>
+		<div>
+			<span class="row">
+				<div class="tile redboxinv">대조군</div>
+				<div class="tile redbright">빨강2</div>
+				<div class="tile redbright int">클릭 가능</div>
+			</span>
+		</div>
+		<div>
+			<span class="row">
+				<div class="tile blueboxinv">대조군</div>
+				<div class="tile bluebright">파랑2</div>
+				<div class="tile bluebright int">클릭 가능</div>
+			</span>
+		</div>
+		<div>
+			<span class="row">
+				<div class="tile yellowboxinv">대조군</div>
+				<div class="tile yellowbright">노랑2</div>
+				<div class="tile yellowbright int">클릭 가능</div>
+			</span>
+		</div>
+		<div>
+			<span class="row">
+				<div class="tile greenboxinv">대조군</div>
+				<div class="tile greenbright">초록2</div>
+				<div class="tile greenbright int">클릭 가능</div>
+			</span>
+		</div>
+		<div>
+			<del style="background-color: var(--c-del-bg); color: var(--c-del-text); padding: 0.1em 0; border-radius: 0.2em; text-decoration: none;">1234</del>
+			<ins style="background-color: var(--c-ins-bg); color: var(--c-ins-text); padding: 0.1em 0; border-radius: 0.2em; text-decoration: none;">1234</ins>
+		</div>
+	</section>
+</body>
+</html>

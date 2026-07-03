@@ -1,0 +1,12 @@
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
+<svg height="900px" width="1600px" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" xmlns:xlink="http://www.w3.org/1999/xlink" enable-background="new 0 0 1600 900">
+    <defs>
+        <linearGradient id="grad1" x1="0%" x2="100%" y1="0%" y2="100%">
+        <stop offset="0%" stop-color="oklch(0.7 0.1592 22)" />
+        <stop offset="50%" stop-color="oklch(0.7 0.1592 202)" />
+        <stop offset="100%" stop-color="oklch(0.7 0.1592 382)" />
+        </linearGradient>
+    </defs>
+    <polygon points="0 0, 0 900, 1600 900, 1600 0" fill="url(#grad1)"></polygon>
+</svg>

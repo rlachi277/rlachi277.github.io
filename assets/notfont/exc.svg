@@ -1,0 +1,6 @@
+<svg preserveAspectRatio="none" id="eoQnFlLb87c1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 350 350" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" stroke="black">
+    <!-- <polygon stroke-linecap="round" stroke-linejoin="round" points="0,0 350,0 350,350 0,350" fill="white" stroke="transparent" stroke-width="3.8" vector-effect="non-scaling-stroke" /> !-->
+    <line stroke-linecap="round" x1="210" y1="70" x2="140" y2="280" fill="black" stroke-width="3.8" vector-effect="non-scaling-stroke"/>
+    <line stroke-linecap="round" x1="140" y1="280" x2="210" y2="280" fill="black" stroke-width="3.8" vector-effect="non-scaling-stroke"/>
+    <line stroke-linecap="round" x1="140" y1="70" x2="210" y2="70" fill="black" stroke-width="3.8" vector-effect="non-scaling-stroke"/>
+</svg>

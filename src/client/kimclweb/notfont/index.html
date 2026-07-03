@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>끼족 문자 생성기</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+	<h1>끼족 문자 생성기</h1>
+	<div id="symbol-size" style="display: none; width: var(--symbol-size);"></div>
+	<a href="/">루트로</a>
+	<br><br>
+	<div>
+		<button id="mode2">기존 끼족 문자</button>
+		<button id="mode1">단순 끼족 문자</button>
+		<button id="mode3">신형 끼족 문자</button>
+		<button id="mode4">압축 끼족 문자</button>
+	</div>
+	<div style="margin-top: 0.2em">
+		<button id="aleft">왼쪽 정렬</button>
+		<button id="acenter">가운데 정렬</button>
+		<button id="aright">오른쪽 정렬</button>
+	</div>
+	<br>
+	<div>
+		<input type="range" id="result-size" min="8" max="30" value="20"/>
+		<label for="result-size" id="result-size-label" style="display: inline-block; width: 4em; white-space: nowrap;">크기: x1</label>
+	</div>
+	<div>
+		<input type="range" id="result-width" min="6" max="50" value="25"/>
+		<label for="result-width" id="result-width-label" style="display: inline-block; width: 4em; white-space: nowrap;">너비: 25개</label>
+	</div>
+	<br>
+	<div id="result-container"></div>
+	<br>
+	<textarea id="code" title="텍스트 입력(한국어/영타 한국어)"></textarea>
+</body>
+</html>

@@ -1,0 +1,7 @@
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="1000" height="1000" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <clipPath id="hexagon" clipPathUnits="objectBoundingBox">
+        <path d="M0.435 0.017527767497326a0.13 0.13 0 0 1 0.13 0l0.32033320996791 0.18494446500535a0.13 0.13 0 0 1 0.065 0.11258330249198l0 0.3698889300107a0.13 0.13 0 0 1 -0.065 0.11258330249198l-0.32033320996791 0.18494446500535a0.13 0.13 0 0 1 -0.13 0l-0.32033320996791 -0.18494446500535a0.13 0.13 0 0 1 -0.065 -0.11258330249198l0 -0.3698889300107a0.13 0.13 0 0 1 0.065 -0.11258330249198" />
+    </clipPath>
+    <polygon points="0 0, 0 1000, 1000 1000, 1000 0" fill="white" clip-path="url(#hexagon)"/>
+</svg>

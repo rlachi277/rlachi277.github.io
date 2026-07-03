@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>colors/full.css</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+		:root {
+			--c-0-l5: var(--c-grayl5);
+			--c-0-l4: var(--c-grayl4);
+			--c-0-l3: var(--c-grayl3);
+			--c-0-l2: var(--c-grayl2);
+			--c-0-l1: var(--c-grayl1);
+			--c-0-0: var(--c-gray);
+			--c-0-d1: var(--c-grayd1);
+			--c-0-d2: var(--c-grayd2);
+			--c-0-d3: var(--c-grayd3);
+			--c-0-d4: var(--c-grayd4);
+			--c-0-d5: var(--c-grayd5);
+			--c-0-bg: light-dark(var(--c-0-l5),var(--c-0-d5));
+			--c-0-bgh: light-dark(var(--c-0-l4),var(--c-0-d4));
+			--c-0-bga: light-dark(var(--c-0-l3),var(--c-0-d3));
+			--c-0-i0: light-dark(var(--c-0-l3),var(--c-0-d3));
+			--c-0-i1: light-dark(var(--c-0-l2),var(--c-0-d2));
+			--c-0-i2: light-dark(var(--c-0-l1),var(--c-0-d1));
+			--c-0-i3: var(--c-0-0);
+			--c-0-i4: light-dark(var(--c-0-d1),var(--c-0-l1));
+			--c-0-bd: var(--c-0-0);
+			--c-0-bdh: light-dark(var(--c-0-d1),var(--c-0-l1));
+			--c-0-bda: light-dark(var(--c-0-d2),var(--c-0-l2));
+			--c-0-c: light-dark(var(--c-0-d1),var(--c-0-l1));
+			--c-0-ch: light-dark(var(--c-0-d2),var(--c-0-l2));
+			--c-0-ca: light-dark(var(--c-0-d3),var(--c-0-l3));
+
+			--c-1-l5: oklch(96% 0.035 25);
+			--c-1-l4: oklch(92% 0.05 25);
+			--c-1-l3: oklch(86% 0.095 25);
+			--c-1-l2: oklch(79% 0.155 25);
+			--c-1-l1: oklch(72% 0.2 25);
+			--c-1-0: oklch(61% 0.22 25);
+			--c-1-d1: oklch(53% 0.19 25);
+			--c-1-d2: oklch(45% 0.17 25);
+			--c-1-d3: oklch(40% 0.15 25);
+			--c-1-d4: oklch(34.5% 0.11 25);
+			--c-1-d5: oklch(29.5% 0.06 25);
+			--c-1-bg: light-dark(var(--c-1-l5),var(--c-1-d5));
+			--c-1-bgh: light-dark(var(--c-1-l4),var(--c-1-d4));
+			--c-1-bga: light-dark(var(--c-1-l3),var(--c-1-d3));
+			--c-1-i0: light-dark(var(--c-1-l3),var(--c-1-d3));
+			--c-1-i1: light-dark(var(--c-1-l2),var(--c-1-d2));
+			--c-1-i2: light-dark(var(--c-1-l1),var(--c-1-d1));
+			--c-1-i3: var(--c-1-0);
+			--c-1-i4: light-dark(var(--c-1-d1),var(--c-1-l1));
+			--c-1-bd: var(--c-1-0);
+			--c-1-bdh: light-dark(var(--c-1-d1),var(--c-1-l1));
+			--c-1-bda: light-dark(var(--c-1-d2),var(--c-1-l2));
+			--c-1-c: light-dark(var(--c-1-d1),var(--c-1-l1));
+			--c-1-ch: light-dark(var(--c-1-d2),var(--c-1-l2));
+			--c-1-ca: light-dark(var(--c-1-d3),var(--c-1-l3));
+
+			--c-2-l5: oklch(96% 0.035 50);
+			--c-2-l4: oklch(92.5% 0.05 50);
+			--c-2-l3: oklch(86.5% 0.085 50);
+			--c-2-l2: oklch(80% 0.14 50);
+			--c-2-l1: oklch(74% 0.165 50);
+			--c-2-0: oklch(64% 0.185 50);
+			--c-2-d1: oklch(57% 0.165 50);
+			--c-2-d2: oklch(48.5% 0.145 50);
+			--c-2-d3: oklch(42% 0.12 50);
+			--c-2-d4: oklch(35% 0.095 50);
+			--c-2-d5: oklch(29.5% 0.06 50);
+			--c-2-bg: light-dark(var(--c-2-l5),var(--c-2-d5));
+			--c-2-bgh: light-dark(var(--c-2-l4),var(--c-2-d4));
+			--c-2-bga: light-dark(var(--c-2-l3),var(--c-2-d3));
+			--c-2-i0: light-dark(var(--c-2-l3),var(--c-2-d3));
+			--c-2-i1: light-dark(var(--c-2-l2),var(--c-2-d2));
+			--c-2-i2: light-dark(var(--c-2-l1),var(--c-2-d1));
+			--c-2-i3: var(--c-2-0);
+			--c-2-i4: light-dark(var(--c-2-d1),var(--c-2-l1));
+			--c-2-bd: var(--c-2-0);
+			--c-2-bdh: light-dark(var(--c-2-d1),var(--c-2-l1));
+			--c-2-bda: light-dark(var(--c-2-d2),var(--c-2-l2));
+			--c-2-c: light-dark(var(--c-2-d1),var(--c-2-l1));
+			--c-2-ch: light-dark(var(--c-2-d2),var(--c-2-l2));
+			--c-2-ca: light-dark(var(--c-2-d3),var(--c-2-l3));
+
+			--c-3-l5: oklch(96.5% 0.035 90);
+			--c-3-l4: oklch(94.3% 0.06 90);
+			--c-3-l3: oklch(90% 0.095 90);
+			--c-3-l2: oklch(85.5% 0.13 90);
+			--c-3-l1: oklch(81% 0.16 90);
+			--c-3-0: oklch(71% 0.168 90);
+			--c-3-d1: oklch(64% 0.13 90);
+			--c-3-d2: oklch(52.5% 0.115 90);
+			--c-3-d3: oklch(44% 0.1 90);
+			--c-3-d4: oklch(36% 0.085 90);
+			--c-3-d5: oklch(30.5% 0.06 90);
+			--c-3-bg: light-dark(var(--c-3-l5),var(--c-3-d5));
+			--c-3-bgh: light-dark(var(--c-3-l4),var(--c-3-d4));
+			--c-3-bga: light-dark(var(--c-3-l3),var(--c-3-d3));
+			--c-3-i0: light-dark(var(--c-3-l3),var(--c-3-d3));
+			--c-3-i1: light-dark(var(--c-3-l2),var(--c-3-d2));
+			--c-3-i2: light-dark(var(--c-3-l1),var(--c-3-d1));
+			--c-3-i3: var(--c-3-0);
+			--c-3-i4: light-dark(var(--c-3-d1),var(--c-3-l1));
+			--c-3-bd: var(--c-3-0);
+			--c-3-bdh: light-dark(var(--c-3-d1),var(--c-3-l1));
+			--c-3-bda: light-dark(var(--c-3-d2),var(--c-3-l2));
+			--c-3-c: light-dark(var(--c-3-d1),var(--c-3-l1));
+			--c-3-ch: light-dark(var(--c-3-d2),var(--c-3-l2));
+			--c-3-ca: light-dark(var(--c-3-d3),var(--c-3-l3));
+
+			--c-4-l5: oklch(96% 0.04 150);
+			--c-4-l4: oklch(93% 0.065 150);
+			--c-4-l3: oklch(89% 0.105 150);
+			--c-4-l2: oklch(82.5% 0.15 150);
+			--c-4-l1: oklch(75% 0.18 150);
+			--c-4-0: oklch(62.5% 0.185 150);
+			--c-4-d1: oklch(55% 0.17 150);
+			--c-4-d2: oklch(47% 0.155 150);
+			--c-4-d3: oklch(42% 0.14 150);
+			--c-4-d4: oklch(35% 0.095 150);
+			--c-4-d5: oklch(29.5% 0.06 150);
+			--c-4-bg: light-dark(var(--c-4-l5),var(--c-4-d5));
+			--c-4-bgh: light-dark(var(--c-4-l4),var(--c-4-d4));
+			--c-4-bga: light-dark(var(--c-4-l3),var(--c-4-d3));
+			--c-4-i0: light-dark(var(--c-4-l3),var(--c-4-d3));
+			--c-4-i1: light-dark(var(--c-4-l2),var(--c-4-d2));
+			--c-4-i2: light-dark(var(--c-4-l1),var(--c-4-d1));
+			--c-4-i3: var(--c-4-0);
+			--c-4-i4: light-dark(var(--c-4-d1),var(--c-4-l1));
+			--c-4-bd: var(--c-4-0);
+			--c-4-bdh: light-dark(var(--c-4-d1),var(--c-4-l1));
+			--c-4-bda: light-dark(var(--c-4-d2),var(--c-4-l2));
+			--c-4-c: light-dark(var(--c-4-d1),var(--c-4-l1));
+			--c-4-ch: light-dark(var(--c-4-d2),var(--c-4-l2));
+			--c-4-ca: light-dark(var(--c-4-d3),var(--c-4-l3));
+
+			--c-5-l5: oklch(96% 0.04 175);
+			--c-5-l4: oklch(93% 0.065 175);
+			--c-5-l3: oklch(88% 0.1 175);
+			--c-5-l2: oklch(81% 0.125 175);
+			--c-5-l1: oklch(74% 0.19 175);
+			--c-5-0: oklch(64.5% 0.165 175);
+			--c-5-d1: oklch(54% 0.13 175);
+			--c-5-d2: oklch(46.5% 0.12 175);
+			--c-5-d3: oklch(41% 0.11 175);
+			--c-5-d4: oklch(34% 0.09 175);
+			--c-5-d5: oklch(29.5% 0.06 175);
+			--c-5-bg: light-dark(var(--c-5-l5),var(--c-5-d5));
+			--c-5-bgh: light-dark(var(--c-5-l4),var(--c-5-d4));
+			--c-5-bga: light-dark(var(--c-5-l3),var(--c-5-d3));
+			--c-5-i0: light-dark(var(--c-5-l3),var(--c-5-d3));
+			--c-5-i1: light-dark(var(--c-5-l2),var(--c-5-d2));
+			--c-5-i2: light-dark(var(--c-5-l1),var(--c-5-d1));
+			--c-5-i3: var(--c-5-0);
+			--c-5-i4: light-dark(var(--c-5-d1),var(--c-5-l1));
+			--c-5-bd: var(--c-5-0);
+			--c-5-bdh: light-dark(var(--c-5-d1),var(--c-5-l1));
+			--c-5-bda: light-dark(var(--c-5-d2),var(--c-5-l2));
+			--c-5-c: light-dark(var(--c-5-d1),var(--c-5-l1));
+			--c-5-ch: light-dark(var(--c-5-d2),var(--c-5-l2));
+			--c-5-ca: light-dark(var(--c-5-d3),var(--c-5-l3));
+
+			--c-6-l5: oklch(95.5% 0.025 225);
+			--c-6-l4: oklch(92.5% 0.05 225);
+			--c-6-l3: oklch(86.5% 0.085 225);
+			--c-6-l2: oklch(80.5% 0.11 225);
+			--c-6-l1: oklch(73.5% 0.14 225);
+			--c-6-0: oklch(62% 0.155 225);
+			--c-6-d1: oklch(54% 0.127 225);
+			--c-6-d2: oklch(46% 0.117 225);
+			--c-6-d3: oklch(41% 0.1 225);
+			--c-6-d4: oklch(34% 0.085 225);
+			--c-6-d5: oklch(28.5% 0.06 225);
+			--c-6-bg: light-dark(var(--c-6-l5),var(--c-6-d5));
+			--c-6-bgh: light-dark(var(--c-6-l4),var(--c-6-d4));
+			--c-6-bga: light-dark(var(--c-6-l3),var(--c-6-d3));
+			--c-6-i0: light-dark(var(--c-6-l3),var(--c-6-d3));
+			--c-6-i1: light-dark(var(--c-6-l2),var(--c-6-d2));
+			--c-6-i2: light-dark(var(--c-6-l1),var(--c-6-d1));
+			--c-6-i3: var(--c-6-0);
+			--c-6-i4: light-dark(var(--c-6-d1),var(--c-6-l1));
+			--c-6-bd: var(--c-6-0);
+			--c-6-bdh: light-dark(var(--c-6-d1),var(--c-6-l1));
+			--c-6-bda: light-dark(var(--c-6-d2),var(--c-6-l2));
+			--c-6-c: light-dark(var(--c-6-d1),var(--c-6-l1));
+			--c-6-ch: light-dark(var(--c-6-d2),var(--c-6-l2));
+			--c-6-ca: light-dark(var(--c-6-d3),var(--c-6-l3));
+
+			--c-7-l5: oklch(95% 0.025 264);
+			--c-7-l4: oklch(90.5% 0.05 264);
+			--c-7-l3: oklch(81.5% 0.09 264);
+			--c-7-l2: oklch(71.5% 0.156 264);
+			--c-7-l1: oklch(64.5% 0.203 264);
+			--c-7-0: oklch(56% 0.2 264);
+			--c-7-d1: oklch(47.5% 0.19 264);
+			--c-7-d2: oklch(40.5% 0.16 264);
+			--c-7-d3: oklch(36% 0.125 264);
+			--c-7-d4: oklch(31.5% 0.1 264);
+			--c-7-d5: oklch(27.5% 0.06 264);
+			--c-7-bg: light-dark(var(--c-7-l5),var(--c-7-d5));
+			--c-7-bgh: light-dark(var(--c-7-l4),var(--c-7-d4));
+			--c-7-bga: light-dark(var(--c-7-l3),var(--c-7-d3));
+			--c-7-i0: light-dark(var(--c-7-l3),var(--c-7-d3));
+			--c-7-i1: light-dark(var(--c-7-l2),var(--c-7-d2));
+			--c-7-i2: light-dark(var(--c-7-l1),var(--c-7-d1));
+			--c-7-i3: var(--c-7-0);
+			--c-7-i4: light-dark(var(--c-7-d1),var(--c-7-l1));
+			--c-7-bd: var(--c-7-0);
+			--c-7-bdh: light-dark(var(--c-7-d1),var(--c-7-l1));
+			--c-7-bda: light-dark(var(--c-7-d2),var(--c-7-l2));
+			--c-7-c: light-dark(var(--c-7-d1),var(--c-7-l1));
+			--c-7-ch: light-dark(var(--c-7-d2),var(--c-7-l2));
+			--c-7-ca: light-dark(var(--c-7-d3),var(--c-7-l3));
+
+			--c-8-l5: oklch(95% 0.028 295);
+			--c-8-l4: oklch(90.5% 0.055 295);
+			--c-8-l3: oklch(81% 0.09 295);
+			--c-8-l2: oklch(73.5% 0.167 295);
+			--c-8-l1: oklch(66% 0.22 295);
+			--c-8-0: oklch(56% 0.225 295);
+			--c-8-d1: oklch(47.5% 0.19 295);
+			--c-8-d2: oklch(41.5% 0.16 295);
+			--c-8-d3: oklch(37% 0.125 295);
+			--c-8-d4: oklch(33% 0.1 295);
+			--c-8-d5: oklch(28.5% 0.06 295);
+			--c-8-bg: light-dark(var(--c-8-l5),var(--c-8-d5));
+			--c-8-bgh: light-dark(var(--c-8-l4),var(--c-8-d4));
+			--c-8-bga: light-dark(var(--c-8-l3),var(--c-8-d3));
+			--c-8-i0: light-dark(var(--c-8-l3),var(--c-8-d3));
+			--c-8-i1: light-dark(var(--c-8-l2),var(--c-8-d2));
+			--c-8-i2: light-dark(var(--c-8-l1),var(--c-8-d1));
+			--c-8-i3: var(--c-8-0);
+			--c-8-i4: light-dark(var(--c-8-d1),var(--c-8-l1));
+			--c-8-bd: var(--c-8-0);
+			--c-8-bdh: light-dark(var(--c-8-d1),var(--c-8-l1));
+			--c-8-bda: light-dark(var(--c-8-d2),var(--c-8-l2));
+			--c-8-c: light-dark(var(--c-8-d1),var(--c-8-l1));
+			--c-8-ch: light-dark(var(--c-8-d2),var(--c-8-l2));
+			--c-8-ca: light-dark(var(--c-8-d3),var(--c-8-l3));
+
+			--c-9-l5: oklch(96% 0.03 345);
+			--c-9-l4: oklch(92.5% 0.055 345);
+			--c-9-l3: oklch(85.5% 0.1 345);
+			--c-9-l2: oklch(80% 0.17 345);
+			--c-9-l1: oklch(72.5% 0.2 345);
+			--c-9-0: oklch(62.5% 0.22 345);
+			--c-9-d1: oklch(53.5% 0.2 345);
+			--c-9-d2: oklch(45% 0.16 345);
+			--c-9-d3: oklch(40% 0.15 345);
+			--c-9-d4: oklch(34.5% 0.1 345);
+			--c-9-d5: oklch(29% 0.06 345);
+			--c-9-bg: light-dark(var(--c-9-l5),var(--c-9-d5));
+			--c-9-bgh: light-dark(var(--c-9-l4),var(--c-9-d4));
+			--c-9-bga: light-dark(var(--c-9-l3),var(--c-9-d3));
+			--c-9-i0: light-dark(var(--c-9-l3),var(--c-9-d3));
+			--c-9-i1: light-dark(var(--c-9-l2),var(--c-9-d2));
+			--c-9-i2: light-dark(var(--c-9-l1),var(--c-9-d1));
+			--c-9-i3: var(--c-9-0);
+			--c-9-i4: light-dark(var(--c-9-d1),var(--c-9-l1));
+			--c-9-bd: var(--c-9-0);
+			--c-9-bdh: light-dark(var(--c-9-d1),var(--c-9-l1));
+			--c-9-bda: light-dark(var(--c-9-d2),var(--c-9-l2));
+			--c-9-c: light-dark(var(--c-9-d1),var(--c-9-l1));
+			--c-9-ch: light-dark(var(--c-9-d2),var(--c-9-l2));
+			--c-9-ca: light-dark(var(--c-9-d3),var(--c-9-l3));
+
+			--c-10-l5: oklch(96% 0.03 0);
+			--c-10-l4: oklch(92.5% 0.055 0);
+			--c-10-l3: oklch(85.5% 0.1 0);
+			--c-10-l2: oklch(80% 0.17 0);
+			--c-10-l1: oklch(72.5% 0.2 0);
+			--c-10-0: oklch(62.5% 0.22 0);
+			--c-10-d1: oklch(53.5% 0.2 0);
+			--c-10-d2: oklch(45% 0.16 0);
+			--c-10-d3: oklch(40% 0.15 0);
+			--c-10-d4: oklch(34.5% 0.1 0);
+			--c-10-d5: oklch(29% 0.06 0);
+			--c-10-bg: light-dark(var(--c-10-l5),var(--c-10-d5));
+			--c-10-bgh: light-dark(var(--c-10-l4),var(--c-10-d4));
+			--c-10-bga: light-dark(var(--c-10-l3),var(--c-10-d3));
+			--c-10-i0: light-dark(var(--c-10-l3),var(--c-10-d3));
+			--c-10-i1: light-dark(var(--c-10-l2),var(--c-10-d2));
+			--c-10-i2: light-dark(var(--c-10-l1),var(--c-10-d1));
+			--c-10-i3: var(--c-10-0);
+			--c-10-i4: light-dark(var(--c-10-d1),var(--c-10-l1));
+			--c-10-bd: var(--c-10-0);
+			--c-10-bdh: light-dark(var(--c-10-d1),var(--c-10-l1));
+			--c-10-bda: light-dark(var(--c-10-d2),var(--c-10-l2));
+			--c-10-c: light-dark(var(--c-10-d1),var(--c-10-l1));
+			--c-10-ch: light-dark(var(--c-10-d2),var(--c-10-l2));
+			--c-10-ca: light-dark(var(--c-10-d3),var(--c-10-l3));
+
+			--c-ins-c: light-dark(#006400,oklch(70% 0.1 140));
+			--c-ins-bg: light-dark(oklch(85% 0.1 140),oklch(35% 0.1 140));
+			--c-del-c: light-dark(#8b0000,oklch(70% 0.15 30));
+			--c-del-bg: light-dark(oklch(85% 0.1 30),oklch(35% 0.1 30));
+		}
+
+		@media print {
+			:root, :host {
+				print-color-adjust: exact !important;
+				--c-lbg: white;
+				--c-ltext: white;
+			}
+		}
+
+		body {
+			max-width: 100%;
+			margin-inline: 5vi;
+		}
+
+		.tile {
+			display: inline-block;
+			width: 5vw;
+			margin: 1vw;
+			aspect-ratio: 1;
+		}
+
+		.text { color: var(--c); }
+		.text:hover { color: var(--ch); }
+		.text:active { color: var(--ca); }
+		.bg { background: var(--bg); padding-inline: 0.15em; border-radius: 0.2em; }
+		.bg:hover { background: var(--bgh); }
+		.bg:active { background: var(--bga); }
+		.bd { border: 1px solid var(--bd); }
+		.bd:hover { border-color: var(--bdh); }
+		.bd:active { border-color: var(--bda); }
+	</style>
+</head>
+<body>
+	<h1>kimcl web 색상</h1>
+	<section>
+		<p class="row">
+			<span class="tile" style="background-color: light-dark(var(--c-0-l5),var(--c-0-d5));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-0-l4),var(--c-0-d4));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-0-l3),var(--c-0-d3));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-0-l2),var(--c-0-d2));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-0-l1),var(--c-0-d1));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-0-0),var(--c-0-0));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-0-d1),var(--c-0-l1));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-0-d2),var(--c-0-l2));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-0-d3),var(--c-0-l3));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-0-d4),var(--c-0-l4));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-0-d5),var(--c-0-l5));"></span>
+		</p>
+		<p class="row">
+			<span class="tile" style="background-color: light-dark(var(--c-1-l5),var(--c-1-d5));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-1-l4),var(--c-1-d4));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-1-l3),var(--c-1-d3));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-1-l2),var(--c-1-d2));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-1-l1),var(--c-1-d1));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-1-0),var(--c-1-0));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-1-d1),var(--c-1-l1));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-1-d2),var(--c-1-l2));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-1-d3),var(--c-1-l3));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-1-d4),var(--c-1-l4));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-1-d5),var(--c-1-l5));"></span>
+		</p>
+		<p class="row">
+			<span class="tile" style="background-color: light-dark(var(--c-2-l5),var(--c-2-d5));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-2-l4),var(--c-2-d4));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-2-l3),var(--c-2-d3));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-2-l2),var(--c-2-d2));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-2-l1),var(--c-2-d1));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-2-0),var(--c-2-0));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-2-d1),var(--c-2-l1));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-2-d2),var(--c-2-l2));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-2-d3),var(--c-2-l3));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-2-d4),var(--c-2-l4));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-2-d5),var(--c-2-l5));"></span>
+		</p>
+		<p class="row">
+			<span class="tile" style="background-color: light-dark(var(--c-3-l5),var(--c-3-d5));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-3-l4),var(--c-3-d4));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-3-l3),var(--c-3-d3));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-3-l2),var(--c-3-d2));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-3-l1),var(--c-3-d1));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-3-0),var(--c-3-0));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-3-d1),var(--c-3-l1));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-3-d2),var(--c-3-l2));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-3-d3),var(--c-3-l3));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-3-d4),var(--c-3-l4));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-3-d5),var(--c-3-l5));"></span>
+		</p>
+		<p class="row">
+			<span class="tile" style="background-color: light-dark(var(--c-4-l5),var(--c-4-d5));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-4-l4),var(--c-4-d4));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-4-l3),var(--c-4-d3));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-4-l2),var(--c-4-d2));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-4-l1),var(--c-4-d1));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-4-0),var(--c-4-0));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-4-d1),var(--c-4-l1));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-4-d2),var(--c-4-l2));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-4-d3),var(--c-4-l3));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-4-d4),var(--c-4-l4));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-4-d5),var(--c-4-l5));"></span>
+		</p>
+		<p class="row">
+			<span class="tile" style="background-color: light-dark(var(--c-5-l5),var(--c-5-d5));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-5-l4),var(--c-5-d4));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-5-l3),var(--c-5-d3));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-5-l2),var(--c-5-d2));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-5-l1),var(--c-5-d1));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-5-0),var(--c-5-0));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-5-d1),var(--c-5-l1));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-5-d2),var(--c-5-l2));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-5-d3),var(--c-5-l3));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-5-d4),var(--c-5-l4));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-5-d5),var(--c-5-l5));"></span>
+		</p>
+		<p class="row">
+			<span class="tile" style="background-color: light-dark(var(--c-6-l5),var(--c-6-d5));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-6-l4),var(--c-6-d4));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-6-l3),var(--c-6-d3));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-6-l2),var(--c-6-d2));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-6-l1),var(--c-6-d1));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-6-0),var(--c-6-0));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-6-d1),var(--c-6-l1));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-6-d2),var(--c-6-l2));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-6-d3),var(--c-6-l3));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-6-d4),var(--c-6-l4));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-6-d5),var(--c-6-l5));"></span>
+		</p>
+		<p class="row">
+			<span class="tile" style="background-color: light-dark(var(--c-7-l5),var(--c-7-d5));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-7-l4),var(--c-7-d4));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-7-l3),var(--c-7-d3));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-7-l2),var(--c-7-d2));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-7-l1),var(--c-7-d1));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-7-0),var(--c-7-0));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-7-d1),var(--c-7-l1));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-7-d2),var(--c-7-l2));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-7-d3),var(--c-7-l3));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-7-d4),var(--c-7-l4));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-7-d5),var(--c-7-l5));"></span>
+		</p>
+		<p class="row">
+			<span class="tile" style="background-color: light-dark(var(--c-8-l5),var(--c-8-d5));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-8-l4),var(--c-8-d4));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-8-l3),var(--c-8-d3));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-8-l2),var(--c-8-d2));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-8-l1),var(--c-8-d1));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-8-0),var(--c-8-0));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-8-d1),var(--c-8-l1));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-8-d2),var(--c-8-l2));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-8-d3),var(--c-8-l3));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-8-d4),var(--c-8-l4));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-8-d5),var(--c-8-l5));"></span>
+		</p>
+		<p class="row">
+			<span class="tile" style="background-color: light-dark(var(--c-9-l5),var(--c-9-d5));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-9-l4),var(--c-9-d4));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-9-l3),var(--c-9-d3));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-9-l2),var(--c-9-d2));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-9-l1),var(--c-9-d1));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-9-0),var(--c-9-0));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-9-d1),var(--c-9-l1));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-9-d2),var(--c-9-l2));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-9-d3),var(--c-9-l3));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-9-d4),var(--c-9-l4));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-9-d5),var(--c-9-l5));"></span>
+		</p>
+		<p class="row">
+			<span class="tile" style="background-color: light-dark(var(--c-10-l5),var(--c-10-d5));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-10-l4),var(--c-10-d4));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-10-l3),var(--c-10-d3));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-10-l2),var(--c-10-d2));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-10-l1),var(--c-10-d1));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-10-0),var(--c-10-0));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-10-d1),var(--c-10-l1));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-10-d2),var(--c-10-l2));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-10-d3),var(--c-10-l3));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-10-d4),var(--c-10-l4));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-10-d5),var(--c-10-l5));"></span>
+		</p>
+		<p class="row">
+			<span class="tile" style="background-color: light-dark(var(--c-0-l5),var(--c-0-d5));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-0-l4),var(--c-0-d4));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-0-l3),var(--c-0-d3));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-0-l2),var(--c-0-d2));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-0-l1),var(--c-0-d1));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-0-0),var(--c-0-0));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-0-d1),var(--c-0-l1));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-0-d2),var(--c-0-l2));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-0-d3),var(--c-0-l3));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-0-d4),var(--c-0-l4));"></span>
+			<span class="tile" style="background-color: light-dark(var(--c-0-d5),var(--c-0-l5));"></span>
+		</p>
+	</section>
+	<section>
+		<div style="color-scheme: light; background-color: var(--c-bg); color: var(--c-text); padding: 2rem;">
+			<p>awehfuaiwlefhuawielhfaa<span class="text" style="--c: light-dark(var(--c-0-0),var(--c-0-l1)); --ch: light-dark(var(--c-0-d1),var(--c-0-l2)); --ca: light-dark(var(--c-0-d2),var(--c-0-l3))">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text" style="--c: light-dark(var(--c-1-0),var(--c-1-l1)); --ch: light-dark(var(--c-1-d1),var(--c-1-l2)); --ca: light-dark(var(--c-1-d2),var(--c-1-l3))">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text" style="--c: light-dark(var(--c-2-0),var(--c-2-l1)); --ch: light-dark(var(--c-2-d1),var(--c-2-l2)); --ca: light-dark(var(--c-2-d2),var(--c-2-l3))">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text" style="--c: light-dark(var(--c-3-0),var(--c-3-l1)); --ch: light-dark(var(--c-3-d1),var(--c-3-l2)); --ca: light-dark(var(--c-3-d2),var(--c-3-l3))">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text" style="--c: light-dark(var(--c-4-0),var(--c-4-l1)); --ch: light-dark(var(--c-4-d1),var(--c-4-l2)); --ca: light-dark(var(--c-4-d2),var(--c-4-l3))">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text" style="--c: light-dark(var(--c-5-0),var(--c-5-l1)); --ch: light-dark(var(--c-5-d1),var(--c-5-l2)); --ca: light-dark(var(--c-5-d2),var(--c-5-l3))">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text" style="--c: light-dark(var(--c-6-0),var(--c-6-l1)); --ch: light-dark(var(--c-6-d1),var(--c-6-l2)); --ca: light-dark(var(--c-6-d2),var(--c-6-l3))">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text" style="--c: light-dark(var(--c-7-0),var(--c-7-l1)); --ch: light-dark(var(--c-7-d1),var(--c-7-l2)); --ca: light-dark(var(--c-7-d2),var(--c-7-l3))">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text" style="--c: light-dark(var(--c-8-0),var(--c-8-l1)); --ch: light-dark(var(--c-8-d1),var(--c-8-l2)); --ca: light-dark(var(--c-8-d2),var(--c-8-l3))">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text" style="--c: light-dark(var(--c-9-0),var(--c-9-l1)); --ch: light-dark(var(--c-9-d1),var(--c-9-l2)); --ca: light-dark(var(--c-9-d2),var(--c-9-l3))">afawfeawef</span>awefaewfwfae</p>
+
+			<p>awehfuaiwlefhuawielhfaa<span class="text bg bd" style="--c: light-dark(var(--c-0-d1),var(--c-0-l1)); --ch: light-dark(var(--c-0-d2),var(--c-0-l2)); --ca: light-dark(var(--c-0-d3),var(--c-0-l3)); --bg: light-dark(var(--c-0-l5),var(--c-0-d5)); --bgh: light-dark(var(--c-0-l4),var(--c-0-d4)); --bga: light-dark(var(--c-0-l3),var(--c-0-d3)); --bd: var(--c-0-0); --bdh: light-dark(var(--c-0-d1), var(--c-0-l1)); --bda: light-dark(var(--c-0-d2), var(--c-0-l2));">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text bg bd" style="--c: light-dark(var(--c-1-d1),var(--c-1-l1)); --ch: light-dark(var(--c-1-d2),var(--c-1-l2)); --ca: light-dark(var(--c-1-d3),var(--c-1-l3)); --bg: light-dark(var(--c-1-l5),var(--c-1-d5)); --bgh: light-dark(var(--c-1-l4),var(--c-1-d4)); --bga: light-dark(var(--c-1-l3),var(--c-1-d3)); --bd: var(--c-1-0); --bdh: light-dark(var(--c-1-d1), var(--c-1-l1)); --bda: light-dark(var(--c-1-d2), var(--c-1-l2));">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text bg bd" style="--c: light-dark(var(--c-2-d1),var(--c-2-l1)); --ch: light-dark(var(--c-2-d2),var(--c-2-l2)); --ca: light-dark(var(--c-2-d3),var(--c-2-l3)); --bg: light-dark(var(--c-2-l5),var(--c-2-d5)); --bgh: light-dark(var(--c-2-l4),var(--c-2-d4)); --bga: light-dark(var(--c-2-l3),var(--c-2-d3)); --bd: var(--c-2-0); --bdh: light-dark(var(--c-2-d1), var(--c-2-l1)); --bda: light-dark(var(--c-2-d2), var(--c-2-l2));">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text bg bd" style="--c: light-dark(var(--c-3-d1),var(--c-3-l1)); --ch: light-dark(var(--c-3-d2),var(--c-3-l2)); --ca: light-dark(var(--c-3-d3),var(--c-3-l3)); --bg: light-dark(var(--c-3-l5),var(--c-3-d5)); --bgh: light-dark(var(--c-3-l4),var(--c-3-d4)); --bga: light-dark(var(--c-3-l3),var(--c-3-d3)); --bd: var(--c-3-0); --bdh: light-dark(var(--c-3-d1), var(--c-3-l1)); --bda: light-dark(var(--c-3-d2), var(--c-3-l2));">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text bg bd" style="--c: light-dark(var(--c-4-d1),var(--c-4-l1)); --ch: light-dark(var(--c-4-d2),var(--c-4-l2)); --ca: light-dark(var(--c-4-d3),var(--c-4-l3)); --bg: light-dark(var(--c-4-l5),var(--c-4-d5)); --bgh: light-dark(var(--c-4-l4),var(--c-4-d4)); --bga: light-dark(var(--c-4-l3),var(--c-4-d3)); --bd: var(--c-4-0); --bdh: light-dark(var(--c-4-d1), var(--c-4-l1)); --bda: light-dark(var(--c-4-d2), var(--c-4-l2));">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text bg bd" style="--c: light-dark(var(--c-5-d1),var(--c-5-l1)); --ch: light-dark(var(--c-5-d2),var(--c-5-l2)); --ca: light-dark(var(--c-5-d3),var(--c-5-l3)); --bg: light-dark(var(--c-5-l5),var(--c-5-d5)); --bgh: light-dark(var(--c-5-l4),var(--c-5-d4)); --bga: light-dark(var(--c-5-l3),var(--c-5-d3)); --bd: var(--c-5-0); --bdh: light-dark(var(--c-5-d1), var(--c-5-l1)); --bda: light-dark(var(--c-5-d2), var(--c-5-l2));">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text bg bd" style="--c: light-dark(var(--c-6-d1),var(--c-6-l1)); --ch: light-dark(var(--c-6-d2),var(--c-6-l2)); --ca: light-dark(var(--c-6-d3),var(--c-6-l3)); --bg: light-dark(var(--c-6-l5),var(--c-6-d5)); --bgh: light-dark(var(--c-6-l4),var(--c-6-d4)); --bga: light-dark(var(--c-6-l3),var(--c-6-d3)); --bd: var(--c-6-0); --bdh: light-dark(var(--c-6-d1), var(--c-6-l1)); --bda: light-dark(var(--c-6-d2), var(--c-6-l2));">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text bg bd" style="--c: light-dark(var(--c-7-d1),var(--c-7-l1)); --ch: light-dark(var(--c-7-d2),var(--c-7-l2)); --ca: light-dark(var(--c-7-d3),var(--c-7-l3)); --bg: light-dark(var(--c-7-l5),var(--c-7-d5)); --bgh: light-dark(var(--c-7-l4),var(--c-7-d4)); --bga: light-dark(var(--c-7-l3),var(--c-7-d3)); --bd: var(--c-7-0); --bdh: light-dark(var(--c-7-d1), var(--c-7-l1)); --bda: light-dark(var(--c-7-d2), var(--c-7-l2));">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text bg bd" style="--c: light-dark(var(--c-8-d1),var(--c-8-l1)); --ch: light-dark(var(--c-8-d2),var(--c-8-l2)); --ca: light-dark(var(--c-8-d3),var(--c-8-l3)); --bg: light-dark(var(--c-8-l5),var(--c-8-d5)); --bgh: light-dark(var(--c-8-l4),var(--c-8-d4)); --bga: light-dark(var(--c-8-l3),var(--c-8-d3)); --bd: var(--c-8-0); --bdh: light-dark(var(--c-8-d1), var(--c-8-l1)); --bda: light-dark(var(--c-8-d2), var(--c-8-l2));">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text bg bd" style="--c: light-dark(var(--c-9-d1),var(--c-9-l1)); --ch: light-dark(var(--c-9-d2),var(--c-9-l2)); --ca: light-dark(var(--c-9-d3),var(--c-9-l3)); --bg: light-dark(var(--c-9-l5),var(--c-9-d5)); --bgh: light-dark(var(--c-9-l4),var(--c-9-d4)); --bga: light-dark(var(--c-9-l3),var(--c-9-d3)); --bd: var(--c-9-0); --bdh: light-dark(var(--c-9-d1), var(--c-9-l1)); --bda: light-dark(var(--c-9-d2), var(--c-9-l2));">afawfeawef</span>awefaewfwfae</p>
+		</div>
+		<div style="color-scheme: dark; background-color: var(--c-bg); color: var(--c-text); padding: 2rem;">
+			<p>awehfuaiwlefhuawielhfaa<span class="text" style="--c: light-dark(var(--c-0-0),var(--c-0-l1)); --ch: light-dark(var(--c-0-d1),var(--c-0-l2)); --ca: light-dark(var(--c-0-d2),var(--c-0-l3))">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text" style="--c: light-dark(var(--c-1-0),var(--c-1-l1)); --ch: light-dark(var(--c-1-d1),var(--c-1-l2)); --ca: light-dark(var(--c-1-d2),var(--c-1-l3))">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text" style="--c: light-dark(var(--c-2-0),var(--c-2-l1)); --ch: light-dark(var(--c-2-d1),var(--c-2-l2)); --ca: light-dark(var(--c-2-d2),var(--c-2-l3))">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text" style="--c: light-dark(var(--c-3-0),var(--c-3-l1)); --ch: light-dark(var(--c-3-d1),var(--c-3-l2)); --ca: light-dark(var(--c-3-d2),var(--c-3-l3))">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text" style="--c: light-dark(var(--c-4-0),var(--c-4-l1)); --ch: light-dark(var(--c-4-d1),var(--c-4-l2)); --ca: light-dark(var(--c-4-d2),var(--c-4-l3))">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text" style="--c: light-dark(var(--c-5-0),var(--c-5-l1)); --ch: light-dark(var(--c-5-d1),var(--c-5-l2)); --ca: light-dark(var(--c-5-d2),var(--c-5-l3))">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text" style="--c: light-dark(var(--c-6-0),var(--c-6-l1)); --ch: light-dark(var(--c-6-d1),var(--c-6-l2)); --ca: light-dark(var(--c-6-d2),var(--c-6-l3))">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text" style="--c: light-dark(var(--c-7-0),var(--c-7-l1)); --ch: light-dark(var(--c-7-d1),var(--c-7-l2)); --ca: light-dark(var(--c-7-d2),var(--c-7-l3))">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text" style="--c: light-dark(var(--c-8-0),var(--c-8-l1)); --ch: light-dark(var(--c-8-d1),var(--c-8-l2)); --ca: light-dark(var(--c-8-d2),var(--c-8-l3))">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text" style="--c: light-dark(var(--c-9-0),var(--c-9-l1)); --ch: light-dark(var(--c-9-d1),var(--c-9-l2)); --ca: light-dark(var(--c-9-d2),var(--c-9-l3))">afawfeawef</span>awefaewfwfae</p>
+
+			<p>awehfuaiwlefhuawielhfaa<span class="text bg bd" style="--c: light-dark(var(--c-0-d1),var(--c-0-l1)); --ch: light-dark(var(--c-0-d2),var(--c-0-l2)); --ca: light-dark(var(--c-0-d3),var(--c-0-l3)); --bg: light-dark(var(--c-0-l5),var(--c-0-d5)); --bgh: light-dark(var(--c-0-l4),var(--c-0-d4)); --bga: light-dark(var(--c-0-l3),var(--c-0-d3)); --bd: var(--c-0-0); --bdh: light-dark(var(--c-0-d1), var(--c-0-l1)); --bda: light-dark(var(--c-0-d2), var(--c-0-l2));">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text bg bd" style="--c: light-dark(var(--c-1-d1),var(--c-1-l1)); --ch: light-dark(var(--c-1-d2),var(--c-1-l2)); --ca: light-dark(var(--c-1-d3),var(--c-1-l3)); --bg: light-dark(var(--c-1-l5),var(--c-1-d5)); --bgh: light-dark(var(--c-1-l4),var(--c-1-d4)); --bga: light-dark(var(--c-1-l3),var(--c-1-d3)); --bd: var(--c-1-0); --bdh: light-dark(var(--c-1-d1), var(--c-1-l1)); --bda: light-dark(var(--c-1-d2), var(--c-1-l2));">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text bg bd" style="--c: light-dark(var(--c-2-d1),var(--c-2-l1)); --ch: light-dark(var(--c-2-d2),var(--c-2-l2)); --ca: light-dark(var(--c-2-d3),var(--c-2-l3)); --bg: light-dark(var(--c-2-l5),var(--c-2-d5)); --bgh: light-dark(var(--c-2-l4),var(--c-2-d4)); --bga: light-dark(var(--c-2-l3),var(--c-2-d3)); --bd: var(--c-2-0); --bdh: light-dark(var(--c-2-d1), var(--c-2-l1)); --bda: light-dark(var(--c-2-d2), var(--c-2-l2));">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text bg bd" style="--c: light-dark(var(--c-3-d1),var(--c-3-l1)); --ch: light-dark(var(--c-3-d2),var(--c-3-l2)); --ca: light-dark(var(--c-3-d3),var(--c-3-l3)); --bg: light-dark(var(--c-3-l5),var(--c-3-d5)); --bgh: light-dark(var(--c-3-l4),var(--c-3-d4)); --bga: light-dark(var(--c-3-l3),var(--c-3-d3)); --bd: var(--c-3-0); --bdh: light-dark(var(--c-3-d1), var(--c-3-l1)); --bda: light-dark(var(--c-3-d2), var(--c-3-l2));">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text bg bd" style="--c: light-dark(var(--c-4-d1),var(--c-4-l1)); --ch: light-dark(var(--c-4-d2),var(--c-4-l2)); --ca: light-dark(var(--c-4-d3),var(--c-4-l3)); --bg: light-dark(var(--c-4-l5),var(--c-4-d5)); --bgh: light-dark(var(--c-4-l4),var(--c-4-d4)); --bga: light-dark(var(--c-4-l3),var(--c-4-d3)); --bd: var(--c-4-0); --bdh: light-dark(var(--c-4-d1), var(--c-4-l1)); --bda: light-dark(var(--c-4-d2), var(--c-4-l2));">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text bg bd" style="--c: light-dark(var(--c-5-d1),var(--c-5-l1)); --ch: light-dark(var(--c-5-d2),var(--c-5-l2)); --ca: light-dark(var(--c-5-d3),var(--c-5-l3)); --bg: light-dark(var(--c-5-l5),var(--c-5-d5)); --bgh: light-dark(var(--c-5-l4),var(--c-5-d4)); --bga: light-dark(var(--c-5-l3),var(--c-5-d3)); --bd: var(--c-5-0); --bdh: light-dark(var(--c-5-d1), var(--c-5-l1)); --bda: light-dark(var(--c-5-d2), var(--c-5-l2));">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text bg bd" style="--c: light-dark(var(--c-6-d1),var(--c-6-l1)); --ch: light-dark(var(--c-6-d2),var(--c-6-l2)); --ca: light-dark(var(--c-6-d3),var(--c-6-l3)); --bg: light-dark(var(--c-6-l5),var(--c-6-d5)); --bgh: light-dark(var(--c-6-l4),var(--c-6-d4)); --bga: light-dark(var(--c-6-l3),var(--c-6-d3)); --bd: var(--c-6-0); --bdh: light-dark(var(--c-6-d1), var(--c-6-l1)); --bda: light-dark(var(--c-6-d2), var(--c-6-l2));">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text bg bd" style="--c: light-dark(var(--c-7-d1),var(--c-7-l1)); --ch: light-dark(var(--c-7-d2),var(--c-7-l2)); --ca: light-dark(var(--c-7-d3),var(--c-7-l3)); --bg: light-dark(var(--c-7-l5),var(--c-7-d5)); --bgh: light-dark(var(--c-7-l4),var(--c-7-d4)); --bga: light-dark(var(--c-7-l3),var(--c-7-d3)); --bd: var(--c-7-0); --bdh: light-dark(var(--c-7-d1), var(--c-7-l1)); --bda: light-dark(var(--c-7-d2), var(--c-7-l2));">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text bg bd" style="--c: light-dark(var(--c-8-d1),var(--c-8-l1)); --ch: light-dark(var(--c-8-d2),var(--c-8-l2)); --ca: light-dark(var(--c-8-d3),var(--c-8-l3)); --bg: light-dark(var(--c-8-l5),var(--c-8-d5)); --bgh: light-dark(var(--c-8-l4),var(--c-8-d4)); --bga: light-dark(var(--c-8-l3),var(--c-8-d3)); --bd: var(--c-8-0); --bdh: light-dark(var(--c-8-d1), var(--c-8-l1)); --bda: light-dark(var(--c-8-d2), var(--c-8-l2));">afawfeawef</span>awefaewfwfae</p>
+			<p>awehfuaiwlefhuawielhfaa<span class="text bg bd" style="--c: light-dark(var(--c-9-d1),var(--c-9-l1)); --ch: light-dark(var(--c-9-d2),var(--c-9-l2)); --ca: light-dark(var(--c-9-d3),var(--c-9-l3)); --bg: light-dark(var(--c-9-l5),var(--c-9-d5)); --bgh: light-dark(var(--c-9-l4),var(--c-9-d4)); --bga: light-dark(var(--c-9-l3),var(--c-9-d3)); --bd: var(--c-9-0); --bdh: light-dark(var(--c-9-d1), var(--c-9-l1)); --bda: light-dark(var(--c-9-d2), var(--c-9-l2));">afawfeawef</span>awefaewfwfae</p>
+		</div>
+	</section>
+	<section>
+		<p id="rainbow" style="line-height: 1.4; font-variant-numeric: tabular-nums;"></p>
+	</section>
+	<script>
+		for (let i=0; i<10; i++) {
+			for (let j=0; j<10; j++) {
+				document.getElementById("rainbow").insertAdjacentHTML("beforeend", `<span class="text bg bd" style="--c: color-mix(in oklch, var(--c-${i}-c),var(--c-${i+1}-c) ${j*10}%); --ch: color-mix(in oklch, var(--c-${i}-ch),var(--c-${i+1}-ch) ${j*10}%); --ca: color-mix(in oklch, var(--c-${i}-ca),var(--c-${i+1}-ca) ${j*10}%); --bg: color-mix(in oklch, var(--c-${i}-bg),var(--c-${i+1}-bg) ${j*10}%); --bgh: color-mix(in oklch, var(--c-${i}-bgh),var(--c-${i+1}-bgh) ${j*10}%); --bga: color-mix(in oklch, var(--c-${i}-bga),var(--c-${i+1}-bga) ${j*10}%); --bd: color-mix(in oklch, var(--c-${i}-bd),var(--c-${i+1}-bd) ${j*10}%); --bdh: color-mix(in oklch, var(--c-${i}-bdh),var(--c-${i+1}-bdh) ${j*10}%); --bda: color-mix(in oklch, var(--c-${i}-bda),var(--c-${i+1}-bda) ${j*10}%);">${i}.${j}</span>`);
+			}
+			document.getElementById("rainbow").insertAdjacentHTML("beforeend", "<wbr>");
+		}
+	</script>
+</body>
+</html>

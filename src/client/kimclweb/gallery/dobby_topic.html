@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>갤러리</title>
+	<style>
+		.meme-container {
+			width: fit-content;
+			height: fit-content;
+			border: 0.8px solid var(--c-text);
+			padding: 0.6em;
+			zoom: 2.5;
+		}
+
+		label {
+			font-weight: bold;
+		}
+	</style>
+</head>
+<body>
+	<h1>R&E 주제선정</h1>
+	<div class="meme-container">
+		<input type="checkbox" id="chamsin" name="참신한가?" onclick="chamsinCheck();">
+		<label for="chamsin">참신한가?</label>
+		<br>
+		<input type="checkbox" id="useful" name="쓸모가 있는가?" onclick="usefulCheck();">
+		<label for="useful">쓸모가 있는가?</label>
+		<br>
+		<input type="checkbox" id="viable" name="우리가 할 수 있는가?" onclick="viableCheck();">
+		<label for="viable">우리가 할 수 있는가?</label>
+	</div>
+</body>
+<script>
+	chamsinBox = document.getElementById("chamsin");
+	usefulBox = document.getElementById("useful");
+	viableBox = document.getElementById("viable");
+	
+	function chamsinCheck() {
+		if (!chamsinBox.checked || !usefulBox.checked || !viableBox.checked) {
+			return;
+		}
+		if (Math.floor(Math.random()*2)==0) {
+			usefulBox.checked = false;
+		} else {
+			viableBox.checked = false;
+		}
+	}
+	
+	function usefulCheck() {
+		if (!chamsinBox.checked || !usefulBox.checked || !viableBox.checked) {
+			return;
+		}
+		if (Math.floor(Math.random()*2)==0) {
+			viableBox.checked = false;
+		} else {
+			chamsinBox.checked = false;
+		}
+	}
+	
+	function viableCheck() {
+		if (!chamsinBox.checked || !usefulBox.checked || !viableBox.checked) {
+			return;
+		}
+		if (Math.floor(Math.random()*2)==0) {
+			chamsinBox.checked = false;
+		} else {
+			usefulBox.checked = false;
+		}
+	}
+</script>
+</html>

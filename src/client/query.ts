@@ -33,7 +33,7 @@ class JQuerish {
 		} else {
 			this.each((e) => {
 				e.setAttribute(key, value);
-			})
+			});
 		}
 	}
 
@@ -46,20 +46,20 @@ class JQuerish {
 		} else {
 			this.each((e) => {
 				e.style.setProperty(key, value);
-			})
+			});
 		}
 	}
 
 	on<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, e: HTMLElementEventMap[K]) => any) {
 		this.each((e) => {
 			e.addEventListener(type, listener);
-		})
+		});
 	}
 
 	off<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, e: HTMLElementEventMap[K]) => any) {
 		this.each((e) => {
 			e.removeEventListener(type, listener);
-		})
+		});
 	}
 
 	remove() {
@@ -70,6 +70,19 @@ class JQuerish {
 		const classList = classes.split(' ');
 		this.each((e) => {
 			e.classList.remove(...classList);
-		})
+		});
+	}
+
+	addClass(classes: string) {
+		const classList = classes.split(' ');
+		this.each((e) => {
+			e.classList.add(...classList);
+		});
+	}
+
+	text(text: string) {
+		this.each((e) => {
+			e.textContent = text;
+		});
 	}
 }
