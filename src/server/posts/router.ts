@@ -42,13 +42,13 @@ const router = express.Router();
 export default router;
 
 router.get('/', (_, res) => {
-	res.status(200).render(indexTemplate, {
+	res.render(indexTemplate, {
 		nav: renderNav(db, "/posts/", "index.html")
 	});
 });
 
 router.get('/index.html', (_, res) => {
-	res.status(200).render(indexTemplate, {
+	res.render(indexTemplate, {
 		nav: renderNav(db, "/posts/", "index.html")
 	});
 });
@@ -63,7 +63,7 @@ router.get('/raw/*path', (req, res) => {
 router.get('/*path', (req, res) => {
 	const path = getPath(req.params.path);
 	const result = getPost(db, "/posts/", path, [], renderNav(db, "/posts/", path));
-	if (result[0]) res.status(200).render(template, result[1]);
+	if (result[0]) res.render(template, result[1]);
 	else res.status(404).render(notFoundTemplate, result[1]);
 });
 

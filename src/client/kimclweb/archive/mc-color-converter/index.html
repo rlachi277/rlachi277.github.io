@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+		* {
+			transition-duration: 0.5s;
+		}
+
+		body {
+			overflow: hidden;
+			--color: rgba(0,0,0,85%);
+			margin:0;
+			background-color:rgba(0,0,0,9%);
+		}
+
+		.title {
+			--color: rgba(0,0,0,85%);
+			font-weight: bold;
+			font-size: 30px;
+			display: inline-block;
+			color: var(--color);
+			text-shadow: 0px 0px 1px var(--color);
+		}
+
+		input {
+			--color: rgba(0,0,0,85%);
+			--textcolor: rgba(0,0,0,85%);
+			background-color: transparent;
+			border: 2px solid var(--color);
+			border-radius: 3px;
+			color: var(--textcolor);
+			font-weight: 900;
+		}
+
+		#red {
+			background-color: rgba(255,0,0,20%);
+		}
+
+		#green {
+			background-color: rgba(0,255,0,20%);
+		}
+
+		#blue {
+			background-color: rgba(0,0,255,20%);
+		}
+
+		#col {
+			background-color: rgba(0,0,0,30%);
+		}
+
+		input::placeholder {
+			color: var(--textcolor);
+		}
+
+		button {
+			--color: rgba(0,0,0,85%);
+			background-color: transparent;
+			border: 2px solid var(--color);
+			border-radius: 3px;
+			color: var(--color);
+			font-weight: 700;
+			box-shadow: 0px 0px 2px var(--color);
+		}
+
+		.short {
+			display:inline-block;
+			width:min(4em,8vw);
+		}
+
+		#col {
+			position:relative;
+			top:3px;
+		}
+
+		.code, .codealpha {
+			display:inline-block;
+			width:min(8em,16vw);
+			position:relative;
+			top:-1px;
+		}
+
+		.glowborder {
+			border: 3px solid var(--color);
+			border-radius: 3.2vw;
+			padding: 3.2vw;
+			display: inline-block;
+			box-shadow: 0px 0px 8px var(--color),
+				inset 0px 0px 8px -2px var(--color);
+			position: absolute;
+			top: 50vh;
+			left: 50vw;
+			transform: translate(-50%, -50%);
+		}
+
+		.container {
+			margin:0;
+			width: 100vw;
+			height: 100vh;
+			background-color:rgba(0,0,0,10%);
+		}
+	</style>
+</head>
+<body>
+	<div class="container" id="bg">
+		<div class="glowborder" id="border">
+			<div class="title" id="title">
+				색깔 변환기
+			</div>
+			<br>
+			<input type="number" placeholder=0 min=0 max=255 class="rgb short" id="red">
+			<input type="number" placeholder=0 min=0 max=255 class="rgb short" id="green">
+			<input type="number" placeholder=0 min=0 max=255 class="rgb short" id="blue">
+			<input type="color" id="col">
+			<input type="number" placeholder=255 min=0 max=255 class="rgb short" id="alpha">
+			<br><br><br>
+			<span id="sans" style="font-weight: bold;">
+				마크,스크래치 컬러코드: 
+			</span>
+			<input type="number" placeholder=0 class="code" id="code">
+			<input type="number" placeholder=0 class="codealpha" id="codealpha">
+			<br><br>
+			<button id="button" onclick="randomForFun();">
+				무작위 색깔
+			</button>
+		</div>
+	</div>
+	<script>
+		function updateRGB(e) {
+			var rgb=document.getElementById("col").value;
+			var r=Number("0x"+rgb.substring(1,3));
+			var g=Number("0x"+rgb.substring(3,5));
+			var b=Number("0x"+rgb.substring(5));
+			document.getElementById("red").value=r;
+			document.getElementById("green").value=g;
+			document.getElementById("blue").value=b;
+			updateColorCode();
+			updateBG(r,g,b);
+		}
+
+		function updateColor(e) {
+			var r = Number(document.getElementById("red").value);
+			var g = Number(document.getElementById("green").value);
+			var b = Number(document.getElementById("blue").value);
+			var a = Number(document.getElementById("alpha").value);
+			if (!(0<=r&&r<=255)) {
+				document.getElementById("red").value=0;
+				r=0;
+			}
+			if (!(0<=g&&g<=255)) {
+				document.getElementById("green").value=0;
+				g=0;
+			}
+			if (!(0<=b&&b<=255)) {
+				document.getElementById("blue").value=0;
+				b=0;
+			}
+			if (!(0<=a&&a<=255)) {
+				document.getElementById("alpha").value=0;
+				a=0;
+			}
+			var rgb = '#'+dig2(r.toString(16))+dig2(g.toString(16))+dig2(b.toString(16));
+			document.getElementById("col").value=rgb;
+			updateColorCode();
+			updateBG(r,g,b);
+		}
+
+		function updateColorCode(e) {
+			var r = Number(document.getElementById("red").value);
+			var g = Number(document.getElementById("green").value);
+			var b = Number(document.getElementById("blue").value);
+			var a = Number(document.getElementById("alpha").value);
+			var cc=r*65536+g*256+b;
+			document.getElementById("code").value=cc;
+			var cca=(a*16777216+cc+2147483648)%4294967296-2147483648;
+			document.getElementById("codealpha").value=cca;
+		}
+
+		function decodeColorCode(e) {
+			var cc=document.getElementById("code").value;
+			if (!(0<=cc&&cc<=16777215)) {
+				document.getElementById("code").value=0;
+				cc=0;
+			}
+			var b=cc%256;
+			cc=Math.floor(cc/256);
+			var g=cc%256;
+			cc=Math.floor(cc/256);
+			var r=cc;
+			var a=255;
+			document.getElementById("red").value=r;
+			document.getElementById("green").value=g;
+			document.getElementById("blue").value=b;
+			document.getElementById("alpha").value=255;
+			document.getElementById("code").value=-16777216+r*65536+g*256+b;
+			updateColor();
+		}
+
+		function decodeColorCodeA(e) {
+			var cca=Number(document.getElementById("codealpha").value);
+			if (2147483648<=cca&&cca<=4294967295) {
+				cca -= 4294967296;
+				document.getElementById("codealpha").value=cca;
+			}
+			if (!(-2147483648<=cca&&cca<=2147483647)) {
+				document.getElementById("codealpha").value=0;
+				cca=0;
+			}
+			cca += 4294967296;
+			var b=cca%256;
+			cca=Math.floor(cca/256);
+			var g=cca%256;
+			cca=Math.floor(cca/256);
+			var r=cca%256;
+			cca=Math.floor(cca/256);
+			var a=cca%256;
+			document.getElementById("red").value=r;
+			document.getElementById("green").value=g;
+			document.getElementById("blue").value=b;
+			document.getElementById("alpha").value=a;
+			document.getElementById("code").value=r*65536+g*256+b;
+			updateColor();
+		}
+
+		function updateBG(r,g,b) {
+			var bgcol="rgba("+r+","+g+","+b+",15%)";
+			var border="rgba("+r+","+g+","+b+",85%)";
+			document.getElementById("bg").style.backgroundColor=bgcol;
+			document.getElementById("border").style.setProperty("--color",border);
+			var inputs=document.getElementsByTagName("input");
+			for (var idx=0; idx<inputs.length; idx++) {
+				inputs[idx].style.setProperty("--color",border);
+				inputs[idx].style.setProperty("--textcolor","rgba("+r*0.6+","+g*0.6+","+b*0.6+",85%)");
+			}
+			document.getElementById("col").style.backgroundColor="rgba("+r+","+g+","+b+",30%)";
+			document.getElementById("title").style.setProperty("--color",border);
+			document.getElementById("sans").style.color=border; // wa sans!
+			
+			document.getElementById("button").style.setProperty("--color",border);
+		}
+
+		function dig2(str) {
+			if (str.length==0) {
+				return "00";
+			} else if (str.length==1) {
+				return "0"+str;
+			}
+			return str;
+		}
+
+		function randomForFun(e) {
+			var random=Math.floor(Math.random()*16777216);
+			if (random==16777216) {
+				console.log("와 이게 뜨네"); // 와 이게 뜨네
+				random=16777215;
+			}
+			document.getElementById("code").value=random;
+			decodeColorCode();
+		}
+
+		var rgbe=document.getElementsByClassName("rgb");
+		for (var idx=0; idx<rgbe.length; idx++) {
+			rgbe[idx].addEventListener('input',updateColor);
+		}
+		document.getElementById("col").addEventListener('input',updateRGB);
+		document.getElementById("code").addEventListener('input',decodeColorCode);
+		document.getElementById("codealpha").addEventListener('input',decodeColorCodeA);
+	</script>
+</body>
+</html>

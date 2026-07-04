@@ -172,9 +172,9 @@ function update() {
 			top = !$("#result-container *").list.at(-1)?.classList.contains("top");
 		}
 		if (ch.s) {
-			d$n("result-container").insertAdjacentHTML("beforeend", `<div class="result-img${compressed?" full":""}" style="--data:url(/assets/notfont/${ch.f}.svg); aspect-ratio: 0.5;">`);
+			d$n("result-container").insertAdjacentHTML("beforeend", `<div class="result-img${compressed?" full":""}" style="--data:url(/assets/kimclweb/notfont/${ch.f}.svg); aspect-ratio: 0.5;">`);
 		} else {
-			d$n("result-container").insertAdjacentHTML("beforeend", `<div class="result-img${!ch.jo&&top?" top":""}${ch.jo&&top?" bottom":""}" style="--data:url(/assets/notfont/${ch.f}.svg);">`);
+			d$n("result-container").insertAdjacentHTML("beforeend", `<div class="result-img${!ch.jo&&top?" top":""}${ch.jo&&top?" bottom":""}" style="--data:url(/assets/kimclweb/notfont/${ch.f}.svg);">`);
 		}
 	}
 }

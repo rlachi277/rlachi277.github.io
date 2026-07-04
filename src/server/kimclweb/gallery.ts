@@ -4,7 +4,7 @@ const router = express.Router();
 export default router;
 
 router.get('/', (_, res) => {
-	res.status(200).render("kimclweb/gallery/index");
+	res.render("kimclweb/gallery/index");
 });
 
 router.get('/*path', (req, res) => {
@@ -14,5 +14,11 @@ router.get('/*path', (req, res) => {
 		return;
 	}
 	path[path.length - 1] = path[path.length - 1].replace(/\.html$/, '');
-	res.status(200).render(`kimclweb/gallery/${path.join('/')}`);
+	res.render(`kimclweb/gallery/${path.join('/')}`, undefined, (err, html) => {
+		if (err) {
+			res.sendStatus(404);
+			return;
+		}
+		res.status(200).send(html);
+	});
 });

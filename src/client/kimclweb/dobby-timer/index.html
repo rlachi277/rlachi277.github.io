@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>Dobby timer</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+	<img src="/assets/kimclweb/dobby-timer/logo.svg" id="logo">
+	<p id="name">311307</p>
+	<div id="top-container">
+		<p id="date-display"></p>
+		<p id="week-display"></p>
+	</div>
+	<div id="middle-container">
+		<div id="day-display">
+			<span id="day-display-text">5;00</span>
+		</div>
+		<div id="hour-progress">
+			<span id="hour-progress-bg"></span>
+			<span id="hour-progress-fg"></span>
+		</div>
+		<div id="timer">
+			<div class="timer-text-container">
+				<span class="timer-text" id="timer1">이</span>
+			</div>
+			<div class="timer-text-container">
+				<span class="timer-text" id="timer2">끾</span>
+			</div>
+			<div class="timer-text-container">
+				<span class="timer-text" id="timer3">끼</span>
+			</div>
+			<div class="timer-text-container timer-colon-container">
+				<span class="timer-text timer-colon">:</span>
+			</div>
+			<div class="timer-text-container">
+				<span class="timer-text" id="timer4"></span>
+			</div>
+			<div class="timer-text-container">
+				<span class="timer-text" id="timer5"></span>
+			</div>
+			<div class="timer-text-container timer-colon-container">
+				<span class="timer-text timer-colon">:</span>
+			</div>
+			<div class="timer-text-container">
+				<span class="timer-text" id="timer6"></span>
+			</div>
+			<div class="timer-text-container">
+				<span class="timer-text" id="timer7"></span>
+			</div>
+		</div>
+		<div id="vacation-timer">
+			<span id="vacation-timer-text">Rnlcksgdk</span>
+		</div>
+		<div id="second-display">
+			<span id="second-display-text">214748</span>
+		</div>
+	</div>
+	<div id="bottom-container">
+		<div class="progress-bar" style="top:0" id="entire">
+			<div class="circle circle-bright-before circle-dark-after entire-circle" style="left:3.846%;"></div>
+			<div class="circle circle-dark-before circle-bright-after entire-circle" style="left:9.188%;"></div>
+			<div class="circle circle-bright-before circle-dark-after entire-circle" style="left:24.359%;"></div>
+			<div class="circle circle-dark-before circle-bright-after entire-circle" style="left:29.701%;"></div>
+			<div class="circle circle-bright-before circle-dark-after entire-circle" style="left:44.872%;"></div>
+			<div class="circle circle-dark-before circle-bright-after entire-circle" style="left:50.214%;"></div>
+			<div class="circle circle-bright-before circle-dark-after entire-circle" style="left:65.385%;"></div>
+			<div class="circle circle-dark-before circle-bright-after entire-circle" style="left:70.727%;"></div>
+			<div class="circle circle-bright-before circle-dark-after entire-circle" style="left:85.897%;"></div>
+			<div class="circle circle-dark-before circle-bright-after entire-circle" style="left:91.239%;"></div>
+			<div class="circle circle-bright-before circle-bright-after entire-circle" style="left:100%;"></div>
+			
+			<div class="actual-bar"></div>
+			<div class="dark-bar" style="width:5.342%;left:3.846%;"></div>
+			<div class="dark-bar" style="width:5.342%;left:24.359%;"></div>
+			<div class="dark-bar" style="width:5.342%;left:44.872%;"></div>
+			<div class="dark-bar" style="width:5.342%;left:65.385%;"></div>
+			<div class="dark-bar" style="width:5.342%;left:85.897%;"></div>
+			<div class="circle circle-past" style="left:0%;"></div>
+			
+			<div class="past-bar" id="entire-past-bar"></div>
+			<div class="circle circle-cursor" id="entire-cursor"></div>
+			
+			<div class="progress" id="entire-progress">yeye</div>
+		</div>
+		<div class="progress-bar" style="bottom:0" id="section">
+			<div class="actual-bar"></div>
+			<div class="dark-bar" id="section-dark" style="left:0"></div>
+			<div class="circle circle-past" style="left:0%;"></div>
+			<div id="section-circle" class="circle circle-bright-before circle-bright-after" style="left:100%;"></div>
+			
+			<div class="past-bar" id="section-past-bar"></div>
+			<div class="circle circle-cursor" id="section-cursor"></div>
+			
+			<div class="progress" id="section-progress">yeat</div>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,101 @@
+@import "../global/font/nanumgothiccoding.css";
+
+:root { background-color: #277AEA; }
+
+#wrapper {
+	transform-style: preserve-3d;
+	perspective: 1px;
+}
+
+.bg {
+	position: absolute;
+	inset: 0;
+	height: 0;
+	margin-top: 0;
+	margin-bottom: 0;
+	z-index: -1;
+	background-size: 840px 840px;
+	background-repeat: repeat;
+}
+
+#bg1 {
+	transform: translateZ(-15px) scale(16);
+	background-image: url('cycycy.png');
+	animation: infinite linear 30s forwards bgscroll1;
+}
+
+#bg2 {
+	opacity: 0.5;
+	transform: translateZ(-7px) scale(8);
+	background-image: url('cyycyy.png');
+	animation: infinite linear 15s forwards bgscroll2;
+}
+
+@keyframes bgscroll1 {
+	from { background-position: 0px 0px; }
+	to { background-position: 840px 840px; }
+}
+
+@keyframes bgscroll2 {
+	from { background-position: -420px -420px; }
+	to { background-position: 420px 420px; }
+}
+
+@media print {
+	html {
+		background-image: url('cyycyy.png') !important;
+		background-size: 840px 840px !important;
+		background-repeat: repeat !important;
+	}
+
+	.bg { display: none; }
+}
+
+.restricted #wrapper { transform-style: flat; perspective: none; overscroll-behavior: none; contain: none; }
+.restricted #wrapper:before { content: ''; position: fixed; inset: 0; background-image: url('pure.png'); background-size: 840px 840px;  animation: infinite linear 30s forwards bgscroll1; pointer-events: none; z-index: -1; }
+.restricted :is(#bg1, #bg2) { transform: none; display: none; }
+
+ecyce-ocean { display: block; height: 1777px; }
+ecyce-shore { display: block; height: 577px; background-image: linear-gradient(transparent, rgb(255 255 255 / 10%) 30%, white); mix-blend-mode: overlay; opacity: 0.8; }
+
+/* 01 */
+
+:root:not(.restricted) .tile.logo:before { inset: -5.6px; border-radius: 26.6px; opacity: 1; }
+
+header { transform: translateZ(0); color: var(--c-ltext); }
+main.tiles { transform: translateZ(0); -webkit-mask-image: linear-gradient(black, black 10%, rgb(0 0 0 / 20%)); mask-image: linear-gradient(black, black 10%, rgb(0 0 0 / 20%)); }
+
+.tile.filler-tile, .tile.filler-wide, .tile.filler-tall, .tile.filler-big { display: block; }
+.tile.filler-big { width: 100%; height: 100%; }
+.tile svg {  stroke: rgb(0 0 0 / 30%); stroke-width: 16px; fill: transparent; stroke-linecap: round; stroke-linejoin: round; }
+.tile.filler-big svg { stroke-width: 8px; }
+@media screen and (max-width: 480px) { .tile.filler-big svg { stroke-width: 16px; } }
+
+/* 02 */
+
+.b02i { display: inline-block; block-size: 36px; aspect-ratio: 1; position: relative; }
+.b02i::before { content: ''; background-size: 100% 100%; block-size: 140%; aspect-ratio: 1; position: absolute; inset-inline-start: 50%; inset-block-start: 50%; transform: translate(-50%,-50%); }
+.compressed .b02i { inline-size: 24px; block-size: 48px; margin-inline-start: -24px; }
+.compressed .b02i::before { block-size: 70%; inset-block-start: 76%; }
+.compressed .b02i.top, .compressed .b02i.bottom { margin-inline-start: 0; }
+.compressed .b02i.top::before { inset-block-start: 24%; }
+.compressed .b02i.full { inline-size: 9px; block-size: 48px; margin-inline-start: 0; }
+.compressed .b02i.full::before { block-size: 140%; inline-size: 280%; object-fit: fill; inset-block-start: 50%; }
+.b02i.r:before { background-image: url(../../notfont/ㄱ.svg); } .b02i.R:before { background-image: url(../../notfont/ㄲ.svg); } .b02i.R2:before { background-image: url(../../notfont/ㄲ2.svg); } .b02i.s:before { background-image: url(../../notfont/ㄴ.svg); } .b02i.e:before { background-image: url(../../notfont/ㄷ.svg); } .b02i.f:before { background-image: url(../../notfont/ㄹ.svg); } .b02i.a:before { background-image: url(../../notfont/ㅁ.svg); } .b02i.q:before { background-image: url(../../notfont/ㅂ.svg); } .b02i.t:before { background-image: url(../../notfont/ㅅ.svg); } .b02i.d:before { background-image: url(../../notfont/ㅇ.svg); } .b02i.w:before { background-image: url(../../notfont/ㅈ.svg); } .b02i.c:before { background-image: url(../../notfont/ㅊ2.svg); } .b02i.z:before { background-image: url(../../notfont/ㅋ.svg); } .b02i.v:before { background-image: url(../../notfont/ㅍ2.svg); } .b02i.g:before { background-image: url(../../notfont/ㅎ.svg); } .b02i.k:before { background-image: url(../../notfont/ㅏ.svg); } .b02i.j:before { background-image: url(../../notfont/ㅓ.svg); } .b02i.h:before { background-image: url(../../notfont/ㅗ.svg); } .b02i.n:before { background-image: url(../../notfont/ㅜ.svg); } .b02i.o:before { background-image: url(../../notfont/ㅐ.svg); } .b02i.p:before { background-image: url(../../notfont/ㅔ.svg); } .b02i.m:before { background-image: url(../../notfont/ㅡ.svg); } .b02i.ml:before { background-image: url(../../notfont/ㅢ.svg); } .b02i.l:before { background-image: url(../../notfont/ㅣ.svg); } .b02i.sp { aspect-ratio: 0.5; } .b02i.sp:before { background-image: url(../../notfont/sp.svg); } .b02i.period { aspect-ratio: 0.5; } .b02i.period:before { background-image: url(../../notfont/period.svg); } .b02i.comma { aspect-ratio: 0.5; } .b02i.comma:before { background-image: url(../../notfont/comma.svg); } .b02i.mod0:before { background-image: url(../../notfont/mod0.svg); } .b02i.mod2:before { background-image: url(../../notfont/mod2.svg); } .b02i.n2:before { background-image: url(../../notfont/2.svg); } .b02i.n5:before { background-image: url(../../notfont/5.svg); } .b02i.n6:before { background-image: url(../../notfont/6.svg); }
+#b02msg1 { filter: invert(1); mix-blend-mode: overlay; zoom: 3; position: relative; left: 5%; }
+#b02msg2 { filter: invert(1); mix-blend-mode: overlay; width: 60%; position: relative; left: 25%; top: 10%;}
+#b02msg3 { mix-blend-mode: overlay; zoom: 6; text-align: center; }
+#b02msg3 > svg { max-width: 95%; }
+
+/* 03 */
+
+.b03txt { max-inline-size: 55rem; box-sizing: border-box; margin-inline: auto; font-family: 'Nanum Gothic Coding', 'Courier New', monospace; }
+#b03txt2 { padding-left: 10rem; }
+#b03txt3 { text-align: end; }
+#b03txt4, #b03txt7 { text-align: end; font-family: 'Courier New', monospace; }
+#b03txt5 { text-align: center; line-height: 1.5; }
+#b03txt6 { line-height: 1.5; }
+.b03uu { text-decoration: double underline; }
+.b03u { text-decoration: underline; }
+.b03o { text-decoration: overline; }
+.b03oo { text-decoration: double overline; }

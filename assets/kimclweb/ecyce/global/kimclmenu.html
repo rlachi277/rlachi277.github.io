@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>kimcl menu</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="refresh" content="0;/404.html">
+</head>
+<body>
+	<template>
+		<style>
+			@media print {
+				#k_menu, #k_commands { display: none; }
+			}
+
+			#k_menu {
+				z-index: 10000;
+				position: fixed;
+				left: 7px;
+				top: 50%;
+				transform: translate(0, -50%);
+				transition: opacity 0.2s, visibility 0.2s;
+				transition-behavior: allow-discrete;
+			}
+
+			#k_menu * {
+				-webkit-user-select: none;
+				-webkit-user-drag: none;
+				user-select: none;
+				touch-action: manipulation;
+			}
+
+			button {
+				display: block;
+				padding: 0;
+				background: none;
+				border: none;
+			}
+			
+			#k_menulogo {
+				cursor: pointer;
+				position: relative;
+				width: 70px;
+				height: 70px;
+				border-radius: 14px;
+			}
+			
+			#k_menublur {
+				position: absolute;
+				inset: 0;
+				border-radius: inherit;
+				transition: backdrop-filter 0.2s;
+			}
+			.k_active #k_menublur { backdrop-filter: blur(3.5px); }
+
+			#k_menulogoimg {
+				position: absolute;
+				inset: 0;
+				border-radius: inherit;
+				background: url('/assets/kimclweb/test_img.png');
+				background-size: cover;
+				image-rendering: pixelated;
+				box-shadow: -4.2px 4.2px 4.2px rgb(28 28 30 / 30%),
+					-8.4px 8.4px 8.4px rgb(28 28 30 / 10%),
+					inset -4.2px 4.2px 4.2px rgb(250 250 250 / 30%);
+				opacity: 0.3;
+				transition: opacity 0.2s;
+			}
+			.k_active #k_menulogoimg { opacity: 0.6; }
+			#k_commands + .k_active #k_menulogoimg, #k_menulogo:hover #k_menulogoimg { opacity: 0.9; }
+			
+			.k_menubtn {
+				transition: scale 0.2s, opacity 0.2s, visibility 0.2s;
+				transition-behavior: allow-discrete;
+				position: absolute;
+				top: 3.5px;
+				left: 3.5px;
+				width: 63px;
+				height: 63px;
+				border-radius: 50%;
+				transform: translate(var(--xtrans), var(--ytrans));
+				scale: 0.5;
+				visibility: hidden;
+				opacity: 0;
+				box-sizing: border-box;
+				background-origin: border-box;
+				border: 4.2px solid rgb(0 0 0 / 30%);
+				backdrop-filter: blur(3.5px);
+				cursor: pointer;
+				touch-action: manipulation;
+			}
+
+			.k_active .k_menubtn {
+				visibility: visible;
+				opacity: 1;
+				scale: 1;
+			}
+			
+			.k_menuicon {
+				position: absolute;
+				inset: 0;
+				shape-rendering: geometricPrecision;
+			}
+			
+			.k_menustroke {
+				stroke-linecap: round;
+				stroke-linejoin: round;
+				fill: transparent;
+				stroke: rgb(0 0 0 / 30%);
+				stroke-width: 4.2px;
+				vector-effect: non-scaling-stroke;
+			}
+
+			#k_commands {
+				position: fixed;
+				inset: 0;
+				margin: auto;
+				width: 100%;
+				max-width: 637px;
+				height: fit-content;
+				box-sizing: border-box;
+				text-align: center;
+				z-index: 10001;
+				line-height: 0px;
+				pointer-events: none;
+				transition: opacity 0.5s;
+				backdrop-filter: grayscale(0.9) invert(1) contrast(0.5) brightness(350%);
+			}
+			#k_commands.k_cmdfail, #k_commands.k_cmdsuccess { opacity: 0; }
+			@media (prefers-color-scheme: dark) {
+				#k_commands { backdrop-filter: grayscale(0.9) invert(1) contrast(0.5) brightness(40%); }
+			}
+
+			.k_cmdicon {
+				display: inline-block;
+				width: 54.6px;
+				height: 54.6px;
+				margin: -7px;
+				position: relative;
+				shape-rendering: geometricPrecision;
+			}
+
+			.k_cmdicon .k_menustroke {
+				transition: stroke 0.2s, fill 0.2s;
+				stroke: var(--stroke);
+			}
+			.k_cmdfail .k_cmdicon .k_menustroke { stroke: oklab(from var(--stroke) l 0 0); }
+			.k_cmdsuccess .k_cmdicon .k_menustroke { fill: var(--stroke); }
+		</style>
+		<div id="k_commandslot"></div>
+		<div id="k_menu" role="menu">
+			<button id="k_menulogo" title="kimcl 메뉴" role="menuitem" type="button" data-id="0">
+				<div id="k_menublur"></div>
+				<div id="k_menulogoimg"></div>
+			</button>
+			<button data-id="1" title="홈으로" role="menuitem" type="button" id="k_btn1" class="k_menubtn" style="--xtrans: 0; --ytrans: -77px; background-color: oklab(0.7 0.2 0.2 / 60%);">
+				<svg role="img" class="k_menuicon" viewBox="0 0 350 350">
+					<circle class="k_menustroke" cx="175" cy="175" r="90"/>
+				</svg>
+			</button>
+			<button data-id="2" title="돌아가기" role="menuitem" type="button" id="k_btn2" class="k_menubtn" style="--xtrans: 77px; --ytrans: -77px; background-color: oklab(0.8 0 0.2 / 60%);">
+				<svg role="img" class="k_menuicon" viewBox="0 0 350 350">
+					<polygon class="k_menustroke" points="90,175 250,267.4 250,82.6"/>
+				</svg>
+			</button>
+			<button data-id="3" title="올라가기" role="menuitem" type="button" id="k_btn3" class="k_menubtn" style="--xtrans: 77px; --ytrans: 0; background-color: oklab(0.7 -0.2 0.2 / 60%);">
+				<svg role="img" class="k_menuicon" viewBox="0 0 350 350">
+					<polygon class="k_menustroke" points="175,90 82.6,250 267.4,250"/>
+				</svg>
+			</button>
+			<button data-id="4" title="숨기기" role="menuitem" type="button" id="k_btn4" class="k_menubtn" style="--xtrans: 77px; --ytrans: 77px; background-color: oklab(0.7 -0.2 -0.2 / 60%);">
+				<svg role="img" class="k_menuicon" viewBox="0 0 350 350">
+					<polygon class="k_menustroke" points="175,260 267.4,100 82.6,100"/>
+				</svg>
+			</button>
+			<button data-id="5" title="?" role="menuitem" type="button" id="k_btn5" class="k_menubtn" style="--xtrans: 0; --ytrans: 77px; background-color: oklab(0.7 0.2 -0.2 / 60%);">
+				<svg role="img" class="k_menuicon" viewBox="0 0 350 350">
+					<polygon class="k_menustroke" points="260,175 100,82.6 100,267.4"/>
+				</svg>
+			</button>
+		</div>
+		<script id="script">
+			function $(id, el) { el=el??document; return el.getElementById(id); }
+			function $q(q, el) { el=el??document; return el.querySelector(q); }
+			function attr(el, at, value) { return value===undefined?el.getAttribute(at):(value===null?el.removeAttribute(at):el.setAttribute(at, value)); }
+
+			let sr = $q("kimcl-menu").shadowRoot;
+
+			for (let i=0; i<=5; i++) {
+				$q(`[data-id="${i}"]`,sr).onclick = (_) => {
+					k_onclick(i);
+				}
+			}
+
+			function k_onclick(id) {
+				if (k_cinput && 0<=id && id<=4) {
+					function k_push(n) {
+						k_command.push(n);
+						$("k_commands",sr).insertAdjacentHTML("beforeend",k_cmdicns[n]);
+					}
+					if (id==0) {
+						let a = k_command.pop();
+						$q(".k_cmdicon:last-child",sr).remove();
+						switch (a) {
+							case 1: k_push(6); break;
+							case 2: k_push(5); break;
+							case 3: k_push(7); break;
+							case 4: k_push(8); break;
+							case 5: case 6: case 7: case 8: k_push(0); break;
+							case 0: k_push(9); break;
+							case 9: break;
+						}
+						return;
+					}
+					k_push(id);
+					return;
+				}
+				let e, h;
+				switch (id) {
+					case 0:
+						e=$('k_menu',sr);
+						attr(e,'class')?attr(e,'class',null):attr(e,'class','k_active');
+						break;
+					case 1:
+						window.location.pathname='/kimclweb/';
+						break;
+					case 2:
+						h=window.location.pathname;
+						if (!(/\/$/.test(h)) && !(/\/index.html$/.test(h))) {
+							window.location.href='.';
+						} else if (h.includes('/things')) {
+							window.location.pathname=h.replace(/\/things\/(?!things\/)(?!.*\/things\/).*/,'/');
+						} else {
+							window.location.href='..';
+						}
+						break;
+					case 3:
+						window.scrollBy(0,-window.scrollY);
+						e=$('wrapper');
+						e && (e.scrollTop=0);
+						break;
+					case 4:
+						attr($('k_menu',sr),'style','opacity: 0; visibility: hidden; pointer-events: none;');
+						break;
+					case 5:
+						k_cinput?k_endcmdinput():k_startcmdinput();
+				}
+			}
+
+			var k_cinput = false;
+			var k_command = [];
+			var k_cmdicns = ['<br class="k_cmdicon">',
+				'<svg class="k_cmdicon" role="img" viewBox="0 0 350 350" style="--stroke: oklab(0.7 0.2 0.2);"><circle class="k_menustroke" cx="175" cy="175" r="90"/></svg>',
+				'<svg class="k_cmdicon" role="img" viewBox="0 0 350 350" style="--stroke: oklab(0.8 0 0.2);"><polygon class="k_menustroke" points="90,175 250,267.4 250,82.6"/></svg>',
+				'<svg class="k_cmdicon" role="img" viewBox="0 0 350 350" style="--stroke: oklab(0.7 -0.2 0.2);"><polygon class="k_menustroke" points="175,90 82.6,250 267.4,250"/></svg>',
+				'<svg class="k_cmdicon" role="img" viewBox="0 0 350 350" style="--stroke: oklab(0.7 -0.2 -0.2);"><polygon class="k_menustroke" points="175,260 267.4,100 82.6,100"/></svg>',
+				'<svg class="k_cmdicon" role="img" viewBox="0 0 350 350" style="--stroke: oklab(0.7 0.2 -0.2);"><polygon class="k_menustroke" points="260,175 100,82.6 100,267.4"/></svg>',
+				'<svg class="k_cmdicon" role="img" viewBox="0 0 350 350" style="--stroke: oklab(0.8 -0.2 0);"><polygon class="k_menustroke" points="95,95 255,95 255,255 95,255"/></svg>',
+				'<svg class="k_cmdicon" role="img" viewBox="0 0 350 350" style="--stroke: oklab(0.6 0 -0.2);"><line class="k_menustroke" x1="95" y1="175" x2="255" y2="175"/><line class="k_menustroke" x1="175" y1="95" x2="175" y2="255"/></svg>',
+				'<svg class="k_cmdicon" role="img" viewBox="0 0 350 350" style="--stroke: oklab(0.7 0.2 0);"><line class="k_menustroke" x1="95" y1="95" x2="255" y2="255"/><line class="k_menustroke" x1="95" y1="255" x2="255" y2="95"/></svg>',
+				'<svg class="k_cmdicon" role="img" viewBox="0 0 350 350" style="--stroke: oklab(0.8 0 0);"><polygon class="k_menustroke" points="175,75 275,175 175,275 75,175"/></svg>'];
+
+			function k_startcmdinput() {
+				k_cinput = true;
+				$("k_commandslot",sr).id = "k_commands";
+				$("k_commands",sr).insertAdjacentHTML("beforeend",k_cmdicns[5]);
+				k_command = [5];
+			}
+
+			function k_endcmdinput() {
+				attr($('k_menu',sr),'style','opacity: 0; visibility: hidden; pointer-events: none;');
+				let success = k_exec();
+				attr($("k_commands",sr),"class",success?"k_cmdsuccess":"k_cmdfail");
+				return;
+			}
+
+			function k_exec() {
+				let cmdstr = k_command.join("").replace(/^0+/,"").replace(/0+$/,"");
+				console.log(cmdstr);
+				let c, h;
+				switch (cmdstr) {
+					// type 0
+					case "":
+						window.close();
+						window.location.href = "about:blank"; // close가 안 될 때가 있더라고
+						setTimeout(()=>{  }, 200);
+						return true;
+					case "9":
+						setTimeout(()=>{ window.location.href = "about:blank"; }, 200);
+						return true;
+					case "5":
+						setTimeout(()=>{ window.location.reload(); }, 200);
+						return true;
+					
+					// type 1
+					case "51":
+						setTimeout(()=>{ window.location.pathname='/kimclweb/'; }, 200);
+						return true;
+					case "52":
+						setTimeout(()=>{ h=window.location.pathname; (/\/$/.test(h)||/\/index.html$/.test(h))?(h.includes('/things/')?window.location.pathname=h.replace(/\/things\/(?!things\/)(?!.*\/things\/).*/,'/'):window.location.href='..'):window.location.href='.'; }, 200);
+						return true;
+					case "53":
+						setTimeout(()=>{ window.scrollBy(0,-window.scrollY); a=$('wrapper'); if (a) a.scrollTop=0; }, 200);
+						return true;
+					case "54":
+						// duh
+						return true;
+					case "55":
+						for (let i=0; i<223; i++) $("k_commands",sr).insertAdjacentHTML("beforeend",k_cmdicns[5]);
+						return true;
+					case "56":
+						window.open('/kimclweb/');
+						return true;
+					case "577":
+					window.open(window.location.href);
+					case "57":
+						window.open(window.location.href);
+						return true;
+					case "58":
+						c = confirm("localStorage와 sessionStorage가 지워집니다. 이는 모든 사이트에 영향을 끼칩니다.");
+						if (!c) return false;
+						localStorage.clear();
+						sessionStorage.clear();
+						return true;
+					case "59":
+						window.open();
+					
+					// type 2
+					
+					// type 3
+
+					// type 4
+					/*
+					case "2506369948599423065555755558011115":
+						c = confirm("->");
+						if (!c) return false;
+						c = confirm(",");
+						if (c) return false;
+						setTimeout(()=>{ window.location.pathname='/ecyce/'; }, 1500);
+						return true;
+					case "25099908015":
+						setTimeout(()=>{ window.location.pathname='/404.html'; }, 200);
+						return true;
+					*/
+
+					// default
+					default:
+						return false;
+				}
+				return false; // ?
+			}
+		</script>
+	</template>
+</body>
+</html>

@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>LOADING</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="shortcut icon" href="/assets/kimclweb/midnight-countdown/favicon.ico">
+	<style>
+		@import url('https://fonts.googleapis.com/css2?family=B612+Mono&display=swap');
+		@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300&display=swap');
+		@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap');
+		body {
+			margin:0px;
+			display:flex;
+			flex-direction:column;
+			justify-content:center;
+			align-items:center;
+			width:100vw;
+			height:100vh;
+			background:rgb(143, 81, 144);
+			overflow:hidden;
+		}
+		.container {
+			margin:0;
+			padding:0;
+		}
+
+		.disable {
+			opacity:30%;
+		}
+		.number {
+			color:white;
+			display:inline-block;
+			font-family: 'B612 Mono', monospace;
+			font-size:20vw;
+			margin:0;
+		}
+		.colon {
+			font-weight:300;
+			font-family: 'Lato', sans-serif;
+			font-size:20vw;
+			position:relative;
+			bottom:2vw;
+			color:white;
+		}
+		.lato {
+			font-family: 'Lato', sans-serif;
+			font-size:2em;
+			font-weight:400;
+		}
+		#blinder {
+			z-index: -1;
+			position: fixed;
+			left: 0; top: 0;
+			width: 100vw; height: 100vh;
+			opacity: 0;
+			transition: opacity 400ms;
+			transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+		}
+		.opaque {
+			opacity: 1 !important;
+			transition: opacity 1497ms !important;
+			transition-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1) !important;
+		}
+		.special {
+			background: linear-gradient(217deg, rgba(255,0,0,1), rgba(255,0,0,0) 70.71%),
+					linear-gradient(127deg, rgba(0,255,0,1), rgba(0,255,0,0) 70.71%),
+					linear-gradient(336deg, rgba(0,0,255,1), rgba(0,0,255,0) 70.71%) !important;
+		}
+
+		.filter {
+			display:none;
+		}
+		.menu {
+			filter: url("#shadowed-goo");
+			opacity:60%;
+		}
+
+		.menu-item, .menu-open-button {
+			border:none;
+			outline:none;
+			text-decoration:none;
+			background: #ff431b;
+			border-radius: 100%;
+			width: 5vw;
+			height: 5vw;
+			margin-left: -2.5vw;
+			position: absolute;
+			top: 1.25vw;
+			color: white;
+			text-align: center;
+			line-height: 5vw;
+			transform: translate3d(0, 0, 0);
+			transition: transform ease-out 200ms background 400ms;
+		}
+
+		.menu-open {
+			display: none;
+		}
+
+		.icon {
+			width: 25px;
+			height: 3px;
+			background: white;
+			display: block;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			margin-left: -12.5px;
+			margin-top: -1.5px;
+			transition: transform 200ms;
+		}
+
+		.icon-1 {
+			transform: translate3d(0, 0, 0) rotate(90deg);
+		}
+
+		.icon-2 {
+			transform: translate3d(0, 0, 0);
+		}
+
+		.menu-open:checked + .menu-open-button .icon-1 {
+			transform: translate3d(0, 0, 0) rotate(135deg);
+		}
+		.menu-open:checked + .menu-open-button .icon-2 {
+			transform: translate3d(0, 0, 0) rotate(45deg);
+		}
+
+		.menu {
+			position:fixed;
+			right: 8vw;
+			bottom:20vh;
+		}
+
+		.menu-item:hover {
+			background: white;
+			color: #ff431b;
+		}
+		.menu-item:hover.checked {
+			color: #00bcd4;
+		}
+		.menu-item:hover.purple {
+			color: #70049b;
+		}
+		.menu-item:nth-child(n+3) {
+			transition-duration: 180ms;
+		}
+
+		.menu-open-button {
+			z-index: 2;
+			transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+			transition-duration: 400ms;
+			transform: scale(1.1, 1.1) translate3d(0, 0, 0);
+			cursor: pointer;
+		}
+
+		.menu-open-button:hover {
+			transform: scale(1.2, 1.2) translate3d(0, 0, 0);
+		}
+
+		.menu-open:checked + .menu-open-button {
+			transition-timing-function: linear;
+			transition-duration: 200ms;
+			transform: scale(1, 1) translate3d(0, 0, 0);
+		}
+
+		.menu-open:checked ~ .menu-item {
+			transition-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
+		}
+		.menu-open:checked ~ .menu-item:nth-child(3) {
+			transition-duration: 211ms;
+			transform: translate3d(-6.875vw, 0, 0);
+		}
+		.menu-open:checked ~ .menu-item:nth-child(4) {
+			transition-duration: 422ms;
+			transform: translate3d(-13.75vw, 0, 0);
+		}
+		.menu-open:checked ~ .menu-item:nth-child(5) {
+			transition-duration: 633ms;
+			transform: translate3d(-20.625vw, 0, 0);
+		}
+		.menu-open:checked ~ .menu-item:nth-child(6) {
+			transition-duration: 844ms;
+			transform: translate3d(-27.5vw, 0, 0);
+		}
+		.menu-open:checked ~ .menu-item:nth-child(7) {
+			transition-duration: 1055ms;
+			transform: translate3d(-34.375vw, 0, 0);
+		}
+		.menu-open:checked ~ .menu-item:nth-child(8) {
+			transition-duration: 1276ms;
+			transform: translate3d(-41.25vw, 0, 0);
+		}
+		.menu-open:checked ~ .menu-item:nth-child(9) {
+			transition-duration: 1497ms;
+			transform: translate3d(-48.125vw, 0, 0);
+		}
+		.checked {
+			background-color:#00bcd4;
+		}
+		.purple {
+			background-color:#70049b;
+		}
+	</style>
+	<script src="https://kit.fontawesome.com/10d1dd4434.js" crossorigin="anonymous"></script>
+	<script src="https://code.jquery.com/jquery-4.0.0.slim.min.js"></script>
+</head>
+<body>
+	<div id="blinder" class="special"></div>
+	<nav class="menu">
+		<input type="checkbox" href="#" class="menu-open" name="menu-open" id="menu-open" onchange="flipSpecial()"/>
+		<label class="menu-open-button" for="menu-open">
+			<span class="icon icon-1"></span>
+			<span class="icon icon-2"></span>
+		</label>
+		<button id="day1" class="menu-item" onclick="buttonClicked(1)"> <span class="lato">1</span> </button>
+		<button id="day2" class="menu-item" onclick="buttonClicked(2)"> <span class="lato">2</span> </button>
+		<button id="day3" class="menu-item" onclick="buttonClicked(3)"> <span class="lato">3</span> </button>
+		<button id="day4" class="menu-item" onclick="buttonClicked(4)"> <span class="lato">4</span> </button>
+		<button id="day5" class="menu-item" onclick="buttonClicked(5)"> <span class="lato">5</span> </button>
+		<button id="day6" class="menu-item" onclick="buttonClicked(6)"> <span class="lato">6</span> </button>
+		<button id="day7" class="menu-item" onclick="buttonClicked(7)"> <span class="lato">7</span> </button>
+	</nav>
+	<!-- filters -->
+	<svg class="filter" xmlns="http://www.w3.org/2000/svg" version="1.1">
+		<defs>
+			<filter id="shadowed-goo">
+				<feGaussianBlur in="SourceGraphic" result="blur" stdDeviation="10" />
+				<feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
+				<feGaussianBlur in="goo" stdDeviation="3" result="shadow" />
+				<feColorMatrix in="shadow" mode="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 -0.2" result="shadow" />
+				<feOffset in="shadow" dx="1" dy="1" result="shadow" />
+				<feComposite in2="shadow" in="goo" result="goo" />
+				<feComposite in2="goo" in="SourceGraphic" result="mix" />
+			</filter>
+			<filter id="goo">
+				<feGaussianBlur in="SourceGraphic" result="blur" stdDeviation="10" />
+				<feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
+				<feComposite in2="goo" in="SourceGraphic" result="mix" />
+			</filter>
+		</defs>
+	</svg>
+	<div class="container">
+		<span id="hour1" class="number">LO</span>
+		<span id="hour2" class="number">A</span>
+		<span id="c1" class="colon">:</span>
+		<span id="min1" class="number">D</span>
+		<span id="min2" class="number"></span>
+		<br id="lf">
+		<span id="c2" class="colon">:</span>
+		<span id="sec1" class="number">IN</span>
+		<span id="sec2" class="number">G</span>
+	</div>
+	<script>
+		//initial
+		function _timeLapse(num) {
+			_offset+=(num-1)*51;
+		}
+		function _rewind(num) {
+			_offset-=(num+1)*51;
+		}
+		function buttonClicked(num) {
+			if (diff<1) return;
+			target=new Date(today);
+			target.setHours(num*24,0,0,0);
+			localStorage.setItem("midnight.target",target);
+		}
+		var target=localStorage.getItem("midnight.target");
+		if (target===null) {
+			target=new Date();
+			target.setHours(24,0,0,0);
+		}
+		target=new Date(target);
+		if (target<new Date()) {
+			target=new Date();
+			target.setHours(24,0,0,0);
+		}
+		localStorage.setItem("midnight.target",target);
+	
+		function mixColor(c1,c2,ratio) {
+			if (ratio<0) ratio=0;
+			else if (ratio>1) ratio=1;
+			var R,G,B;
+			R=Math.floor((c1[0]*(1-ratio))+(c2[0]*ratio));
+			G=Math.floor((c1[1]*(1-ratio))+(c2[1]*ratio));
+			B=Math.floor((c1[2]*(1-ratio))+(c2[2]*ratio));
+			var result = [R,G,B];
+			return result;
+		}
+		function arrayToRGB(array) {
+			return "rgb("+array[0]+","+array[1]+","+array[2]+")";
+		}
+		function twoDigit(num) {
+			if (num<10) {
+				return "0"+num;
+			} else {
+				return num;
+			}
+		}
+		var _special = false
+		function flipSpecial() {
+			_special = !_special
+			if (_special) {
+				$("#blinder").addClass("opaque");
+			} else {
+				$("#blinder").removeClass("opaque")
+			}
+		}
+	
+		var _offset=0;
+		var code;
+		var today;
+		var diff;
+		var timeLeft;
+		function loop() {
+			var now=new Date();
+			now.setMilliseconds(_offset);
+			today=new Date(now);
+			today.setHours(0,0,0,0);
+			diff=(target-today)/86400000;
+			$(".menu-item").removeClass("checked");
+			$("#day"+diff).addClass("checked");
+			if (diff==1) {
+				$(".menu-open-button").addClass("checked");
+			} else {
+				$(".menu-open-button").removeClass("checked");
+			}
+			timeLeft=Math.ceil((target-now)/1000);
+			var hour=Math.floor(timeLeft/3600);
+			var min=Math.floor(timeLeft/60)%60;
+			var sec=timeLeft%60;
+			hour=twoDigit(hour);
+			min=twoDigit(min);
+			sec=twoDigit(sec);
+			if (hour!=0) {
+				$("title").text("Timer - "+hour+":"+min+":"+sec);
+			} else if (min!=0) {
+				$("title").text("Timer - "+min+":"+sec);
+			} else {
+				$("title").text("Timer - "+sec)
+			}
+			var ratio=timeLeft/604800;
+			var color1=mixColor([255,34,34],[143,81,144],ratio);
+			var color2=mixColor([32,128,255],[143,81,144],ratio);
+			$("body").css("background","linear-gradient(225deg,"+arrayToRGB(color1)+","+arrayToRGB(color2)+")");
+			$("#hour1").text(Math.floor(timeLeft/36000));
+			$("#hour2").text(Math.floor(timeLeft%36000/3600));
+			$("#min1").text(Math.floor(timeLeft%3600/600));
+			$("#min2").text(Math.floor(timeLeft%600/60));
+			$("#sec1").text(Math.floor(timeLeft%60/10));
+			$("#sec2").text(timeLeft%10);
+			if (timeLeft<360000) {
+				$("#lf").css("display","none");
+				if (timeLeft<36000) {
+					$("#hour1").addClass("disable");
+					if (timeLeft<3600) {
+						$("#hour1,#hour2,#c1").css("display","none");
+						$("#min1,#min2,#c2,#sec1,#sec2").css("font-size","30vw");
+						if (timeLeft<600) {
+							$("#min1").addClass("disable");
+							if (timeLeft<60) {
+								$("#blinder").addClass("opaque");
+								$("#min1,#min2,#c2").css("display","none");
+								$("#sec1,#sec2").css("font-size","50vw");
+								if (timeLeft<10) {
+									$("#sec1").css("display","none");
+								} else {
+									$("#sec1").css("display","inline-block");
+								}
+							} else {
+								$("#min1,#min2,#c2").css("display","inline-block");
+								$("#sec1,#sec2").css("font-size","30vw");
+							}
+						} else {
+							$("#min1").removeClass("disable");
+						}
+					} else {
+						$("#hour1,#hour2,#c1").css("display","inline-block");
+						$("#min1,#min2,#c1,#sec1,#sec2").css("font-size","20vw");
+					}
+				} else {
+					$("#hour1").removeClass("disable");
+				}
+			} else {
+				$("#lf").css("display","block");
+				$("#hour1").removeClass("disable");
+			}
+			if (timeLeft>60) {
+				if (!_special) {
+					$("#blinder").removeClass("opaque");
+				}
+			}else if (timeLeft<0) {
+				$(".menu-open-button").removeClass("checked");
+				$(".menu-item").removeClass("checked");
+				$("#day1").addClass("purple");
+				$(".menu-open-button").addClass("purple");
+				$("#sec2").text("0");
+				$("title").text("Timer - REFRESH TO RESTART")
+				clearInterval(code);
+			}
+		}
+		code=setInterval(loop,51);
+	</script>
+</body>
+</html>

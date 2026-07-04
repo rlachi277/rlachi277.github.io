@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>kimcyc e area</title>
+	<meta charset="UTF-8">
+	<meta name="description" content="kimcl web / 별 거 있음">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" type="image/png" href="img/favicon.ico">
+	<link rel="preload" type="text/css" as="style" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-gov-dynamic-subset.min.css">
+	<link rel="stylesheet" type="text/css" href="global/tiles.css">
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<link rel="stylesheet" type="text/css" href="global/font/pretendardgovnohanja.css" media="screen and (min-width: 480px)">
+	<script src="global/jquery_slim.js"></script>
+	<script src="script.js" defer></script>
+	<script src="global/kimclmenu.js" type="module"></script>
+</head>
+<body>
+	<kimcl-menu></kimcl-menu>
+	<div id="wrapper">
+		<div class="bg"></div>
+		<header>
+			<button class="tile logo" title="이끾끼 에리어" onclick="logo_click(event);" style="--dglow1:oklab(0.7 -0.2 0.2);--dglow2:oklab(0.7 0.2 0.2);--dglow3:oklab(0.7 -0.2 -0.2);--dglow4:oklab(0.7 0.2 -0.2);">
+				<div class="tile-img-wrapper">
+					<img id="logo-img" class="tile-img pixel" alt="이끾끼 에리어 로고" src="img/cycarealogo.png" fetchpriority="high">
+				</div>
+			</button>
+			<h2 class="title" id="title1">안녕하세요 여러분.</h2>
+			<h2 class="title" id="title2">공간 사이의 공간에 오신 것을 환영합니다.</h2>
+			<h1 class="title" id="title3">이끾끼 에리어</h1>
+		</header>
+		<div class="areatext"></div>
+		<div class="tiles about">
+			<a id="about1" class="tile about-tile" href="/kimclweb/">
+				<div class="tile-img-wrapper">
+					<div class="tile-img" style="background: #277AEA;"></div>
+				</div>
+				<div class="tile-flex">
+					<span class="item-eyebrow about-normal">ECYC E AREA</span>
+					<h2 class="item-headline about-normal">공간 사이의 공간</h2>
+					<p class="item-description about-normal">이끾끼 에리어는 곳곳에 숨겨져 있습니다.<br>이곳은 이끾끼 에리어의 중심입니다.</p>
+					<span class="item-eyebrow about-archive">ECYC E ARCHIVE</span>
+					<h2 class="item-headline about-archive">기록의 공간</h2>
+					<p class="item-description about-archive">이끾끼 에리어는 언젠가는 사라질 것입니다.<br>이곳은 이끾끼 에리어를 기록하는 곳입니다.<br>사라진 이끾끼 에리어도 볼 수 있습니다.</p>
+					<span class="item-cta">← 돌아가기</span>
+				</div>
+			</a>
+			<a id="about2" class="tile about-tile" href="javascript:togglePower();">
+				<div class="tile-img-wrapper">
+					<div class="tile-img" style="background: #277AEA;"></div>
+				</div>
+				<div class="tile-flex">
+					<span class="item-eyebrow about-normal">POWER OF ECYC E</span>
+					<h2 class="item-headline about-normal">이끾끼의 힘</h2>
+					<p class="item-description power-normal about-normal">이끾끼 에리어에는 이끾끼의 힘이 차 있습니다.<br>이는 일부에게는 문제를 일으킬 수 있습니다.<br>배경에 원근감이 없다면 즉시 이곳을 눌러야 합니다.</p>
+					<span class="item-cta power-normal about-normal">힘 제한하기 →</span>
+					<p class="item-description power-restricted about-normal">이끾끼의 힘은 제한하지 않는 것을 권장합니다.<br>이곳을 눌러 제한을 풀 수 있습니다.<br>배경의 원근감이 사라진다면 즉시 다시 눌러야 합니다.</p>
+					<span class="item-cta power-restricted about-normal">힘 제한 풀기 →</span>
+					<span class="item-eyebrow about-archive">BEYOND</span>
+					<h2 class="item-headline about-archive">나아가기</h2>
+					<p class="item-description about-archive">기록은 이끾끼의 힘을 사용해 이루어집니다.<br>따라서 기록들은 이끾끼의 힘의 원천과 가까이 있습니다.<br>이곳을 눌러 이끾끼의 힘의 원천에 갈 수 있습니다.</p>
+					<span class="item-cta about-archive">나아가기 →</span>
+				</div>
+			</a>
+		</div>
+		<main class="tiles">
+			<a class="tile archivetile" href="https://docs.google.com/document/d/1LRkUSsMmdVSv3C44eqoVH8vy-Akz9FTCfsSYkYMwuFQ/edit?tab=t.e41fn347z50s" data-archive="things/archive/firstarea/" target="_blank">
+				<div class="tile-img-wrapper">
+					<div class="tile-img" style="background: #F9FBFD;"></div>
+				</div>
+				<img class="tile-icon" src="img/gdocs.svg" alt="">
+				<div class="tile-flex" style="color: var(--c-dtext);">
+					<span class="item-eyebrow gdocs">GOOGLE DOCS</span>
+					<h2 class="item-headline gdocs">영어 수행평가 계획</h2>
+					<span class="item-cta gdocs">이끾끼 디멘션은 최초의 이끾끼 에리어입니다.</span>
+				</div>
+			</a>
+			<a class="tile archivetile" href="https://www.notion.so/246420eb286580dca036d2d001ca00f9" data-archive="things/archive/ilgiarea/" target="_blank">
+				<div class="tile-img-wrapper">
+					<div class="tile-img" style="background: #191919;"></div>
+				</div>
+				<div class="tile-icon emoji-icon">📔</div>
+				<div class="tile-flex">
+					<span class="item-eyebrow notion">NOTION</span>
+					<h2 class="item-headline notion"><span class="notion-icon" style="background-image: url('img/rhdehd.webp');"></span> 공동일기구역</h2>
+					<span class="item-cta"></span>
+				</div>
+			</a>
+			<a class="tile archivetile" href="https://www.notion.so/2481ff5c232f80739ae3ffadd2717a29" data-archive="things/archive/gaeinarea/" target="_blank">
+				<div class="tile-img-wrapper">
+					<div class="tile-img" style="background: #191919;"></div>
+				</div>
+				<img class="tile-icon" src="img/Notion-logo.svg" alt="">
+				<div class="tile-flex">
+					<span class="item-eyebrow notion">NOTION</span>
+					<h2 class="item-headline notion"><span class="notion-icon" style="background-image: url('img/sciencekimchi.png');"></span> 개인 노션</h2>
+					<span class="item-cta"></span>
+				</div>
+			</a>
+			<a class="tile archivetile" href="https://www.notion.so/2538f00ad6ba80588d83e43e30c6d9e5" data-archive="things/archive/recordarea/" target="_blank">
+				<div class="tile-img-wrapper">
+					<div class="tile-img" style="background: #191919;"></div>
+				</div>
+				<img class="tile-icon" src="img/cycrecord_text.svg" alt="">
+				<div class="tile-flex">
+					<span class="item-eyebrow notion">NOTION</span>
+					<h2 class="item-headline notion"><span class="notion-icon" style="background-image: url('img/cycrecord_text.svg');"></span> 끾기록 디지털화</h2>
+					<span class="item-cta"></span>
+				</div>
+			</a>
+			<a class="tile archivetile big-tile" href="https://qpi.kro.kr/archive/ecyce.html" data-archive="things/archive/qpiarea/" target="_blank">
+				<div class="tile-img-wrapper">
+					<div class="tile-img" style="background: radial-gradient(circle at 50% 52%, rgb(from var(--c-bg) r g b / 20%) 0% 20%, transparent 70%), linear-gradient(150deg, #10004C 0%, #5F6584 100%);"></div>
+				</div>
+				<img class="tile-icon" src="img/logo_dark.ico" alt="">
+				<div class="tile-flex">
+					<span class="item-eyebrow">QPI</span>
+					<h2 class="item-headline">쿼터파이</h2>
+					<span class="item-cta">더 알아보기 →</span>
+				</div>
+			</a>
+			<a class="tile" href="things/offline/" target="_blank">
+				<div class="tile-img-wrapper">
+					<div class="tile-img" style="background: #BBBBBB;"></div>
+				</div>
+				<div class="tile-icon emoji-icon">⛓️‍💥</div>
+				<div class="tile-flex" style="color: var(--c-dtext);">
+					<span class="item-eyebrow">OFFLINE</span>
+					<h2 class="item-headline">URL 없음</h2>
+					<span class="item-cta"></span>
+				</div>
+			</a>
+			<a class="tile" href="things/irl/" target="_blank">
+				<div class="tile-img-wrapper">
+					<div class="tile-img" style="background-color: #748330; background-image: url('img/some_grass_to_touch.jpeg'); background-size: cover;"></div>
+				</div>
+				<div class="tile-icon emoji-icon">🌏</div>
+				<div class="tile-flex" style="color: #edffaa;">
+					<span class="item-eyebrow" style="opacity: 1;">IRL</span>
+					<h2 class="item-headline">현실</h2>
+					<span class="item-cta"></span>
+				</div>
+			</a>
+
+			<a class="tile filler-tile">
+				<div class="tile-img-wrapper">
+					<div class="tile-img pixel" style="background-color: var(--c-bg); background-image: url('img/rhdehd.webp'); background-size: cover;"></div>
+				</div>
+			</a>
+			<a class="tile filler-big">
+				<div class="tile-img-wrapper">
+					<div class="tile-img pixel" style="background-color: var(--c-bg); background-image: url('img/cycarealogo.png'); background-size: cover;"></div>
+				</div>
+			</a>
+			<a class="tile filler-wide">
+				<div class="tile-img-wrapper">
+					<div class="tile-img" style="background-color: var(--c-bg); background-image: url('img/archive.png'); background-size: cover;"></div>
+				</div>
+			</a>
+			<a class="tile filler-tall">
+				<div class="tile-img-wrapper">
+					<div class="tile-img" style="background-color: var(--c-bg); background-image: url('img/some_grass_to_touch.jpeg'); background-size: cover;"></div>
+				</div>
+			</a>
+			<a class="tile filler-tile">
+				<div class="tile-img-wrapper">
+					<div class="tile-img" style="background-color: var(--c-bg); background-image: url('img/cycrecord_text.svg'); background-size: cover;"></div>
+				</div>
+			</a>
+			<a class="tile filler-tile">
+				<div class="tile-img-wrapper">
+					<div class="tile-img tilted pixel" style="background-color: var(--c-bg); background-image: url('img/sciencekimchi.png'); background-size: cover;"></div>
+				</div>
+			</a>
+		</main>
+	</div>
+</body>
+</html>

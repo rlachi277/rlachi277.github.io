@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>kimcl web</title>
+	<meta charset="UTF-8">
+	<meta name="description" content="kimcl web / 별 거 없음">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" type="image/png" href="/assets/kimclweb/favicon.ico">
+	<link rel="preload" type="text/css" as="style" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-gov-dynamic-subset.min.css">
+	<style>
+		@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-gov-dynamic-subset.min.css");
+
+		:root {
+			color-scheme: light dark;
+
+			--c-lbg: oklch(98.5% 0 0);
+			--c-dbg: oklch(25% 0 0);
+			--c-ltext: oklch(98.5% 0 0);
+			--c-dtext: oklch(20% 0 0);
+			--c-black: black;
+			--c-grayl4: oklch(91% 0 0);
+			--c-grayd4: oklch(35% 0 0);
+
+			--c-bg: light-dark(var(--c-lbg),var(--c-dbg));
+			--c-text: light-dark(var(--c-dtext),var(--c-ltext));
+			--c-gray1: light-dark(var(--c-grayl4),var(--c-grayd4));
+
+			--font: "Pretendard GOV Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+		}
+
+		@media print {
+			:root {
+				print-color-adjust: exact !important;
+				--c-lbg: white;
+				--c-ltext: white;
+			}
+		}
+
+		* { scrollbar-width: none; scroll-behavior: smooth; }
+
+		html { height: 100%; background-color: var(--c-bg); }
+
+		body {
+			margin: 0;
+			font-family: var(--font);
+			color: var(--c-text);
+		}
+
+		@media print {
+			body { overflow: visible !important; height: auto !important; }
+		}
+
+		header {
+			padding: 35px;
+			display: grid;
+			grid-template-columns: 140px 1fr;
+			grid-template-rows: 140px;
+			gap: 35px;
+			align-items: center;
+			justify-content: left;
+		}
+
+		.title {
+			grid-row: 1;
+			grid-column: 2;
+			font-size: 6rem;
+			line-height: 80%;
+			margin: 0;
+			word-break: keep-all;
+		}
+
+		.tile.logo {
+			padding: 0;
+			border: 0;
+			background: none;
+			grid-column: 1;
+			grid-row: 1;
+			width: 100%;
+			height: 100%;
+			touch-action: manipulation;
+		}
+
+		@media screen and (max-width: 480px) {
+			header {
+				padding-top: 60px;
+				grid-auto-flow: row;
+				grid-template-columns: auto;
+				grid-template-rows: 175px auto;
+				justify-content: center;
+			}
+
+			.tile.logo {
+				width: 175px;
+				height: 175px;
+				margin-left: auto;
+				margin-right: auto;
+			}
+
+			.title {
+				grid-row: 2;
+				grid-column: 1;
+				text-align: center;
+			}
+		}
+
+		#logo-img {
+			-webkit-user-select: none;
+			-webkit-user-drag: none;
+			user-select: none;
+		}
+
+		.tiles {
+			padding: 35px;
+			display: grid;
+			grid-auto-flow: row dense;
+			grid-template-columns: repeat(auto-fit, 157.5px);
+			grid-auto-rows: 157.5px;
+			gap: 35px;
+			justify-content: center;
+			align-items: center;
+			justify-items: center;
+		}
+
+		@media screen and (min-width: 1310px) {
+			.tiles {
+				grid-template-columns: repeat(auto-fit, 177.5px);
+				grid-auto-rows: 177.5px;
+			}
+		}
+
+		.tile {
+			--dglow: rgb(from var(--c-ltext) r g b / 50%);
+			--dglow1: var(--dglow);
+			--dglow2: var(--dglow);
+			--dglow3: var(--dglow);
+			--dglow4: var(--dglow);
+			--glow1: light-dark(oklch(from var(--dglow1) calc(1.235 - l) c h / calc(0.9 * alpha)),var(--dglow1)); /* 1.235 = 98.5% + 25% */
+			--glow2: light-dark(oklch(from var(--dglow2) calc(1.235 - l) c h / calc(0.9 * alpha)),var(--dglow2));
+			--glow3: light-dark(oklch(from var(--dglow3) calc(1.235 - l) c h / calc(0.9 * alpha)),var(--dglow3));
+			--glow4: light-dark(oklch(from var(--dglow4) calc(1.235 - l) c h / calc(0.9 * alpha)),var(--dglow4));
+			
+			transition: transform 0.2s;
+			display: block;
+			position: relative;
+			z-index: 1;
+			grid-column: span 2;
+			grid-row: span 2;
+			width: 100%;
+			height: 100%;
+			border-radius: 21px;
+			box-shadow: -7px 7px 7px rgb(from var(--c-black) r g b / 30%),
+				-14px 14px 14px rgb(from var(--c-black) r g b / 10%);
+			break-inside: avoid-page;
+		}
+		.tile:hover, .tile:focus-visible { transform: scale(1.02); }
+
+		@media screen and (max-width: 480px) {
+			.tiles {
+				grid-template-columns: 1fr;
+				grid-auto-rows: unset;
+				padding: 25px;
+				gap: 25px;
+			}
+
+			.tile {
+				height: unset;
+				aspect-ratio: 1;
+			}
+		}
+
+		.tile::before {
+			content: '';
+			position: absolute;
+			pointer-events: none;
+			inset: 0px;
+			border-radius: 21px;
+			opacity: 0;
+			background: conic-gradient(from -45deg, var(--glow1), var(--glow2), var(--glow4), var(--glow3), var(--glow1));
+			filter: blur(2.8px);
+			transition: inset 0.2s, border-radius 0.2s, opacity 0.2s;
+		}
+
+		.tile:hover::before {
+			inset: -5.6px;
+			border-radius: 26.6px;
+			opacity: 1;
+		}
+
+		.tile::after {
+			content: '';
+			position: absolute;
+			pointer-events: none;
+			inset: 0;
+			border-radius: inherit;
+			box-shadow: inset -7px 7px 7px rgb(from var(--c-lbg) r g b / 30%);
+		}
+
+		@media screen and (max-width: 480px) {
+			.tile.tile.tile { grid-row: span 1; grid-column: span 1; }
+		}
+
+		.tile-img-wrapper {
+			position: absolute;
+			inset: 0;
+			border-radius: inherit;
+			overflow: clip;
+			pointer-events: none;
+		}
+
+		.tile-img {
+			position: relative;
+			display: inline-block;
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+		.tile-img.pixel { image-rendering: pixelated; }
+		.tile-img.tilted { transform: scale(1.6) rotate3d(-1,1,1,45deg); }
+
+		.tile-img.dark { display: none; }
+		@media (prefers-color-scheme: dark) {
+			.tile-img.dark { display: inline-block; }
+			.tile-img.light { display: none; }
+		}
+
+		@keyframes hue-rotate {
+			from { filter: hue-rotate(0deg); }
+			to { filter: hue-rotate(360deg); }
+		}
+
+		#hidden-site { background-color: var(--c-gray1); }
+		.hidden { display: none; }
+		.transparent { opacity: 0%; }
+	</style>
+</head>
+<body>
+	<header>
+		<button class="tile logo" title="kimcl web" onclick="logo_click(event);">
+			<div class="tile-img-wrapper">
+				<img id="logo-img" class="tile-img tilted pixel" alt="kimcl web 로고" src="/assets/kimclweb/test_img.png" fetchpriority="high">
+			</div>
+		</button>
+		<h1 id="title" class="title">kimcl web</h1>
+	</header>
+	<div id="hidden-site" class="tiles hidden" hidden>
+		<a class="tile" title="신호등 시간 기록(traffic-sign-recorder)" href="archive/traffic-sign-recorder/">
+			<div class="tile-img-wrapper">
+				<img class="tile-img tilted" src="/assets/kimclweb/thumbnail/traffic-sign-recorder.png" alt="" loading="lazy">
+			</div>
+		</a>
+		<a class="tile" title="시간 관리자(time-manager)" href="archive/time-manager/">
+			<div class="tile-img-wrapper">
+				<img class="tile-img" src="/assets/kimclweb/thumbnail/time-manager.png" alt="안알려줌" loading="lazy" style="background-color: #FF6666;">
+			</div>
+		</a>
+		<a class="tile" title="벽돌 타이머(brick-timer)" href="archive/brick-timer/">
+			<div class="tile-img-wrapper">
+				<img class="tile-img" src="/assets/kimclweb/thumbnail/brick-timer.png" alt="" loading="lazy">
+			</div>
+		</a>
+		<a class="tile" title="원 타이머 초기 버전(eight-timer)" href="archive/lstimer/v1.html">
+			<div class="tile-img-wrapper">
+				<img class="tile-img" src="/assets/kimclweb/thumbnail/eight-timer.png" alt="" loading="lazy">
+			</div>
+		</a>
+		<a class="tile" title="원 타이머 둘째 버전(lstimer-v2)" href="archive/lstimer/v2.html">
+			<div class="tile-img-wrapper">
+				<img class="tile-img" src="/assets/kimclweb/thumbnail/lstimer-v2.png" alt="" loading="lazy">
+			</div>
+		</a>
+		<a class="tile" title="자정 카운트다운(midnight-countdown)" href="archive/midnight-countdown/" style="--dglow:rgb(143,81,144);">
+			<div class="tile-img-wrapper">
+				<img class="tile-img" src="/assets/kimclweb/thumbnail/midnight.png" alt="" loading="lazy">
+			</div>
+		</a>
+		<a class="tile" title="마크/스크래치용 색깔 변환기(mc-color-converter)" href="archive/mc-color-converter/" style="--dglow:#94c8a3;">
+			<div class="tile-img-wrapper">
+				<img class="tile-img" src="/assets/kimclweb/thumbnail/mc-color-converter.png" alt="" loading="lazy">
+			</div>
+		</a>
+		<a class="tile" title="성적 표시 사이트(goodjobness)" href="archive/goodjobness/" style="--dglow1:#4C4;--dglow2:#EC4;--dglow3:#F45;--dglow4:#8C4;">
+			<div class="tile-img-wrapper">
+				<img class="tile-img tilted" src="/assets/kimclweb/thumbnail/goodjobness.png" alt="" loading="lazy">
+			</div>
+		</a>
+		<a class="tile" title="원 타이머(lstimer-v3)" href="archive/lstimer/v3.html" style="--dglow1:hsl(160,100%,60%);--dglow2:hsl(215,100%,60%);--dglow3:hsl(320,100%,60%);--dglow4:hsl(285,100%,60%);">
+			<div class="tile-img-wrapper">
+				<img class="tile-img" src="/assets/kimclweb/thumbnail/lstimer-v3.png" alt="" loading="lazy">
+			</div>
+		</a>
+	</div>
+	<main class="tiles">
+		<a class="tile" title="끼족 문자 생성기(notfont)" href="notfont/" style="--dglow:white;">
+			<div class="tile-img-wrapper">
+				<img class="tile-img" src="/assets/kimclweb/thumbnail/notfont.png" alt="" fetchpriority="high">
+			</div>
+		</a>
+		<a class="tile" title="갤러리(gallery)" href="gallery/" style="--dglow1:oklab(0.7 -0.2 0.2);--dglow2:oklab(0.7 0.2 0.2);--dglow3:oklab(0.7 -0.2 -0.2);--dglow4:oklab(0.7 0.2 -0.2);">
+			<div class="tile-img-wrapper">
+				<img class="tile-img" src="/assets/kimclweb/thumbnail/gallery.png" alt="" fetchpriority="high">
+			</div>
+		</a>
+		<a class="tile" title="도비 타이머(dobby-timer)" href="dobby-timer/" style="--dglow:#F1E4D2;">
+			<div class="tile-img-wrapper">
+				<img class="tile-img" src="/assets/kimclweb/thumbnail/dobby-timer.png" alt="" fetchpriority="high">
+			</div>
+		</a>
+		<a class="tile" title="타이머(yet-another-timer)" href="yet-another-timer/" style="--dglow:green;">
+			<div class="tile-img-wrapper">
+				<img class="tile-img" src="/assets/kimclweb/thumbnail/yet-another-timer.png" alt="" fetchpriority="high">
+			</div>
+		</a>
+	</main>
+	<script>
+		var clicks = 0;
+		function logo_click(e) {
+			document.getElementById("logo-img").style.setProperty("animation", "none");
+			document.getElementById("logo-img").offsetHeight;
+			document.getElementById("logo-img").style.setProperty("animation", "1s hue-rotate");
+			clicks++;
+			window.setTimeout(() => { if (clicks<6) clicks=0; }, 1000);
+			if (clicks<6) return;
+			document.getElementById("logo-img").classList.remove("tilted");
+			document.getElementById("title").innerHTML = `<a href="archive/">archive</a>`;
+			document.getElementById("hidden-site").classList.remove("hidden");
+			document.getElementById("hidden-site").removeAttribute("hidden");
+		}
+	</script>
+</body>
+</html>

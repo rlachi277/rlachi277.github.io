@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<!--using namespace std;-->
+
+<html lang="ko">
+<head>
+	<title>Goodjobness!</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" href="/assets/kimclweb/goodjobness/fav.ico">
+	<style>
+		div {
+			overflow: visible;
+		}
+
+		:root {
+			--color-bg: #222;
+			--color-box-bg: #2D2D2D;
+			--color-dark: #111;
+			--color-medium: #999;
+			--color-bright: #DDD;
+			--color-all: linear-gradient(135deg, rgba(165,255,85,1) 0%, rgba(85,255,255,1) 50%, rgba(220,52,255,1) 100%);
+			--color-first: linear-gradient(135deg, rgba(165,255,85,1) 0%, rgba(85,255,255,1) 100%);
+			--color-second: linear-gradient(135deg, rgba(85,255,255,1) 0%, rgba(220,52,255,1) 100%);
+			--color-all-solid: rgba(85,255,255,1);
+			--color-first-solid: rgba(165,255,85,1);
+			--color-second-solid: rgba(220,52,255,1);
+			--color-red: #D20;
+			--color-green: #4C4;
+			--color-yellow: #EC4;
+			--color-purple: #94C;
+			--color-blue: #44F;
+			--color-bright-red: #F45;
+			--color-lime: #8C4;
+			--color-gray: #CCC;
+			
+			--color-bronze: #AD5600;
+			--color-silver: #435F7A;
+			--color-gold: #EC9A00;
+			--color-platinum: #27E2A4;
+			--color-diamond: #00B4FC;
+			--color-ruby: #FF0062;
+			--color-bronze-dark: #AD560088;
+			--color-silver-dark: #435F7A88;
+			--color-gold-dark: #EC9A0088;
+			--color-platinum-dark: #27E2A488;
+			--color-diamond-dark: #00B4FC88;
+			--color-ruby-dark: #FF006288;
+			--color-ghudegy: #9C62D3;
+			--color-ghudegy-dark: #9C62D388;
+			
+			--base-length: min(56.25vw, 100vh);
+			--glow-strength: calc(var(--base-length) * 0.02);
+			
+			--img-bronze: url("/assets/kimclweb/goodjobness/bronze.svg");
+			--img-silver: url("/assets/kimclweb/goodjobness/silver.svg");
+			--img-gold: url("/assets/kimclweb/goodjobness/gold.svg");
+			--img-platinum: url("/assets/kimclweb/goodjobness/platinum.svg");
+			--img-diamond: url("/assets/kimclweb/goodjobness/diamond.svg");
+			--img-ruby: url("/assets/kimclweb/goodjobness/ruby.svg");
+			--img-ghudegy: url("/assets/kimclweb/goodjobness/ghudegy.svg");
+		}
+
+		body {
+			background-color: var(--color-bg);
+		}
+
+		#keep_distance {
+			width: 100%;
+			height: calc(var(--base-length) * 0.03)
+		}
+
+		#subject_selector {
+			height: calc(var(--base-length) * 0.08);
+			padding: calc(var(--base-length) * 0.005);
+			display: flex;
+			justify-content: center;
+		}
+
+		.s_button {
+			padding: calc(var(--base-length) * 0.025);
+			padding-left: calc(var(--base-length) * 0.04);
+			padding-right: calc(var(--base-length) * 0.04);
+			margin-left: calc(var(--base-length) * 0.005);
+			margin-right: calc(var(--base-length) * 0.005);
+			border-radius: var(--base-length);
+			
+			border: none;
+			font-size: calc(var(--base-length) * 0.03);
+			font-weight: 900;
+			cursor: pointer;
+			
+			--color-button-bg: var(--color-button-main);
+			background-color: var(--color-bg);
+			color: var(--color-button-main);
+			transition: 0.3s;
+		}
+
+		.s_button:hover {
+			color: var(--color-bg);
+			background: var(--color-button-bg);
+			opacity: 50%;
+		}
+
+		.s_button_active, .s_button_active:hover {
+			color: var(--color-bg);
+			background: var(--color-button-bg);
+			opacity: 100%;
+		}
+
+
+		#infos {
+			padding: calc(var(--base-length) * 0.03);
+		}
+
+		.info_line {
+			width: 100%;
+			display: flex;
+			justify-content: center;
+			margin: calc(var(--base-length) * 0.03) 0 calc(var(--base-length) * 0.03) 0;
+		}
+
+		.info_box {
+			display: inline-block;
+			position: relative;
+			border-radius: calc(var(--base-length) * 0.06);
+			background: var(--color-box-bg);
+			margin: 0 calc(var(--base-length) * 0.015) 0 calc(var(--base-length) * 0.015);
+			--info-box-width: calc(var(--base-length) * 0.37);
+			width: var(--info-box-width);
+			transition: 0.3s;
+			
+			box-shadow: var(--color-dark) 10px 10px 10px;
+		}
+
+		.info_exam_box {
+			height: calc(var(--info-box-width) * 1.4);
+		}
+
+		.info_eval_box {
+			height: calc(var(--info-box-width) * 1.2);
+		}
+
+		.info_big_box {
+			--info-box-width: calc(var(--base-length) * 0.77);
+		}
+
+		.info_sum_box {
+			--info-box-width: calc(var(--base-length) * 0.77);
+			height: calc(var(--info-box-width) / 0.77 * 0.44);
+		}
+
+		.info_big_sum_box {
+			--info-box-width: calc(var(--base-length) * 1.57);
+		}
+
+		.info_title {
+			display: inline-block;
+			position: absolute;
+			top: calc(var(--info-box-width) * 0.16);
+			left: calc(var(--info-box-width) * 0.5);
+			translate: -50% -50%;
+			
+			width: var(--info-box-width);
+			text-align: center;
+			font-weight: 900;
+		}
+
+		.info_title:before {
+			color: var(--color-title);
+			text-shadow: var(--color-title) 0 0 var(--glow-strength);
+			font-size: calc(var(--info-box-width) * 0.09);
+			content: var(--data-title);
+			margin-right: calc(var(--info-box-width) * 0.035);
+		}
+
+		.info_title:after {
+			color: var(--color-medium);
+			font-size: calc(var(--info-box-width) * 0.06);
+			content: var(--data-ratio);
+		}
+
+		.info_sum_title {
+			display: inline-block;
+			position: absolute;
+			top: calc(var(--info-box-width) * 0.07);
+			left: calc(var(--info-box-width) * 0.28);
+			translate: -50% -50%;
+			
+			width: var(--info-box-width);
+			text-align: center;
+			font-weight: 900;
+		}
+
+		.info_sum_title:before {
+			color: var(--color-subj);
+			text-shadow: var(--color-subj) 0 0 var(--glow-strength);
+			font-size: calc(var(--info-box-width) * 0.05);
+			content: var(--data-title);
+			margin-right: calc(var(--info-box-width) * 0.035);
+		}
+
+		.info_exam_score, .info_eval_score {
+			position: absolute;
+			top: calc(var(--info-box-width) * 0.52);
+			left: calc(var(--info-box-width) * 0.5);
+			translate: -50% -50%;
+			
+			font-size: calc(var(--info-box-width) * 0.45);
+			font-weight: 900;
+			color: var(--color-score);
+			text-shadow: var(--color-score) 0 0 var(--glow-strength);
+		}
+
+		.info_exam_score:after, .info_eval_score:after {
+			content: var(--data-score);
+		}
+
+		.info_exam_glow, .info_eval_glow {
+			position: absolute;
+			left: calc(var(--info-box-width) * 0.2);
+			filter: drop-shadow(0 0 var(--glow-strength) var(--color-glow));
+		}
+
+		.info_exam_img, .info_eval_img {
+			width: calc(var(--info-box-width) * 0.15);
+		}
+
+		.info_exam_data, .info_eval_data {
+			position: absolute;
+			left: calc(var(--info-box-width) * 0.45);
+			
+			font-size: calc(var(--info-box-width) * 0.15);
+			font-weight: 900;
+			color: var(--color-data);
+			text-shadow: var(--color-data) 0 0 var(--glow-strength);
+		}
+
+		.info_exam_rel_glow {
+			top: calc(var(--info-box-width) * 0.8);
+			--color-glow: var(--color-rel);
+		}
+
+		.info_exam_rel_img {
+			content: var(--img-rel);
+		}
+
+		.info_exam_rel_data {
+			top: calc(var(--info-box-width) * 0.8);
+			--color-data: var(--color-rel);
+		}
+
+		.info_exam_rel_data:after {
+			content: var(--data-rel);
+		}
+
+		.info_exam_abs_glow {
+			top: calc(var(--info-box-width) * 1.08);
+			--color-glow: var(--color-abs);
+		}
+
+		.info_exam_abs_img {
+			content: var(--img-abs);
+		}
+
+		.info_exam_abs_data {
+			top: calc(var(--info-box-width) * 1.066);
+			--color-data: var(--color-abs);
+		}
+
+		.info_exam_abs_data:before {
+			content: var(--data-abs);
+		}
+
+		.info_exam_abs_data:after {
+			font-size: calc(var(--info-box-width) * 0.09);
+			padding-left: calc(var(--info-box-width) * 0.03);
+			content: 'A' var(--data-abs-diff);
+		}
+
+		.info_exam_abs_line {
+			position: absolute;
+			left: calc(var(--info-box-width) * 0.45);
+			top: calc(var(--info-box-width) * 1.234);
+			width: calc(var(--info-box-width) * 0.35);
+			height: calc(var(--info-box-width) * 0.015);
+			background: linear-gradient(90deg, var(--color-abs) 0%, var(--color-abs) var(--data-line), var(--color-abs-dark) var(--data-line), var(--color-abs-dark) 100%);
+			box-shadow: var(--color-abs) 0 0 var(--glow-strength);
+			
+			--data-line-left: var(--data-abs-left);
+			--data-line-right: var(--data-abs-right);
+		}
+
+		.info_exam_abs_line:before, .info_eval_line:before {
+			position: absolute;
+			top: 100%;
+			width: 100%;
+			
+			font-weight: 600;
+			text-align: left;
+			font-size: calc(var(--info-box-width) * 0.045);
+			color: var(--color-abs);
+			text-shadow: var(--color-abs) 0 0 var(--glow-strength);
+			
+			content: var(--data-line-left);
+		}
+
+		.info_exam_abs_line:after, .info_eval_line:after {
+			position: absolute;
+			top: 100%;
+			width: 100%;
+			
+			font-weight: 600;
+			text-align: right;
+			font-size: calc(var(--info-box-width) * 0.045);
+			color: var(--color-abs-dark);
+			text-shadow: var(--color-abs) 0 0 var(--glow-strength);
+			
+			content: var(--data-line-right);
+		}
+
+		.info_ghost_box {
+			display: inline-block;
+			position: relative;
+			border-radius: calc(var(--base-length) * 0.06);
+			margin: 0 calc(var(--base-length) * 0.015) 0 calc(var(--base-length) * 0.015);
+			--info-box-width: calc(var(--base-length) * 0.37);
+			width: var(--info-box-width);
+			height: var(--info-box-width) * 1.2;
+		}
+
+		.info_eval_glow {
+			top: calc(var(--info-box-width) * 0.8);
+			--color-glow: var(--color-score);
+		}
+
+		.info_eval_img, .info_sum_img {
+			content: var(--img-score);
+		}
+
+		.info_eval_data {
+			top: calc(var(--info-box-width) * 0.8);
+			--color-data: var(--color-score);
+		}
+
+		.info_eval_data:before {
+			content: var(--data-grade);
+		}
+
+		.info_eval_data:after {
+			font-size: calc(var(--info-box-width) * 0.09);
+			padding-left: calc(var(--info-box-width) * 0.03);
+			content: 'A' var(--data-grade-diff);
+		}
+
+		.info_eval_line {
+			position: absolute;
+			left: calc(var(--info-box-width) * 0.2);
+			top: calc(var(--info-box-width) * 1.024);
+			width: calc(var(--info-box-width) * 0.6);
+			height: calc(var(--info-box-width) * 0.015);
+			background: linear-gradient(90deg, var(--color-score) 0%, var(--color-score) var(--data-line), var(--color-score-dark) var(--data-line), var(--color-score-dark) 100%);
+			box-shadow: var(--color-score) 0 0 var(--glow-strength);
+			
+			--data-line-left: var(--data-grade-left);
+			--data-line-right: var(--data-grade-right);
+			--color-abs: var(--color-score);
+			--color-abs-dark: var(--color-score-dark);
+		}
+
+		.info_sum_abs_score {
+			position: absolute;
+			top: calc(var(--info-box-width) * (0.2 + (1 / 0.77 * 0.444 - 0.5) / 2));
+			left: calc(var(--info-box-width) * 0.25);
+			translate: -50% -50%;
+			
+			font-size: calc(var(--info-box-width) * 0.3);
+			font-weight: 900;
+			color: var(--color-subj);
+			text-shadow: var(--color-subj) 0 0 var(--glow-strength);
+		}
+
+		.info_sum_abs_score:before {
+			content: var(--data-abs-grade);
+			margin-right: calc(var(--info-box-width) * 0.02);
+		}
+
+		.info_sum_abs_score:after {
+			color: var(--color-abs);
+			font-size: calc(var(--info-box-width) * 0.1);
+			content: 'A' var(--data-abs-diff);
+			text-shadow: var(--color-abs) 0 0 var(--glow-strength);
+		}
+
+		.info_sum_glow {
+			position: absolute;
+			left: calc(var(--info-box-width) * 0.07);
+			top: calc(var(--info-box-width) * (0.35 + (1 / 0.77 * 0.444 - 0.5) / 2));
+			filter: drop-shadow(0 0 var(--glow-strength) var(--color-rel));
+		}
+
+		.info_sum_img {
+			width: calc(var(--info-box-width) * 0.08)
+		}
+
+		.info_sum_rel_grade {
+			position: absolute;
+			left: calc(var(--info-box-width) * 0.19);
+			top: calc(var(--info-box-width) * (0.333 + (1 / 0.77 * 0.444 - 0.5) / 2));
+			
+			font-size: calc(var(--info-box-width) * 0.12);
+			font-weight: 900;
+			color: var(--color-rel);
+			text-shadow: var(--color-rel) 0 0 var(--glow-strength);
+		}
+
+		.info_sum_rel_grade:after {
+			content: var(--data-rel-grade);
+		}
+
+		.info_sum_sep {
+			display: inline-block;
+			position: absolute;
+			left: calc(var(--info-box-width) * 0.5);
+			top: calc(var(--info-box-width) * (0.25 + (1 / 0.77 * 0.444 - 0.5) / 2));
+			translate: -50% -50%;
+			width: calc(var(--info-box-width) * 0.008);
+			height: calc(var(--info-box-width) * 0.48);
+			
+			background-color: var(--color-subj);
+			box-shadow: var(--color-subj) 0px 0px var(--glow-strength);
+		}
+
+		.info_sum_more {
+			position: absolute;
+			left: calc(var(--info-box-width) * 0.54);
+			top: calc(var(--info-box-width) * (0.04 + (1 / 0.77 * 0.444 - 0.5) / 2));
+			width: calc(var(--info-box-width) * 0.42);
+			height: calc(var(--info-box-width) * 0.42);
+			
+			overflow: scroll;
+			padding-right: calc(var(--info-box-width) * 0.1);
+			box-sizing: content-box;
+		}
+
+		.info_sum_row {
+			position: relative;
+			width: 100%;
+			height: calc(var(--info-box-width) * 0.07);
+		}
+
+		.info_sum_row_name {
+			position: absolute;
+			top: 50%;
+			translate: 0% -50%;
+			
+			font-size: calc(var(--info-box-width) * 0.036);
+			font-weight: 900;
+		}
+
+		.info_sum_row_name:before {
+			content: var(--data-title);
+			color: var(--color-subj);
+			text-shadow: var(--color-subj) 0 0 var(--glow-strength);
+			margin-right: calc(var(--info-box-width) * 0.008);
+		}
+
+		.info_sum_row_name:after {
+			content: var(--data-ratio);
+			color: var(--color-medium);
+		}
+
+		.info_sum_row_data {
+			position: absolute;
+			right: 0;
+			top: 50%;
+			translate: 0% -50%;
+			
+			font-size: calc(var(--info-box-width) * 0.036);
+			font-weight: 900;
+			color: var(--color-grade);
+			text-shadow: var(--color-grade) 0 0 var(--glow-strength);
+		}
+
+		.info_sum_row_data:before {
+			content: var(--data-abs-diff)
+		}
+	</style>
+	<script src="https://code.jquery.com/jquery-4.0.0.slim.min.js"></script>
+	<script src="/assets/kimclweb/goodjobness/hidden/data.js"></script>
+</head>
+<body>
+	<div id="keep_distance"></div>
+	<nav id="subject_selector">
+		<button class="s_button s_button_active" id="s_all" style="--color-button-main: var(--color-all-solid);"
+		onclick="change_page('all')" type="button">전체</button>
+		<button class="s_button" id="s_first"  style="--color-button-main: var(--color-first-solid);"
+		onclick="change_page('first')" type="button">중간</button>
+		<button class="s_button" id="s_second" style="--color-button-main: var(--color-second-solid);"
+		onclick="change_page('second')" type="button">기말</button>
+		<button class="s_button" id="s_kor" style="--color-button-main: var(--color-red);"
+		onclick="change_page('kor')" type="button">국어</button>
+		<button class="s_button" id="s_mat" style="--color-button-main: var(--color-green);"
+		onclick="change_page('mat')" type="button">수학</button>
+		<button class="s_button" id="s_soc" style="--color-button-main: var(--color-yellow);"
+		onclick="change_page('soc')" type="button">사회</button>
+		<button class="s_button" id="s_eng" style="--color-button-main: var(--color-purple);"
+		onclick="change_page('eng')" type="button">영어</button>
+		<button class="s_button" id="s_phy" style="--color-button-main: var(--color-blue);"
+		onclick="change_page('phy')" type="button">물리</button>
+		<button class="s_button" id="s_che" style="--color-button-main: var(--color-bright-red);"
+		onclick="change_page('che')" type="button">화학</button>
+		<button class="s_button" id="s_sci" style="--color-button-main: var(--color-lime);"
+		onclick="change_page('sci')" type="button">통과</button>
+		<button class="s_button" id="s_inf" style="--color-button-main: var(--color-gray);"
+		onclick="change_page('inf')" type="button">정보</button>
+	</nav>
+	<main id="infos"></main>
+	<script>
+		let subj_to_color = {"all":"all-solid", "first": "first-solid", "second":"second-solid", "kor":"red", "mat":"green", "soc":"yellow", "eng":"purple", "phy":"blue", "che":"bright-red", "sci":"lime", "inf":"gray", "mola":"ghudegy"};
+		let subj_to_idx = {"kor":0, "mat":1, "soc":2, "eng":3, "phy":4, "che":5, "sci":6, "inf":7};
+		let rel_to_color = {"1":"ruby", "2":"ruby", "3":"diamond", "4":"platinum", "5":"gold", "6":"silver", "7":"silver", "8":"bronze", "9":"bronze", "?":"ghudegy"};
+		let abs_to_color = {"A":"diamond", "B":"platinum", "C":"gold", "D":"silver", "E":"bronze", "?":"ghudegy"};
+		let abs_to_color_dark = {"A":"diamond", "B":"platinum-dark", "C":"gold-dark", "D":"silver-dark", "E":"bronze-dark", "?":"ghudegy-dark"};
+
+		let page = "all";
+		let locked = true;
+
+		window.setTimeout(load_new_data, 10);
+
+		function change_page(to) {
+			if (locked || page==to) {
+				return;
+			}
+			locked = true;
+			$(".s_button_active").removeClass("s_button_active");
+			$(`#s_${to}`).addClass("s_button_active");
+			page = to;
+			
+			$(".info_box").css("opacity", "0%");
+			window.setTimeout(load_new_data, 300);
+		}
+
+		function load_new_data() {
+			$(".info_box").remove();
+			$(".info_line").remove();
+			
+			try {
+				if (page == "all") {
+					for (let i=0; i<4; i++) {
+						let cur_line = new_info_line();
+						cur_line.append(new_info_box(all_data[i*2].sum));
+						cur_line.append(new_info_box(all_data[i*2+1].sum));
+						$("#infos").append(cur_line);
+					}
+				} else if (page == "first") {
+					let cur_line = new_info_line();
+					for (let i=0; i<4; i++) {
+						cur_line.append(new_info_box(all_data[i].first));
+					}
+					$("#infos").append(cur_line);
+					cur_line = new_info_line();
+					for (let i=4; i<8; i++) {
+						cur_line.append(new_info_box(all_data[i].first));
+					}
+					$("#infos").append(cur_line)
+				} else if (page == "second") {
+					let cur_line = new_info_line();
+					for (let i=0; i<4; i++) {
+						cur_line.append(new_info_box(all_data[i].second));
+					}
+					$("#infos").append(cur_line);
+					cur_line = new_info_line();
+					for (let i=4; i<8; i++) {
+						cur_line.append(new_info_box(all_data[i].second));
+					}
+					$("#infos").append(cur_line)
+				} else {
+					let data = all_data[subj_to_idx[page]];
+					let cur_line = new_info_line();
+					cur_line.append(new_info_box(data.sum));
+					cur_line.append(new_info_box(data.eval[0]));
+					cur_line.append(new_info_box(data.eval[1]));
+					$("#infos").append(cur_line);
+					cur_line = new_info_line();
+					cur_line.append(new_info_box(data.first));
+					cur_line.append(new_info_box(data.second));
+					cur_line.append(new_info_box(data.eval[2]));
+					cur_line.append(new_info_box(data.eval[3]));
+					$("#infos").append(cur_line);
+					// 수행평가가 5개 이상이면 님이 코드 추가하면 됨
+				}
+			} finally {
+				window.setTimeout(make_data_appear, 50);
+			}
+		}
+
+		function make_data_appear() {
+			$(".info_box").css("opacity", "100%");
+			window.setTimeout(unlock, 300);
+		}
+
+		function unlock() {
+			locked = false;
+		}
+
+		function new_info_line() {
+			return $(`<div class="info_line">`);
+		}
+
+		function new_info_box(data) {
+			if (data === undefined) return $(`<div class="info_ghost_box"></div>`); // 써보고 싶었음
+			if (data.type == "sum") {
+				return new_sum_box(data.args);
+			} else if (data.type == "exam") {
+				return new_exam_box(data.args);
+			} else if (data.type == "eval") {
+				return new_eval_box(data.args);
+			}
+			return $(`<div class="info_ghost_box"></div>`);
+		}
+
+		function new_exam_box(data) {
+			data = $.extend({title:"????", ratio:"??", subj:"mola", score:"48", rel_grade:"?", abs_grade:"?", abs_diff:"??", abs_left:"0", abs_right:"100"}, data);
+			
+			result = $(`<div class="info_box info_exam_box" style="
+			opacity: 0%;
+				
+			--color-title: var(--color-${subj_to_color[data.subj]});
+			--color-score: var(--color-title);
+			--color-rel: var(--color-${rel_to_color[data.rel_grade]});
+			--color-abs: var(--color-${abs_to_color[data.abs_grade]});
+			--color-abs-dark: var(--color-${abs_to_color_dark[data.abs_grade]});
+				
+			--data-title: '${data.title}';
+			--data-ratio: '${data.ratio}';
+			--data-score: '${data.score}';
+			--data-rel: '${data.rel_grade}등급';
+			--data-abs: '${data.abs_grade}';
+			--data-abs-diff: '${data.abs_diff}';
+			--data-abs-left: '${data.abs_left}';
+			--data-abs-right: '${data.abs_right}';
+			--data-line: ${data.abs_right ? (data.score-data.abs_left)*100/(data.abs_right-data.abs_left) : 100}%;
+				
+			--img-rel: var(--img-${rel_to_color[data.rel_grade]});
+			--img-abs: var(--img-${abs_to_color[data.abs_grade]});">
+				<span class="info_title"></span>
+				<span class="info_exam_score"></span>
+				<span class="info_exam_glow info_exam_rel_glow">
+					<img class="info_exam_img info_exam_rel_img"/>
+				</span>
+				<span class="info_exam_data info_exam_rel_data"></span>
+				<span class="info_exam_glow info_exam_abs_glow">
+					<img class="info_exam_img info_exam_abs_img"/>
+				</span>
+				<span class="info_exam_data info_exam_abs_data"></span>
+				<span class="info_exam_abs_line"></span>
+			</div>`);
+				
+			if (data.big) {
+				result.addClass("info_big_box");
+			}
+			
+			return result;
+		}
+
+		function new_eval_box(data) {
+			data = $.extend({title:"????", ratio:"??", subj:"mola", score:"48", grade:"?", grade_diff:"??", grade_left:"0", grade_right:"100"}, data);
+			
+			result = $(`<div class="info_box info_eval_box" style="
+			opacity: 0%;
+					
+			--color-title: var(--color-${abs_to_color[data.grade]});
+			--color-score: var(--color-title);
+			--color-score-dark: var(--color-${abs_to_color_dark[data.grade]});
+			
+			--data-title: '${data.title}';
+			--data-ratio: '${data.ratio}';
+			--data-score: '${data.score}';
+			--data-grade: '${data.grade}';
+			--data-grade-diff: '${data.grade_diff}';
+			--data-grade-left: '${data.grade_left}';
+			--data-grade-right: '${data.grade_right}';
+			--data-line: ${data.grade_right ? (data.score-data.grade_left)*100/(data.grade_right-data.grade_left) : 100}%;
+			
+			--img-score: var(--img-${abs_to_color[data.grade]});">
+				<span class="info_title"></span>
+				<span class="info_eval_score"></span>
+				<span class="info_eval_glow">
+					<img class="info_eval_img"/>
+				</span>
+				<span class="info_eval_data"></span>
+				<span class="info_eval_line"></span>
+			</div>`);
+				
+			if (data.big) {
+				result.addClass("info_big_box");
+			}
+			
+			return result;
+		}
+
+		function new_sum_box(data) {
+			data = $.extend({subj:"mola",title:"????", abs_grade:"?",rel_grade:"?",abs_diff:"??", more:[]}, data);
+			result = $(`<div class="info_box info_sum_box" style="
+			opacity: 0%;
+			--color-subj: var(--color-${subj_to_color[data.subj]});
+			--color-abs: var(--color-${abs_to_color[data.abs_grade]});
+			--color-rel: var(--color-${rel_to_color[data.rel_grade]});
+						
+			--data-title: '${data.title}';
+			--data-abs-grade: '${data.abs_grade}';
+			--data-abs-diff: '${data.abs_diff}';
+			--data-rel-grade: '${data.rel_grade}등급';
+						
+			--img-score: var(--img-${rel_to_color[data.rel_grade]});">
+				<span class="info_sum_title"></span>
+				<span class="info_sum_abs_score"></span>
+				<span class="info_sum_glow">
+					<img class="info_sum_img"/>
+				</span>
+				<span class="info_sum_rel_grade"></span>
+				<span class="info_sum_sep"></span>
+				<div class="info_sum_more"></div>
+			</div>`);
+				
+			if (data.big) {
+				result.addClass("info_big_sum_box");
+			}
+			
+			for (e in data.more) {
+				result.children(".info_sum_more").append($(`<div class="info_sum_row" style="
+				--color-grade: var(--color-${abs_to_color[data.more[e].grade]});
+								
+				--data-title: '${data.more[e].title}';
+				--data-ratio: '${data.more[e].ratio}';
+				--data-abs-diff: '${data.more[e].diff}';
+				">
+					<span class="info_sum_row_name"></span>
+					<span class="info_sum_row_data"></span>
+				</div>`));
+			}
+			
+			return result;
+		}
+	</script>
+</body>
+</html>

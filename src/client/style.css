@@ -59,3 +59,5 @@ a.broken:active { color: var(--c-linkea); }
 a.self { color: var(--c-links); }
 a.self:hover, a.self:focus-visible { color: var(--c-linksh); }
 a.self:active { color: var(--c-linksa); }
+
+.nav-base { opacity: 0.7; }

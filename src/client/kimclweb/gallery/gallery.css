@@ -40,6 +40,11 @@
 	--c-link: light-dark(oklch(53% 0.16 260),oklch(71.5% 0.1 260));
 	--c-linkh: light-dark(oklch(47% 0.14 260),oklch(80% 0.085 260));
 	--c-linka: light-dark(oklch(34% 0.08 260),oklch(87.5% 0.06 260));
+
+
+	--c-linke: light-dark(#bf3c2c,#fd7865);
+	--c-linkeh: light-dark(#9f3526,#fea898);
+	--c-linkea: light-dark(#612419,#ffc8bd);
 }
 
 @media print {
@@ -98,6 +103,10 @@ div, p, h1, h2, h3, h4, h5, h6, figure, form { text-align: center; }
 a { color: var(--c-link); text-decoration: none; }
 a:hover, a:focus-visible { color: var(--c-linkh); text-decoration: underline; }
 a:active { color: var(--c-linka); text-decoration: underline; }
+
+a.broken { color: var(--c-linke); }
+a.broken:hover, a.broken:focus-visible { color: var(--c-linkeh); }
+a.broken:active { color: var(--c-linkea); }
 
 figcaption {
 	margin-block-end: 0.25em;

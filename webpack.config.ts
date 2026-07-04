@@ -23,19 +23,19 @@ const entries = {
   "cycelog/log1_style": "cycelog/entries/log1_style",
   "cycelog/log3_style": "cycelog/entries/log3_style",
 
-  "notfont/entry": "kimclweb/notfont/entries/entry",
-  "gallery/entry": "kimclweb/gallery/entries/entry",
-  "dobbytimer/entry": "kimclweb/dobbytimer/entries/entry",
+  "kimclweb/notfont/entry": "kimclweb/notfont/entries/entry",
+  "kimclweb/gallery/entry": "kimclweb/gallery/entries/entry",
+  "kimclweb/dobby-timer/entry": "kimclweb/dobby-timer/entries/entry",
 } satisfies Record<string, string>;
 
-type HtmlTemplate = {
-  template: string,
+type HtmlTemplate = true | {
+  template?: string,
   templateParameters?: Record<string,string>,
-  chunks: (keyof typeof entries)[]
+  chunks?: (keyof typeof entries)[]
 };
 
 const html: Record<string, HtmlTemplate> = {
-  "index": {template: "index.html", chunks: ["index"]},
+  "index": {chunks: ["index"]},
 
   "posts/index": {template: "posts/index.ejs", chunks: ["posts/post", "posts/style"]},
   "posts/post": {
@@ -63,7 +63,8 @@ const html: Record<string, HtmlTemplate> = {
     chunks: ["cycelog/log3", "posts/style"]
   },
 
-  "kimclweb/notfont/index": {template: "kimclweb/notfont/index.html", chunks: ["notfont/entry"]},
+  "kimclweb/index": true,
+  "kimclweb/notfont/index": {chunks: ["kimclweb/notfont/entry"]},
   ...[
     "kimclweb/gallery/index",
     "kimclweb/gallery/dobby_topic",
@@ -74,7 +75,7 @@ const html: Record<string, HtmlTemplate> = {
     "kimclweb/gallery/oklch-gradient/index",
     "kimclweb/gallery/oklch-gradient/icon"
   ].reduce((acc: Record<string, HtmlTemplate>, name) => {
-    acc[name] = {template: `${name}.html`, chunks: ["gallery/entry"]};
+    acc[name] = {chunks: ["kimclweb/gallery/entry"]};
     return acc;
   }, {}),
   ...[
@@ -84,10 +85,30 @@ const html: Record<string, HtmlTemplate> = {
     "kimclweb/gallery/oklch-gradient/b copy",
     "kimclweb/gallery/oklch-gradient/c"
   ].reduce((acc: Record<string, HtmlTemplate>, name) => {
-    acc[name] = {template: `${name}.html`, chunks: []};
+    acc[name] = true;
     return acc;
   }, {}),
-  "kimclweb/dobbytimer/index": {template: "kimclweb/dobbytimer/index.html", chunks: ["dobbytimer/entry"]},
+  "kimclweb/dobby-timer/index": {chunks: ["kimclweb/dobby-timer/entry"]},
+  "kimclweb/yet-another-timer/index": true,
+
+  "kimclweb/archive/index": {chunks: ["kimclweb/gallery/entry"]},
+  ...[
+    "kimclweb/archive/brick-timer/index",
+    "kimclweb/archive/brick-timer/timer",
+    "kimclweb/archive/goodjobness/index",
+    "kimclweb/archive/lstimer/v1",
+    "kimclweb/archive/lstimer/v2",
+    "kimclweb/archive/lstimer/v3",
+    "kimclweb/archive/mc-color-converter/index",
+    "kimclweb/archive/midnight-countdown/index",
+    "kimclweb/archive/time-manager/index",
+    "kimclweb/archive/time-manager/statics",
+    "kimclweb/archive/time-manager/time",
+    "kimclweb/archive/traffic-sign-recorder/index",
+  ].reduce((acc: Record<string, HtmlTemplate>, name) => {
+    acc[name] = true;
+    return acc;
+  }, {}),
 };
 
 const config: webpack.Configuration = {
@@ -123,17 +144,23 @@ const config: webpack.Configuration = {
       filename: "[name].css"
     }),
     ...Object.entries(html).reduce((acc: HTMLWebpackPlugin[], [k, v]) => {
-      const template = path.resolve(__dirname, "src/client", v.template);
+      if (v === true) v = {};
+      const v2 = {
+        template: v.template ?? `${k}.html`,
+        templateParameters: v.templateParameters,
+        chunks: v.chunks ?? []
+      };
+      const template = path.resolve(__dirname, "src/client", v2.template);
       acc.push(new HTMLWebpackPlugin({
-        templateContent: v.template.endsWith(".ejs") ?
-          () => ejs.render(fs.readFileSync(template, "utf8"), v.templateParameters ?? {}) :
+        templateContent: v2.template.endsWith(".ejs") ?
+          () => ejs.render(fs.readFileSync(template, "utf8"), v2.templateParameters ?? {}) :
           false,
-        template: v.template.endsWith(".ejs") ? '' : template,
+        template: v2.template.endsWith(".ejs") ? '' : template,
         templateParameters: v.templateParameters ?? false,
         filename: `../template/${k}.ejs`,
         publicPath: "/public/",
         scriptLoading: "module",
-        chunks: v.chunks
+        chunks: v2.chunks
       }));
       return acc;
     }, [])

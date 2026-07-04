@@ -4,9 +4,7 @@ import root from './root.js';
 
 import posts from './posts/router.js';
 import cycelog from './cycelog/router.js';
-import notfont from './kimclweb/notfont.js';
-import gallery from './kimclweb/gallery.js';
-import dobbytimer from './kimclweb/dobbytimer.js';
+import kimclweb from './kimclweb/router.js';
 
 import vibing from '../vibing/script/router.js';
 
@@ -28,9 +26,7 @@ app.use(express.json());
 
 app.use('/posts', posts);
 app.use('/cycelog', cycelog);
-app.use('/notfont', notfont);
-app.use('/gallery', gallery);
-app.use('/dobbytimer', dobbytimer);
+app.use('/kimclweb', kimclweb);
 
 app.use('/vibing', vibing);
 

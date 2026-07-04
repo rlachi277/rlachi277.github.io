@@ -1,0 +1,708 @@
+<html><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<link rel="icon" type="image/png" href="../../../img/favicon2.ico">
+	<title>이끾끼 에리어</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+	print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+	print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.collection-content td {
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(115, 114, 110, 1);
+	fill: rgba(115, 114, 110, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(205, 60, 58, 1);
+	fill: rgba(205, 60, 58, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(115, 114, 110, 1);
+	fill: rgba(115, 114, 110, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(205, 60, 58, 1);
+	fill: rgba(205, 60, 58, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-default { background-color: rgba(42, 28, 0, 0.07); }
+.select-value-color-gray { background-color: rgba(28, 19, 1, 0.11); }
+.select-value-color-brown { background-color: rgba(142, 58, 1, 0.141); }
+.select-value-color-orange { background-color: rgba(213, 96, 0, 0.188); }
+.select-value-color-yellow { background-color: rgba(209, 155, 0, 0.238); }
+.select-value-color-green { background-color: rgba(1, 104, 42, 0.145); }
+.select-value-color-blue { background-color: rgba(45, 149, 218, 0.236); }
+.select-value-color-purple { background-color: rgba(104, 1, 184, 0.125); }
+.select-value-color-pink { background-color: rgba(204, 1, 88, 0.137); }
+.select-value-color-red { background-color: rgba(228, 26, 0, 0.148); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="2481ff5c-232f-8073-9ae3-ffadd2717a29" class="page sans"><header><img class="page-cover-image" src="d.png" style="object-position:center 50%"/><h1 class="page-title">이끾끼 에리어</h1><p class="page-description"></p></header><div class="page-body"><p id="2481ff5c-232f-80b5-ba1e-c30494813a51" class="">안녕하세요 여러분</p><p id="2481ff5c-232f-80c6-92f1-ebd5bbdfc7bf" class="">공간 사이의 공간에 오신 것을 환영합니다</p><p id="2481ff5c-232f-80ab-8386-d49f11ecb508" class="">
+</p><div id="2481ff5c-232f-8076-a600-c595c74523cf" class="collection-content"><h4 class="collection-title"></h4><table class="collection-content"><thead><tr><th><span class="icon property-icon"><div data-testid="/icons/font_gray.svg" style="width:14px;height:14px;flex-shrink:0;transform:scale(1.2);mask:url(/icons/font_gray.svg?mode=light) no-repeat center;-webkit-mask:url(/icons/font_gray.svg?mode=light) no-repeat center;background-color:rgba(71, 70, 68, 0.6);fill:rgba(71, 70, 68, 0.6)"></div></span>이름</th><th><span class="icon property-icon"><div data-testid="/icons/formula_gray.svg" style="width:14px;height:14px;flex-shrink:0;transform:scale(1.2);mask:url(/icons/formula_gray.svg?mode=light) no-repeat center;-webkit-mask:url(/icons/formula_gray.svg?mode=light) no-repeat center;background-color:rgba(71, 70, 68, 0.6);fill:rgba(71, 70, 68, 0.6)"></div></span>수식</th><th><span class="icon property-icon"><div data-testid="/icons/arrow-northeast_gray.svg" style="width:14px;height:14px;flex-shrink:0;transform:scale(1.2);mask:url(/icons/arrow-northeast_gray.svg?mode=light) no-repeat center;-webkit-mask:url(/icons/arrow-northeast_gray.svg?mode=light) no-repeat center;background-color:rgba(71, 70, 68, 0.6);fill:rgba(71, 70, 68, 0.6)"></div></span>이1 2</th><th><span class="icon property-icon"><div data-testid="/icons/description_gray.svg" style="width:14px;height:14px;flex-shrink:0;transform:scale(1.2);mask:url(/icons/description_gray.svg?mode=light) no-repeat center;-webkit-mask:url(/icons/description_gray.svg?mode=light) no-repeat center;background-color:rgba(71, 70, 68, 0.6);fill:rgba(71, 70, 68, 0.6)"></div></span>텍스트</th></tr></thead><tbody><tr id="2481ff5c-232f-8019-99fb-cdac64a9710e"><td class="cell-title"><a href="https://www.notion.so/2481ff5c232f801999fbcdac64a9710e?pvs=21">제목 없음</a></td><td class="cell-tc??">:katalk_z:</td><td class="cell-y:wZ"><a href="https://www.notion.so/2481ff5c232f80869169d4c153fc7f1b?pvs=21">이끾끾ㄲ끼</a></td><td class="cell-BtGg"></td></tr><tr id="2481ff5c-232f-8036-9c4e-d44725002108"><td class="cell-title"><a href="https://www.notion.so/2481ff5c232f80369c4ed44725002108?pvs=21">제목 없음</a></td><td class="cell-tc??">:katalk_z:</td><td class="cell-y:wZ"><a href="https://www.notion.so/2481ff5c232f80869169d4c153fc7f1b?pvs=21">이끾끾ㄲ끼</a></td><td class="cell-BtGg"></td></tr><tr id="2481ff5c-232f-8058-a9df-ef3561bed138"><td class="cell-title"><a href="https://www.notion.so/2481ff5c232f8058a9dfef3561bed138?pvs=21">제목 없음</a></td><td class="cell-tc??">:katalk_z:</td><td class="cell-y:wZ"></td><td class="cell-BtGg"></td></tr><tr id="2481ff5c-232f-80cc-a7f1-f0a0af5574d1"><td class="cell-title"><a href="https://www.notion.so/2481ff5c232f80cca7f1f0a0af5574d1?pvs=21">제목 없음</a></td><td class="cell-tc??">:katalk_z:</td><td class="cell-y:wZ"><a href="https://www.notion.so/2481ff5c232f80869169d4c153fc7f1b?pvs=21">이끾끾ㄲ끼</a></td><td class="cell-BtGg"></td></tr><tr id="2481ff5c-232f-80cc-acb6-f909f4203222"><td class="cell-title"><a href="https://www.notion.so/2481ff5c232f80ccacb6f909f4203222?pvs=21">제목 없음</a></td><td class="cell-tc??">:katalk_z:</td><td class="cell-y:wZ"><a href="https://www.notion.so/2481ff5c232f80869169d4c153fc7f1b?pvs=21">이끾끾ㄲ끼</a></td><td class="cell-BtGg"></td></tr><tr id="2481ff5c-232f-8000-94a6-e3c92db66202"><td class="cell-title"><a href="https://www.notion.so/2481ff5c232f800094a6e3c92db66202?pvs=21">제목 없음</a></td><td class="cell-tc??">:katalk_z:</td><td class="cell-y:wZ"><a href="https://www.notion.so/2481ff5c232f80869169d4c153fc7f1b?pvs=21">이끾끾ㄲ끼</a></td><td class="cell-BtGg"></td></tr></tbody></table><br/><br/></div><div id="2481ff5c-232f-80f6-98b5-ceaadb069411" class="collection-content"><h4 class="collection-title"></h4><table class="collection-content"><thead><tr><th><span class="icon property-icon"><div data-testid="/icons/font_gray.svg" style="width:14px;height:14px;flex-shrink:0;transform:scale(1.2);mask:url(/icons/font_gray.svg?mode=light) no-repeat center;-webkit-mask:url(/icons/font_gray.svg?mode=light) no-repeat center;background-color:rgba(71, 70, 68, 0.6);fill:rgba(71, 70, 68, 0.6)"></div></span>이름</th><th><span class="icon property-icon"><div data-testid="/icons/arrow-northeast_gray.svg" style="width:14px;height:14px;flex-shrink:0;transform:scale(1.2);mask:url(/icons/arrow-northeast_gray.svg?mode=light) no-repeat center;-webkit-mask:url(/icons/arrow-northeast_gray.svg?mode=light) no-repeat center;background-color:rgba(71, 70, 68, 0.6);fill:rgba(71, 70, 68, 0.6)"></div></span>이2</th></tr></thead><tbody><tr id="2481ff5c-232f-8086-9169-d4c153fc7f1b"><td class="cell-title"><a href="https://www.notion.so/2481ff5c232f80869169d4c153fc7f1b?pvs=21">이끾끾ㄲ끼</a></td><td class="cell-HVeq"><a href="https://www.notion.so/2481ff5c232f80ccacb6f909f4203222?pvs=21">제목 없음</a>, <a href="https://www.notion.so/2481ff5c232f800094a6e3c92db66202?pvs=21">제목 없음</a>, <a href="https://www.notion.so/2481ff5c232f80cca7f1f0a0af5574d1?pvs=21">제목 없음</a>, <a href="https://www.notion.so/2481ff5c232f80369c4ed44725002108?pvs=21">제목 없음</a>, <a href="https://www.notion.so/2481ff5c232f801999fbcdac64a9710e?pvs=21">제목 없음</a></td></tr></tbody></table><br/><br/></div><p id="24a1ff5c-232f-80b0-8fe8-f3bb25a938b3" class="">
+</p><p id="24a1ff5c-232f-80f4-bc57-e454e89283bd" class="">
+</p><p id="24a1ff5c-232f-804b-be95-e0fc3787cb3f" class="">-이,-가(주어)</p><p id="24a1ff5c-232f-80f8-94a2-c65ba8e02070" class="">-의,-한,-는,-게 등(관형어, 일반적인? 부사어)</p><p id="24a1ff5c-232f-80bf-86f5-c23d29cc2a77" class="">-에(위치/시간)</p><p id="24a1ff5c-232f-8022-9660-f46392301ee6" class="">-에서(출발지)</p><p id="24a1ff5c-232f-80fa-a798-dad8a7f9b091" class="">-에게,-한테,-로(목적지)</p><p id="24a1ff5c-232f-802a-9912-eb236ec91d87" class="">-을,-를(목적어)</p><p id="24a1ff5c-232f-8006-a6a2-f6fcee38e51f" class="">-로써,-로(사용)</p><p id="24a1ff5c-232f-8085-b1d1-dded31397452" class="">-로서(자격)</p><p id="24a1ff5c-232f-8097-ade3-f5df9008ba91" class="">-와,-과,-(이)랑</p><p id="24a1ff5c-232f-8032-9223-ee76188067a2" class="">-은,-는</p><p id="24a1ff5c-232f-804f-a914-cdff67ba3ae1" class="">-도</p><p id="24a1ff5c-232f-8067-b3ef-d90bae1bc787" class="">
+</p><p id="24a1ff5c-232f-80c8-bca4-d8a44c1b278d" class="">나(나 한정)</p><p id="24a1ff5c-232f-80e8-a438-e6a16eb23094" class="">나(나 제외)/자신,본인</p><p id="24a1ff5c-232f-8073-852a-d219c47e6e78" class="">우리(나 한정)</p><p id="24a1ff5c-232f-8006-925b-ddba3534c858" class="">우리(나 제외)</p><p id="24a1ff5c-232f-801f-8647-d7706f8fb8eb" class="">너</p><p id="24a1ff5c-232f-80cc-b012-e94d4b4dfba7" class="">너희</p><p id="24a1ff5c-232f-8013-8214-db81866f28de" class="">그(사람)</p><p id="24a1ff5c-232f-804c-9811-d727a3e28ede" class="">그들</p><p id="24a1ff5c-232f-8098-8b27-fc7730b4272d" class="">‘애들‘(우리 학교의 학생들)</p><p id="24a1ff5c-232f-8058-8913-e14ccc462602" class="">이(대명사/의존명사)</p><p id="24a1ff5c-232f-806c-bc4c-df2ebd60f69f" class="">저(대명사/의존명사)</p><p id="24a1ff5c-232f-8025-8253-d16dad536b2e" class="">그(대명사/의존명사)</p><p id="24a1ff5c-232f-8011-9205-fb051a49b44a" class="">
+</p><p id="24a1ff5c-232f-8040-b343-d1935ebd657e" class="">-들(어미)</p><p id="24a1ff5c-232f-80ed-8046-f7462b00be70" class="">사람/명(의존명사)</p><p id="24a1ff5c-232f-8024-9665-f30be39e64b6" class="">물건/것(의존명사)</p><p id="24a1ff5c-232f-80c2-bf5d-d7b90ba06421" class="">숫자/개,번(의존명사)</p><p id="24a1ff5c-232f-80a3-a89e-faabf705aa0d" class="">시간/때(의존명사)</p><p id="24a1ff5c-232f-80c3-8c23-fce99686e626" class="">공간/곳(의존명사)</p><p id="24a1ff5c-232f-80ed-b258-d231af5297aa" class="">뭐/뭔가(명사)/어떤</p><p id="24a1ff5c-232f-8038-9b3f-ed02ae4c2fc0" class="">
+</p><p id="24a1ff5c-232f-8067-99c4-cb83e1b71ae0" class="">안</p><p id="24a1ff5c-232f-8092-924f-dbc892c85f11" class="">밖</p><p id="24a1ff5c-232f-8053-8c12-ffe0ae806191" class="">앞</p><p id="24a1ff5c-232f-8079-9709-e47802377095" class="">뒤</p><p id="24a1ff5c-232f-80cc-ae66-d7ec62d3b652" class="">시작</p><p id="24a1ff5c-232f-804f-8bbb-c08e01deb88f" class="">끝</p><p id="24a1ff5c-232f-8019-b041-dfabc8624ed1" class="">
+</p><p id="24a1ff5c-232f-80ab-b6e8-ede3a6d9dd50" class="">따라서/-서,-므로(어미,이유)</p><p id="24a1ff5c-232f-80df-a0a0-f0bd7c3c8089" class="">왜냐면</p><p id="24a1ff5c-232f-80cf-a3e4-c5a7d863c7f3" class="">-면(어미,인과)</p><p id="24a1ff5c-232f-8026-a79f-c5f218dab299" class="">모두</p><p id="24a1ff5c-232f-80f0-b8f6-e17bec2fa8fd" class="">정말,매우</p><p id="24a1ff5c-232f-8018-a2b4-d48f79719e6f" class="">가장</p><p id="24a1ff5c-232f-80db-b3de-f65b7a5c2ade" class="">
+</p><p id="24a1ff5c-232f-8033-b8fe-c2194e8f805a" class="">또한/-도(어미)</p><p id="24a1ff5c-232f-8059-bb58-e28f1ab71556" class="">더불어/더</p><p id="24a1ff5c-232f-802a-8910-fb12e783fa5f" class="">그리고/-고(어미)</p><p id="24a1ff5c-232f-80fe-84a1-e92ecaff0008" class="">그런데/-는데(어미)</p><p id="24a1ff5c-232f-8021-96af-d7b1af36f53b" class="">하지만/-지만,-만(어미,역접)</p><p id="24a1ff5c-232f-8099-aad5-c1c8fe82398f" class="">오직/-만(어미,유일)</p><p id="24a1ff5c-232f-8098-a997-f6532aba461d" class="">
+</p><p id="24a1ff5c-232f-8026-9434-d4fe8f07acc4" class="">-이다</p><p id="24a1ff5c-232f-80c0-840d-c4ff2bdcfe03" class="">과거 서술</p><p id="24a1ff5c-232f-8048-8225-eb6b865badc8" class="">미래 서술</p><p id="24a1ff5c-232f-8043-beef-e0c01f8f0996" class="">있다</p><p id="24a1ff5c-232f-80c5-978c-e9ad70ca817d" class="">하다</p><p id="24a1ff5c-232f-800d-a250-ee35d7133f20" class="">되다(변화/피동/성공)</p><p id="24a1ff5c-232f-80c6-a66f-f93cb9d4c3ce" class="">같다</p><p id="24a1ff5c-232f-80a1-867b-fc87dedfb346" class="">비슷하다/~같다(비유)</p><p id="24a1ff5c-232f-8083-a15e-f25a4c2b59be" class="">다르다</p><p id="24b1ff5c-232f-809c-99b2-fb118aac36d3" class="">
+</p><p id="24a1ff5c-232f-8029-9425-e363e55e01c2" class="">옳다(사실/도덕)</p><p id="24a1ff5c-232f-806b-9d7e-decaed8daa03" class="">틀리다(사실/도덕)/안(부정)/않다(용어,부정)</p><p id="24a1ff5c-232f-80d4-a029-e99e7600f602" class="">많다/좋다(주관적 판단)</p><p id="24a1ff5c-232f-80c9-9847-dcc63654c391" class="">많다</p><p id="24a1ff5c-232f-802b-8223-e9017dfa500f" class="">좋다</p><p id="24a1ff5c-232f-80bb-b051-dc73ebfd3151" class="">적다/나쁘다(주관적 판단)</p><p id="24a1ff5c-232f-805b-84a7-cb314ad89f5b" class="">적다</p><p id="24a1ff5c-232f-8066-a5f0-f344b49395e1" class="">나쁘다</p><p id="24b1ff5c-232f-80d1-bc38-dcc5445fd0db" class="">좋아하다(주관)</p><p id="24b1ff5c-232f-805b-add2-f7e2efe2f507" class="">싫어하다(주관)</p><p id="24b1ff5c-232f-8093-b25d-cb5fb5b53674" class="">
+</p><p id="24a1ff5c-232f-8040-bece-e7de1c9c0df7" class="">알다</p><p id="24a1ff5c-232f-8013-9e84-e435cd0d8b56" class="">잊다</p><p id="24a1ff5c-232f-80f9-a8a6-c306da5c20f9" class="">생각하다</p><p id="24a1ff5c-232f-8062-9f96-da0e7e2b0cc4" class="">가지다</p><p id="24a1ff5c-232f-80eb-a60d-e3cc0ae182e3" class="">보다(관찰/경험/추측)</p><p id="24b1ff5c-232f-803a-995f-dd8584a9263e" class="">오다</p><p id="24b1ff5c-232f-8018-88d3-d105e50aabf7" class="">가다</p><p id="24a1ff5c-232f-8032-85ba-f6ad3f69a2bb" class="">
+</p><p id="24a1ff5c-232f-80a1-a1a1-ca91fab6158e" class="">원하다/~하고 싶다</p><p id="24a1ff5c-232f-807f-9485-d69ade781918" class="">~할 수 있다(능력/확신하지 않는 추측)</p><p id="24a1ff5c-232f-802a-a078-f0593b7252df" class="">~한 듯싶다(약간 확신하는 추측)</p><p id="24a1ff5c-232f-8046-b36b-e65881dbf6f8" class="">~했을 것이다(확신하는 추측)</p><p id="24a1ff5c-232f-808c-a4b9-c4cae735b591" class="">~해야 한다(의무)</p><p id="24a1ff5c-232f-80ae-b42c-f17db40c8bea" class="">~해라(부탁)</p><p id="24a1ff5c-232f-802d-8405-da7b0a95570d" class="">~해라(강압)</p><p id="24a1ff5c-232f-80a5-977a-f04438b937d3" class="">~하자(부탁)</p><p id="24a1ff5c-232f-80b2-a101-d93093ac5d1f" class="">~하자(강압)</p><p id="24b1ff5c-232f-80d8-b0bf-c35524ae72e0" class="">
+</p><p id="24b1ff5c-232f-8025-9ec4-dcc072c670f4" class=""><style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css');</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo>=</mo><mstyle displaystyle="true" scriptlevel="0"><mfrac><mrow><mi>U</mi><mtext>의 넓이</mtext></mrow><mrow><mi>A</mi><mtext>의 넓이</mtext></mrow></mfrac></mstyle></mrow><annotation encoding="application/x-tex">P=\dfrac{U의\ 넓이}{A의\ 넓이}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.0463em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">A</span><span class="mord hangul_fallback">의</span><span class="mspace"> </span><span class="mord hangul_fallback">넓이</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">U</span><span class="mord hangul_fallback">의</span><span class="mspace"> </span><span class="mord hangul_fallback">넓이</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span><span>﻿</span></span></p><p id="24b1ff5c-232f-8060-b315-d590670f446e" class="">
+</p><p id="24b1ff5c-232f-806a-81b0-cd8472abddb1" class="">
+</p><p id="24b1ff5c-232f-8065-8d9f-ec7f02bddf7a" class="">12341234</p><p id="2521ff5c-232f-8093-b4be-f8a50fe6197f" class="">Qwerqwetw Gyukgyukgyukgyu</p><p id="2521ff5c-232f-80e9-ae35-f4124f156c5e" class="">Chucks</p><p id="2521ff5c-232f-80b8-9e15-eb05c245d40a" class="">Hyukgyukgyukgyukg</p><p id="2521ff5c-232f-80cb-a2e4-c8b94a6ed057" class="">
+</p><p id="2521ff5c-232f-80c2-9b05-ebfe0970ffa3" class="">Vivivhcphchpchp</p><p id="2521ff5c-232f-80ba-8bd1-d8c02a3f0344" class="">Cgochov</p><p id="2521ff5c-232f-80cc-a1fd-f9d5fd493878" class="">Duffy</p><p id="2531ff5c-232f-80b2-8f32-d70444c2a249" class="">
+</p><p id="2521ff5c-232f-8056-99aa-f5334afc931b" class="">:katalk_z::katalk_z::katalk_z:</p><p id="2531ff5c-232f-80fc-98e2-fc342e7cc893" class="">
+</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>
