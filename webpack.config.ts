@@ -17,11 +17,8 @@ const entries = {
   "index": "index",
 
   "posts/post": "posts/entries/post",
-  "posts/style": "posts/entries/style",
   "cycelog/log1": "cycelog/entries/log1",
   "cycelog/log3": "cycelog/entries/log3",
-  "cycelog/log1_style": "cycelog/entries/log1_style",
-  "cycelog/log3_style": "cycelog/entries/log3_style",
 
   "kimclweb/notfont/entry": "kimclweb/notfont/entries/entry",
   "kimclweb/gallery/entry": "kimclweb/gallery/entries/entry",
@@ -37,30 +34,30 @@ type HtmlTemplate = true | {
 const html: Record<string, HtmlTemplate> = {
   "index": {chunks: ["index"]},
 
-  "posts/index": {template: "posts/index.ejs", chunks: ["posts/post", "posts/style"]},
+  "posts/index": {template: "posts/index.ejs", chunks: ["posts/post"]},
   "posts/post": {
     template: "posts/post.ejs",
     templateParameters: {title: "끾웹 글쓰기", rootclass: ""},
-    chunks: ["posts/post", "posts/style"]
+    chunks: ["posts/post"]
   },
   "posts/404": {
     template: "posts/post.ejs",
     templateParameters: {title: "끾웹 글쓰기(404)", rootclass: "notfound"},
-    chunks: ["posts/post", "posts/style"]
+    chunks: ["posts/post"]
   },
-  "cycelog/log1_index": {template: "cycelog/log1_index.ejs", chunks: ["cycelog/log1", "posts/style"]},
-  "cycelog/log1": {template: "cycelog/log1.ejs", chunks: ["cycelog/log1", "cycelog/log1_style"]},
+  "cycelog/log1_index": {template: "cycelog/log1_index.ejs", chunks: ["cycelog/log1"]},
+  "cycelog/log1": {template: "cycelog/log1.ejs", chunks: ["cycelog/log1"]},
   "cycelog/log1_404": {
     template: "posts/post.ejs",
     templateParameters: {title: "끾기록: 1차 기록(404)", rootclass: "notfound"},
-    chunks: ["cycelog/log1", "posts/style"]
+    chunks: ["cycelog/log1"]
   },
-  "cycelog/log3_index": {template: "cycelog/log3_index.ejs", chunks: ["cycelog/log3", "posts/style"]},
-  "cycelog/log3": {template: "cycelog/log3.ejs", chunks: ["cycelog/log3", "cycelog/log3_style"]},
+  "cycelog/log3_index": {template: "cycelog/log3_index.ejs", chunks: ["cycelog/log3"]},
+  "cycelog/log3": {template: "cycelog/log3.ejs", chunks: ["cycelog/log3"]},
   "cycelog/log3_404": {
     template: "posts/post.ejs",
     templateParameters: {title: "끾기록: 3차 기록(404)", rootclass: "notfound"},
-    chunks: ["cycelog/log3", "posts/style"]
+    chunks: ["cycelog/log3"]
   },
 
   "kimclweb/index": true,

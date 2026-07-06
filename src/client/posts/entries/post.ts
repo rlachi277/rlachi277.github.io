@@ -1,3 +1,6 @@
+import "../../colors.css";
+import "../style.css";
+
 import type { MenubarData } from "../menubar.js";
 
 import { setup } from "../script.js";

@@ -1,3 +1,8 @@
+import "../../colors.css";
+import "../../posts/style.css";
+import "../colors.css";
+import "../log3.css";
+
 import type { MenubarData } from "../../posts/menubar.js";
 
 import { setup } from "../log3_script.js";
