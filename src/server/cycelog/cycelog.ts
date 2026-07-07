@@ -84,7 +84,7 @@ export function getLog1(db: Database, root: string, postId: string, renderHooks:
 	const result = getPostFromData(data, root, postId, renderHooks, nav);
 	if (data === undefined) return result;
 	return [result[0],{
-		header: result[1].content,
+		header: result[1].content + result[1].nav,
 		table: buildLog1Table(getRawLog1(db, postId))
 	}];
 }
