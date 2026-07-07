@@ -61,3 +61,16 @@ a.self:hover, a.self:focus-visible { color: var(--c-linksh); }
 a.self:active { color: var(--c-linksa); }
 
 .nav-base { opacity: 0.7; }
+
+img.icon {
+	height: 1em;
+	vertical-align: middle;
+	image-rendering: pixelated;
+}
+
+img.icon.icon-dark { display: none; }
+
+@media (prefers-color-scheme: dark) {
+	img.icon.icon-light { display: none; }
+	img.icon.icon-dark { display: revert; }
+}
