@@ -84,7 +84,7 @@ export function getLog1(db: Database, root: string, postId: string, renderHooks:
 	const result = getPostFromData(data, root, postId, renderHooks, nav);
 	if (data === undefined) return result;
 	return [result[0],{
-		header: result[1].content + result[1].nav,
+		header: result[1].nav + result[1].content,
 		table: buildLog1Table(getRawLog1(db, postId))
 	}];
 }
@@ -170,8 +170,8 @@ function getMoveTarget(db: Database, postId: string, startId: number, endId: num
 		WHERE id BETWEEN ? AND ?`).get(startId, endId)?.['COUNT(1)'];
 	if (dbResult.length !== allCount) throw badRequest("적용 범위에 다른 글의 1차 기록이 포함됩니다.");
 	
-	const newRangeStart = (delta > 0) ? endId+1 : startId+delta;
-	const newRangeEnd = (delta > 0) ? endId+delta : startId-1;
+	const newRangeStart = (delta > 0) ? Math.max(endId+1, startId+delta) : startId+delta;
+	const newRangeEnd = (delta > 0) ? endId+delta : Math.min(startId-1, endId+delta);
 	const newRangeCount = db.prepare<[number,number],CountRow>(`SELECT COUNT(1) FROM entries
 		WHERE id BETWEEN ? AND ?`).get(newRangeStart,newRangeEnd)?.['COUNT(1)'];
 	if (newRangeCount !== 0) throw badRequest("이 동작으로 인해 번호 충돌이 발생할 가능성이 있습니다.");

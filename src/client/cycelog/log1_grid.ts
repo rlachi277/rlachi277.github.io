@@ -71,9 +71,13 @@ export function focusOn(row: number, col: number, focus: boolean, block: boolean
 }
 
 function onTableKeydown(this: HTMLElement, e: KeyboardEvent) {
-	if (this.getAttribute("contenteditable") === "plaintext-only") return;
+	if (e.isComposing) return;
+	if (!(e.target instanceof HTMLElement)) return;
+	const cell = e.target.closest("td");
+	if (!(cell instanceof HTMLElement)) return;
+	if (cell.getAttribute("contenteditable") === "plaintext-only") return;
+	const row = cell.parentElement as HTMLElement;
 	const shortcut = e.ctrlKey || e.metaKey;
-	const row = this.parentElement as HTMLElement;
 	if (e.key === "ArrowUp") {
 		e.preventDefault();
 		e.stopPropagation();
@@ -120,13 +124,13 @@ function onTableKeydown(this: HTMLElement, e: KeyboardEvent) {
 		e.preventDefault();
 		e.stopPropagation();
 		if (curC === 0 && row.hasAttribute("data-id")) {
-			if (e.ctrlKey || e.metaKey) onIdFieldClick.call(this, {
+			if (e.ctrlKey || e.metaKey) onIdFieldClick.call(cell, {
 				shiftKey: e.shiftKey,
 				altKey: false,
 				ctrlKey: e.shiftKey,
 				metaKey: false
 			});
-			else if (e.shiftKey) onIdFieldClick.call(this, {
+			else if (e.shiftKey) onIdFieldClick.call(cell, {
 				shiftKey: true,
 				altKey: false,
 				ctrlKey: false,
@@ -134,12 +138,12 @@ function onTableKeydown(this: HTMLElement, e: KeyboardEvent) {
 			});
 			return;
 		}
-		else this.click();
+		else cell.click();
 	} else if (e.key === "Backspace") {
 		if (curC === 0 && row.hasAttribute("data-id")) {
 			e.preventDefault();
 			e.stopPropagation();
-			onIdFieldClick.call(this, {
+			onIdFieldClick.call(cell, {
 				shiftKey: false,
 				altKey: true,
 				ctrlKey: false,
@@ -166,7 +170,9 @@ const LOG1_TYPE_KEYBIND: Record<string,number> = Object.freeze({
 
 function onBodyKeydown(e: KeyboardEvent) {
 	if (d$n("dialog").matches(":open")) return;
-	if (e.key === "Escape") {
+	if (e.isComposing) return;
+	if (e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) return;
+	if (newEntryPhase !== 0 && e.key === "Escape") {
 		cancelNewEntry();
 		focusOn(curR, curC, true);
 		return;
@@ -182,7 +188,6 @@ function onBodyKeydown(e: KeyboardEvent) {
 			case 3: focusOn(lastRow, 3, true); break;
 		}
 	}
-	if (e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) return;
 	advanceNewEntry(e);
 }
 
@@ -255,7 +260,7 @@ async function advanceNewEntry(e: KeyboardEvent | {key: string}) {
 			setupRow(newRow);
 
 			cancelNewEntry();
-			focusOn(newData.id, 3, true);
+			focusOn(parseInt(newRow.getAttribute("data-row") as string), 3, true);
 		} catch (e) {
 			alert(`오류: ${e}`);
 			cancelNewEntry();

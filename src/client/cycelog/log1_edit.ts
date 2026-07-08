@@ -5,6 +5,7 @@ import { $, d$n, q$n } from "../query.js";
 import { dialog, showWarning } from "../posts/dialog.js";
 import { sendDelete, sendMove, sendPatch } from "./log1_fetch.js";
 import { setupGrid, getFocusState, focusOn } from "./log1_grid.js";
+import { k2e } from "../k2e.js";
 
 const S = window.getSelection() as Selection;
 const SYMBOLS: Record<string,string> = {".": "·", "st": "★"};
@@ -27,7 +28,7 @@ export function setupRow(row: HTMLElement) {
 export async function onIdFieldClick(this: HTMLElement, e: PointerEvent | Record<'shiftKey'|'ctrlKey'|'altKey'|'metaKey',boolean>) {
 	const row = this.parentElement as HTMLElement;
 	const id = parseInt(row.getAttribute("data-id") as string);
-	focusOn(id, 0, true);
+	focusOn(parseInt(row.getAttribute("data-row") as string), 0, true);
 	if (e.altKey) deleteEntryDialog.call(this, id);
 	else if (e.shiftKey && !(e.ctrlKey || e.metaKey)) moveEntriesDialog(id);
 	else {
@@ -152,7 +153,7 @@ function isHttpError(e: unknown): e is {status: number, reason?: string, html?: 
 async function onTypeFieldClick(this: HTMLElement) {
 	const row = this.parentElement as HTMLElement;
 	const id = parseInt(row.getAttribute("data-id") as string);
-	focusOn(id, 1, true);
+	focusOn(parseInt(row.getAttribute("data-row") as string), 1, true);
 	const cur = parseInt(row.getAttribute("data-type") ?? "0");
 	dialog(`${id}번 항목 유형 변경`, `
 		<label><input type="radio" name="log1-type" value="1"${cur===1 ? " checked autofocus" : ""}>공부</label>
@@ -183,7 +184,7 @@ async function onTypeFieldClick(this: HTMLElement) {
 async function onTimeFieldClick(this: HTMLElement) {
 	const row = this.parentElement as HTMLElement;
 	const id = parseInt(row.getAttribute("data-id") as string);
-	focusOn(id, 2, true);
+	focusOn(parseInt(row.getAttribute("data-row") as string), 2, true);
 	const cur = row.getAttribute("data-time") ?? "";
 	const wrapper = this.firstChild as HTMLElement;
 	dialog(`${id}번 항목 시간 변경`, `
@@ -208,7 +209,7 @@ async function onTimeFieldClick(this: HTMLElement) {
 }
 
 async function onContentFieldClick(this: HTMLElement) {
-	focusOn(parseInt((this.parentElement as HTMLElement).getAttribute("data-id") as string), 3, true);
+	focusOn(parseInt((this.parentElement as HTMLElement).getAttribute("data-row") as string), 3, true);
 	this.setAttribute("contenteditable", "plaintext-only");
 	if (!this.contains(S.anchorNode)) {
 		S.selectAllChildren(this);
@@ -217,6 +218,7 @@ async function onContentFieldClick(this: HTMLElement) {
 }
 
 async function onContentFieldKeydown(this: HTMLElement, e: KeyboardEvent) {
+	if (e.isComposing) return;
 	if (this.getAttribute("contenteditable") !== "plaintext-only") return;
 	e.stopPropagation();
 	if (e.key === "Enter") {
@@ -234,7 +236,7 @@ async function onContentFieldKeydown(this: HTMLElement, e: KeyboardEvent) {
 		if (!(S.anchorNode instanceof Text)) return;
 		const text = this.textContent.substring(0, S.anchorOffset);
 		const cmd = text.match(/\]([^\]]*)\]$/)?.[1];
-		if (cmd == undefined || !Object.hasOwn(SYMBOLS, cmd)) {
+		if (cmd == undefined || !Object.hasOwn(SYMBOLS, k2e(cmd.toLowerCase()))) {
 			showWarning("잘못된 기호 명령어입니다.");
 			return;
 		}
@@ -243,7 +245,7 @@ async function onContentFieldKeydown(this: HTMLElement, e: KeyboardEvent) {
 		range.setStart(S.anchorNode, S.anchorOffset - (cmd.length + 2));
 		range.setEnd(S.anchorNode, S.anchorOffset);
 		range.deleteContents();
-		range.insertNode(document.createTextNode(SYMBOLS[cmd]));
+		range.insertNode(document.createTextNode(SYMBOLS[k2e(cmd.toLowerCase())]));
 
 		S.removeAllRanges();
 		S.addRange(range);
