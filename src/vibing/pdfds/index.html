@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" type="image/png" href="/vibing/assets/favicon.png">
+	<title>PDF-DS Field Guide</title>
+	<link
+		id="pdf-ds-source"
+		rel="stylesheet"
+		href="https://cdn.jsdelivr.net/gh/qpi-labels/PDF-DS@main/src/index.css"
+		onerror="this.onerror=null; this.dataset.fallback='true'; this.href='./pdf-ds.backup.css';"
+	>
+	<link rel="stylesheet" href="./style.css">
+	<script type="module" src="./app.js"></script>
+</head>
+<body>
+	<div class="pdf-app guide-app">
+		<div id="drawer-overlay" class="drawer-overlay" hidden></div>
+
+		<aside id="site-nav" class="pdf-sidebar guide-sidebar" aria-label="PDF-DS guide navigation">
+			<div class="pdf-content-relative pdf-p-300">
+				<div class="sidebar-hero">
+					<div>
+						<a class="home-link pdf-text-label-14-mono pdf-text-muted pdf-mb-100" href="../">/vibing</a>
+						<span class="sidebar-eyebrow">Physical-Digital Fusion Design Guidelines</span>
+						<h1 class="sidebar-title">PDF-DS<br>System</h1>
+						<p class="sidebar-subtitle">A hardware-grade digital control specification built from functionalist clarity, physical structure, and disciplined spacing.</p>
+					</div>
+					<button id="hero-theme-toggle" class="theme-hero-button" type="button" aria-label="Toggle theme">
+						<span id="hero-theme-icon" aria-hidden="true">🌙</span>
+						<span id="hero-theme-label">Dark</span>
+					</button>
+				</div>
+
+				<nav class="sidebar-index" aria-label="Guidelines index">
+					<h2 class="sidebar-index-title">GUIDELINES INDEX</h2>
+
+					<div class="sidebar-group">
+						<div class="sidebar-group-header">
+							<span>Intro &amp; Architecture</span>
+						</div>
+						<a class="sidebar-row active" href="#philosophy" data-page-link="philosophy">
+							<span class="nav-number">01</span>
+							<span>Philosophy</span>
+						</a>
+						<a class="sidebar-row" href="#architecture" data-page-link="architecture">
+							<span class="nav-number">02</span>
+							<span>System Architecture</span>
+						</a>
+						<a class="sidebar-row" href="#installation" data-page-link="installation">
+							<span class="nav-number">03</span>
+							<span>Installation</span>
+						</a>
+					</div>
+
+					<div class="sidebar-group">
+						<div class="sidebar-group-header">
+							<span>Foundations</span>
+						</div>
+						<a class="sidebar-row" href="#spacing" data-page-link="spacing">
+							<span class="nav-number">04</span>
+							<span>Blueprint Grid &amp; Spacing</span>
+						</a>
+						<a class="sidebar-row" href="#typography" data-page-link="typography">
+							<span class="nav-number">05</span>
+							<span>Typography</span>
+						</a>
+						<a class="sidebar-row" href="#theme" data-page-link="theme">
+							<span class="nav-number">06</span>
+							<span>Color</span>
+						</a>
+						<a class="sidebar-row" href="#materials" data-page-link="materials">
+							<span class="nav-number">07</span>
+							<span>Materials</span>
+						</a>
+					</div>
+
+					<div class="sidebar-group">
+						<div class="sidebar-group-header">
+							<span>Components</span>
+						</div>
+						<a class="sidebar-row" href="#components" data-page-link="components">
+							<span class="nav-number">08</span>
+							<span>Buttons &amp; Morphing</span>
+						</a>
+						<a class="sidebar-row" href="#forms" data-page-link="forms">
+							<span class="nav-number">09</span>
+							<span>Forms</span>
+						</a>
+						<a class="sidebar-row" href="#modals" data-page-link="modals">
+							<span class="nav-number">10</span>
+							<span>Modals</span>
+						</a>
+						<a class="sidebar-row" href="#navigation" data-page-link="navigation">
+							<span class="nav-number">11</span>
+							<span>Navigation</span>
+						</a>
+					</div>
+
+					<div class="sidebar-group">
+						<div class="sidebar-group-header">
+							<span>Layout</span>
+						</div>
+						<a class="sidebar-row" href="#layout" data-page-link="layout">
+							<span class="nav-number">12</span>
+							<span>Split Screen</span>
+						</a>
+						<a class="sidebar-row" href="#mobile" data-page-link="mobile">
+							<span class="nav-number">13</span>
+							<span>Mobile Screen</span>
+						</a>
+						<a class="sidebar-row" href="#qa" data-page-link="qa">
+							<span class="nav-number">14</span>
+							<span>QA &amp; Checklist</span>
+						</a>
+					</div>
+				</nav>
+
+				<div class="sidebar-source pdf-mt-400 pdf-pt-200 pdf-border-top" style="margin-top: 32px; padding-top: 16px;">
+					<div class="pdf-text-label-14-mono pdf-text-muted pdf-mb-050">
+						<a href="https://github.com/qpi-labels/PDF-DS" target="_blank" rel="noreferrer">View on GitHub ↗</a>
+					</div>
+					<div class="pdf-text-label-14-mono pdf-text-muted">Made with PDF-DS</div>
+					<div class="source-state pdf-text-copy-13-mono">
+						<span id="css-source-dot" class="pdf-indicator-dot" aria-hidden="true"></span>
+						<span id="css-source-label">CSS source checking</span>
+					</div>
+				</div>
+			</div>
+		</aside>
+
+		<main class="pdf-main-view">
+			<div class="mobile-topbar">
+				<a class="mobile-brand pdf-text-label-14-mono" href="../">PDF-DS Field Guide</a>
+				<div class="pdf-flex-row pdf-gap-100">
+					<button class="pdf-secondary-btn pdf-btn-sm theme-choice active" type="button" data-theme-choice="light">Light</button>
+					<button class="pdf-secondary-btn pdf-btn-sm theme-choice" type="button" data-theme-choice="dark">Dark</button>
+				</div>
+			</div>
+
+			<div class="pdf-main-content guide-content pdf-selectable">
+				<section class="guide-page pdf-animate-fade-in" data-page="philosophy" aria-labelledby="philosophy-title">
+					<header class="chapter-header pdf-panel pdf-grid-bg">
+						<div class="pdf-content-relative chapter-header-inner">
+							<div>
+								<span class="chapter-label pdf-text-label-14-mono pdf-text-red pdf-mb-100" style="display: block;">CHAPTER 01</span>
+								<h2 id="philosophy-title" class="pdf-text-heading-32">Philosophy</h2>
+							</div>
+							<span class="chapter-progress pdf-text-label-14-mono pdf-text-muted">7% PROGRESS</span>
+						</div>
+					</header>
+
+					<div class="document-hero">
+						<span class="document-eyebrow">PHYSICAL-DIGITAL FUSION DESIGN SYSTEM</span>
+						<h3 class="document-title">A tactile digital design language</h3>
+						<p class="document-copy">A compact field guide for interfaces that feel precise, physical, and legible. It borrows the PDF-DS structure, then replaces the original material with local examples and project-specific notes.</p>
+						<div class="document-actions">
+							<a href="https://github.com/qpi-labels/PDF-DS" target="_blank" rel="noopener noreferrer">
+								<button class="pdf-btn-primary pdf-btn-md" type="button">View on GitHub</button>
+							</a>
+							<a href="#architecture" data-page-link="architecture">
+								<button class="pdf-secondary-btn pdf-btn-md" type="button">Open Architecture</button>
+							</a>
+						</div>
+					</div>
+
+					<div class="pdf-panel pdf-grid-bg motif-panel">
+						<div class="pdf-content-relative motif-layout">
+							<img src="../assets/thumbnail/pdfds.png" alt="Generated PDF-DS field guide thumbnail" class="motif-image">
+							<p class="pdf-text-label-14-mono pdf-text-muted motif-copy">
+								<strong class="pdf-text-red" style="font-size: 12px;">DESIGN MOTIF</strong><br>
+								Layered document surfaces<br>
+								precise controls<br>
+								and a hardware-like index.
+							</p>
+						</div>
+					</div>
+				</section>
+
+				<section class="guide-page" data-page="installation" aria-labelledby="installation-title" hidden>
+					<header class="chapter-header pdf-panel pdf-grid-bg">
+						<div class="pdf-content-relative">
+							<span class="chapter-label pdf-text-label-14-mono pdf-text-red pdf-mb-100" style="display: block;">CHAPTER 03</span>
+							<h2 id="installation-title" class="pdf-text-heading-32">CDN quick start and local fallback</h2>
+						</div>
+					</header>
+
+					<div class="pdf-panel">
+						<h3 class="pdf-text-label-16 pdf-mb-200">Recommended link tag</h3>
+						<pre class="pdf-code-block pdf-selectable specimen-code"><code>&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/qpi-labels/PDF-DS@main/src/index.css"&gt;</code></pre>
+					</div>
+
+					<div class="pdf-panel">
+						<h3 class="pdf-text-label-16 pdf-mb-200">Fallback used here</h3>
+						<p id="source-card-copy" class="pdf-text-copy-14 pdf-text-muted pdf-mb-200">The CDN file is requested first. If that request fails, this page switches to the copied backup at <code>./pdf-ds.backup.css</code>.</p>
+						<pre class="pdf-code-block pdf-selectable specimen-code"><code>&lt;link
+  id="pdf-ds-source"
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/gh/qpi-labels/PDF-DS@main/src/index.css"
+  onerror="this.onerror=null; this.dataset.fallback='true'; this.href='./pdf-ds.backup.css';"
+&gt;</code></pre>
+					</div>
+
+					<div class="status-grid" aria-label="Runtime status">
+						<article class="pdf-panel stat-panel">
+							<span class="pdf-text-copy-13-mono pdf-text-muted">Stylesheet</span>
+							<strong id="source-card-title" class="pdf-text-heading-24">Upstream first</strong>
+						</article>
+						<article class="pdf-panel stat-panel">
+							<span class="pdf-text-copy-13-mono pdf-text-muted">Manifest</span>
+							<strong class="pdf-text-heading-24">/api/manifest</strong>
+							<p id="manifest-summary" class="pdf-text-copy-14 pdf-text-muted">Loading server-side manifest.</p>
+						</article>
+						<article class="pdf-panel stat-panel">
+							<span class="pdf-text-copy-13-mono pdf-text-muted">Active mode</span>
+							<strong id="theme-label" class="pdf-text-heading-24">Light</strong>
+							<p class="pdf-text-copy-14 pdf-text-muted">The theme buttons write to local storage.</p>
+						</article>
+					</div>
+				</section>
+
+				<section class="guide-page" data-page="architecture" aria-labelledby="architecture-title" hidden>
+					<header class="chapter-header pdf-panel pdf-grid-bg">
+						<div class="pdf-content-relative">
+							<span class="chapter-label pdf-text-label-14-mono pdf-text-red pdf-mb-100" style="display: block;">CHAPTER 02</span>
+							<h2 id="architecture-title" class="pdf-text-heading-32">System Architecture</h2>
+						</div>
+					</header>
+
+					<div class="pdf-panel">
+						<h3 class="pdf-text-label-16 pdf-mb-200">Single-layer CSS architecture</h3>
+						<p class="pdf-text-copy-14 pdf-text-muted">The reference site presents PDF-DS as one stylesheet of tokens, utilities, and components. This local page follows that idea: external PDF-DS first, then a small project stylesheet for page-specific layout.</p>
+					</div>
+
+					<div class="pdf-panel pdf-grid-bg">
+						<div class="pdf-content-relative architecture-diagram">
+							<div><strong>:root tokens</strong><span>spacing, color, type, elevation</span></div>
+							<div><strong>Component classes</strong><span>buttons, panels, inputs, tables</span></div>
+							<div><strong>Utility classes</strong><span>layout, sizing, typography, interaction</span></div>
+						</div>
+					</div>
+				</section>
+
+				<section class="guide-page" data-page="spacing" aria-labelledby="spacing-title" hidden>
+					<header class="chapter-header pdf-panel pdf-grid-bg">
+						<div class="pdf-content-relative">
+							<span class="chapter-label pdf-text-label-14-mono pdf-text-red pdf-mb-100" style="display: block;">CHAPTER 04</span>
+							<h2 id="spacing-title" class="pdf-text-heading-32">Interactive spacing scale</h2>
+						</div>
+					</header>
+
+					<div class="pdf-bg-secondary pdf-border pdf-p-300 pdf-flex-col pdf-gap-200">
+						<div class="pdf-flex-row pdf-justify-between pdf-items-center">
+							<span class="pdf-text-label-14-mono pdf-text-red">SELECTED SPACING VISUALIZATION</span>
+							<span id="spacing-readout" class="pdf-badge">--space-300</span>
+						</div>
+						<div class="spacing-stage">
+							<label class="pdf-text-copy-13-mono pdf-text-muted" for="spacing-slider">Scale index</label>
+							<input id="spacing-slider" type="range" min="0" max="7" value="5">
+							<div id="spacing-bars" class="spacing-bars"></div>
+						</div>
+					</div>
+
+					<table class="pdf-table token-table">
+						<thead>
+							<tr>
+								<th>Token</th>
+								<th>Role</th>
+								<th>Example use</th>
+							</tr>
+						</thead>
+						<tbody id="token-rows">
+							<tr>
+								<td><code>--space-300</code></td>
+								<td>Rhythm</td>
+								<td>Panel gaps and sidebar padding.</td>
+							</tr>
+						</tbody>
+					</table>
+				</section>
+
+				<section class="guide-page" data-page="typography" aria-labelledby="typography-title" hidden>
+					<header class="chapter-header pdf-panel pdf-grid-bg">
+						<div class="pdf-content-relative">
+							<span class="chapter-label pdf-text-label-14-mono pdf-text-red pdf-mb-100" style="display: block;">CHAPTER 05</span>
+							<h2 id="typography-title" class="pdf-text-heading-32">Typography</h2>
+						</div>
+					</header>
+
+					<div class="pdf-bg-secondary pdf-border pdf-p-300">
+						<h3 class="pdf-text-label-16 pdf-mb-200">Typography Scale</h3>
+						<div class="type-specimen">
+							<div><span>Heading 72 (Display)</span><strong class="pdf-text-heading-72">PDF-DS System</strong></div>
+							<div><span>Heading 32 (Title)</span><strong class="pdf-text-heading-32">Physical-Digital Fusion</strong></div>
+							<div><span>Label 16 (UI Elements)</span><strong class="pdf-text-label-16">System Architecture</strong></div>
+							<div><span>Mono 14 / Mono 13</span><strong class="pdf-text-label-14-mono">JetBrains Mono / Data Label</strong></div>
+						</div>
+					</div>
+				</section>
+
+				<section class="guide-page" data-page="theme" aria-labelledby="theme-title" hidden>
+					<header class="chapter-header pdf-panel pdf-grid-bg">
+						<div class="pdf-content-relative">
+							<span class="chapter-label pdf-text-label-14-mono pdf-text-red pdf-mb-100" style="display: block;">CHAPTER 06</span>
+							<h2 id="theme-title" class="pdf-text-heading-32">Achromatic color and theme simulator</h2>
+						</div>
+					</header>
+
+					<div class="theme-lab pdf-bg-secondary pdf-border pdf-p-300">
+						<div class="pdf-flex-row pdf-justify-between pdf-items-center pdf-mb-300 pdf-flex-wrap pdf-gap-150">
+							<span class="pdf-text-label-14-mono pdf-text-red">LIGHT & DARK MODE</span>
+							<div class="theme-segment">
+								<button class="pdf-secondary-btn pdf-btn-sm theme-choice active" type="button" data-theme-choice="light">Light</button>
+								<button class="pdf-secondary-btn pdf-btn-sm theme-choice" type="button" data-theme-choice="dark">Dark</button>
+							</div>
+						</div>
+						<div class="theme-simulator">
+							<div class="theme-device">
+								<div class="device-topbar">
+									<span></span><span></span><span></span>
+									<strong>PDF-DS</strong>
+								</div>
+								<div class="device-content">
+									<div class="pdf-panel device-panel">
+										<span class="pdf-text-label-14-mono pdf-text-red">ACTION STATE</span>
+										<h3 class="pdf-text-label-16 pdf-mt-100">Double safeguard</h3>
+										<p class="pdf-text-copy-14 pdf-text-muted pdf-mt-100">A single destructive command is marked with functional red while neutral surfaces remain achromatic.</p>
+										<button class="pdf-btn-primary pdf-btn-sm pdf-mt-200" type="button">Approve action</button>
+									</div>
+								</div>
+							</div>
+							<div class="pdf-panel">
+								<h3 class="pdf-text-label-16 pdf-mb-150">Contrast notes</h3>
+								<p class="pdf-text-copy-14 pdf-text-muted">The live site leans on exact reversals: light and dark modes share the same hierarchy, not separate decorative palettes.</p>
+							</div>
+						</div>
+					</div>
+				</section>
+
+				<section class="guide-page" data-page="materials" aria-labelledby="materials-title" hidden>
+					<header class="chapter-header pdf-panel pdf-grid-bg">
+						<div class="pdf-content-relative">
+							<span class="chapter-label pdf-text-label-14-mono pdf-text-red pdf-mb-100" style="display: block;">CHAPTER 07</span>
+							<h2 id="materials-title" class="pdf-text-heading-32">Materials</h2>
+						</div>
+					</header>
+
+					<div class="material-stack">
+						<article class="pdf-panel">
+							<span class="pdf-text-label-14-mono pdf-text-muted">1. Flat Surface</span>
+							<h3 class="pdf-text-label-16 pdf-mt-100">Base Panel</h3>
+							<p class="pdf-text-copy-14 pdf-text-muted pdf-mt-100">A plain bordered layer without exaggerated depth.</p>
+						</article>
+						<article class="pdf-panel material-bevel">
+							<span class="pdf-text-label-14-mono pdf-text-muted">2. Hardware Bevel</span>
+							<h3 class="pdf-text-label-16 pdf-mt-100">Control Container</h3>
+							<p class="pdf-text-copy-14 pdf-text-muted pdf-mt-100">The PDF-DS bevel gives independent controls a physical edge.</p>
+						</article>
+						<article class="pdf-panel material-active">
+							<span class="pdf-text-label-14-mono pdf-text-muted">3. Pressed State</span>
+							<h3 class="pdf-text-label-16 pdf-mt-100">Active Surface</h3>
+							<p class="pdf-text-copy-14 pdf-text-muted pdf-mt-100">The active bevel reverses the highlight and shadow relationship.</p>
+						</article>
+					</div>
+				</section>
+
+				<section class="guide-page" data-page="components" aria-labelledby="components-title" hidden>
+					<header class="chapter-header pdf-panel pdf-grid-bg">
+						<div class="pdf-content-relative">
+							<span class="chapter-label pdf-text-label-14-mono pdf-text-red pdf-mb-100" style="display: block;">CHAPTER 08</span>
+							<h2 id="components-title" class="pdf-text-heading-32">Components and morphing controls</h2>
+						</div>
+					</header>
+
+					<div class="component-grid">
+						<article class="pdf-panel component-panel">
+							<div class="pdf-panel-header">
+								<h3 class="pdf-text-label-16">Buttons</h3>
+							</div>
+							<div class="button-row">
+								<button class="pdf-btn-primary pdf-btn-sm" type="button">Primary</button>
+								<button class="pdf-secondary-btn pdf-btn-sm" type="button">Secondary</button>
+								<button class="pdf-secondary-btn pdf-btn-sm" type="button" disabled>Disabled</button>
+							</div>
+						</article>
+
+						<article class="pdf-panel component-panel">
+							<div class="pdf-panel-header">
+								<h3 class="pdf-text-label-16">Forms & Inputs</h3>
+							</div>
+							<label class="field-label pdf-text-copy-13-mono" for="sample-input">Token search</label>
+							<input id="sample-input" class="pdf-input pdf-input-md" type="text" value="--color-functional-red">
+						</article>
+
+						<article class="pdf-panel component-panel">
+							<div class="pdf-panel-header">
+								<h3 class="pdf-text-label-16">Target sizing</h3>
+							</div>
+							<div class="target-demo">
+								<button class="target-button" type="button" aria-label="48px target"></button>
+								<span class="pdf-text-copy-13-mono pdf-text-muted">48x48px target</span>
+							</div>
+						</article>
+					</div>
+
+					<pre class="pdf-code-block pdf-selectable specimen-code"><code>&lt;button class="pdf-btn-primary pdf-btn-sm"&gt;Primary&lt;/button&gt;
+&lt;article class="pdf-panel"&gt;...&lt;/article&gt;
+&lt;input class="pdf-input pdf-input-md"&gt;</code></pre>
+				</section>
+
+				<section class="guide-page" data-page="layout" aria-labelledby="layout-title" hidden>
+					<header class="chapter-header pdf-panel pdf-grid-bg">
+						<div class="pdf-content-relative">
+							<span class="chapter-label pdf-text-label-14-mono pdf-text-red pdf-mb-100" style="display: block;">CHAPTER 12</span>
+							<h2 id="layout-title" class="pdf-text-heading-32">Asymmetric split screen</h2>
+						</div>
+					</header>
+
+					<div class="split-demo pdf-bg-secondary pdf-border pdf-p-300">
+						<div class="pdf-flex-row pdf-justify-between pdf-items-center pdf-mb-200">
+							<span class="pdf-text-label-14-mono pdf-text-red">25:75 BLUEPRINT FORMAT</span>
+							<span id="split-readout" class="pdf-badge">25%</span>
+						</div>
+						<input id="split-slider" type="range" min="20" max="50" value="25">
+						<div class="split-stage" id="split-stage">
+							<div class="split-side">
+								<span class="pdf-text-label-14-mono">CONTROL PANEL</span>
+								<p class="pdf-text-copy-13-mono pdf-text-muted">Fixed navigation and system status.</p>
+							</div>
+							<div class="split-main">
+								<span class="pdf-text-label-14-mono">CONTENT CANVAS</span>
+								<p class="pdf-text-copy-13-mono pdf-text-muted">Scrollable document and examples.</p>
+							</div>
+						</div>
+					</div>
+				</section>
+
+				<section class="guide-page" data-page="forms" aria-labelledby="forms-title" hidden>
+					<header class="chapter-header pdf-panel pdf-grid-bg">
+						<div class="pdf-content-relative">
+							<span class="chapter-label pdf-text-label-14-mono pdf-text-red pdf-mb-100" style="display: block;">CHAPTER 09</span>
+							<h2 id="forms-title" class="pdf-text-heading-32">Forms</h2>
+						</div>
+					</header>
+
+					<div class="pdf-bg-secondary pdf-border pdf-p-300">
+						<h3 class="pdf-text-label-16 pdf-mb-200">Input states</h3>
+						<div class="form-specimen">
+							<label class="field-label pdf-text-copy-13-mono" for="form-default">Default State</label>
+							<input id="form-default" class="pdf-input pdf-input-md" type="text" value="Token value">
+							<label class="field-label pdf-text-copy-13-mono" for="form-error">Validation Error</label>
+							<input id="form-error" class="pdf-input pdf-input-md form-error" type="text" value="not-an-email">
+							<p class="pdf-text-copy-13-mono pdf-text-red">Use functional red with explanatory text for validation failure.</p>
+						</div>
+					</div>
+				</section>
+
+				<section class="guide-page" data-page="modals" aria-labelledby="modals-title" hidden>
+					<header class="chapter-header pdf-panel pdf-grid-bg">
+						<div class="pdf-content-relative">
+							<span class="chapter-label pdf-text-label-14-mono pdf-text-red pdf-mb-100" style="display: block;">CHAPTER 10</span>
+							<h2 id="modals-title" class="pdf-text-heading-32">Modals</h2>
+						</div>
+					</header>
+
+					<div class="modal-stage pdf-bg-secondary pdf-border pdf-p-300">
+						<div class="modal-card pdf-panel">
+							<span class="pdf-text-label-14-mono pdf-text-red">DESTRUCTIVE ACTION</span>
+							<h3 class="pdf-text-heading-24 pdf-mt-100">Delete project data?</h3>
+							<p class="pdf-text-copy-14 pdf-text-muted pdf-mt-100">This specimen shows a focused decision surface with a clear primary action and neutral cancel command.</p>
+							<div class="button-row pdf-mt-200">
+								<button class="pdf-btn-primary pdf-btn-sm" type="button">Delete data</button>
+								<button class="pdf-secondary-btn pdf-btn-sm" type="button">Cancel</button>
+							</div>
+						</div>
+					</div>
+				</section>
+
+				<section class="guide-page" data-page="navigation" aria-labelledby="navigation-title" hidden>
+					<header class="chapter-header pdf-panel pdf-grid-bg">
+						<div class="pdf-content-relative">
+							<span class="chapter-label pdf-text-label-14-mono pdf-text-red pdf-mb-100" style="display: block;">CHAPTER 11</span>
+							<h2 id="navigation-title" class="pdf-text-heading-32">Navigation</h2>
+						</div>
+					</header>
+
+					<div class="pdf-panel">
+						<h3 class="pdf-text-label-16 pdf-mb-200">Hierarchy cues</h3>
+						<p class="pdf-text-copy-14 pdf-text-muted">The active row uses a red left rail and red number block. Inactive rows stay gray so the current chapter remains unambiguous.</p>
+						<div class="mini-nav pdf-mt-300">
+							<div class="sidebar-row active"><span class="nav-number">11</span><span>Navigation</span></div>
+							<div class="sidebar-row"><span class="nav-number">12</span><span>Split Screen</span></div>
+							<div class="sidebar-row"><span class="nav-number">13</span><span>Mobile Screen</span></div>
+						</div>
+					</div>
+				</section>
+
+				<section class="guide-page" data-page="mobile" aria-labelledby="mobile-title" hidden>
+					<header class="chapter-header pdf-panel pdf-grid-bg">
+						<div class="pdf-content-relative">
+							<span class="chapter-label pdf-text-label-14-mono pdf-text-red pdf-mb-100" style="display: block;">CHAPTER 13</span>
+							<h2 id="mobile-title" class="pdf-text-heading-32">Mobile bottom sheet navigation</h2>
+						</div>
+					</header>
+
+					<div class="mobile-demo pdf-bg-secondary pdf-border pdf-p-300">
+						<div class="phone-frame">
+							<div class="phone-status pdf-text-copy-13-mono">9:41</div>
+							<div class="phone-screen">
+								<span class="pdf-text-label-14-mono pdf-text-red">MOBILE SCREEN</span>
+								<h3 class="pdf-text-heading-24 pdf-mt-100">Chapter index</h3>
+								<p class="pdf-text-copy-14 pdf-text-muted pdf-mt-100">On narrow screens, the navigator becomes a bottom sheet that can be opened from a fixed action button.</p>
+								<button class="pdf-btn-primary pdf-btn-sm pdf-mt-300" type="button" id="demo-drawer-button">Open contents</button>
+							</div>
+						</div>
+					</div>
+				</section>
+
+				<section class="guide-page" data-page="qa" aria-labelledby="qa-title" hidden>
+					<header class="chapter-header pdf-panel pdf-grid-bg">
+						<div class="pdf-content-relative">
+							<span class="chapter-label pdf-text-label-14-mono pdf-text-red pdf-mb-100" style="display: block;">CHAPTER 14</span>
+							<h2 id="qa-title" class="pdf-text-heading-32">Design QA checklist</h2>
+						</div>
+					</header>
+
+					<div id="principle-list" class="principle-list"></div>
+
+					<table class="pdf-table release-table">
+						<thead>
+							<tr>
+								<th>Item</th>
+								<th>Status</th>
+								<th>Owner</th>
+							</tr>
+						</thead>
+						<tbody id="release-rows">
+							<tr>
+								<td>Loading manifest</td>
+								<td><span class="pdf-badge">WAIT</span></td>
+								<td>Server</td>
+							</tr>
+						</tbody>
+					</table>
+				</section>
+
+				<div class="chapter-controls pdf-flex-row pdf-justify-between pdf-items-center pdf-border-top pdf-pt-200">
+					<button id="prev-page" class="pdf-secondary-btn pdf-btn-sm" type="button">← PREV</button>
+					<span id="chapter-position" class="pdf-text-label-14-mono pdf-text-muted">01 / 11</span>
+					<button id="next-page" class="pdf-btn-primary pdf-btn-sm" type="button">NEXT →</button>
+				</div>
+
+				<footer class="pdf-footer pdf-text-copy-13-mono">
+					<span>Built in src/vibing/pdfds</span>
+					<a href="https://github.com/qpi-labels/PDF-DS" target="_blank" rel="noreferrer">qpi-labels/PDF-DS</a>
+				</footer>
+			</div>
+		</main>
+
+		<button id="bottom-menu-toggle" class="pdf-btn-primary mobile-menu-button" type="button">CONTENTS</button>
+	</div>
+</body>
+</html>
