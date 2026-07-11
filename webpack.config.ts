@@ -3,8 +3,8 @@ import fs from 'fs';
 import ejs from "ejs";
 import { fileURLToPath } from "url";
 import webpack from "webpack";
+import { EsbuildPlugin } from "esbuild-loader";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
-import CssMinimizerPlugin from "css-minimizer-webpack-plugin";
 import HTMLWebpackPlugin from "html-webpack-plugin";
 
 // in case you run into any TypeScript error when configuring `devServer` // THIS IS NOT AI this was copy-pasted from https://webpack.js.org/guides/typescript/
@@ -123,10 +123,9 @@ const config: webpack.Configuration = {
       },
       {
         test: /\.tsx?$/i,
-        loader: "ts-loader",
+        loader: "esbuild-loader",
         options: {
-          configFile: path.resolve(__dirname, "tsconfig.client.json"),
-          context: __dirname
+          tsconfig: path.resolve(__dirname, "tsconfig.client.json"),
         },
         exclude: /node_modules/,
       },
@@ -165,8 +164,9 @@ const config: webpack.Configuration = {
   optimization: {
     splitChunks: {chunks: "all"},
     minimizer: [
-      "...",
-      new CssMinimizerPlugin()
+      new EsbuildPlugin({
+        css: true
+      })
     ]
   },
   output: {
