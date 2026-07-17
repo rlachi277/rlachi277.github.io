@@ -11,10 +11,6 @@ body {
 	margin-block-end: 3rem;
 }
 
-@media screen and (max-width: 480px) {
-	body { margin-block-start: -2rem; }
-}
-
 h1 { font-size: 3em; }
 h2 { font-size: 2em; }
 h3 { font-size: 1.5em; }
@@ -22,6 +18,10 @@ h4 { font-size: 1.33em; }
 h5 { font-size: 1.17em; }
 h6 { font-size: 1em; }
 h1, h2, h3, h4, h5, h6 { margin-block-start: 1em; margin-block-end: 0.25em; }
+
+@media screen and (max-width: 480px) {
+	body, h1 { margin-block-start: 1rem; }
+}
 
 p {
 	text-align: justify;

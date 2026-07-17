@@ -10,10 +10,6 @@ body {
 	margin-block-end: 3rem;
 }
 
-@media screen and (max-width: 480px) {
-	body { margin-block-start: -2rem; }
-}
-
 section.container:not(:has(> *:not(.container-bar, .middle-bar))):after {
 	content: '### 비어 있음 :O ###';
 	opacity: 0.8;
@@ -49,6 +45,10 @@ hgroup :is(h1, h2, h3, h4, h5, h6) {
 hgroup p {
 	font-weight: bold;
 	margin-block-start: 0.1em;
+}
+
+@media screen and (max-width: 480px) {
+	body, h1 { margin-block-start: 1rem; }
 }
 
 p {

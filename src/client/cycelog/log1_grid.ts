@@ -34,6 +34,7 @@ export function setupGrid() {
 
 	document.body.addEventListener("keydown", onBodyKeydown);
 	$("#log1-new-type, #log1-new-time, #log1-new-content").on("blur", onNewEntryBlur);
+	d$("log1-new-content")?.addEventListener("input", onNewContentInput);
 }
 
 function onScroll() {
@@ -284,4 +285,20 @@ function cancelNewEntry() {
 		case 3: d$n("log1-new-content").blur(); break;
 	}
 	newEntryPhase = 0;
+}
+
+function onNewContentInput(this: HTMLElement) {
+	const newTextContent = this.textContent
+		.replace(/\]\.\]$/, "·")
+		.replace(/\]st\]$|\]ㄴㅅ\]$/, "★")
+		.replace(/--$/, "—")
+		.replace(/<->$/, "↔");
+	if (this.textContent === newTextContent) return;
+	this.textContent = newTextContent;
+	const range = document.createRange();
+	range.selectNodeContents(this);
+	range.collapse();
+	const S = window.getSelection();
+	S?.removeAllRanges();
+	S?.addRange(range);
 }
