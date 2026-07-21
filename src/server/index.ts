@@ -1,7 +1,7 @@
 import express from 'express';
 import path from 'path';
-import root from './root.js';
 import compression from 'compression';
+import root from './root.js';
 
 import posts from './posts/router.js';
 import cycelog from './cycelog/router.js';
