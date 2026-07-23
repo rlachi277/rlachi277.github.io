@@ -47,7 +47,7 @@ function insertEntry() {
 		} else if (d$(`entry${id}`) !== null) {
 			showWarning("해당 항목은 이미 반영되었습니다.");
 			return false;
-		} else if (!Object.hasOwn(types, id)) {
+		} else if (!(id === 0 || id === -1 || id === -3) && !Object.hasOwn(types, id)) {
 			showWarning("이 글에는 해당 번호의 항목이 없습니다.");
 			return false;
 		}

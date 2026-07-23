@@ -2,6 +2,10 @@
 	font-family: "Pretendard GOV Variable", "Pretendard GOV", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
 }
 
+p:not(hgroup p) {
+	text-indent: 1ch each-line;
+}
+
 .entry { color: var(--c); outline-offset: 2px; }
 .entry:hover, .entry:focus-visible { color: var(--ch); }
 .entry:active { color: var(--ca); }
@@ -16,6 +20,7 @@
 .entry[data-type="4"] { --c: var(--c-45); --ch: var(--c-45h); --ca: var(--c-45a); }
 .entry[data-type="5"] { --c: var(--c-67); --ch: var(--c-67h); --ca: var(--c-67a); }
 .entry[data-type="6"] { --c: var(--c-2); --ch: var(--c-2h); --ca: var(--c-2a); }
+.entry[data-type="add"] { --c: var(--c-0); --ch: var(--c-0h); --ca: var(--c-0a); }
 
 .entry:target {
 	background-color: Mark;

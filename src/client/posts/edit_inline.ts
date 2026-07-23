@@ -277,7 +277,7 @@ function descendRight(node: Node | null, offset: number | undefined = undefined)
 	return node;
 }
 
-const SYMBOLS: Record<string,string> = {".": "·", "st": "★"};
+const SYMBOLS: Record<string,string> = {".": "·", "st": "☆"};
 
 function tabCommand(this: Element, e: KeyboardEvent) {
 	if (
@@ -555,7 +555,7 @@ function toElement(cmd: string): Element {
 
 export function inlineCleanup(target: Element) {
 	if (target.innerHTML === '<br>' || target.innerHTML === '\n') target.innerHTML = '';
-	const remove = $("font, span:not(.color, .colorbox, .select-marker)", target);
+	const remove = $("font, span:not(.color, .colorbox, .select-marker, .semantic)", target);
 	if (remove.exists) {
 		const { startMarker, endMarker } = markCursor();
 		for (const e of remove.list) e.replaceWith(...e.childNodes);

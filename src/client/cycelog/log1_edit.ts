@@ -8,7 +8,7 @@ import { setupGrid, getFocusState, focusOn } from "./log1_grid.js";
 import { k2e } from "../k2e.js";
 
 const S = window.getSelection() as Selection;
-const SYMBOLS: Record<string,string> = {".": "·", "st": "★", "--": "—", "<->": "↔"};
+const SYMBOLS: Record<string,string> = {".": "·", "st": "☆", "--": "—", "<->": "↔"};
 
 export function setupLog1Edit() {
 	setupGrid();

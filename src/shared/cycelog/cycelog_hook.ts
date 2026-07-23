@@ -13,11 +13,19 @@ export function entryDeseriHook(types: Record<number,number>, whereFunc: WhereFu
 		const postId = cur.split('/').at(-1) as string;
 		if (data.type === 'entry') {
 			const id = (data.variant?.id ?? undefined) as number | undefined;
+			if (id === 0 || id === -1 || id === -3) {
+				return {
+					type: 'html',
+					html: `<span contenteditable="false" class="entry semantic" data-type="add" data-id="${id}" title="수첩 기록에 없었으나 ${id === 0 ? "이후" : (id === -1 ? "1차 기록 시" : "3차 기록 시")} 추가한 정보">
+						${id === 0 ? "Add" : (id === -1 ? "Add1" : "Add3")}
+					</span>`.replaceAll(/\n|\t/g, '')
+				} as const;
+			}
 			const type = id !== undefined ? (types?.[id] ?? 0) : 0;
 			const path = id !== undefined ? `../log1/${postId}#entry${id}` : '';
 			return {
 				type: 'html',
-				html: `<a class="entry"${id !== undefined ? ` href="${path}" id="entry${id}" data-id="${id}"` : ''} data-type="${type}">
+				html: `<a contenteditable="false" class="entry"${id !== undefined ? ` href="${path}" id="entry${id}" data-id="${id}"` : ''} data-type="${type}">
 					#${id ?? "?"}
 				</a>`.replaceAll(/\n|\t/g, '')
 			} as const;

@@ -54,8 +54,10 @@ db.prepare(`
 const router = express.Router();
 export default router;
 
+const rootTemplate = "cycelog/root.ejs";
+
 router.get('/', (_, res) => {
-	res.redirect('log3/');
+	res.render(rootTemplate);
 });
 
 

@@ -17,6 +17,7 @@ const entries = {
   "index": "index",
 
   "posts/post": "posts/entries/post",
+  "cycelog/root": "cycelog/entries/root",
   "cycelog/log1": "cycelog/entries/log1",
   "cycelog/log3": "cycelog/entries/log3",
 
@@ -45,6 +46,7 @@ const html: Record<string, HtmlTemplate> = {
     templateParameters: {title: "끾웹 글쓰기(404)", rootclass: "notfound"},
     chunks: ["posts/post"]
   },
+  "cycelog/root": {chunks: ["cycelog/root"]},
   "cycelog/log1_index": {template: "cycelog/log1_index.ejs", chunks: ["cycelog/log1"]},
   "cycelog/log1": {template: "cycelog/log1.ejs", chunks: ["cycelog/log1"]},
   "cycelog/log1_404": {
