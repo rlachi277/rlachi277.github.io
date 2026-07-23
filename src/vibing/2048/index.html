@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" type="image/png" href="/vibing/assets/favicon.png">
+	<title>2048</title>
+	<link rel="stylesheet" href="./style.css">
+	<script type="module" src="./app.js"></script>
+</head>
+<body>
+	<main class="game-shell">
+		<header class="game-header">
+			<div>
+				<a class="back-link" href="../">Back to vibing/</a>
+				<h1>2048</h1>
+			</div>
+			<div class="score-area" aria-label="Game scores">
+				<div class="score-box"><span>SCORE</span><strong id="score">0</strong></div>
+				<div class="score-box"><span>BEST</span><strong id="best-score">0</strong></div>
+			</div>
+		</header>
+
+		<div class="intro-row">
+			<p>Join the numbers and get to the <strong>2048 tile!</strong></p>
+			<button id="new-game" type="button">New Game</button>
+		</div>
+
+		<section id="game-board" class="game-board" aria-label="2048 game board" aria-live="polite">
+			<div class="grid-background" aria-hidden="true">
+				<span></span><span></span><span></span><span></span>
+				<span></span><span></span><span></span><span></span>
+				<span></span><span></span><span></span><span></span>
+				<span></span><span></span><span></span><span></span>
+			</div>
+			<div id="tile-layer" class="tile-layer"></div>
+			<div id="game-message" class="game-message" hidden>
+				<p id="message-title"></p>
+				<div class="message-actions">
+					<button id="keep-playing" type="button" hidden>Keep going</button>
+					<button id="try-again" type="button" hidden>Try again</button>
+				</div>
+			</div>
+		</section>
+
+		<p class="how-to"><strong>HOW TO PLAY:</strong> Use your <strong>arrow keys</strong> or <strong>WASD</strong> keys to move the tiles. Tiles with the same number merge into one when they touch.</p>
+	</main>
+</body>
+</html>

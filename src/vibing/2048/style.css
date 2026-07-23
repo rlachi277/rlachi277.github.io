@@ -1,0 +1,146 @@
+:root {
+	color-scheme: light;
+	--board-size: min(92vw, 500px);
+	--gap: clamp(8px, 2vw, 15px);
+	--board: #bbada0;
+	--ink: #776e65;
+}
+
+* { box-sizing: border-box; }
+
+body {
+	min-width: 280px;
+	margin: 0;
+	background: #faf8ef;
+	color: var(--ink);
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+button { font: inherit; }
+
+.game-shell {
+	width: var(--board-size);
+	margin: 0 auto;
+	padding: 28px 0 44px;
+}
+
+.game-header, .intro-row, .score-area, .message-actions { display: flex; align-items: center; }
+
+.game-header { justify-content: space-between; gap: 18px; }
+
+.back-link {
+	display: inline-block;
+	margin-bottom: 5px;
+	color: #776e65;
+	font-size: .86rem;
+	font-weight: 700;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 3px;
+}
+
+h1 {
+	margin: 0;
+	font-size: clamp(3.5rem, 13vw, 5rem);
+	line-height: .8;
+	letter-spacing: -4px;
+}
+
+.score-area { gap: 6px; }
+
+.score-box {
+	min-width: 74px;
+	padding: 7px 10px 8px;
+	border-radius: 3px;
+	background: #bbada0;
+	color: #fff;
+	text-align: center;
+	line-height: 1;
+}
+
+.score-box span { display: block; color: #eee4da; font-size: .72rem; font-weight: 700; }
+.score-box strong { display: block; margin-top: 3px; font-size: 1.3rem; }
+
+.intro-row { justify-content: space-between; gap: 12px; margin: 23px 0 18px; }
+.intro-row p { margin: 0; font-size: 1.05rem; line-height: 1.35; }
+
+#new-game, .message-actions button {
+	border: 0;
+	border-radius: 3px;
+	padding: 10px 15px;
+	background: #8f7a66;
+	color: #f9f6f2;
+	cursor: pointer;
+	font-weight: 700;
+	white-space: nowrap;
+}
+
+#new-game:hover, .message-actions button:hover { background: #776e65; }
+#new-game:focus-visible, .message-actions button:focus-visible, .back-link:focus-visible { outline: 3px solid #edc22e; outline-offset: 3px; }
+
+.game-board {
+	position: relative;
+	width: 100%;
+	aspect-ratio: 1;
+	border-radius: 6px;
+	background: var(--board);
+	touch-action: none;
+}
+
+.grid-background, .tile-layer { position: absolute; inset: var(--gap); }
+.grid-background { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gap); }
+.grid-background span { border-radius: 4px; background: rgba(238, 228, 218, .35); }
+.tile-layer { pointer-events: none; }
+
+.tile {
+	position: absolute;
+	width: calc((100% - (var(--gap) * 3)) / 4);
+	height: calc((100% - (var(--gap) * 3)) / 4);
+	display: grid;
+	place-items: center;
+	border-radius: 4px;
+	font-size: clamp(1.5rem, 8vw, 3.45rem);
+	font-weight: 700;
+	line-height: 1;
+	transition: transform 110ms ease-in-out;
+}
+
+.tile-2 { background: #eee4da; color: #776e65; }
+.tile-4 { background: #ede0c8; color: #776e65; }
+.tile-8 { background: #f2b179; color: #f9f6f2; }
+.tile-16 { background: #f59563; color: #f9f6f2; }
+.tile-32 { background: #f67c5f; color: #f9f6f2; }
+.tile-64 { background: #f65e3b; color: #f9f6f2; }
+.tile-128 { background: #edcf72; color: #f9f6f2; font-size: clamp(1.25rem, 6.5vw, 2.8rem); }
+.tile-256 { background: #edcc61; color: #f9f6f2; font-size: clamp(1.25rem, 6.5vw, 2.8rem); }
+.tile-512 { background: #edc850; color: #f9f6f2; font-size: clamp(1.25rem, 6.5vw, 2.8rem); }
+.tile-1024 { background: #edc53f; color: #f9f6f2; font-size: clamp(1rem, 5.2vw, 2.3rem); }
+.tile-2048 { background: #edc22e; color: #f9f6f2; font-size: clamp(1rem, 5.2vw, 2.3rem); box-shadow: 0 0 18px 5px rgba(243, 215, 116, .55); }
+.tile-super { background: #3c3a32; color: #f9f6f2; font-size: clamp(.9rem, 4.5vw, 2rem); }
+
+.game-message {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	place-content: center;
+	gap: 20px;
+	padding: 20px;
+	border-radius: 6px;
+	background: rgba(238, 228, 218, .73);
+	text-align: center;
+	z-index: 2;
+}
+
+.game-message[hidden] { display: none; }
+
+.game-message p { margin: 0; color: #776e65; font-size: clamp(2.2rem, 10vw, 3.7rem); font-weight: 700; }
+.message-actions { justify-content: center; flex-wrap: wrap; gap: 8px; }
+
+.how-to { margin: 28px 0 0; font-size: .9rem; line-height: 1.55; }
+
+@media (max-width: 420px) {
+	.game-shell { padding-top: 20px; }
+	.score-box { min-width: 62px; padding-right: 7px; padding-left: 7px; }
+	.score-box strong { font-size: 1.1rem; }
+	.intro-row p { font-size: .92rem; }
+	#new-game { padding: 9px 10px; }
+}
