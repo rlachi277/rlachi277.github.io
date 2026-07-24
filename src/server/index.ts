@@ -7,6 +7,7 @@ import posts from './posts/router.js';
 import cycelog from './cycelog/router.js';
 import kimclweb from './kimclweb/router.js';
 
+import newscript from '../server/newscript/router.js';
 import vibing from '../vibing/script/router.js';
 
 const app = express();
@@ -30,6 +31,7 @@ app.use('/posts', posts);
 app.use('/cycelog', cycelog);
 app.use('/kimclweb', kimclweb);
 
+app.use('/newscript', newscript);
 app.use('/vibing', vibing);
 
 app.listen(port, () => {

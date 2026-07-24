@@ -1,0 +1,73 @@
+:root {
+	background-color: var(--c-bg);
+	color: var(--c-text);
+	font-family: sans-serif;
+}
+
+body {
+	padding-inline: max(2%, 1rem);
+	margin: 0;
+	margin-block-start: calc(-1lh + -4px);
+	margin-block-end: 3rem;
+}
+
+h1 { font-size: 3em; margin-block-start: 1em; margin-block-end: 0.25em; }
+
+@media screen and (max-width: 480px) {
+	body, h1 { margin-block-start: 1rem; }
+}
+
+a { color: var(--c-link); text-decoration: none; }
+a:hover, a:focus-visible { color: var(--c-linkh); text-decoration: underline; }
+a:active { color: var(--c-linka); text-decoration: underline; }
+
+#code {
+	font-family: inherit;
+	display: block;
+	inline-size: 50vi;
+	block-size: 20vb;
+	font-size: 1.5em;
+	background-color: transparent;
+	border: 1px solid currentColor;
+	margin-block-end: 8px;
+}
+
+#result-container {
+	border: 3.8px solid currentColor;
+	max-inline-size: 900px;
+	padding: 18px;
+	background-color: transparent;
+	position: relative;
+}
+
+button {
+	border: 1px solid currentColor;
+	background-color: transparent;
+}
+button:is(:hover, :focus-visible) { background-color: var(--c-0-bgh); }
+button:active { background-color: var(--c-0-bga); }
+
+.grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, 36px);
+	grid-auto-rows: 36px;
+}
+
+.grid:not(#center) { position: absolute; inset-block-start: 18px; inset-inline-start: 18px; inset-block-end: -18px; inset-inline-end: -18px; }
+.grid#edgeh { translate: -18px 0; }
+.grid#edgev { translate: 0 -18px; }
+.grid#corner { translate: -18px -18px; }
+
+.cell {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.cell img {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+	position: absolute;
+}

@@ -24,6 +24,9 @@ const entries = {
   "kimclweb/notfont/entry": "kimclweb/notfont/entries/entry",
   "kimclweb/gallery/entry": "kimclweb/gallery/entries/entry",
   "kimclweb/dobby-timer/entry": "kimclweb/dobby-timer/entries/entry",
+
+  "newscript/normal": "newscript/entries/normal",
+  "newscript/base64": "newscript/entries/base64"
 } satisfies Record<string, string>;
 
 type HtmlTemplate = true | {
@@ -108,6 +111,9 @@ const html: Record<string, HtmlTemplate> = {
     acc[name] = true;
     return acc;
   }, {}),
+
+  "newscript/index": {chunks: ["newscript/normal"]},
+  "newscript/index64": {chunks: ["newscript/base64"]}
 };
 
 const config: webpack.Configuration = {
