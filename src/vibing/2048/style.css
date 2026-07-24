@@ -104,6 +104,9 @@ h1 {
 	transition: transform 110ms ease-in-out;
 }
 
+.moving-tile { z-index: 1; }
+.tile-awaiting-merge { opacity: 0; }
+
 .tile-2 { background: #eee4da; color: #776e65; }
 .tile-4 { background: #ede0c8; color: #776e65; }
 .tile-8 { background: #f2b179; color: #f9f6f2; }

@@ -1,5 +1,7 @@
 type Direction = "up" | "down" | "left" | "right";
 type Cell = number | null;
+type Position = {row: number; column: number};
+type TileMotion = Position & {to: Position; value: number};
 
 const size = 4;
 const boardElement = required<HTMLElement>("game-board");
@@ -65,19 +67,29 @@ function move(direction: Direction): void {
 	if ((won && !keepPlaying) || !movesAvailable()) return;
 	const before = JSON.stringify(board);
 	const traversals = traversal(direction);
+	const motions: TileMotion[] = [];
 
 	for (const line of traversals) {
-		const values = line.map(({row, column}) => board[row][column]).filter((value): value is number => value !== null);
+		const occupied = line.flatMap((position) => {
+			const value = board[position.row][position.column];
+			return value === null ? [] : [{...position, value}];
+		});
 		const merged: number[] = [];
-		for (let index = 0; index < values.length; index++) {
-			if (values[index] === values[index + 1]) {
-				const value = values[index] * 2;
+		let destinationIndex = 0;
+		for (let index = 0; index < occupied.length; index++) {
+			const destination = line[destinationIndex];
+			if (occupied[index].value === occupied[index + 1]?.value) {
+				const value = occupied[index].value * 2;
 				merged.push(value);
 				score += value;
+				addMotion(motions, occupied[index], destination, true);
+				addMotion(motions, occupied[index + 1], destination, true);
 				index++;
 			} else {
-				merged.push(values[index]);
+				merged.push(occupied[index].value);
+				addMotion(motions, occupied[index], destination);
 			}
+			destinationIndex++;
 		}
 		line.forEach(({row, column}, index) => { board[row][column] = merged[index] ?? null; });
 	}
@@ -89,7 +101,20 @@ function move(direction: Direction): void {
 		localStorage.setItem("vibing.2048.best", String(bestScore));
 	}
 	if (!won && board.some((row) => row.includes(2048))) won = true;
-	render();
+	const mergeDestinations = new Set<string>();
+	const motionCounts = new Map<string, number>();
+	motions.forEach((motion) => {
+		const key = positionKey(motion.to);
+		motionCounts.set(key, (motionCounts.get(key) ?? 0) + 1);
+	});
+	motionCounts.forEach((count, key) => {
+		if (count > 1) mergeDestinations.add(key);
+	});
+	render(mergeDestinations);
+	playMotions(motions);
+	window.setTimeout(() => {
+		tileLayer.querySelectorAll(".tile-awaiting-merge").forEach((tile) => tile.classList.remove("tile-awaiting-merge"));
+	}, 140);
 	if (won && !keepPlaying) showMessage("You win!", true);
 	else if (!movesAvailable()) showMessage("Game over!", false);
 }
@@ -118,7 +143,7 @@ function movesAvailable(): boolean {
 	));
 }
 
-function render(): void {
+function render(hiddenTiles = new Set<string>()): void {
 	tileLayer.replaceChildren();
 	board.forEach((row, rowIndex) => row.forEach((value, column) => {
 		if (value === null) return;
@@ -126,15 +151,39 @@ function render(): void {
 		tile.className = `tile ${value <= 2048 ? `tile-${value}` : "tile-super"}`;
 		tile.textContent = String(value);
 		tile.style.transform = `translate(${gridOffset(column)}, ${gridOffset(rowIndex)})`;
+		if (hiddenTiles.has(positionKey({row: rowIndex, column}))) tile.classList.add("tile-awaiting-merge");
 		tileLayer.append(tile);
 	}));
 	scoreElement.textContent = String(score);
 	bestScoreElement.textContent = String(bestScore);
 }
 
+function addMotion(motions: TileMotion[], from: Position & {value: number}, to: Position, includeStationary = false): void {
+	if (!includeStationary && from.row === to.row && from.column === to.column) return;
+	motions.push({row: from.row, column: from.column, to, value: from.value});
+}
+
+function playMotions(motions: TileMotion[]): void {
+	for (const motion of motions) {
+		const ghost = document.createElement("div");
+		ghost.className = `tile moving-tile ${motion.value <= 2048 ? `tile-${motion.value}` : "tile-super"}`;
+		ghost.textContent = String(motion.value);
+		ghost.style.transform = `translate(${gridOffset(motion.column)}, ${gridOffset(motion.row)})`;
+		tileLayer.append(ghost);
+		requestAnimationFrame(() => {
+			ghost.style.transform = `translate(${gridOffset(motion.to.column)}, ${gridOffset(motion.to.row)})`;
+		});
+		window.setTimeout(() => ghost.remove(), 140);
+	}
+}
+
 function gridOffset(index: number): string {
 	if (index === 0) return "0";
 	return `calc(${index * 100}% + ${Array.from({length: index}, () => "var(--gap)").join(" + ")})`;
+}
+
+function positionKey(position: Position): string {
+	return `${position.row}:${position.column}`;
 }
 
 function showMessage(title: string, canContinue: boolean): void {
