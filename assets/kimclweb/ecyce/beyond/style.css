@@ -1,4 +1,4 @@
-@import "../global/font/nanumgothiccoding.css";
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding:wght@400;700&display=swap');
 
 :root { background-color: #277AEA; }
 
