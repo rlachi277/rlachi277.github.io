@@ -6,7 +6,12 @@ p:not(hgroup p) {
 	text-indent: 1ch each-line;
 }
 
-.entry { color: var(--c); outline-offset: 2px; }
+p:has(> ins:only-child) {
+	text-indent: 0;
+	margin-block-start: -0.4lh;
+}
+
+.entry { color: var(--c); outline-offset: 2px; margin-inline-start: 2px; }
 .entry:hover, .entry:focus-visible { color: var(--ch); }
 .entry:active { color: var(--ca); }
 

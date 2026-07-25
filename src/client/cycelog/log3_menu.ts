@@ -76,7 +76,7 @@ export const editMenu = {
 	insertWeek: menuInsert((after, isFirst) => {
 		if (isFirst || after.parentElement !== d$n("main")) return null;
 		const newElement = document.createElement("section");
-		newElement.classList.add("week");
+		// newElement.classList.add("week");
 		const hgroup = document.createElement("hgroup");
 
 		hgroup.append(document.createElement("h2"));
