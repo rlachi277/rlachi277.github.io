@@ -104,6 +104,10 @@ export const editMenu = {
 		el.classList.add("columns");
 		return el;
 	}, false),
+	insertBlockComment: menuInsert((after, isFirst) => {
+		if (!isFirst && after.parentElement === d$n("main")) return null;
+		return document.createElement("ins");
+	}, false),
 	deleteElement: () => {
 		startTargeting((target) => {
 			if (target.tagName === "HGROUP" || /^H[1-6]$/.test(target.tagName)) {

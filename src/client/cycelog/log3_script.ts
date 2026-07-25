@@ -13,6 +13,14 @@ declare global {
 
 export function setup(menuBar: MenubarData[], defaultMenu: MenuActions, editMenu: MenuActions) {
 	const params = new URLSearchParams(window.location.search);
-	if (params.get("edit") && !$(":root.notfound, :root.index").exists) setupLog3Edit(window.LOG3_TYPES ?? '{}');
+	if (params.get("edit") && !$(":root.notfound, :root.index").exists) {
+		$(".entry").each((e) => {
+			const split = e.getAttribute("href")?.split("#");
+			if (split === undefined) return;
+			const newHref = split.slice(0, -1).join("#") + "?edit=t#" + split.at(-1);
+			e.setAttribute("href", newHref);
+		});
+		setupLog3Edit(window.LOG3_TYPES ?? '{}');
+	}
 	postsSetup(menuBar, defaultMenu, editMenu);
 }
