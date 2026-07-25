@@ -59,10 +59,10 @@
 	height: calc(100vh + 252px + 70px);
 	z-index: -1;
 	transform: translateZ(-3px) scale(4);
-	background-image: url('img/area.png');
+	background-image: url('img/area.webp');
 	background-size: cover;
 }
-.archive .bg { background-image: url('img/archive.png'); }
+.archive .bg { background-image: url('img/archive.webp'); }
 
 .bg::before {
 	content: '';
@@ -80,7 +80,7 @@
 
 @media print {
 	html {
-		background-image: url('img/area.png') !important;
+		background-image: url('img/area.webp') !important;
 		background-size: cover !important;
 	}
 
@@ -92,7 +92,7 @@ header {
 	--opacity2: 0;
 	transition: border-bottom-color 1s;
 	transform: translateZ(0);
-	background: url('img/areablur.png');
+	background: url('img/areablur.webp');
 	background-size: 840px 840px;
 	border-bottom: 4.2px solid var(--c-bg);
 }
@@ -140,7 +140,7 @@ header::before {
 	inset: 0;
 	top: 210px;
 	margin: auto;
-	background: url('img/areatext.png');
+	background: url('img/areatext.webp');
 	background-size: cover;
 	background-position: center;
 	opacity: 0;
@@ -176,7 +176,7 @@ header::before {
 
 main.tiles {
 	display: none;
-	background: url('img/areablur.png');
+	background: url('img/areablur.webp');
 	background-size: 840px 840px;
 	position: relative;
 	border-top: 4.2px solid var(--c-grayl2);
@@ -184,7 +184,7 @@ main.tiles {
 	padding-top: 70px;
 }
 .on main.tiles { display: grid; }
-.archive main.tiles { background-image: url('img/archiveblur.png'); }
+.archive main.tiles { background-image: url('img/archiveblur.webp'); }
 
 main.tiles::before {
 	content: '';
