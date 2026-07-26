@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24">
+    <style>
+		.light { display: block; }
+		.dark { display: none; }
+		@media (prefers-color-scheme: dark) {
+			.light { display: none; }
+			.dark { display: block; }
+		}
+	</style>
+	<image class="light" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAxklEQVR4AcyUAQ4CIQwEwUf6SD+JbAKlllpKRb3LbSgUdigk3NKXvx8DHqWkE2KnMiqAMUt8FDKvAeCO95xTRNyjxTMAxi253ShrZ8BwLTV8p5ry/RbAcgDYylPOA8h1dlcN6XdBPAByVIIlJApARZ1nQqIAaSr7HZ6iADJYBbsAHI2UydgFmGZa8hIAXKAlbeM09tcK5GWu+rRrHswVsLecT3TFytoZACdMjAhrhQZAecvFXH+XeQ0AliNxQvBqegW0wZPNEwAA///whBKeAAAABklEQVQDAKBsgTHJgukfAAAAAElFTkSuQmCC" width="24" height="24"/>
+	<image class="dark" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAwUlEQVR4AcSUCw7DIAxDYYfcIXdJJkup8EJGQkpbJItAiB8fiVe5uN0M+LRWdohupZ8AxpQ4FZJXB7Dju9aSEXtIPAJgLMnlzqgdAeLaJk2WhLq/gFk12LM851xApcaFUYgLYFMdRyApAA51wDxICqBN9fiAo08BUBjVEgBXo+WBlgCemZV/HoAHnMnaNc89dwL9mN6Yd83xeAL6y3lhKDZqRwCcsDAj1Cp1gPGXq7XxIXl1AMqR2CF4iX4BMrmz+wIAAP//mCZdQQAAAAZJREFUAwBtEcAx+O5agwAAAABJRU5ErkJggg==" width="24" height="24"/>
+</svg>
