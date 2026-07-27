@@ -148,11 +148,11 @@ router.get('/log3/index.html', (_, res) => {
 
 router.get('/log3/:id', (req, res) => {
 	const id = req.params.id;
-	const types: Record<number,number> = {};
+	const entryData: Record<number,[number,string,string]> = {};
 	const data = getRawLog1(db, id);
-	for (const e of data) types[e.id] = e.type;
+	for (const e of data) entryData[e.id] = [e.type, e.time, e.content];
 
-	const result = getLog3(db, "/cycelog/log3/", id, [entryDeseriHook(types, serverWhere(db))], renderNav(db, "/cycelog/log3/", id), types);
+	const result = getLog3(db, "/cycelog/log3/", id, [entryDeseriHook(entryData, serverWhere(db))], renderNav(db, "/cycelog/log3/", id), entryData);
 	if (result[0]) res.render(log3Template, result[1]);
 	else res.status(404).render(log3NotFoundTemplate, result[1]);
 });

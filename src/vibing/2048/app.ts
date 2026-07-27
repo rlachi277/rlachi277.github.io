@@ -4,6 +4,7 @@ type Position = {row: number; column: number};
 type TileMotion = Position & {to: Position; value: number};
 
 const size = 4;
+const motionDuration = 95;
 const boardElement = required<HTMLElement>("game-board");
 const tileLayer = required<HTMLElement>("tile-layer");
 const scoreElement = required<HTMLElement>("score");
@@ -101,20 +102,12 @@ function move(direction: Direction): void {
 		localStorage.setItem("vibing.2048.best", String(bestScore));
 	}
 	if (!won && board.some((row) => row.includes(2048))) won = true;
-	const mergeDestinations = new Set<string>();
-	const motionCounts = new Map<string, number>();
-	motions.forEach((motion) => {
-		const key = positionKey(motion.to);
-		motionCounts.set(key, (motionCounts.get(key) ?? 0) + 1);
-	});
-	motionCounts.forEach((count, key) => {
-		if (count > 1) mergeDestinations.add(key);
-	});
-	render(mergeDestinations);
+	const motionDestinations = new Set(motions.map((motion) => positionKey(motion.to)));
+	render(motionDestinations);
 	playMotions(motions);
 	window.setTimeout(() => {
-		tileLayer.querySelectorAll(".tile-awaiting-merge").forEach((tile) => tile.classList.remove("tile-awaiting-merge"));
-	}, 140);
+		tileLayer.querySelectorAll(".tile-awaiting-motion").forEach((tile) => tile.classList.remove("tile-awaiting-motion"));
+	}, motionDuration);
 	if (won && !keepPlaying) showMessage("You win!", true);
 	else if (!movesAvailable()) showMessage("Game over!", false);
 }
@@ -151,7 +144,7 @@ function render(hiddenTiles = new Set<string>()): void {
 		tile.className = `tile ${value <= 2048 ? `tile-${value}` : "tile-super"}`;
 		tile.textContent = String(value);
 		tile.style.transform = `translate(${gridOffset(column)}, ${gridOffset(rowIndex)})`;
-		if (hiddenTiles.has(positionKey({row: rowIndex, column}))) tile.classList.add("tile-awaiting-merge");
+		if (hiddenTiles.has(positionKey({row: rowIndex, column}))) tile.classList.add("tile-awaiting-motion");
 		tileLayer.append(tile);
 	}));
 	scoreElement.textContent = String(score);
@@ -170,10 +163,11 @@ function playMotions(motions: TileMotion[]): void {
 		ghost.textContent = String(motion.value);
 		ghost.style.transform = `translate(${gridOffset(motion.column)}, ${gridOffset(motion.row)})`;
 		tileLayer.append(ghost);
+		void ghost.offsetWidth;
 		requestAnimationFrame(() => {
 			ghost.style.transform = `translate(${gridOffset(motion.to.column)}, ${gridOffset(motion.to.row)})`;
 		});
-		window.setTimeout(() => ghost.remove(), 140);
+		window.setTimeout(() => ghost.remove(), motionDuration);
 	}
 }
 

@@ -101,11 +101,11 @@ h1 {
 	font-size: clamp(1.5rem, 8vw, 3.45rem);
 	font-weight: 700;
 	line-height: 1;
-	transition: transform 110ms ease-in-out;
+	transition: transform 95ms ease-in-out;
 }
 
-.moving-tile { z-index: 1; }
-.tile-awaiting-merge { opacity: 0; }
+.moving-tile { z-index: 1; will-change: transform; }
+.tile-awaiting-motion { opacity: 0; }
 
 .tile-2 { background: #eee4da; color: #776e65; }
 .tile-4 { background: #ede0c8; color: #776e65; }

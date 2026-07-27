@@ -7,7 +7,7 @@ import { setupLog3Edit } from "./log3_edit.js";
 
 declare global {
 	interface Window {
-		LOG3_TYPES?: string;
+		LOG3_DATA?: string;
 	}
 }
 
@@ -20,7 +20,7 @@ export function setup(menuBar: MenubarData[], defaultMenu: MenuActions, editMenu
 			const newHref = split.slice(0, -1).join("#") + "?edit=t#" + split.at(-1);
 			e.setAttribute("href", newHref);
 		});
-		setupLog3Edit(window.LOG3_TYPES ?? '{}');
+		setupLog3Edit(window.LOG3_DATA ?? '{}');
 	}
 	postsSetup(menuBar, defaultMenu, editMenu);
 }

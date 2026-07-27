@@ -40,11 +40,11 @@ type MoveData = {
 
 type WhereRow = Required<Pick<EntryRow, "post"|"type">>;
 
-export function getLog3(db: Database, root: string, path: string, renderHooks: DeseriHook[], nav: string, types: Record<number,number>): [boolean, Record<string,string>] {
+export function getLog3(db: Database, root: string, path: string, renderHooks: DeseriHook[], nav: string, entryData: Record<number,[number,string,string]>): [boolean, Record<string,string>] {
 	const result = getPost(db, root, path, renderHooks, nav);
 	return [result[0], {
 		...result[1],
-		types: JSON.stringify(types)
+		entryData: JSON.stringify(entryData)
 	}];
 }
 

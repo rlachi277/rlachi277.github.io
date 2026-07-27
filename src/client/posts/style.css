@@ -362,7 +362,7 @@ dialog {
 #dialog-main input {
 	border: none;
 	border-block-end: 1px solid currentColor;
-	background: var(--c-bg);
+	background: none;
 	font-family: inherit;
 	font-size: 1em;
 }

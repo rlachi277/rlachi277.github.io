@@ -11,7 +11,7 @@ ins:not(p ins) {
 	margin-block-start: -0.4lh;
 }
 
-.entry { color: var(--c); outline-offset: 2px; margin-inline-start: 2px; scroll-margin-block: 50vb; }
+.entry { color: var(--c); outline-offset: 2px; scroll-margin-block: 50vb; }
 .entry:hover, .entry:focus-visible { color: var(--ch); }
 .entry:active { color: var(--ca); }
 

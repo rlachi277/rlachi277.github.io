@@ -10,6 +10,7 @@
     "check:server": "tsc -p tsconfig.server.json --noEmit",
     "check:client": "tsc -p tsconfig.client.json --noEmit",
     "check:webpack": "tsc -p tsconfig.webpack.json --noEmit",
+    "check:vibing": "tsc -p tsconfig.vibing.json --noEmit",
     "check": "npm run check:server && npm run check:client && npm run check:webpack",
     "build:server": "tsc -p tsconfig.server.json",
     "build:client": "webpack --config webpack.config.ts",
