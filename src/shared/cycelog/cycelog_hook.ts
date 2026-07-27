@@ -42,7 +42,7 @@ export function entryDeseriHook(entryData: Record<number,[number,string,string]>
 			const path = id !== undefined ? `./${refData.where}#entry${id}` : '';
 			return {
 				type: 'html',
-				html: `<a class="entry ref" id="${refId}"${id !== undefined ? ` href="${path}" data-id="${id}" title="${id}번 항목 언급"` : ''} data-type="${refData.type}">
+				html: `<a contenteditable="false" class="entry ref" id="${refId}"${id !== undefined ? ` href="${path}" data-id="${id}" title="${id}번 항목 언급"` : ''} data-type="${refData.type}">
 					ref. #${id ?? "?"}
 				</a>`.replaceAll(/\n|\t/g, '')
 			} as const;
