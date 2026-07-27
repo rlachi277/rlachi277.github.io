@@ -564,7 +564,7 @@ export function inlineCleanup(target: Element) {
 }
 
 export function blurCleanup(target: Element) {
-	$('.select-marker', target).remove();
+	$('.select-marker:not(.dialog-marker)', target).remove();
 	normalizeEditable(target);
 	clearHistory();
 }

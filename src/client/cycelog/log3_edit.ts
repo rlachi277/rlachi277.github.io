@@ -1,7 +1,7 @@
 import type { DeseriHook } from '../../shared/posts/seri.js';
 
 import { entrySeriHook, entryDeseriHook } from '../../shared/cycelog/cycelog_hook.js';
-import { d$, d$n } from "../query.js";
+import { $, d$, d$n } from "../query.js";
 import { SERI_HOOKS, DESERI_HOOKS } from "../posts/script.js";
 import { dialog, showWarning } from "../posts/dialog.js";
 import { clientWhere } from './log3_where.js';
@@ -36,6 +36,9 @@ function onKeydown(e: KeyboardEvent) {
 
 function insertEntry() {
 	const range = S.getRangeAt(0);
+	const marker = document.createElement("span");
+	marker.classList.add("select-marker", "dialog-marker");
+	range.insertNode(marker);
 	const container = range.startContainer;
 	const section = ((container instanceof Element) ? container : container.parentElement)?.closest("section");
 	console.log(section?.parentElement);
@@ -70,13 +73,16 @@ function insertEntry() {
 			alert("오류: newEl == undefined");
 			return false;
 		}
-		insertAtRange(range, newEl);
+		insertAtMarker(marker, newEl);
 		return true;
 	})();
 }
 
 function insertReference() {
 	const range = S.getRangeAt(0);
+	const marker = document.createElement("span");
+	marker.classList.add("select-marker", "dialog-marker");
+	range.insertNode(marker);
 	dialog("항목 참조", `
 		<label for="dialog-entry-id">번호: </label>
 		<input id="dialog-entry-id" type="number" placeholder="항목 번호 입력">
@@ -95,19 +101,24 @@ function insertReference() {
 			alert("오류: newEl == undefined");
 			return false;
 		}
-		insertAtRange(range, newEl);
+		insertAtMarker(marker, newEl);
 		return true;
 	})();
 }
 
-function insertAtRange(range: Range, html: string) {
-	const marker = document.createElement("span");
-	marker.classList.add("select-marker");
-	range.insertNode(marker);
+function insertAtMarker(marker: HTMLElement, html: string) {
 	marker.insertAdjacentHTML("beforebegin", html);
+	const range = document.createRange();
 	range.selectNode(marker);
 	range.collapse();
 	S.removeAllRanges();
 	S.addRange(range);
 	S.anchorNode?.dispatchEvent(new Event("input", {bubbles: true}));
+	marker.remove();
+	$(".entry:not([href*='?edit=t'])").each((e) => {
+		const split = e.getAttribute("href")?.split("#");
+		if (split === undefined) return;
+		const newHref = split.slice(0, -1).join("#") + "?edit=t#" + split.at(-1);
+		e.setAttribute("href", newHref);
+	});
 }
