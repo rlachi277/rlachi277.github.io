@@ -15,10 +15,11 @@ export function setup(menuBar: MenubarData[], defaultMenu: MenuActions, editMenu
 	const params = new URLSearchParams(window.location.search);
 	if (params.get("edit") && !$(":root.notfound, :root.index").exists) {
 		$(".entry").each((e) => {
-			const split = e.getAttribute("href")?.split("#");
-			if (split === undefined) return;
-			const newHref = split.slice(0, -1).join("#") + "?edit=t#" + split.at(-1);
-			e.setAttribute("href", newHref);
+			const href = e.getAttribute("href");
+			if (href === null || !href.startsWith("./")) return;
+			const url = new URL(href, window.location.href);
+			url.searchParams.set("edit", "t");
+			e.setAttribute("href", url.toString());
 		});
 		setupLog3Edit(window.LOG3_DATA ?? '{}');
 	}

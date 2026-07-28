@@ -16,10 +16,20 @@ export const defaultMenu = {
 		const path = `../log1/${window.location.pathname.split('/').at(-1)}${window.location.search}`;
 		window.location.href = path;
 	},
-
+	returnToRef: () => {
+		const url = new URL(window.location.href);
+		const ref = url.searchParams.get("ref");
+		if (ref === null) return;
+		url.hash = `#${ref}`;
+		url.searchParams.delete("ref");
+		window.location.href = url.toString();
+	},
 	removeMark: () => {
 		sessionStorage.setItem('scrollY', window.scrollY.toString());
-		window.location.href = window.location.pathname + window.location.search;
+		const url = new URL(window.location.href);
+		url.searchParams.delete("ref");
+		url.hash = "";
+		window.location.href = url.toString();
 	}
 }
 

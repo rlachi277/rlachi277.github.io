@@ -26,7 +26,7 @@ const menu: MenubarData[] = [{
 	text: "기록",
 	submenu: [
 		{text: "3차 기록 보기", action: "toLog3"},
-		{text: "항목 강조 해제", action: "removeMark", filter: [true, false, false]}
+		{text: "강조 해제", action: "removeMark", filter: [true, false, false]}
 	]
 }] as const;
 

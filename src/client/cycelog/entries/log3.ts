@@ -42,7 +42,8 @@ const menu: MenubarData[] = [{
 	text: "기록",
 	submenu: [
 		{text: "1차 기록 보기", action: "toLog1"},
-		{text: "항목 강조 해제", action: "removeMark", filter: [true, false, false]}
+		{text: "참조로 돌아가기", action: "returnToRef", filter: [true, false, false]},
+		{text: "강조 해제", action: "removeMark", filter: [true, false, false]}
 	]
 }] as const;
 

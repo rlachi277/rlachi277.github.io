@@ -185,11 +185,7 @@ function onEditableClick(e: PointerEvent) {
 	if (link === null) return;
 	e.preventDefault();
 	let url = new URL(link.href);
-	if (url.host === window.location.host) {
-		let params = new URLSearchParams(url.search);
-		params.set("edit", "t");
-		url.search = params.toString();
-	}
+	if (url.host === window.location.host) url.searchParams.set("edit", "t");
 	// this will not work on iOS Safari, but like
 	// will you Ctrl-click a link while editing a post on iOS
 	if (e.shiftKey) window.open(url, "_blank", "noopener");

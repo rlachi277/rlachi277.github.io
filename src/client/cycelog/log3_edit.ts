@@ -115,10 +115,11 @@ function insertAtMarker(marker: HTMLElement, html: string) {
 	S.addRange(range);
 	S.anchorNode?.dispatchEvent(new Event("input", {bubbles: true}));
 	marker.remove();
-	$(".entry:not([href*='?edit=t'])").each((e) => {
-		const split = e.getAttribute("href")?.split("#");
-		if (split === undefined) return;
-		const newHref = split.slice(0, -1).join("#") + "?edit=t#" + split.at(-1);
-		e.setAttribute("href", newHref);
+	$(".entry[href]:not([href*='edit=t'])").each((e) => {
+		const href = e.getAttribute("href");
+		if (href === null || !href.startsWith("./")) return;
+		const url = new URL(href, window.location.href);
+		url.searchParams.set("edit", "t");
+		e.setAttribute("href", url.toString());
 	});
 }

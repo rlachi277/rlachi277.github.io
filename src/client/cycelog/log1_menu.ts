@@ -28,7 +28,10 @@ export const defaultMenu = {
 
 	removeMark: () => {
 		sessionStorage.setItem('scrollY', window.scrollY.toString());
-		window.location.href = window.location.pathname + window.location.search;
+		const url = new URL(window.location.href);
+		url.searchParams.delete("ref");
+		url.hash = "";
+		window.location.href = url.toString();
 	}
 };
 

@@ -7,7 +7,6 @@ export type WhereData = {
 
 export type WhereFunc = (id: number | undefined, refId: string) => WhereData;
 
-let refCnt = 0;
 export function entryDeseriHook(entryData: Record<number,[number,string,string]>, whereFunc: WhereFunc): DeseriHook {
 	return function (data, cur) {
 		const postId = cur.split('/').at(-1) as string;
@@ -32,17 +31,16 @@ export function entryDeseriHook(entryData: Record<number,[number,string,string]>
 			} as const;
 		} else if (data.type === 'ref') {
 			const id = (data.variant?.id ?? undefined) as number | undefined;
-			refCnt += 1;
-			const refId = `ref${refCnt}`;
+			const refId = (data.variant?.refId as string | null | undefined) ?? `ref${Math.random().toString(36).substring(2)}`;
 			let refData: WhereData | undefined = undefined;
 			if (id !== undefined && Object.hasOwn(entryData, id)) {
 				refData = {where: postId, type: entryData?.[id][0] ?? 0};
 			}
 			if (refData === undefined) refData = whereFunc(id, refId);
-			const path = id !== undefined ? `./${refData.where}#entry${id}` : '';
+			const path = id !== undefined ? `./${refData.where}?ref=${refId}#entry${id}` : '';
 			return {
 				type: 'html',
-				html: `<a contenteditable="false" class="entry ref" id="${refId}"${id !== undefined ? ` href="${path}" data-id="${id}" title="${id}번 항목 언급"` : ''} data-type="${refData.type}">
+				html: `<a contenteditable="false" class="entry ref" id="${refId}"${id !== undefined ? ` href="${path}" data-id="${id}" title="${id}번 항목 참조"` : ''} data-type="${refData.type}">
 					ref. #${id ?? "?"}
 				</a>`.replaceAll(/\n|\t/g, '')
 			} as const;
@@ -51,11 +49,11 @@ export function entryDeseriHook(entryData: Record<number,[number,string,string]>
 	};
 }
 
-export const entrySeriHook: SeriHook = function (el, _) {
+export const entrySeriHook: SeriHook = function (el, _): ReturnType<SeriHook> {
 	if (el.classList.contains("ref")) {
 		return {
 			type: 'ref',
-			variant: {id: parseInt(el.getAttribute("data-id") ?? ""), date: el.getAttribute("data-date") ?? null}, // NaN -> null
+			variant: {id: parseInt(el.getAttribute("data-id") ?? ""), refId: el.getAttribute("id") ?? null, date: el.getAttribute("data-date") ?? null}, // NaN -> null
 			children: null
 		} as const;
 	} else if (el.classList.contains("entry")) {
