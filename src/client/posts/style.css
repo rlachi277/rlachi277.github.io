@@ -237,6 +237,7 @@ ins {
 }
 
 del {
+	background-color: var(--c-0-bga);
 	color: var(--c-0--2);
 }
 

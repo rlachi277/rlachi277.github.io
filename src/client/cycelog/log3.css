@@ -2,13 +2,36 @@
 	font-family: "Pretendard GOV Variable", "Pretendard GOV", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
 }
 
+body {
+	margin-block-end: 12rem;
+}
+
+main > section.week > section { color: var(--c-0); }
+
+section.week > hgroup > h2::first-line { /* I really didn't want to make another element */
+	background-color: light-dark(yellow, transparent);
+	color: light-dark(currentColor, yellow);
+}
+
+section.week > hgroup > p::first-line {
+	background-color: light-dark(lime, transparent);
+	color: light-dark(currentColor, lime);
+}
+
 p:not(hgroup p) {
 	text-indent: 1ch each-line;
 }
 
-ins:not(p ins) {
+ins.editable {
 	display: block;
 	margin-block-start: -0.4lh;
+}
+
+pre {
+	font-family: 'Nanum Gothic Coding', monospace;
+	padding-inline: 2ch;
+	margin-block-start: -0.4lh;
+	overflow-x: auto;
 }
 
 .entry { color: var(--c); outline-offset: 2px; scroll-margin-block: 50vb; }
@@ -25,7 +48,7 @@ ins:not(p ins) {
 .entry[data-type="4"] { --c: var(--c-45); --ch: var(--c-45h); --ca: var(--c-45a); }
 .entry[data-type="5"] { --c: var(--c-67); --ch: var(--c-67h); --ca: var(--c-67a); }
 .entry[data-type="6"] { --c: var(--c-2); --ch: var(--c-2h); --ca: var(--c-2a); }
-.entry[data-type="add"] { --c: var(--c-0); --ch: var(--c-0h); --ca: var(--c-0a); }
+.entry[data-type="add"] { --c: var(--c-0); --ch: var(--c-0h); --ca: var(--c-0h); }
 
 .entry:target {
 	background-color: Mark;

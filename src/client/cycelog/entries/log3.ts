@@ -30,11 +30,12 @@ const menu: MenubarData[] = [{
 	submenu: [
 		{text: "주차 추가", action: "insertWeek"},
 		{text: "문단 삽입", action: "insertP"},
-		{text: "<section> 삽입", action: "insertSection"},
+		{text: "단락 삽입", action: "insertSection"},
 		{text: "<fieldset> 삽입", action: "insertFieldset"},
 		{text: "<legend> 삽입", action: "insertLegend"},
 		{text: "다단 레이아웃 삽입", action: "insertColumns"},
 		{text: "블록 주석 삽입", action: "insertBlockComment"},
+		{text: "<pre> 삽입", action: "insertPre"},
 		{text: "요소 삭제", action: "deleteElement"},
 		{text: "삽입/삭제 중단", action: "stopTargeting"}
 	]

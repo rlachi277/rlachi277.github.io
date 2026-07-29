@@ -29,7 +29,7 @@ const SIMPLE_TYPES = new Set([
 	"h1", "h2", "h3", "h4", "h5", "h6",
 	"figcaption", "legend",
 	"li", "summary",
-	"strong", "em", "b", "i", "u", "s",
+	"strong", "em", "b", "i", "u", "s", "pre",
 	"ruby", "rt", "rp",
 	"sub", "sup", "ins", "del"
 ]);
@@ -54,7 +54,7 @@ export function seri(el: Node, init: boolean = false, hooks: SeriHook[] = []): S
 			return {
 				type: hookResult.type,
 				...(hookResult.variant !== undefined && {variant: hookResult.variant}),
-				children: (hookResult.children === null) ? null : children
+				children: (hookResult.children === null) ? null : hookResult.children.concat(children)
 			};
 		}
 	}

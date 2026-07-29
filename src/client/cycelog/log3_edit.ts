@@ -1,6 +1,6 @@
 import type { DeseriHook } from '../../shared/posts/seri.js';
 
-import { entrySeriHook, entryDeseriHook } from '../../shared/cycelog/cycelog_hook.js';
+import { cycelogSeriHook, cycelogDeseriHook } from '../../shared/cycelog/cycelog_hook.js';
 import { $, d$, d$n } from "../query.js";
 import { SERI_HOOKS, DESERI_HOOKS } from "../posts/script.js";
 import { dialog, showWarning } from "../posts/dialog.js";
@@ -11,8 +11,8 @@ let deseriHook: DeseriHook;
 
 export function setupLog3Edit(entryDataString: string) {
 	entryData = Object.freeze(JSON.parse(entryDataString));
-	deseriHook = entryDeseriHook(entryData, clientWhere("/cycelog/"));
-	SERI_HOOKS.push(entrySeriHook);
+	deseriHook = cycelogDeseriHook(entryData, clientWhere("/cycelog/"));
+	SERI_HOOKS.push(cycelogSeriHook);
 	DESERI_HOOKS.push(deseriHook);
 	document.body.addEventListener("keydown", onKeydown);
 }
@@ -117,7 +117,7 @@ function insertAtMarker(marker: HTMLElement, html: string) {
 	marker.remove();
 	$(".entry[href]:not([href*='edit=t'])").each((e) => {
 		const href = e.getAttribute("href");
-		if (href === null || !href.startsWith("./")) return;
+		if (href === null) return;
 		const url = new URL(href, window.location.href);
 		url.searchParams.set("edit", "t");
 		e.setAttribute("href", url.toString());

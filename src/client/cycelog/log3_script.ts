@@ -16,7 +16,7 @@ export function setup(menuBar: MenubarData[], defaultMenu: MenuActions, editMenu
 	if (params.get("edit") && !$(":root.notfound, :root.index").exists) {
 		$(".entry").each((e) => {
 			const href = e.getAttribute("href");
-			if (href === null || !href.startsWith("./")) return;
+			if (href === null) return;
 			const url = new URL(href, window.location.href);
 			url.searchParams.set("edit", "t");
 			e.setAttribute("href", url.toString());

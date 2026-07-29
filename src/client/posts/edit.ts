@@ -19,7 +19,7 @@ export type ElementFactory = (after: Element, isFirst: boolean) => Element | nul
 const EDITABLES = new Set([
 	"H1", "H2", "H3", "H4", "H5", "H6",
 	"P", "FIGCAPTION", "LEGEND",
-	"STRONG", "EM", "B", "I", "U",
+	"STRONG", "EM", "B", "I", "U", "S", "PRE",
 	"RUBY", "RT", "RP",
 	"SUB", "SUP", "INS", "DEL",
 	"SUMMARY", "A", "BUTTON"

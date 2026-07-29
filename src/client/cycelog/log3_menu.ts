@@ -20,9 +20,11 @@ export const defaultMenu = {
 		const url = new URL(window.location.href);
 		const ref = url.searchParams.get("ref");
 		if (ref === null) return;
-		url.hash = `#${ref}`;
-		url.searchParams.delete("ref");
-		window.location.href = url.toString();
+		const [postId, refId] = ref.split('.');
+		const target = new URL(`./${postId}`, url);
+		if (url.searchParams.get("edit") !== null) target.searchParams.set("edit", "t");
+		target.hash = `#${refId}`;
+		window.location.href = target.toString();
 	},
 	removeMark: () => {
 		sessionStorage.setItem('scrollY', window.scrollY.toString());
@@ -86,7 +88,7 @@ export const editMenu = {
 	insertWeek: menuInsert((after, isFirst) => {
 		if (isFirst || after.parentElement !== d$n("main")) return null;
 		const newElement = document.createElement("section");
-		// newElement.classList.add("week");
+		newElement.classList.add("week");
 		const hgroup = document.createElement("hgroup");
 
 		hgroup.append(document.createElement("h2"));
@@ -113,6 +115,10 @@ export const editMenu = {
 		const el = document.createElement("div");
 		el.classList.add("columns");
 		return el;
+	}, false),
+	insertPre: menuInsert((after, isFirst) => {
+		if (!isFirst && after.parentElement === d$n("main")) return null;
+		return document.createElement("pre");
 	}, false),
 	insertBlockComment: menuInsert((after, isFirst) => {
 		if (!isFirst && after.parentElement === d$n("main")) return null;

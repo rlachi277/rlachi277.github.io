@@ -17,7 +17,7 @@ import {
 } from "./cycelog.js";
 import { withErrors } from "../posts/router.js";
 import { renderNav } from '../posts/render_nav.js';
-import { entryDeseriHook } from '../../shared/cycelog/cycelog_hook.js';
+import { cycelogDeseriHook } from '../../shared/cycelog/cycelog_hook.js';
 
 const db = new Database('db/cycelog.db');
 db.pragma('journal_mode = WAL');
@@ -152,7 +152,7 @@ router.get('/log3/:id', (req, res) => {
 	const data = getRawLog1(db, id);
 	for (const e of data) entryData[e.id] = [e.type, e.time, e.content];
 
-	const result = getLog3(db, "/cycelog/log3/", id, [entryDeseriHook(entryData, serverWhere(db))], renderNav(db, "/cycelog/log3/", id), entryData);
+	const result = getLog3(db, "/cycelog/log3/", id, [cycelogDeseriHook(entryData, serverWhere(db))], renderNav(db, "/cycelog/log3/", id), entryData);
 	if (result[0]) res.render(log3Template, result[1]);
 	else res.status(404).render(log3NotFoundTemplate, result[1]);
 });

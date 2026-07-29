@@ -331,10 +331,10 @@ function tabCommand(this: Element, e: KeyboardEvent) {
 	let command = null;
 	if (cmd === "b") command = "strong";
 	else if (cmd === "u") command = "em";
-	else if (cmd === "^") command = "sup";
-	else if (cmd === "_") command = "sub";
-	else if (cmd === "d") command = "del";
-	else if (cmd === "e") command = "ins";
+	else if (cmd === "^" || cmd === "sup") command = "sup";
+	else if (cmd === "_" || cmd === "sub") command = "sub";
+	else if (cmd === "d" || cmd === "del") command = "del";
+	else if (cmd === "e" || cmd === "ins") command = "ins";
 	else if (cmd === "s") command = "s";
 	else if (0 <= parseInt(cmd) && parseInt(cmd) <= 10) command = `color${cmd}`; // goodbye cursed JS moment
 	else if (cmd.startsWith("cb")) {
