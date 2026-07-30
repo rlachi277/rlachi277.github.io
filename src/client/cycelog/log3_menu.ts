@@ -116,10 +116,19 @@ export const editMenu = {
 		el.classList.add("columns");
 		return el;
 	}, false),
-	insertPre: menuInsert((after, isFirst) => {
-		if (!isFirst && after.parentElement === d$n("main")) return null;
-		return document.createElement("pre");
-	}, false),
+	insertPre: dialog("<pre> 삽입", `
+		<label for="dialog-wrap">자동 줄바꿈: </label>
+		<input id="dialog-wrap" type="checkbox">
+	`, async () => {
+		const wrap = (d$n("dialog-wrap") as HTMLInputElement).checked;
+		menuInsert((after, isFirst) => {
+			if (!isFirst && after.parentElement === d$n("main")) return null;
+			const el = document.createElement("pre");
+			if (wrap) el.classList.add("wrap");
+			return el;
+		}, false)();
+		return true;
+	}),
 	insertBlockComment: menuInsert((after, isFirst) => {
 		if (!isFirst && after.parentElement === d$n("main")) return null;
 		return document.createElement("ins");

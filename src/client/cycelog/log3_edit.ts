@@ -31,6 +31,8 @@ function onKeydown(e: KeyboardEvent) {
 		insertEntry();
 	} else if (shortcut && e.key === "e" && e.shiftKey) {
 		insertReference();
+	} else if (shortcut && e.key === ";") {
+		insertEndOfWeek();
 	}
 }
 
@@ -104,6 +106,15 @@ function insertReference() {
 		insertAtMarker(marker, newEl);
 		return true;
 	})();
+}
+
+function insertEndOfWeek() {
+	const range = S.getRangeAt(0);
+	const marker = document.createElement("span");
+	marker.classList.add("select-marker", "dialog-marker");
+	range.insertNode(marker);
+	const newEl = `<span class="semantic end-of-week">그렇게 ???가 끝났다.</span>`;
+	insertAtMarker(marker, newEl);
 }
 
 function insertAtMarker(marker: HTMLElement, html: string) {

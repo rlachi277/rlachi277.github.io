@@ -60,6 +60,9 @@ p[lang=en] { hyphens: auto; }
 
 hr { color: inherit; border: none; margin-block: 0.5lh; }
 
+pre { overflow-x: auto; }
+pre.wrap { white-space: pre-wrap; overflow-x: none; }
+
 .columns { columns: 20em; }
 .columns:has( > :is(p, figure):first-child, > .first-bar + :is(p, figure)) { margin-block-start: 0.4lh; }
 .columns > :is(p, figure):first-child, .columns > .first-bar + :is(p, figure) { margin-block-start: 0; }
@@ -237,8 +240,8 @@ ins {
 }
 
 del {
-	background-color: var(--c-0-bga);
-	color: var(--c-0--2);
+	background-color: light-dark(var(--c-0-l3), var(--c-0-d5));
+	color: light-dark(var(--c-0-d2), var(--c-0-d1));
 }
 
 nav {
@@ -367,6 +370,25 @@ dialog {
 	font-family: inherit;
 	font-size: 1em;
 }
+#dialog-main input[type="checkbox"] {
+	appearance: none;
+	inline-size: 0.85lh;
+	block-size: 0.85lh;
+	vertical-align: top;
+	box-sizing: border-box;
+	border: 1.5px solid currentColor;
+	background: transparent;
+	margin-inline: 0;
+	margin-block: 0.075lh;
+	position: relative;
+}
+#dialog-main input[type="checkbox"]:checked::before {
+	content: '';
+	position: absolute;
+	inset: 2.5px;
+	background-color: currentColor;
+}
+#dialog-main input[type="checkbox"]:hover { background-color: var(--c-bgh); }
 #dialog-main input::file-selector-button {
 	border: 1px solid currentColor;
 	border-block-end: none;

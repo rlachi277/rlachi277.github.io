@@ -14,24 +14,12 @@ section.week > hgroup > h2::first-line { /* I really didn't want to make another
 }
 
 section.week > hgroup > p::first-line {
-	background-color: light-dark(lime, transparent);
-	color: light-dark(currentColor, lime);
+	background-color: light-dark(#00ff00dd, transparent);
+	color: light-dark(currentColor, #00ff33);
 }
 
 p:not(hgroup p) {
 	text-indent: 1ch each-line;
-}
-
-ins.editable {
-	display: block;
-	margin-block-start: -0.4lh;
-}
-
-pre {
-	font-family: 'Nanum Gothic Coding', monospace;
-	padding-inline: 2ch;
-	margin-block-start: -0.4lh;
-	overflow-x: auto;
 }
 
 .entry { color: var(--c); outline-offset: 2px; scroll-margin-block: 50vb; }
@@ -54,4 +42,21 @@ pre {
 	background-color: Mark;
 	color: MarkText;
 	outline: 1px auto var(--c);
+}
+
+section > ins {
+	display: block;
+	margin-block-start: -0.4lh;
+}
+
+pre {
+	font-family: 'Nanum Gothic Coding', monospace;
+	padding-inline: 2ch;
+	margin-block-start: -0.4lh;
+	line-height: 1.05;
+}
+
+.end-of-week {
+	background-color: light-dark(#00ff00dd, transparent);
+	color: light-dark(currentColor, #00ff33);
 }

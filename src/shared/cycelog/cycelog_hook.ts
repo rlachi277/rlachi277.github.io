@@ -1,4 +1,4 @@
-import type { DeseriHook, SeriHook } from "../posts/seri.js";
+import { sani, type DeseriHook, type SeriHook } from "../posts/seri.js";
 
 export type WhereData = {
 	readonly where: string,
@@ -16,6 +16,12 @@ export function cycelogDeseriHook(entryData: Record<number,[number,string,string
 				tagName: 'section',
 				attrs: ` class="week"`
 			};
+		} else if (data.type === 'end-of-week') {
+			return {
+				type: 'normal',
+				tagName: 'span',
+				attrs: ` class="semantic end-of-week"`
+			};
 		} else if (data.type === 'entry') {
 			const id = (data.variant?.id ?? undefined) as number | undefined;
 			const date = (data.variant?.date ?? undefined) as string | undefined;
@@ -31,8 +37,8 @@ export function cycelogDeseriHook(entryData: Record<number,[number,string,string
 			const path = id !== undefined ? `../log1/${postId}#entry${id}` : '';
 			return {
 				type: 'html',
-				html: `<a contenteditable="false" class="entry"${id !== undefined ? ` href="${path}" id="entry${id}" data-id="${id}" title="${id}번 항목(${entryData?.[id][1] ?? '?'}) / ${entryData?.[id][2] ?? '?'}"` : ''}${date !== undefined ? ` data-date=${date}` : ''} data-type="${type}">
-					#${id ?? "?"}${date !== undefined ? ` ${date}` : ''}
+				html: `<a contenteditable="false" class="entry"${id !== undefined ? ` href="${sani(path)}" id="entry${id}" data-id="${id}" title="${id}번 항목(${sani(entryData?.[id][1] ?? '?')}) / ${sani(entryData?.[id][2] ?? '?')}"` : ''}${date !== undefined ? ` data-date="${sani(date)}"` : ''} data-type="${type}">
+					#${id ?? "?"}${date !== undefined ? ` ${sani(date)}` : ''}
 				</a>`.replaceAll(/\n|\t/g, '')
 			} as const;
 		} else if (data.type === 'ref') {
@@ -46,7 +52,7 @@ export function cycelogDeseriHook(entryData: Record<number,[number,string,string
 			const path = id !== undefined ? `./${refData.where}?ref=${postId}.${refId}#entry${id}` : '';
 			return {
 				type: 'html',
-				html: `<a contenteditable="false" class="entry ref" id="${refId}"${id !== undefined ? ` href="${path}" data-id="${id}" title="${id}번 항목 참조"` : ''} data-type="${refData.type}">
+				html: `<a contenteditable="false" class="entry ref" id="${refId}"${id !== undefined ? ` href="${sani(path)}" data-id="${id}" title="${id}번 항목 참조"` : ''} data-type="${refData.type}">
 					ref. #${id ?? "?"}
 				</a>`.replaceAll(/\n|\t/g, '')
 			} as const;
@@ -59,6 +65,11 @@ export const cycelogSeriHook: SeriHook = function (el, _): ReturnType<SeriHook> 
 	if (el.classList.contains("week")) {
 		return {
 			type: 'week',
+			children: []
+		} as const;
+	} else if (el.classList.contains("end-of-week")) {
+		return {
+			type: 'end-of-week',
 			children: []
 		} as const;
 	} if (el.classList.contains("entry")) {

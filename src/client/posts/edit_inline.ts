@@ -29,7 +29,9 @@ function clearHistory() {
 export function inlineCommands(this: Element, shortcut: boolean, e: KeyboardEvent) {
 	if (shortcut) {
 		let command = null;
-		if (e.key === "b") command = "strong";
+		if (e.key === "z" && e.shiftKey) command = "redo";
+		else if (e.key === "z") command = "undo";
+		else if (e.key === "b") command = "strong";
 		else if (e.key === "u") command = "em";
 		else if (e.key === ".") command = "sup";
 		else if (e.key === ",") command = "sub";
@@ -37,8 +39,6 @@ export function inlineCommands(this: Element, shortcut: boolean, e: KeyboardEven
 		else if (e.key === "e") command = "ins";
 		else if (e.key === "x" && e.shiftKey) command = "s";
 		else if (e.key === "k") command = "a";
-		else if (e.key === "z" && e.shiftKey) command = "redo";
-		else if (e.key === "z") command = "undo";
 		else if ("0" <= e.key && e.key <= "9") command = `color${e.key}`;
 		else return false;
 		
@@ -277,7 +277,7 @@ function descendRight(node: Node | null, offset: number | undefined = undefined)
 	return node;
 }
 
-const SYMBOLS: Record<string,string> = {".": "·", "st": "☆"};
+const SYMBOLS: Record<string,string> = {".": "·", "st": "☆", "--": "—"};
 
 function tabCommand(this: Element, e: KeyboardEvent) {
 	if (

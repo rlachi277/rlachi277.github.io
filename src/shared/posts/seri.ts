@@ -29,7 +29,7 @@ const SIMPLE_TYPES = new Set([
 	"h1", "h2", "h3", "h4", "h5", "h6",
 	"figcaption", "legend",
 	"li", "summary",
-	"strong", "em", "b", "i", "u", "s", "pre",
+	"strong", "em", "b", "i", "u", "s",
 	"ruby", "rt", "rp",
 	"sub", "sup", "ins", "del"
 ]);
@@ -89,6 +89,11 @@ export function seri(el: Node, init: boolean = false, hooks: SeriHook[] = []): S
 	case 'P':
 		result.type = "p";
 		result.variant = getAttributes(el, ["lang"]);
+		break;
+	case 'PRE':
+		result.type = "pre";
+		result.variant = {wrap: null};
+		if (el.classList.contains('wrap')) result.variant.wrap = true;
 		break;
 	case 'FIGURE':
 		result.type = "figure";
@@ -248,6 +253,10 @@ export function deseri(data: SeriData, cur: string, init: boolean = false, hooks
 	case 'p':
 		tagName = "p";
 		attrs += setAttributes(data.variant, ["lang"]);
+		break;
+	case 'pre':
+		tagName = "pre";
+		if (data.variant?.wrap) attrs = ` class="wrap"`;
 		break;
 	case 'img':
 		tagName = "img";
