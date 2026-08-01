@@ -28,8 +28,8 @@ export function cycelogDeseriHook(entryData: Record<number,[number,string,string
 			if (id === 0 || id === -1 || id === -3) {
 				return {
 					type: 'html',
-					html: `<span contenteditable="false" class="entry semantic" data-type="add" data-id="${id}" title="수첩 기록에 없었으나 ${id === 0 ? "이후" : (id === -1 ? "1차 기록 시" : "3차 기록 시")} 추가한 정보">
-						${id === 0 ? "Add" : (id === -1 ? "Add1" : "Add3")}
+					html: `<span contenteditable="false" class="entry semantic" data-type="add" data-id="${id}" title="수첩 기록에 없었으나 ${id === 0 ? "이후" : (id === -1 ? "1차 기록 시" : "3차 기록 시")} 추가한 정보"${date !== undefined ? ` data-date="${sani(date)}"` : ''}>
+						${id === 0 ? "Add" : (id === -1 ? "Add1" : "Add3")}${date !== undefined ? ` ${sani(date)}` : ''}
 					</span>`.replaceAll(/\n|\t/g, '')
 				} as const;
 			}
@@ -38,7 +38,7 @@ export function cycelogDeseriHook(entryData: Record<number,[number,string,string
 			return {
 				type: 'html',
 				html: `<a contenteditable="false" class="entry"${id !== undefined ? ` href="${sani(path)}" id="entry${id}" data-id="${id}" title="${id}번 항목(${sani(entryData?.[id][1] ?? '?')}) / ${sani(entryData?.[id][2] ?? '?')}"` : ''}${date !== undefined ? ` data-date="${sani(date)}"` : ''} data-type="${type}">
-					#${id ?? "?"}${date !== undefined ? ` ${sani(date)}` : ''}
+					#${id ?? "?"}${date !== undefined ? ` ${sani(date)}` : ''}
 				</a>`.replaceAll(/\n|\t/g, '')
 			} as const;
 		} else if (data.type === 'ref') {
@@ -53,7 +53,7 @@ export function cycelogDeseriHook(entryData: Record<number,[number,string,string
 			return {
 				type: 'html',
 				html: `<a contenteditable="false" class="entry ref" id="${refId}"${id !== undefined ? ` href="${sani(path)}" data-id="${id}" title="${id}번 항목 참조"` : ''} data-type="${refData.type}">
-					ref. #${id ?? "?"}
+					ref. #${id ?? "?"}
 				</a>`.replaceAll(/\n|\t/g, '')
 			} as const;
 		}
@@ -72,16 +72,16 @@ export const cycelogSeriHook: SeriHook = function (el, _): ReturnType<SeriHook> 
 			type: 'end-of-week',
 			children: []
 		} as const;
-	} if (el.classList.contains("entry")) {
-		return {
-			type: 'entry',
-			variant: {id: parseInt(el.getAttribute("data-id") ?? ""), date: el.getAttribute("data-date") ?? null}, // NaN -> null
-			children: null
-		} as const;
-	} else if (el.classList.contains("ref")) {
+	} if (el.classList.contains("ref")) {
 		return {
 			type: 'ref',
 			variant: {id: parseInt(el.getAttribute("data-id") ?? ""), refId: el.getAttribute("id") ?? null, date: el.getAttribute("data-date") ?? null}, // NaN -> null
+			children: null
+		} as const;
+	} else if (el.classList.contains("entry")) {
+		return {
+			type: 'entry',
+			variant: {id: parseInt(el.getAttribute("data-id") ?? ""), date: el.getAttribute("data-date") ?? null}, // NaN -> null
 			children: null
 		} as const;
 	}

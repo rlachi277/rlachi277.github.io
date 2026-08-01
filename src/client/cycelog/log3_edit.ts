@@ -31,7 +31,7 @@ function onKeydown(e: KeyboardEvent) {
 		insertEntry();
 	} else if (shortcut && e.key === "e" && e.shiftKey) {
 		insertReference();
-	} else if (shortcut && e.key === ";") {
+	} else if (shortcut && e.key === ".") {
 		insertEndOfWeek();
 	}
 }
@@ -43,7 +43,6 @@ function insertEntry() {
 	range.insertNode(marker);
 	const container = range.startContainer;
 	const section = ((container instanceof Element) ? container : container.parentElement)?.closest("section");
-	console.log(section?.parentElement);
 	const isAtSubsection = (section instanceof HTMLElement) && (section.parentElement !== d$n("main"));
 	dialog("항목 반영", `
 		<label for="dialog-entry-id">번호: </label>

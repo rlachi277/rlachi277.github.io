@@ -134,6 +134,10 @@ figure.float-right, figure.float-left {
 figure.float-right { float: inline-end; }
 figure.float-left { float: inline-start; }
 
+.align { display: block; }
+.align.align-center { text-align-last: center; }
+.align.align-right { text-align-last: end; }
+
 a { color: var(--c-link); text-decoration: none; }
 a:hover, a:focus-visible { color: var(--c-linkh); text-decoration: underline; }
 a:active { color: var(--c-linka); text-decoration: underline; }
@@ -457,6 +461,11 @@ dialog {
 	inset-inline-end: calc(100% + 0.05lh);
 	inset-inline-start: -0.45lh;
 	background-color: var(--barbg);
+	appearance: none;
+	border: none;
+	padding: 0;
+	margin: 0;
+	font: inherit;
 }
 .container-bar.middle-bar { background-color: var(--midbg); z-index: -1; }
 .container-bar.first-bar { inset-block-end: max(50% + 1px, 100% - 3lh); }

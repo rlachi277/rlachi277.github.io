@@ -172,6 +172,11 @@ export function seri(el: Node, init: boolean = false, hooks: SeriHook[] = []): S
 		} else if (el.classList.contains("colorbox")) {
 			result.type = "colorbox";
 			result.variant = {color: getColor(el.classList), click: el.classList.contains("click")};
+		} else if (el.classList.contains("align")) {
+			result.type = "align";
+			result.variant = {direction: null};
+			if (el.classList.contains('align-center')) result.variant.direction = "center";
+			else if (el.classList.contains('align-right')) result.variant.direction = "right";
 		} else {
 			return null;
 		}
@@ -335,6 +340,13 @@ export function deseri(data: SeriData, cur: string, init: boolean = false, hooks
 	case 'colorbox':
 		tagName = "span";
 		attrs = ` class="colorbox c${data.variant?.color}${data.variant?.click?" click":""}"`;
+		break;
+	case 'align':
+		tagName = "span";
+		switch (data.variant?.direction) {
+			case 'center': attrs = ` class="align align-center"`; break;
+			case 'right': attrs = ` class="align align-right"`; break;
+		}
 		break;
 	default:
 		return null;

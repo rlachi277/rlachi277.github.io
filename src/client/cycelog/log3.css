@@ -15,7 +15,7 @@ section.week > hgroup > h2::first-line { /* I really didn't want to make another
 
 section.week > hgroup > p::first-line {
 	background-color: light-dark(#00ff00dd, transparent);
-	color: light-dark(currentColor, #00ff33);
+	color: light-dark(currentColor, #00ff44);
 }
 
 p:not(hgroup p) {
@@ -36,7 +36,7 @@ p:not(hgroup p) {
 .entry[data-type="4"] { --c: var(--c-45); --ch: var(--c-45h); --ca: var(--c-45a); }
 .entry[data-type="5"] { --c: var(--c-67); --ch: var(--c-67h); --ca: var(--c-67a); }
 .entry[data-type="6"] { --c: var(--c-2); --ch: var(--c-2h); --ca: var(--c-2a); }
-.entry[data-type="add"] { --c: var(--c-0); --ch: var(--c-0h); --ca: var(--c-0h); }
+.entry[data-type="add"] { --c: var(--c-0h); --ch: var(--c-0a); --ca: var(--c-0a); }
 
 .entry:target {
 	background-color: Mark;
@@ -58,5 +58,5 @@ pre {
 
 .end-of-week {
 	background-color: light-dark(#00ff00dd, transparent);
-	color: light-dark(currentColor, #00ff33);
+	color: light-dark(currentColor, #00ff44);
 }

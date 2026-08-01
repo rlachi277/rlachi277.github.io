@@ -40,6 +40,8 @@ export function inlineCommands(this: Element, shortcut: boolean, e: KeyboardEven
 		else if (e.key === "x" && e.shiftKey) command = "s";
 		else if (e.key === "k") command = "a";
 		else if ("0" <= e.key && e.key <= "9") command = `color${e.key}`;
+		else if (e.key === ";") command = "align-center";
+		else if (e.key === "'") command = "align-right";
 		else return false;
 		
 		if (command === "undo") {
@@ -259,7 +261,9 @@ function applyCommand(affected: AffectedWithFormats[], command: string, allOn: b
 
 function nextNode(node: Node | null): Node | null {
 	if (node === null) return null;
-	return node.nextSibling ?? nextNode(node.parentNode);
+	let next = node.nextSibling;
+	while (next !== null && next instanceof HTMLElement && next.classList.contains("select-marker")) next = next.nextSibling;
+	return next ?? nextNode(node.parentNode);
 }
 
 function descendRight(node: Node | null, offset: number | undefined = undefined): Text | Element | null {
@@ -341,7 +345,9 @@ function tabCommand(this: Element, e: KeyboardEvent) {
 		const color = cmd.substring(2);
 		if (0 <= parseInt(color) && parseInt(color) <= 10) command = `colorbox${color}`;
 	}
-	else if (cmd === "a" || cmd == "k") command = "a";
+	else if (cmd === "a" || cmd === "k") command = "a";
+	else if (cmd === ";" || cmd === "center") command = "align-center";
+	else if (cmd === "'" || cmd === "right") command = "align-right";
 	if (command === null) {
 		showWarning("올바르지 않은 탭 명령어입니다.");
 		throw -1;
@@ -425,7 +431,9 @@ function findOpenBracket(closeText: Text, root: Element): {text: Text, flag: num
 
 function prevNode(node: Node | null): Node | null {
 	if (node === null) return null;
-	return node.previousSibling ?? prevNode(node.parentNode);
+	let prev = node.previousSibling;
+	while (prev !== null && prev instanceof HTMLElement && prev.classList.contains("select-marker")) prev = prev.previousSibling;
+	return prev ?? prevNode(node.parentNode);
 }
 
 function descendLeft(node: Node | null, offset: number | undefined = undefined): Text | Element | null {
@@ -527,6 +535,9 @@ function toCommand(node: Node): string {
 			return `color${getColor(node.classList)}`;
 		} else if (node.classList.contains('colorbox')) {
 			return `colorbox${getColor(node.classList)}`;
+		} else if (node.classList.contains('align')) {
+			if (!node.classList.contains("align-center") && !node.classList.contains("align-right")) return "keep";
+			return `align-${node.classList.contains("align-center") ? "center" : "right"}`;
 		}
 		return 'keep';
 	}
@@ -550,12 +561,18 @@ function toElement(cmd: string): Element {
 		el.classList.add("color", `c${cmd.substring(5)}`);
 		return el;
 	}
+	if (cmd.startsWith('align')) {
+		const el = document.createElement('span');
+		el.classList.add("align", cmd);
+		return el;
+	}
 	return document.createElement(cmd);
 }
 
 export function inlineCleanup(target: Element) {
 	if (target.innerHTML === '<br>' || target.innerHTML === '\n') target.innerHTML = '';
-	const remove = $("font, span:not(.color, .colorbox, .select-marker, .semantic), br:last-child:not(br + br)", target);
+	const remove = $("font, span:not(.color, .colorbox, .align, .semantic, .select-marker)", target);
+	if (target.lastChild?.nodeName === "BR" && target.lastChild.previousSibling?.nodeName !== "BR") remove.list.push(target.lastChild as HTMLElement); // br:true-last-child:not(br true+ br)
 	if (remove.exists) {
 		const { startMarker, endMarker } = markCursor();
 		for (const e of remove.list) e.replaceWith(...e.childNodes);

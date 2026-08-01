@@ -47,7 +47,7 @@ export function startEdit(el: Node, init = false): boolean {
 	} else if (!editing) return false;
 
 	if (!(el instanceof Element)) return false;
-	if (el.classList.contains("new")) return false;
+	if (el.classList.contains("new") || el.classList.contains("container-bar")) return false;
 
 	let type = getEditType(el);
 	if (type === null) return false;
@@ -110,7 +110,7 @@ function applyEditType(el: Element, type: EDIT_TYPE): EDIT_TYPE {
 	function markContainer(el: Element, first: boolean, last: boolean) {
 		el.classList.add("container");
 		if (first) {
-			const fbar = document.createElement("span");
+			const fbar = document.createElement("button");
 			fbar.classList.add("container-bar", "first-bar");
 			el.prepend(fbar);
 		}
@@ -118,7 +118,7 @@ function applyEditType(el: Element, type: EDIT_TYPE): EDIT_TYPE {
 		mbar.classList.add("container-bar", "middle-bar");
 		el.append(mbar);
 		if (last) {
-			const lbar = document.createElement("span");
+			const lbar = document.createElement("button");
 			lbar.classList.add("container-bar", "last-bar");
 			el.append(lbar);
 		}
@@ -248,6 +248,7 @@ function handleCancelKey(target: HTMLElement) {
 	if (!manageConfirm(target, "will-cancel", "will-submit")) return;
 	target.innerHTML = deseri(JSON.parse(originalMap.get(target) as string), window.location.pathname, true, DESERI_HOOKS) ?? "";
 	target.blur();
+	regainFocus(target);
 }
 
 function manageConfirm(el: HTMLElement, confirmClass: string, stopClass: string): boolean {
@@ -265,7 +266,7 @@ function manageConfirm(el: HTMLElement, confirmClass: string, stopClass: string)
 }
 
 function handlePDeleteKey(target: HTMLElement) {
-	if (!target.matches("p:not(hgroup p)")) return;
+	if (!target.matches("p:not(hgroup p, .new)")) return;
 	target.classList.add("deleted");
 }
 
@@ -298,6 +299,7 @@ function handlePInsertKey(target: HTMLElement, key: string) {
 
 function onEditableInput(this: HTMLElement) {
 	this.classList.add("edited");
+	this.classList.remove("will-submit", "will-cancel");
 	inlineCleanup(this);
 }
 
@@ -324,7 +326,7 @@ function submit(el: HTMLElement, makeData: boolean, splice: number) {
 		data: data,
 		splice: splice
 	})});
-	originalMap.set(el, JSON.stringify(data));
+	originalMap.set(el, JSON.stringify(seri(el, true, SERI_HOOKS)));
 }
 
 const S = window.getSelection() as Selection;
