@@ -443,6 +443,21 @@ dialog {
 	animation: 1s warning-fade;
 }
 
+@media print {
+	body {
+		margin: 0 !important;
+		padding: 0 !important;
+	}
+	@page {
+		size: A4 !important;
+		margin: 10mm !important;
+	}
+	h1 { margin-block-start: 0 !important; }
+	#menubar, nav { display: none !important; }
+	hgroup { break-inside: avoid; }
+	pre { white-space: pre-wrap; overflow-x: none; }
+}
+
 /* for edit */
 
 .unit, .container, .editable {

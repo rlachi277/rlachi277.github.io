@@ -60,3 +60,15 @@ pre {
 	background-color: light-dark(#00ff00dd, transparent);
 	color: light-dark(currentColor, #00ff44);
 }
+
+@media print {
+	@page {
+		@bottom-center {
+			font-family: 'Nanum Gothic Coding';
+			font-weight: bold;
+			font-size: 0.8rem;
+			content: counter(page) "/" counter(pages);
+			text-align: center;
+		}
+	}
+}
