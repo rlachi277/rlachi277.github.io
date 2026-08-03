@@ -338,9 +338,9 @@ export function deseri(data: SeriData, cur: string, init: boolean = false, hooks
 		}
 		break;
 	case 'math':
-		return `<math contenteditable="false">${data.variant?.inner}</math>`;
+		return `<math>${data.variant?.inner}</math>`;
 	case 'svg':
-		return `<svg contenteditable="false">${data.variant?.inner}</svg>`;
+		return `<svg>${data.variant?.inner}</svg>`;
 	case 'columns':
 		tagName = "div";
 		attrs = ` class="columns"`;
