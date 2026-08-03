@@ -329,7 +329,7 @@ nav menu {
 #menubar menu ul {
 	margin: 0;
 	padding: 0;
-	position-anchor: auto;
+	position-anchor: auto; /* unnecessary because position-area but ptsd */
 	position-area: block-end span-inline-end;
 	inset-inline-start: -1px;
 	border: 1px solid currentColor;
