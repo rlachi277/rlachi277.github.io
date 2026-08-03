@@ -67,8 +67,26 @@ pre {
 			font-family: 'Nanum Gothic Coding';
 			font-weight: bold;
 			font-size: 0.8rem;
-			content: counter(page) "/" counter(pages);
+			content: counter(page);
 			text-align: center;
 		}
+	}
+	@page:first {
+		counter-reset: page 0;
+		@bottom-center { content: none; }
+	}
+	h1:first-child {
+		break-after: page;
+		block-size: 100vb;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+	h1:first-child::after {
+		display: block;
+		content: url('/assets/cycelog/logo.svg');
+		block-size: 25rem;
+		inline-size: 25rem;
 	}
 }
