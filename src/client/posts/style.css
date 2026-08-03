@@ -329,17 +329,19 @@ nav menu {
 #menubar menu ul {
 	margin: 0;
 	padding: 0;
-	inset: auto;
-	inset-block-start: anchor(outside);
-	inset-inline-start: calc(anchor(inside) - 1px);
+	position-anchor: auto;
+	position-area: block-end span-inline-end;
+	inset-inline-start: -1px;
 	border: 1px solid currentColor;
 	background-color: var(--c-bg);
 	list-style: none;
 }
 
 #menubar menu ul ul {
-	inset-block-start: calc(anchor(inside) - 1px);
-	inset-inline-start: anchor(outside);
+	position-anchor: auto;
+	position-area: inline-end span-block-end;
+	inset-inline-start: 0;
+	inset-block-start: -1px;
 }
 
 #menubar menu ul > li { margin: 0; }
