@@ -1,4 +1,5 @@
-import { sani, type DeseriHook, type SeriHook } from "../posts/seri.js";
+import type { DeseriHook, SeriHook } from "../posts/seri.js";
+import { sani } from "../posts/seri.js";
 
 export type WhereData = {
 	readonly where: string,

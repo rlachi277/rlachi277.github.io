@@ -163,6 +163,14 @@ export function seri(el: Node, init: boolean = false, hooks: SeriHook[] = []): S
 		result.variant.shape = "colorbox";
 		result.variant.color = getColor(el.classList);
 		break;
+	case 'SVG':
+		result.type = "svg";
+		result.variant = {inner: "!unsanitized!"};
+		break;
+	case 'MATH':
+		result.type = "math";
+		result.variant = {inner: "!unsanitized!"};
+		break;
 	default:
 		if (el.classList.contains("columns")) {
 			result.type = "columns";
@@ -329,6 +337,10 @@ export function deseri(data: SeriData, cur: string, init: boolean = false, hooks
 			break;
 		}
 		break;
+	case 'math':
+		return `<math>${data.variant?.inner}</math>`;
+	case 'svg':
+		return `<svg>${data.variant?.inner}</svg>`;
 	case 'columns':
 		tagName = "div";
 		attrs = ` class="columns"`;

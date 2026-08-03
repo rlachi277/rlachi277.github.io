@@ -2,6 +2,7 @@ import type { DeseriHook, SeriHook } from "../../shared/posts/seri.js";
 import type { MenubarData } from "./menubar.js";
 
 import { $, d$n } from "../query.js";
+import DOMPurify from "../purify.es.mjs";
 import { setupDialog } from "./dialog.js";
 import { startEdit } from "./edit.js";
 import { setupMenubar } from "./menubar.js";
@@ -30,7 +31,30 @@ function setupMenu(menu: MenuActions | null) {
 	}
 }
 
-export const SERI_HOOKS: SeriHook[] = [];
+export const SERI_HOOKS: SeriHook[] = [
+	function (el, _): ReturnType<SeriHook> {
+		if (el.tagName === "svg") {
+			return {
+				type: 'svg',
+				variant: {inner: DOMPurify.sanitize(el.innerHTML, {
+					USE_PROFILES: {svg: true, svgFilters: true},
+					NAMESPACE: "http://www.w3.org/2000/svg",
+				})},
+				children: null
+			} as const;
+		} else if (el.tagName === "math") {
+			return {
+				type: 'math',
+				variant: {inner: DOMPurify.sanitize(el.innerHTML, {
+					USE_PROFILES: {mathMl: true},
+					NAMESPACE: "http://www.w3.org/1998/Math/MathML",
+				})},
+				children: null
+			} as const;
+		}
+		return undefined;
+	}
+];
 export const DESERI_HOOKS: DeseriHook[] = [];
 
 export function setup(menuBar: MenubarData[], defaultMenu: MenuActions, editMenu: MenuActions | null = null, noEdit: boolean = false) {

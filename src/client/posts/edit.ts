@@ -29,7 +29,7 @@ const CONTAINERS = new Set([
 ]);
 const UNITS = new Set([
 	"HGROUP", "IMG", "AUDIO", "VIDEO",
-	"FIGURE", "HR", "BR",
+	"FIGURE", "HR", "BR", "MATH", "SVG",
 	"TRACK", "SOURCE"
 ]);
 

@@ -466,12 +466,14 @@ function markCursor(): {startMarker: HTMLSpanElement, endMarker: HTMLSpanElement
 	};
 }
 
-function returnToMarker(startMarker: Node, endMarker: Node) {
+function returnToMarker(startMarker: HTMLSpanElement, endMarker: HTMLSpanElement) {
 	const cursor = document.createRange();
 	cursor.setStartAfter(startMarker);
 	cursor.setEndBefore(endMarker);
 	S.removeAllRanges();
 	S.addRange(cursor);
+	startMarker.remove();
+	endMarker.remove();
 }
 
 function normalizeEditable(el: Element) {
