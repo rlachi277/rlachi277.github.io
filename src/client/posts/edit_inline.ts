@@ -305,12 +305,13 @@ function tabCommand(this: Element, e: KeyboardEvent) {
 	const closeFlag = cdata.flag;
 	const cmd = cdata.cmd;
 
+	const closeTextContent = closeTextNode.textContent;
 	let closeIdx = closeFlag === 2 ?
-		closeTextNode.textContent.lastIndexOf("]", S.anchorOffset-1) - cmd.length - 1 :
-		closeTextNode.textContent.lastIndexOf("]") - cmd.length - 1;
+		closeTextContent.lastIndexOf("]", closeTextContent.lastIndexOf("]", S.anchorOffset-1)-1) :
+		closeTextContent.lastIndexOf("]", closeTextContent.lastIndexOf("]")-1);
 	let cursorIdx = closeFlag === 2 ?
-		closeTextNode.textContent.lastIndexOf("]", S.anchorOffset-1) + 1 :
-		closeTextNode.textContent.lastIndexOf("]") + 1;
+		closeTextContent.lastIndexOf("]", S.anchorOffset-1) + 1 :
+		closeTextContent.lastIndexOf("]") + 1;
 	
 	if (Object.hasOwn(SYMBOLS, cmd)) {
 		const range = document.createRange();
