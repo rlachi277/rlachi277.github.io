@@ -325,7 +325,15 @@ function submit(el: HTMLElement, makeData: boolean, splice: number) {
 		pos: pos,
 		data: data,
 		splice: splice
-	})});
+	})}).then((res) => {
+		if (!res.ok) {
+			showWarning("오류 발생. 편집 내용을 별도로 저장하고 새로고침하세요.");
+			stopEdit();
+		}
+	}).catch((_) => {
+		showWarning("오류 발생. 편집 내용을 별도로 저장하고 새로고침하세요.");
+		stopEdit();
+	});
 	originalMap.set(el, JSON.stringify(seri(el, true, SERI_HOOKS)));
 }
 

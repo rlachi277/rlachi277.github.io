@@ -1,3 +1,5 @@
+* { outline-color: currentColor; }
+
 :root {
 	background-color: var(--c-bg);
 	color: var(--c-text);

@@ -117,10 +117,10 @@ export const editMenu = {
 		return el;
 	}, false),
 	insertPre: dialog("<pre> 삽입", `
-		<label for="dialog-wrap">자동 줄바꿈: </label>
-		<input id="dialog-wrap" type="checkbox">
+		<label for="dialog-nowrap">줄바꿈 없음: </label>
+		<input id="dialog-nowrap" type="checkbox">
 	`, async () => {
-		const wrap = (d$n("dialog-wrap") as HTMLInputElement).checked;
+		const wrap = !(d$n("dialog-nowrap") as HTMLInputElement).checked;
 		menuInsert((after, isFirst) => {
 			if (!isFirst && after.parentElement === d$n("main")) return null;
 			const el = document.createElement("pre");
