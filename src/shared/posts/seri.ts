@@ -150,10 +150,10 @@ export function seri(el: Node, init: boolean = false, hooks: SeriHook[] = []): S
 			result.variant.shape = "broken";
 		} else if (el.classList.contains("color")) {
 			result.variant.shape = "color";
-			result.variant.color = getColor(el.classList);
+			result.variant.color = getColor(el);
 		} else if (el.classList.contains("colorbox")) {
 			result.variant.shape = "colorbox";
-			result.variant.color = getColor(el.classList);
+			result.variant.color = getColor(el);
 		}
 		break;
 	case 'BUTTON':
@@ -161,7 +161,7 @@ export function seri(el: Node, init: boolean = false, hooks: SeriHook[] = []): S
 		result.type = "button";
 		result.variant = {};
 		result.variant.shape = "colorbox";
-		result.variant.color = getColor(el.classList);
+		result.variant.color = getColor(el);
 		break;
 	case 'SVG':
 		result.type = "svg";
@@ -176,10 +176,10 @@ export function seri(el: Node, init: boolean = false, hooks: SeriHook[] = []): S
 			result.type = "columns";
 		} else if (el.classList.contains("color")) {
 			result.type = "color";
-			result.variant = {color: getColor(el.classList), click: el.classList.contains("click")};
+			result.variant = {color: getColor(el), click: el.classList.contains("click")};
 		} else if (el.classList.contains("colorbox")) {
 			result.type = "colorbox";
-			result.variant = {color: getColor(el.classList), click: el.classList.contains("click")};
+			result.variant = {color: getColor(el), click: el.classList.contains("click")};
 		} else if (el.classList.contains("align")) {
 			result.type = "align";
 			result.variant = {direction: null};
@@ -208,11 +208,8 @@ function getAttributes(el: Element, names: string[]): SeriVariant {
 	return variant;
 }
 
-export function getColor(classList: DOMTokenList): number {
-	for (let i=0; i<=10; i++) {
-		if (classList.contains(`c${i}`)) return i;
-	}
-	return -1;
+export function getColor(el: Element): string {
+	return el.getAttribute("data-color") ?? "-1";
 }
 
 export function deseri(data: SeriData, cur: string, init: boolean = false, hooks: DeseriHook[] = []): string | null {
@@ -319,10 +316,10 @@ export function deseri(data: SeriData, cur: string, init: boolean = false, hooks
 			attrs += ` class="broken"`;
 			break;
 		case 'color':
-			attrs += ` class="color c${data.variant?.color}"`;
+			attrs += ` class="color" data-color="${data.variant?.color}"`;
 			break;
 		case 'colorbox':
-			attrs += ` class="colorbox c${data.variant?.color}"`;
+			attrs += ` class="colorbox" data-color="${data.variant?.color}"`;
 			break;
 		}
 		break;
@@ -347,11 +344,11 @@ export function deseri(data: SeriData, cur: string, init: boolean = false, hooks
 		break;
 	case 'color':
 		tagName = "span";
-		attrs = ` class="color c${data.variant?.color}${data.variant?.click?" click":""}"`;
+		attrs = ` class="color${data.variant?.click?" click":""}" data-color="${data.variant?.color}"`;
 		break;
 	case 'colorbox':
 		tagName = "span";
-		attrs = ` class="colorbox c${data.variant?.color}${data.variant?.click?" click":""}"`;
+		attrs = ` class="colorbox${data.variant?.click?" click":""}" data-color="${data.variant?.color}"`;
 		break;
 	case 'align':
 		tagName = "span";

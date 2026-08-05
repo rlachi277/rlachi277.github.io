@@ -39,7 +39,7 @@ export function inlineCommands(this: Element, shortcut: boolean, e: KeyboardEven
 		else if (e.key === "e") command = "ins";
 		else if (e.key === "x" && e.shiftKey) command = "s";
 		else if (e.key === "k") command = "a";
-		else if ("0" <= e.key && e.key <= "9") command = `color${e.key}`;
+		else if ("0" <= e.key && e.key <= "9") command = `c:${e.key}`;
 		else if (e.key === ";") command = "align-center";
 		else if (e.key === "'") command = "align-right";
 		else return false;
@@ -242,8 +242,8 @@ function applyCommand(affected: AffectedWithFormats[], command: string, allOn: b
 			if (e.on && format === command) continue;
 			if (command === 'ins' && format === 'del' || command === 'del' && format === 'ins' ||
 			command === 'sup' && format === 'sub' || command === 'sub' && format === 'sup' ||
-			command.startsWith('color') && format.startsWith('color') ||
-			command.startsWith('colorbox') && format.startsWith('colorbox') ||
+			command.startsWith('c:') && format.startsWith('c:') ||
+			command.startsWith('cb:') && format.startsWith('cb:') ||
 			command.startsWith('align') && format.startsWith('align')) continue;
 			const newElement = toElement(format);
 			newElement.append(el);
@@ -342,11 +342,11 @@ function tabCommand(this: Element, e: KeyboardEvent) {
 	else if (cmd === "d" || cmd === "del") command = "del";
 	else if (cmd === "e" || cmd === "ins") command = "ins";
 	else if (cmd === "s") command = "s";
-	else if (0 <= parseInt(cmd) && parseInt(cmd) <= 10) command = `color${cmd}`; // goodbye cursed JS moment
-	else if (cmd.startsWith("cb")) {
-		const color = cmd.substring(2);
-		if (0 <= parseInt(color) && parseInt(color) <= 10) command = `colorbox${color}`;
-	}
+	else if (0 <= parseInt(cmd) && parseInt(cmd) <= 10) command = `c:${cmd}`; // goodbye cursed JS moment
+	else if (cmd.startsWith("cb:")) command = `cb:${cmd.substring(3)}`;
+	else if (cmd.startsWith("cb")) command = `cb:${cmd.substring(2)}`;
+	else if (cmd.startsWith("c:")) command = `c:${cmd.substring(2)}`;
+	else if (cmd.startsWith("c")) command = `c:${cmd.substring(1)}`;
 	else if (cmd === "a" || cmd === "k") command = "a";
 	else if (cmd === ";" || cmd === "center") command = "align-center";
 	else if (cmd === "'" || cmd === "right") command = "align-right";
@@ -536,9 +536,9 @@ function toCommand(node: Node): string {
 	if (!(node instanceof Element)) return 'keep';
 	if (node.tagName === "SPAN") {
 		if (node.classList.contains('color')) {
-			return `color${getColor(node.classList)}`;
+			return `c:${getColor(node)}`;
 		} else if (node.classList.contains('colorbox')) {
-			return `colorbox${getColor(node.classList)}`;
+			return `cb:${getColor(node)}`;
 		} else if (node.classList.contains('align')) {
 			if (!node.classList.contains("align-center") && !node.classList.contains("align-right")) return "keep";
 			return `align-${node.classList.contains("align-center") ? "center" : "right"}`;
@@ -555,14 +555,16 @@ function toElement(cmd: string): Element {
 		showWarning("부분적 서식 적용이 불가합니다.");
 		throw -1;
 	}
-	if (cmd.startsWith('colorbox')) {
+	if (cmd.startsWith('c:')) {
 		const el = document.createElement('span');
-		el.classList.add("colorbox", `c${cmd.substring(8)}`);
+		el.classList.add("color");
+		el.setAttribute("data-color", cmd.substring(2));
 		return el;
 	}
-	if (cmd.startsWith('color')) {
+	if (cmd.startsWith('cb:')) {
 		const el = document.createElement('span');
-		el.classList.add("color", `c${cmd.substring(5)}`);
+		el.classList.add("colorbox");
+		el.setAttribute("data-color", cmd.substring(3));
 		return el;
 	}
 	if (cmd.startsWith('align')) {

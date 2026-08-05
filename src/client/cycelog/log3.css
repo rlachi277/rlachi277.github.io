@@ -48,6 +48,21 @@ p:not(hgroup p) {
 	outline: 1px auto var(--c);
 }
 
+.color[data-color="45"] { --c: var(--c-45); --ch: var(--c-45h); --ca: var(--c-45a); }
+.color[data-color="67"] { --c: var(--c-67); --ch: var(--c-67h); --ca: var(--c-67a); }
+.color[data-color="sr"] { --c: #D16D6A; --ch: #D16D6A; --ca: #D16D6A; }
+.color[data-color="sp"] { --c: #8D7DB3; --ch: #8D7DB3; --ca: #8D7DB3; }
+.color[data-color="sy"] { --c: #F9DA78; --ch: #F9DA78; --ca: #F9DA78; }
+.color[data-color="sg"] { --c: #9DC384; --ch: #9DC384; --ca: #9DC384; }
+.color[data-color="sb"] { --c: #789DE5; --ch: #789DE5; --ca: #789DE5; }
+
+.colorbox[data-color="45"] { --bg: var(--c-45-bg); --bd: var(--c-45-bd); --c: var(--c-45-bc);
+	--bgh: var(--c-45-bgh); --bdh: var(--c-45-bdh); --ch: var(--c-45-bch);
+	--bga: var(--c-45-bga); --bda: var(--c-45-bda); --ca: var(--c-45-bca); }
+.colorbox[data-color="67"] { --bg: var(--c-67-bg); --bd: var(--c-67-bd); --c: var(--c-67-bc);
+	--bgh: var(--c-67-bgh); --bdh: var(--c-67-bdh); --ch: var(--c-67-bch);
+	--bga: var(--c-67-bga); --bda: var(--c-67-bda); --ca: var(--c-67-bca); }
+
 pre {
 	font-family: 'Nanum Gothic Coding', monospace;
 	padding-inline: 2ch;
