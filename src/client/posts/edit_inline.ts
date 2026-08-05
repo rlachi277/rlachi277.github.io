@@ -99,8 +99,8 @@ function runCommand(this: Element, e: KeyboardEvent, command: string) {
 	applied.append(endMarker);
 	startMarker.after(applied);
 
-	returnToMarker(startMarker, endMarker)
 	normalizeEditable(this);
+	returnToMarker(startMarker, endMarker);
 }
 
 function collectAffected(range: Range, root: Element): Affected[] {
