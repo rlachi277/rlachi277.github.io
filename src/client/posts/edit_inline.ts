@@ -243,7 +243,8 @@ function applyCommand(affected: AffectedWithFormats[], command: string, allOn: b
 			if (command === 'ins' && format === 'del' || command === 'del' && format === 'ins' ||
 			command === 'sup' && format === 'sub' || command === 'sub' && format === 'sup' ||
 			command.startsWith('color') && format.startsWith('color') ||
-			command.startsWith('colorbox') && format.startsWith('colorbox')) continue;
+			command.startsWith('colorbox') && format.startsWith('colorbox') ||
+			command.startsWith('align') && format.startsWith('align')) continue;
 			const newElement = toElement(format);
 			newElement.append(el);
 			el = newElement;
