@@ -71,6 +71,11 @@ pre {
 	margin-block-start: 0;
 }
 
+pre :is(ul, ol) { padding-inline-start: 3ch; }
+pre ol, pre ol ol, pre ol ol ol {
+	list-style-type: decimal;
+}
+
 :is(p, pre):has( + :is(ins, pre)) { margin-block-end: 0; }
 
 .end-of-week {
