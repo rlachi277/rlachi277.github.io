@@ -185,6 +185,8 @@ export function seri(el: Node, init: boolean = false, hooks: SeriHook[] = []): S
 			result.variant = {direction: null};
 			if (el.classList.contains('align-center')) result.variant.direction = "center";
 			else if (el.classList.contains('align-right')) result.variant.direction = "right";
+		} else if (el.classList.contains("overline")) {
+			result.type = "overline";
 		} else {
 			return null;
 		}
@@ -356,6 +358,10 @@ export function deseri(data: SeriData, cur: string, init: boolean = false, hooks
 			case 'center': attrs = ` class="align align-center"`; break;
 			case 'right': attrs = ` class="align align-right"`; break;
 		}
+		break;
+	case 'overline':
+		tagName = "span";
+		attrs = ` class="overline"`;
 		break;
 	default:
 		return null;

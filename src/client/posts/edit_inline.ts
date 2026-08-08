@@ -350,6 +350,7 @@ function tabCommand(this: Element, e: KeyboardEvent) {
 	else if (cmd === "a" || cmd === "k") command = "a";
 	else if (cmd === ";" || cmd === "center") command = "align-center";
 	else if (cmd === "'" || cmd === "right") command = "align-right";
+	else if (cmd === "o" || cmd === "overline") command = "overline";
 	if (command === null) {
 		showWarning("올바르지 않은 탭 명령어입니다.");
 		throw -1;
@@ -542,6 +543,8 @@ function toCommand(node: Node): string {
 		} else if (node.classList.contains('align')) {
 			if (!node.classList.contains("align-center") && !node.classList.contains("align-right")) return "keep";
 			return `align-${node.classList.contains("align-center") ? "center" : "right"}`;
+		} else if (node.classList.contains('overline')) {
+			return 'overline';
 		}
 		return 'keep';
 	}
@@ -572,12 +575,17 @@ function toElement(cmd: string): Element {
 		el.classList.add("align", cmd);
 		return el;
 	}
+	if (cmd === 'overline') {
+		const el = document.createElement('span');
+		el.classList.add("overline");
+		return el;
+	}
 	return document.createElement(cmd);
 }
 
 export function inlineCleanup(target: Element) {
 	if (target.innerHTML === '<br>' || target.innerHTML === '\n') target.innerHTML = '';
-	const remove = $("font, span:not(.color, .colorbox, .align, .semantic, .select-marker)", target);
+	const remove = $("font, span:not(.color, .colorbox, .align, .overline, .semantic, .select-marker)", target);
 	if (target.lastChild?.nodeName === "BR" && target.lastChild.previousSibling?.nodeName !== "BR") remove.list.push(target.lastChild as HTMLElement); // br:true-last-child:not(br true+ br)
 	if (remove.exists) {
 		const { startMarker, endMarker } = markCursor();
