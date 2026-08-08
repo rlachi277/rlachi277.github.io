@@ -280,7 +280,7 @@ nav menu {
 	padding-block: 4px;
 	padding-inline: 8px;
 }
-#nav-skip:focus { inset-block-start: 3em; }
+#nav-skip:focus { inset-block-start: 3rem; z-index: 2; }
 
 @media screen and (max-width: 480px) {
 	nav { float: none; margin-inline-start: 0; }

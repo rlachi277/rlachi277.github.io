@@ -34,6 +34,10 @@ app.use('/kimclweb', kimclweb);
 app.use('/newscript', newscript);
 app.use('/vibing', vibing);
 
+app.use((_, res) => {
+    res.status(404).render('404');
+});
+
 app.listen(port, () => {
 	console.log(`Server running at http://localhost:${port}`);
 });

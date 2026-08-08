@@ -37,6 +37,7 @@ type HtmlTemplate = true | {
 
 const html: Record<string, HtmlTemplate> = {
   "index": {chunks: ["index"]},
+  "404": true,
 
   "posts/index": {template: "posts/index.ejs", chunks: ["posts/post"]},
   "posts/post": {

@@ -71,7 +71,10 @@ export function setup(menuBar: MenubarData[], defaultMenu: MenuActions, editMenu
 	window.addEventListener('resize', onResize);
 
 	d$n("nav-skip").addEventListener("click", () => {
-		$("nav a").list.at(-1)?.focus();
+		const title = $("h1:first-child").list[0];
+		title.setAttribute("tabindex", "-1");
+		title.focus();
+		title.removeAttribute("tabindex");
 	});
 
 	$(".menu-action").on("click", function () {

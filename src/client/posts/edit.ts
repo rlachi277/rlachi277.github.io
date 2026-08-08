@@ -398,24 +398,31 @@ export function startTargeting(f: TargetHandler) {
 
 	$("*:not(#menubar):not(#menubar *)").attr("tabindex", "-1");
 	$(".unit.editable").attr("contenteditable", null);
-	addTargetListeners("unit", f, false, false);
-	addTargetListeners("first-bar", f, true, true);
-	addTargetListeners("last-bar", f, true, false);
+	addTargetListeners("unit", f, true, false, false);
+	addTargetListeners("first-bar", f, false, true, true);
+	addTargetListeners("last-bar", f, false, true, false);
 
 	document.addEventListener("keydown", (e) => {
 		if (e.key == 'Escape') stopTargeting();
 	}, {signal: targetingAbort?.signal});
 }
 
-function addTargetListeners(cls: string, f: TargetHandler, parent: boolean, isFirst: boolean) {
-	for (const el of document.getElementsByClassName(cls)) {
+function addTargetListeners(cls: string, f: TargetHandler, keydown: boolean, parent: boolean, isFirst: boolean) {
+	for (const el of (document.getElementsByClassName(cls) as HTMLCollectionOf<HTMLElement>)) {
 		el.setAttribute("tabindex", "0");
-		el.addEventListener("click", (e) => {
+		const handler = (e: Event) => {
 			e.preventDefault();
 			(el as HTMLElement).blur();
 			const after = parent ? (el.parentElement as Element) : el;
 			if (!f(after, isFirst)) return;
 			stopTargeting();
+		};
+		el.addEventListener("click", handler, {signal: targetingAbort?.signal});
+		if (keydown) el.addEventListener("keydown", (e) => {
+			if (e.key !== "Enter") return;
+			e.stopPropagation();
+			e.preventDefault();
+			handler(e);
 		}, {signal: targetingAbort?.signal});
 	}
 }
