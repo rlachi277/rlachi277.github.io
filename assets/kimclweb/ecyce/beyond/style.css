@@ -20,14 +20,14 @@
 
 #bg1 {
 	transform: translateZ(-15px) scale(16);
-	background-image: url('cycycy.png');
+	background-image: url('cycycy.webp');
 	animation: infinite linear 30s forwards bgscroll1;
 }
 
 #bg2 {
 	opacity: 0.5;
 	transform: translateZ(-7px) scale(8);
-	background-image: url('cyycyy.png');
+	background-image: url('cyycyy.webp');
 	animation: infinite linear 15s forwards bgscroll2;
 }
 
@@ -43,7 +43,7 @@
 
 @media print {
 	html {
-		background-image: url('cyycyy.png') !important;
+		background-image: url('cyycyy.webp') !important;
 		background-size: 840px 840px !important;
 		background-repeat: repeat !important;
 	}
@@ -52,7 +52,7 @@
 }
 
 .restricted #wrapper { transform-style: flat; perspective: none; overscroll-behavior: none; contain: none; }
-.restricted #wrapper:before { content: ''; position: fixed; inset: 0; background-image: url('pure.png'); background-size: 840px 840px;  animation: infinite linear 30s forwards bgscroll1; pointer-events: none; z-index: -1; }
+.restricted #wrapper:before { content: ''; position: fixed; inset: 0; background-image: url('pure.webp'); background-size: 840px 840px;  animation: infinite linear 30s forwards bgscroll1; pointer-events: none; z-index: -1; }
 .restricted :is(#bg1, #bg2) { transform: none; display: none; }
 
 ecyce-ocean { display: block; height: 1777px; }
