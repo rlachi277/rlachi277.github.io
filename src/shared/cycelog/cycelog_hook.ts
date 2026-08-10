@@ -11,7 +11,7 @@ export type WhereFunc = (id: number | undefined, refId: string) => WhereData;
 export function cycelogDeseriHook(entryData: Record<number,[number,string,string]>, whereFunc: WhereFunc): DeseriHook {
 	return function (data, cur) {
 		const postId = cur.split('/').at(-1) as string;
-		if (data.type === 'week') {
+		if (data.type === 'week') { // TODO: change to <detail>
 			return {
 				type: 'normal',
 				tagName: 'section',
