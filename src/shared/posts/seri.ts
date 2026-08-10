@@ -339,7 +339,11 @@ export function deseri(data: SeriData, cur: string, init: boolean = false, hooks
 	case 'math':
 		return `<math>${data.variant?.inner}</math>`;
 	case 'svg':
-		return `<svg>${data.variant?.inner}</svg>`;
+		return `<svg${
+			data.variant?.width != null ? ` width="${sani(data.variant?.width.toString())}"` : ''
+		}${
+			data.variant?.height != null ? ` height="${sani(data.variant?.height.toString())}"` : ''
+		}>${data.variant?.inner}</svg>`;
 	case 'columns':
 		tagName = "div";
 		attrs = ` class="columns"`;

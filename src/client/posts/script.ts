@@ -36,10 +36,14 @@ export const SERI_HOOKS: SeriHook[] = [
 		if (el.tagName === "svg") {
 			return {
 				type: 'svg',
-				variant: {inner: DOMPurify.sanitize(el.innerHTML, {
-					USE_PROFILES: {svg: true, svgFilters: true},
-					NAMESPACE: "http://www.w3.org/2000/svg",
-				})},
+				variant: {
+					inner: DOMPurify.sanitize(el.innerHTML, {
+						USE_PROFILES: {svg: true, svgFilters: true},
+						NAMESPACE: "http://www.w3.org/2000/svg",
+					}),
+					width: el.getAttribute("width"),
+					height: el.getAttribute("height")
+				},
 				children: null
 			} as const;
 		} else if (el.tagName === "math") {
