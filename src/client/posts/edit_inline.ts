@@ -282,7 +282,7 @@ function descendRight(node: Node | null, offset: number | undefined = undefined)
 	return node;
 }
 
-const SYMBOLS: Record<string,string> = {".": "·", "st": "☆", "--": "—"};
+const SYMBOLS: Record<string,string> = {".": "·", "st": "☆", "--": "—", "nb": " "};
 
 function tabCommand(this: Element, e: KeyboardEvent) {
 	if (

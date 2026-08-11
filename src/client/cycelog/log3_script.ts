@@ -38,7 +38,4 @@ export function setup(menuBar: MenubarData[], defaultMenu: MenuActions, editMenu
 		setupLog3Edit(window.LOG3_DATA ?? '{}');
 	}
 	postsSetup(menuBar, defaultMenu, editMenu);
-	window.addEventListener("load", () => {
-		history.replaceState(null, '', window.location.pathname + window.location.search);
-	});
 }
