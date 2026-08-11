@@ -62,12 +62,6 @@ export const SERI_HOOKS: SeriHook[] = [
 export const DESERI_HOOKS: DeseriHook[] = [];
 
 export function setup(menuBar: MenubarData[], defaultMenu: MenuActions, editMenu: MenuActions | null = null, noEdit: boolean = false) {
-	const scrollY = sessionStorage.getItem('scrollY');
-	if (scrollY !== null) {
-		window.scrollTo(0, parseInt(scrollY));
-		sessionStorage.removeItem('scrollY');
-	}
-	
 	setupMenubar(menuBar);
 	setupDialog();
 
@@ -94,4 +88,13 @@ export function setup(menuBar: MenubarData[], defaultMenu: MenuActions, editMenu
 		});
 		setupMenu(editMenu);
 	}
+
+	// DEBUG
+	import("../../shared/posts/seri.js").then((seri) => {
+		(window as any)._refresh_data = () => {
+			let s = seri.seri(d$n("main"), true, SERI_HOOKS);
+			console.log(s);
+			fetch(window.location.pathname, { method: "PUT", body: JSON.stringify(s) });
+		}
+	});
 }

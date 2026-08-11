@@ -6,18 +6,19 @@ body {
 	margin-block-end: 12rem;
 }
 
-section.week {
+details.week {
 	text-align: justify; /* for 'block'(actually still inline) comments */
 }
 
-main > section.week > section { color: var(--c-0); }
+details.week > summary { display: block; cursor: pointer; }
+details.week > section { color: var(--c-0); }
 
-section.week > hgroup > h2::first-line { /* I really didn't want to make another element */
+details.week > summary > hgroup > h2::first-line { /* I really didn't want to make another element */
 	background-color: light-dark(yellow, transparent);
 	color: light-dark(currentColor, yellow);
 }
 
-section.week > hgroup > p::first-line {
+details.week > summary > hgroup > p::first-line {
 	background-color: light-dark(#00ff00dd, transparent);
 	color: light-dark(currentColor, #00ff44);
 }
@@ -81,6 +82,12 @@ pre ol, pre ol ol, pre ol ol ol {
 .end-of-week {
 	background-color: light-dark(#00ff00dd, transparent);
 	color: light-dark(currentColor, #00ff44);
+}
+
+.week > .container-bar {
+	--barbg: var(--c-6-3); --barbgh: var(--c-6-2); --barbga: var(--c-6-1); --midbg: var(--c-6-5);
+	inset-inline-end: calc(100% + 0.85lh);
+	inset-inline-start: -1.25lh;
 }
 
 @media print {

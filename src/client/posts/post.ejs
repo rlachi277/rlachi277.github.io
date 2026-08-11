@@ -9,8 +9,13 @@
 </head>
 <body>
 	<%%- nav %>
-	<main id="main">
-		<%%- content %>
-	</main>
+	<main id="main"><%%- content %></main>
+	<script>
+		const scrollY = sessionStorage.getItem('scrollY');
+		if (scrollY !== null) {
+			window.scrollTo(0, parseInt(scrollY));
+			sessionStorage.removeItem('scrollY');
+		}
+	</script>
 </body>
 </html>

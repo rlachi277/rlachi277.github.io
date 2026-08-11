@@ -12,8 +12,19 @@
 </head>
 <body>
 	<%%- nav %>
-	<main id="main">
-		<%%- content %>
-	</main>
+	<main id="main"><%%- content %></main>
+	<script>
+		document.querySelectorAll(".week").forEach((e, i) => {
+			e.open = sessionStorage.getItem(`cycelog.week${i}`) === 'true';
+			e.addEventListener('toggle', () => {
+				sessionStorage.setItem(`cycelog.week${i}`, e.open);
+			});
+		});
+		const scrollY = sessionStorage.getItem('scrollY');
+		if (scrollY !== null) {
+			window.scrollTo(0, parseInt(scrollY));
+			sessionStorage.removeItem('scrollY');
+		}
+	</script>
 </body>
 </html>

@@ -23,7 +23,7 @@ app.get('/README.md', (_, res) => { res.sendFile(path.join(root, '..', 'README.m
 app.use('/public', express.static(path.join(root, 'public')));
 app.use('/assets', express.static(path.join(root, '..', 'assets')));
 
-app.use(express.text());
+app.use(express.text({limit: '50mb'}));
 app.use(express.json({limit: '50mb'}));
 app.use(compression());
 

@@ -21,7 +21,25 @@ export function setup(menuBar: MenubarData[], defaultMenu: MenuActions, editMenu
 			url.searchParams.set("edit", "t");
 			e.setAttribute("href", url.toString());
 		});
+		$(".week > summary").each((e) => {
+			const atrocity = document.createElement("summary");
+			atrocity.classList.add("atrocity", "volatile");
+			atrocity.innerHTML = e.innerHTML ?? "???";
+			e.before(atrocity);
+			const week = e.parentElement as HTMLDetailsElement;
+			if (week.open) atrocity.firstElementChild?.setAttribute("hidden", "hidden");
+			week.addEventListener("toggle", () => {
+				console.log(atrocity);
+				if (week.open) atrocity.firstElementChild?.setAttribute("hidden", "hidden");
+				else {
+					atrocity.innerHTML = e.innerHTML ?? "???";
+				}
+			});
+		})
 		setupLog3Edit(window.LOG3_DATA ?? '{}');
 	}
 	postsSetup(menuBar, defaultMenu, editMenu);
+	window.addEventListener("load", () => {
+		history.replaceState(null, '', window.location.pathname + window.location.search);
+	});
 }

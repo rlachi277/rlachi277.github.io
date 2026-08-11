@@ -32,6 +32,16 @@ export const defaultMenu = {
 		url.searchParams.delete("ref");
 		url.hash = "";
 		window.location.href = url.toString();
+	},
+	collapseAll: () => {
+		document.querySelectorAll("details.week").forEach((e) => {
+			(e as HTMLDetailsElement).open = false;
+		});
+	},
+	expandAll: () => {
+		document.querySelectorAll("details.week").forEach((e) => {
+			(e as HTMLDetailsElement).open = true;
+		});
 	}
 }
 

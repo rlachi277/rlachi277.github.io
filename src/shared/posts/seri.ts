@@ -40,7 +40,7 @@ export function seri(el: Node, init: boolean = false, hooks: SeriHook[] = []): S
 		return el.textContent.replaceAll(/\n\s*/g, "");
 	}
 	if (!(el instanceof Element)) return null;
-	if (el.classList.contains("new") && !init) return null;
+	if ((el.classList.contains("new") || el.classList.contains("volatile")) && !init) return null;
 	const children: SeriData[] = [];
 	el.childNodes.forEach((e) => {
 		const child = seri(e, false, hooks);

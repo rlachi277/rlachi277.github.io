@@ -47,7 +47,7 @@ export function startEdit(el: Node, init = false): boolean {
 	} else if (!editing) return false;
 
 	if (!(el instanceof Element)) return false;
-	if (el.classList.contains("new") || el.classList.contains("container-bar")) return false;
+	if (el.classList.contains("new") || el.classList.contains("volatile") || el.classList.contains("container-bar")) return false;
 
 	let type = getEditType(el);
 	if (type === null) return false;

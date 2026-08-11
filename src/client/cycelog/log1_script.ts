@@ -22,4 +22,7 @@ export function setup(menuBar: MenubarData[], defaultMenu: MenuActions, editMenu
 			});
 		}
 	}
+	window.addEventListener("load", () => {
+		history.replaceState(null, '', window.location.pathname + window.location.search);
+	});
 }

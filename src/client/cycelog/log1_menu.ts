@@ -25,7 +25,6 @@ export const defaultMenu = {
 		const path = `../log3/${window.location.pathname.split('/').at(-1)}${window.location.search}`;
 		window.location.href = path;
 	},
-
 	removeMark: () => {
 		sessionStorage.setItem('scrollY', window.scrollY.toString());
 		const url = new URL(window.location.href);
