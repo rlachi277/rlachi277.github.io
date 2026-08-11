@@ -354,7 +354,7 @@ nav menu {
 	margin: 0;
 	padding: 0;
 	position-anchor: auto; /* unnecessary because position-area but ptsd */
-	position-area: block-end span-inline-end;
+	position-area: block-end span-inline-end; /* TODO: doesn't work well with webkit. Either john burr until it gets fixed or make JS alternative */
 	inset-inline-start: -1px;
 	border: 1px solid currentColor;
 	background-color: var(--c-bg);
@@ -362,7 +362,6 @@ nav menu {
 }
 
 #menubar menu ul ul {
-	position-anchor: auto;
 	position-area: inline-end span-block-end;
 	inset-inline-start: 0;
 	inset-block-start: -1px;

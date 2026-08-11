@@ -39,7 +39,7 @@ export function cycelogDeseriHook(entryData: Record<number,[number,string,string
 			return {
 				type: 'html',
 				html: `<a contenteditable="false" class="entry"${id !== undefined ? ` href="${sani(path)}" id="entry${id}" data-id="${id}" title="${id}번 항목(${sani(entryData?.[id][1] ?? '?')}) / ${sani(entryData?.[id][2] ?? '?')}"` : ''}${date !== undefined ? ` data-date="${sani(date)}"` : ''} data-type="${type}">
-					#${id ?? "?"}${date !== undefined ? ` ${sani(date)}` : ''}
+					#${id ?? "?"}${date !== undefined ? ` ${sani(date)}` : ''}
 				<wbr></a>`.replaceAll(/\n|\t/g, '')
 			} as const;
 		} else if (data.type === 'ref') {

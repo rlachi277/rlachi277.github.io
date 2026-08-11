@@ -121,6 +121,6 @@ pre ol, pre ol ol, pre ol ol ol {
 	}
 }
 
-details.week > summary.editable > hgroup > *:empty::before {
+details.week > summary:is(.editable, .atrocity) > hgroup > *:empty::before {
 	content: '### 비어 있음 :O ###';
 }

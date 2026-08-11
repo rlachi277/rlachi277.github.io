@@ -545,7 +545,7 @@ export function header(after: Element, isFirst: boolean) {
 	let depth = 1;
 	let cur = parent;
 	while (cur != d$n("main")) {
-		if (cur.matches("section, article")) depth++;
+		if (cur.matches("section, article, [role='region']")) depth++;
 		cur = cur.parentElement as Element;
 	}
 	if (depth > 6) depth = 6;
