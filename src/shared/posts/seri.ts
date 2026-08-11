@@ -343,6 +343,9 @@ export function deseri(data: SeriData, cur: string, init: boolean = false, hooks
 			data.variant?.width != null ? ` width="${sani(data.variant?.width.toString())}"` : ''
 		}${
 			data.variant?.height != null ? ` height="${sani(data.variant?.height.toString())}"` : ''
+		}${
+			data.variant?.width != null && data.variant?.height != null ?
+			` viewBox="0 0 ${sani(data.variant?.width.toString())} ${sani(data.variant?.height.toString())}"` : ''
 		}>${data.variant?.inner}</svg>`;
 	case 'columns':
 		tagName = "div";

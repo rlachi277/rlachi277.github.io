@@ -97,14 +97,30 @@ export const editMenu = {
 
 	insertWeek: menuInsert((after, isFirst) => {
 		if (isFirst || after.parentElement !== d$n("main")) return null;
-		const newElement = document.createElement("section");
+		const newElement = document.createElement("details");
 		newElement.classList.add("week");
+		newElement.setAttribute("role", "region");
+		const summary = document.createElement("summary");
 		const hgroup = document.createElement("hgroup");
+		newElement.open = true;
 
 		hgroup.append(document.createElement("h2"));
 		hgroup.append(document.createElement("p"));
 		
-		newElement.append(hgroup);
+		summary.append(hgroup);
+		newElement.append(summary);
+
+		const atrocity = document.createElement("summary");
+		atrocity.classList.add("atrocity", "volatile");
+		atrocity.innerHTML = summary.innerHTML ?? "???";
+		summary.before(atrocity);
+		newElement.addEventListener("toggle", () => {
+			if (newElement.open) atrocity.firstElementChild?.setAttribute("hidden", "hidden");
+			else {
+				atrocity.innerHTML = summary.innerHTML ?? "???";
+			}
+		});
+		
 		newElement.append(document.createElement("p"));
 		return newElement;
 	}, false),

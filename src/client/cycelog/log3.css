@@ -6,8 +6,9 @@ body {
 	margin-block-end: 12rem;
 }
 
-details.week {
+main {
 	text-align: justify; /* for 'block'(actually still inline) comments */
+	overflow-wrap: anywhere;
 }
 
 details.week > summary { display: block; cursor: pointer; }
@@ -66,13 +67,13 @@ p:not(hgroup p) {
 
 pre {
 	font-family: 'Nanum Gothic Coding', monospace;
+	font-size: 0.9em;
 	padding-inline: 2ch;
 	line-height: 1.05;
 	text-align: start;
 	margin-block-start: 0;
 }
 
-pre :is(ul, ol) { padding-inline-start: 3ch; }
 pre ol, pre ol ol, pre ol ol ol {
 	list-style-type: decimal;
 }
@@ -118,4 +119,8 @@ pre ol, pre ol ol, pre ol ol ol {
 		block-size: 25rem;
 		inline-size: 25rem;
 	}
+}
+
+details.week > summary.editable > hgroup > *:empty::before {
+	content: '### 비어 있음 :O ###';
 }

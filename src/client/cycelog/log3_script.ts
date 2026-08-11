@@ -29,7 +29,6 @@ export function setup(menuBar: MenubarData[], defaultMenu: MenuActions, editMenu
 			const week = e.parentElement as HTMLDetailsElement;
 			if (week.open) atrocity.firstElementChild?.setAttribute("hidden", "hidden");
 			week.addEventListener("toggle", () => {
-				console.log(atrocity);
 				if (week.open) atrocity.firstElementChild?.setAttribute("hidden", "hidden");
 				else {
 					atrocity.innerHTML = e.innerHTML ?? "???";
