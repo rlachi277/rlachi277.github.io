@@ -23,9 +23,9 @@ const filterIndex = $(":root.index").exists ? 1 :
 
 let popoverCnt = 0;
 let first = true;
-function buildMenubar(data: MenubarData[], submenu: boolean = false): HTMLElement {
-	const wrapper = document.createElement(submenu ? "ul" : "menu");
-	wrapper.setAttribute("role", submenu ? "menu" : "menubar");
+function buildMenubar(data: MenubarData[], isSubmenu: boolean = false): HTMLElement {
+	const wrapper = document.createElement(isSubmenu ? "ul" : "menu");
+	wrapper.setAttribute("role", isSubmenu ? "menu" : "menubar");
 	for (const e of data) {
 		if (e.filter !== undefined && !e.filter[filterIndex]) continue;
 		const li = document.createElement("li");
@@ -48,6 +48,13 @@ function buildMenubar(data: MenubarData[], submenu: boolean = false): HTMLElemen
 			submenu.setAttribute("id", `menu-popover-${popoverCnt}`);
 			submenu.setAttribute("popover", "");
 			button.setAttribute("popovertarget", `menu-popover-${popoverCnt}`);
+			button.addEventListener("click", () => {
+				// sorry people who change the default writing-mode etc. for some reason
+				// i think i can't support that here
+				const rect = button.getBoundingClientRect();
+				submenu.style.left = isSubmenu ? `${rect.right}px` : `${rect.left - 1}px`;
+				submenu.style.top = isSubmenu ? `${rect.top - 1}px` : `${rect.bottom}px`;
+			});
 			li.append(submenu);
 		}
 		wrapper.append(li);

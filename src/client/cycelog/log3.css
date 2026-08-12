@@ -42,7 +42,7 @@ p:not(hgroup p) {
 .entry[data-type="4"] { --c: var(--c-45); --ch: var(--c-45h); --ca: var(--c-45a); }
 .entry[data-type="5"] { --c: var(--c-67); --ch: var(--c-67h); --ca: var(--c-67a); }
 .entry[data-type="6"] { --c: var(--c-2); --ch: var(--c-2h); --ca: var(--c-2a); }
-.entry[data-type="add"] { --c: var(--c-0h); --ch: var(--c-0a); --ca: var(--c-0a); }
+.entry[data-type="add"] { --c: light-dark(var(--c-0-d1),var(--c-0-0)); --ch: light-dark(var(--c-0-d2),var(--c-0-l1)); --ca: light-dark(var(--c-0-d2),var(--c-0-l1)); }
 
 .entry:target {
 	background-color: Mark;
