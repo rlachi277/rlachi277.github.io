@@ -595,7 +595,16 @@ export function inlineCleanup(target: Element) {
 }
 
 export function blurCleanup(target: Element) {
-	$('.select-marker:not(.dialog-marker)', target).remove();
+	$('.select-marker:not(.dialog-marker)', target).list.forEach((e) => {
+		e.replaceWith(...e.childNodes);
+	});
 	normalizeEditable(target);
 	clearHistory();
+}
+
+export function submitCleanup(target: Element) {
+	$(".dialog-marker", target).list.forEach((e) => {
+		e.replaceWith(...e.childNodes);
+	});
+	normalizeEditable(target);
 }

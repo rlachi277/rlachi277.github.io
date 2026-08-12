@@ -4,7 +4,8 @@ import { $, d$n, q$n } from "../query.js";
 import {
 	inlineCommands,
 	inlineCleanup,
-	blurCleanup
+	blurCleanup,
+	submitCleanup
 } from "./edit_inline.js";
 import { showWarning } from "./dialog.js";
 
@@ -315,8 +316,10 @@ function onEditableBlur(this: HTMLElement) {
 
 function submit(el: HTMLElement, makeData: boolean, splice: number) {
 	el.innerHTML = el.innerHTML.replaceAll("\n", "<br>");
-	if (el.lastChild?.nodeName === "BR") el.removeChild(el.lastChild);
 	(document.activeElement as HTMLElement | null)?.blur();
+	inlineCleanup(el);
+	blurCleanup(el);
+	submitCleanup(el);
 	const pos = positionMap.get(el);
 	const data = makeData ? seri(el, false, SERI_HOOKS) : undefined;
 	fetch(window.location.pathname, {method: "PATCH", headers: {

@@ -15,9 +15,8 @@ export function setup(menuBar: MenubarData[], defaultMenu: MenuActions, editMenu
 			const id = parseInt((td.parentElement as HTMLElement).getAttribute("data-id") as string);
 			(td as HTMLElement).addEventListener("click", (e: PointerEvent) => {
 				const path = `../log3/${window.location.pathname.split("/").at(-1)}#entry${id}`;
-				/* this *will* work on iOS Safari. only _blank doesn't work. */
 				if (e.ctrlKey || e.metaKey) window.open(path, "_blank", "noopener");
-				else window.open(path, "_self", "noopener");
+				else window.open(path, "_self", "noopener"); // this *will* work on iOS Safari. only _blank doesn't work.
 				e.preventDefault();
 			});
 		}

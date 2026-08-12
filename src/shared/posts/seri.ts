@@ -19,7 +19,7 @@ type DeseriHookResult = {
 	readonly tagName: string,
 	readonly attrs: string
 } | {
-	readonly type: "html",
+	readonly type: "html" | "htmlTemplate",
 	readonly html: string
 };
 
@@ -231,6 +231,8 @@ export function deseri(data: SeriData, cur: string, init: boolean = false, hooks
 			switch (hookResult.type) {
 			case 'html':
 				return hookResult.html;
+			case 'htmlTemplate':
+				return hookResult.html.replace(/<%- ?children ?%>/, children);
 			case 'void':
 				return `<${hookResult.tagName}>`;
 			default:

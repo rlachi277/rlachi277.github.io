@@ -94,7 +94,7 @@ pre ol, pre ol ol, pre ol ol ol {
 @media print {
 	@page {
 		@bottom-center {
-			font-family: 'Nanum Gothic Coding';
+			font-family: 'Menlo' monospace;
 			font-weight: bold;
 			font-size: 0.8rem;
 			content: counter(page);
@@ -119,6 +119,8 @@ pre ol, pre ol ol, pre ol ol ol {
 		block-size: 25rem;
 		inline-size: 25rem;
 	}
+	.week:not(:open) { display: none; }
+	.week-collapse { display: none; }
 }
 
 details.week > summary:is(.editable, .atrocity) > hgroup > *:empty::before {

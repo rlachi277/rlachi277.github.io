@@ -40,12 +40,11 @@ tfoot td { inset-block-end: 20px; }
 
 table, th, td {
 	border: 0.5px solid currentColor;
-	border-collapse: separate;
 	border-spacing: 0;
 	vertical-align: top;
 	block-size: 1lh;
 }
-table { border-block-width: 0; }
+table { border-block-width: 0; border-collapse: separate; }
 thead th { border-block-width: 1px; }
 tbody tr:first-child td { border-block-start-width: 0; }
 tfoot td { border-block-width: 1px; }
@@ -56,7 +55,7 @@ th, td { padding: 0.5ic; }
 
 :is(th, td):nth-child(1) { inline-size: 6ch; text-align: end; }
 :is(th, td):nth-child(2) { inline-size: 2ic; text-align: center; }
-:is(th, td):nth-child(3) { inline-size: 12ch; }
+:is(th, td):nth-child(3) { inline-size: 9ch; }
 
 tr td { background-color: var(--bg); }
 tr { --bg: var(--c-bg); --bgf: var(--c-bgh); }
@@ -133,3 +132,67 @@ td:focus {
 #dialog-main input[type="radio"][name="log1-type"][value="4"] { --bd: var(--c-45-bd); --bdh: var(--c-45-bdh); --bda: var(--c-45-bda); --bg: var(--c-45-bg); --bgh: var(--c-45-bgh); --bga: var(--c-45-bga); }
 #dialog-main input[type="radio"][name="log1-type"][value="5"] { --bd: var(--c-67-bd); --bdh: var(--c-67-bdh); --bda: var(--c-67-bda); --bg: var(--c-67-bg); --bgh: var(--c-67-bgh); --bga: var(--c-67-bga); }
 #dialog-main input[type="radio"][name="log1-type"][value="6"] { --bd: var(--c-2-bd); --bdh: var(--c-2-bdh); --bda: var(--c-2-bda); --bg: var(--c-2-bg); --bgh: var(--c-2-bgh); --bga: var(--c-2-bga); }
+
+@media print {
+	@page {
+		@bottom-center {
+			font-family: 'Menlo' monospace;
+			font-weight: bold;
+			font-size: 0.8rem;
+			content: counter(page);
+			text-align: center;
+		}
+	}
+	@page:first {
+		counter-reset: page 0;
+		@bottom-center { content: none; }
+	}
+	table {
+		font-size: 0.9rem;
+	}
+	h1 {
+		break-after: page;
+		block-size: 100vb;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+	h1::after {
+		display: block;
+		content: url('/assets/cycelog/logo.svg');
+		block-size: 25rem;
+		inline-size: 25rem;
+	}
+	tr { --nc: currentColor; }
+	tr:has(+ tr[data-type="1"]) { --nc: var(--c-1); }
+	tr:has(+ tr[data-type="2"]) { --nc: var(--c-8); }
+	tr:has(+ tr[data-type="3"]) { --nc: var(--c-3); }
+	tr:has(+ tr[data-type="4"]) { --nc: var(--c-45); }
+	tr:has(+ tr[data-type="5"]) { --nc: var(--c-67); }
+	tr:has(+ tr[data-type="6"]) { --nc: var(--c-2); }
+	th, td {
+		border: 1px solid currentColor !important;
+		border-block-end-color: color-mix(in oklab, currentColor 50%, var(--nc)) !important;
+		padding-block: 0.3ic !important;
+		vertical-align: middle;
+	}
+	:is(th, td):first-child { border-inline-start: none !important; font-family: 'Menlo' !important; padding-inline: 0.4ic !important; }
+	:is(th, td):nth-child(3) { font-family: 'Menlo' !important; padding-inline: 0.4ic !important; }
+	:is(th, td):last-child { border-inline-end: none !important; }
+	.log1-time-wrapper {
+		overflow: visible !important;
+		overflow-wrap: anywhere !important;
+		inline-size: 100% !important;
+	}
+	table {
+		border-collapse: collapse !important;
+		box-sizing: border-box !important;
+		width: 100% !important;
+		border: none !important;
+	}
+	table::before, table::after { content: none !important; }
+	thead th, tfoot td { background-color: transparent !important; position: static !important; }
+	tfoot { display: none; }
+	tr { break-inside: avoid; }
+}

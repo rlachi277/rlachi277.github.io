@@ -1,4 +1,5 @@
 import { sani } from "../posts/seri.js";
+import { html } from "../template.js";
 
 export const LOG1_TYPE_NAME = Object.freeze([
 	"",
@@ -10,21 +11,21 @@ export const LOG1_TYPE_NAME = Object.freeze([
 	"정보"
 ]);
 
-const LOG1_THEAD = `<thead id="log1-thead">
+const LOG1_THEAD = html`<thead id="log1-thead">
 	<tr>
 		<th scope="col">번호</th>
 		<th scope="col">유형</th>
 		<th scope="col">시간</th>
 		<th scope="col">내용</th>
 	</tr>
-</thead>`.replaceAll(/\n|\t/g, '');
+</thead>`;
 
-const LOG1_TFOOT = `<tfoot><tr id="log1-new-entry">
+const LOG1_TFOOT = html`<tfoot><tr id="log1-new-entry">
 	<td id="log1-new-id"></td>
 	<td id="log1-new-type"></td>
 	<td id="log1-new-time"></td>
 	<td id="log1-new-content"></td>
-</tr></tfoot>`.replaceAll(/\n|\t/g, '');
+</tr></tfoot>`;
 
 export type Log1RowData = {
 	readonly id: number,
@@ -41,15 +42,15 @@ export function buildLog1Table(data: Log1RowData[]): string {
 	for (const e of data) dataById[e.id] = e;
 	let rows = '';
 	for (let i = minId; i <= maxId; i++) rows += buildLog1Row(i, dataById[i]);
-	return `<table id="log1-table" role="grid">
+	return html`<table id="log1-table" role="grid">
 		${LOG1_THEAD}
 		<tbody>${rows}</tbody>
 		${LOG1_TFOOT}
-	</table>`.replaceAll(/\n|\t/g, '');
+	</table>`;
 }
 
 export function buildLog1Row(id: number, data: Log1RowData): string {
-	return `<tr data-row="${id}"
+	return html`<tr data-row="${id}"
 	${data?.id != undefined ? ` id="entry${data.id}" data-id="${data.id}"` : ''}
 	${data?.type != undefined ? ` data-type="${data.type}"` : ''}
 	${data?.time != undefined ? ` data-time="${sani(data.time)}"` : ''}>
@@ -57,5 +58,5 @@ export function buildLog1Row(id: number, data: Log1RowData): string {
 		<td class="log1-td-type">${data?.type != undefined ? LOG1_TYPE_NAME[data.type] : ''}</td>
 		<td class="log1-td-time"><div class="log1-time-wrapper">${data?.time != undefined ? sani(data.time) : ''}</div></td>
 		<td class="log1-td-content">${data?.content != undefined ? sani(data.content) : ''}</td>
-	</tr>`.replaceAll(/\n|\t/g, '');
+	</tr>`;
 }

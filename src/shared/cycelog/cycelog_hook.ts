@@ -1,5 +1,6 @@
 import type { DeseriHook, SeriHook } from "../posts/seri.js";
 import { sani } from "../posts/seri.js";
+import { html } from "../template.js";
 
 export type WhereData = {
 	readonly where: string,
@@ -13,9 +14,11 @@ export function cycelogDeseriHook(entryData: Record<number,[number,string,string
 		const postId = cur.split('/').at(-1) as string;
 		if (data.type === 'week') {
 			return {
-				type: 'normal',
-				tagName: 'details',
-				attrs: ` class="week" role="region"`
+				type: 'htmlTemplate',
+				html: html`<details class="week" role="region">
+					<%- children %>
+					<button class="volatile week-collapse colorbox" onclick="this.parentElement.scrollIntoView(); this.parentElement.open = false;">접기</button>
+				</details>`
 			};
 		} else if (data.type === 'end-of-week') {
 			return {
@@ -29,18 +32,18 @@ export function cycelogDeseriHook(entryData: Record<number,[number,string,string
 			if (id === 0 || id === -1 || id === -3) {
 				return {
 					type: 'html',
-					html: `<span contenteditable="false" class="entry semantic" data-type="add" data-id="${id}" title="수첩 기록에 없었으나 ${id === 0 ? "이후" : (id === -1 ? "1차 기록 시" : "3차 기록 시")} 추가한 정보"${date !== undefined ? ` data-date="${sani(date)}"` : ''}>
+					html: html`<span contenteditable="false" class="entry semantic" data-type="add" data-id="${id}" title="수첩 기록에 없었으나 ${id === 0 ? "이후" : (id === -1 ? "1차 기록 시" : "3차 기록 시")} 추가한 정보"${date !== undefined ? ` data-date="${sani(date)}"` : ''}>
 						${id === 0 ? "Add" : (id === -1 ? "Add1" : "Add3")}${date !== undefined ? ` ${sani(date)}` : ''}
-					<wbr></span>`.replaceAll(/\n|\t/g, '')
+					<wbr></span>`
 				} as const;
 			}
 			const type = id !== undefined ? (entryData?.[id][0] ?? 0) : 0;
 			const path = id !== undefined ? `../log1/${postId}#entry${id}` : '';
 			return {
 				type: 'html',
-				html: `<a contenteditable="false" class="entry"${id !== undefined ? ` href="${sani(path)}" id="entry${id}" data-id="${id}" title="${id}번 항목(${sani(entryData?.[id][1] ?? '?')}) / ${sani(entryData?.[id][2] ?? '?')}"` : ''}${date !== undefined ? ` data-date="${sani(date)}"` : ''} data-type="${type}">
+				html: html`<a contenteditable="false" class="entry"${id !== undefined ? ` href="${sani(path)}" id="entry${id}" data-id="${id}" title="${id}번 항목(${sani(entryData?.[id][1] ?? '?')}) / ${sani(entryData?.[id][2] ?? '?')}"` : ''}${date !== undefined ? ` data-date="${sani(date)}"` : ''} data-type="${type}">
 					#${id ?? "?"}${date !== undefined ? ` ${sani(date)}` : ''}
-				<wbr></a>`.replaceAll(/\n|\t/g, '')
+				<wbr></a>`
 			} as const;
 		} else if (data.type === 'ref') {
 			const id = (data.variant?.id ?? undefined) as number | undefined;
@@ -53,9 +56,9 @@ export function cycelogDeseriHook(entryData: Record<number,[number,string,string
 			const path = id !== undefined ? `./${refData.where}?ref=${postId}.${refId}#entry${id}` : '';
 			return {
 				type: 'html',
-				html: `<a contenteditable="false" class="entry ref" id="${refId}"${id !== undefined ? ` href="${sani(path)}" data-id="${id}" title="${id}번 항목 참조"` : ''} data-type="${refData.type}">
+				html: html`<a contenteditable="false" class="entry ref" id="${refId}"${id !== undefined ? ` href="${sani(path)}" data-id="${id}" title="${id}번 항목 참조"` : ''} data-type="${refData.type}">
 					ref. #${id ?? "?"}
-				<wbr></a>`.replaceAll(/\n|\t/g, '')
+				<wbr></a>`
 			} as const;
 		}
 		return undefined;

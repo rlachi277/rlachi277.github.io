@@ -1,4 +1,5 @@
 import { d$, d$n } from "../query.js";
+import { html } from "../../shared/template.js";
 
 type DialogAction = (() => boolean) | (() => Promise<boolean>);
 
@@ -19,7 +20,7 @@ export function dialog(title: string, main: string, action: DialogAction, danger
 }
 
 export function setupDialog() {
-	document.body.insertAdjacentHTML("afterbegin", `<dialog id="dialog">
+	document.body.insertAdjacentHTML("afterbegin", html`<dialog id="dialog">
 		<h6 id="dialog-title"></h6>
 		<div id="dialog-main"></div>
 		<div id="dialog-buttons">
@@ -27,7 +28,7 @@ export function setupDialog() {
 			<button id="dialog-confirm">확인</button>
 		</div>
 	</dialog>
-	<div id="warning"></div>`.replaceAll(/\n|\t/g, ''));
+	<div id="warning"></div>`);
 	d$("dialog-confirm")?.addEventListener("click", async function () {
 		if (dialogAction === null) return;
 		if (await dialogAction()) (d$("dialog") as HTMLDialogElement).close();
