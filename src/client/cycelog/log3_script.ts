@@ -35,7 +35,7 @@ export function setup(menuBar: MenubarData[], defaultMenu: MenuActions, editMenu
 				}
 			});
 		})
-		setupLog3Edit(window.LOG3_DATA ?? '{}');
+		setupLog3Edit();
 	}
 	postsSetup(menuBar, defaultMenu, editMenu);
 }

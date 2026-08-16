@@ -7,19 +7,15 @@ h1 {
 	z-index: 1;
 }
 
-table {
-	font-family: "Pretendard GOV Variable", "Pretendard GOV", monospace;
-
-	table-layout: fixed;
-	inline-size: 100%;
-}
+thead th { inset-block-start: calc(1rlh + 20px); cursor: pointer; }
+tfoot td { inset-block-end: 20px; }
 
 table::before {
 	content: '';
 	position: fixed;
 	background-color: var(--c-bg);
 	inset-block-start: 0;
-	block-size: calc(1lh + 20px);
+	block-size: calc(1rlh + 20px);
 	inset-inline: 0;
 }
 table.unfixed-before::before { position: absolute; inset-block-start: var(--unfixed-top); }
@@ -33,67 +29,6 @@ table::after {
 	inset-inline: 0;
 }
 table.unfixed-after::after { position: absolute; inset-block-end: 0; }
-
-thead th, tfoot td { background-color: var(--c-bg); position: sticky; }
-thead th { inset-block-start: calc(1lh + 20px); cursor: pointer; }
-tfoot td { inset-block-end: 20px; }
-
-table, th, td {
-	border: 0.5px solid currentColor;
-	border-spacing: 0;
-	vertical-align: top;
-	block-size: 1lh;
-}
-table { border-block-width: 0; border-collapse: separate; }
-thead th { border-block-width: 1px; }
-tbody tr:first-child td { border-block-start-width: 0; }
-tfoot td { border-block-width: 1px; }
-tbody:empty + tfoot td { border-block-start-width: 0; border-block-end-width: 1px; }
-tbody tr:last-child td { border-block-end-width: 0; }
-
-th, td { padding: 0.5ic; }
-
-:is(th, td):nth-child(1) { inline-size: 6ch; text-align: end; }
-:is(th, td):nth-child(2) { inline-size: 2ic; text-align: center; }
-:is(th, td):nth-child(3) { inline-size: 9ch; }
-
-tr td { background-color: var(--bg); }
-tr { --bg: var(--c-bg); --bgf: var(--c-bgh); }
-tr[data-type="1"] { --bg: var(--c-1-bg); --bgf: var(--c-1-bgh); color: var(--c-1); }
-tr[data-type="2"] { --bg: var(--c-8-bg); --bgf: var(--c-8-bgh); color: var(--c-8); }
-tr[data-type="3"] { --bg: var(--c-3-bg); --bgf: var(--c-3-bgh); color: var(--c-3); }
-tr[data-type="4"] { --bg: var(--c-45-bg); --bgf: var(--c-45-bgh); color: var(--c-45); }
-tr[data-type="5"] { --bg: var(--c-67-bg); --bgf: var(--c-67-bgh); color: var(--c-67); }
-tr[data-type="6"] { --bg: var(--c-2-bg); --bgf: var(--c-2-bgh); color: var(--c-2); }
-
-tr { scroll-margin-block: 50vb; }
-tr:target { --bg: var(--bgf); outline: 1px auto currentColor; }
-tr:target td:first-child { background-color: Mark; color: MarkText; }
-
-td.log1-td-id { cursor: pointer; }
-td.log1-edited { text-decoration: currentColor dotted underline; }
-
-td:focus {
-	background-color: var(--bgf);
-	outline: 1px auto currentColor;
-}
-
-.log1-time-wrapper {
-	overflow: clip;
-	text-overflow: ellipsis;
-}
-.log1-time-wrapper:hover {
-	overflow: visible;
-	inline-size: max-content;
-	padding-right: 1ic;
-	position: relative;
-	background-color: var(--bg);
-	box-shadow: 0 0 0 0.25ic var(--bg);
-}
-:is(tr:target td, td:focus) .log1-time-wrapper:hover {
-	background-color: var(--bgf);
-	box-shadow: 0 0 0 0.25ic var(--bgf);
-}
 
 #dialog-main input[type="number"] {
 	width: 6ch;

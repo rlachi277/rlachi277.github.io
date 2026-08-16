@@ -7,7 +7,7 @@
 body {
 	padding-inline: max(2%, 1rem);
 	margin: 0;
-	margin-block-start: calc(-1lh + -4px);
+	margin-block-start: calc(-1rlh + -4px);
 	margin-block-end: 3rem;
 }
 

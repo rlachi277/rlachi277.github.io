@@ -2,6 +2,12 @@ import type { DeseriHook, SeriHook } from "../posts/seri.js";
 import { sani } from "../posts/seri.js";
 import { html } from "../template.js";
 
+export type EntryData = {
+	has: (id: number) => boolean,
+	get: (id: number) => readonly [number,string,string] | undefined,
+	[key: string]: unknown
+};
+
 export type WhereData = {
 	readonly where: string,
 	readonly type: number
@@ -9,7 +15,7 @@ export type WhereData = {
 
 export type WhereFunc = (id: number | undefined, refId: string) => WhereData;
 
-export function cycelogDeseriHook(entryData: Record<number,[number,string,string]>, whereFunc: WhereFunc): DeseriHook {
+export function cycelogDeseriHook(entryData: EntryData, whereFunc: WhereFunc): DeseriHook {
 	return function (data, cur) {
 		const postId = cur.split('/').at(-1) as string;
 		if (data.type === 'week') {
@@ -37,11 +43,14 @@ export function cycelogDeseriHook(entryData: Record<number,[number,string,string
 					<wbr></span>`
 				} as const;
 			}
-			const type = id !== undefined ? (entryData?.[id][0] ?? 0) : 0;
-			const path = id !== undefined ? `../log1/${postId}#entry${id}` : '';
+			const curData = id !== undefined ? entryData.get(id) : undefined;
+			const type = curData?.[0] ?? 0;
+			const time = curData?.[1] ?? '?';
+			const content = curData?.[2] ?? '?';
+			const path = id !== undefined ? `../log1/${postId}#l1entry${id}` : '';
 			return {
 				type: 'html',
-				html: html`<a contenteditable="false" class="entry"${id !== undefined ? ` href="${sani(path)}" id="entry${id}" data-id="${id}" title="${id}번 항목(${sani(entryData?.[id][1] ?? '?')}) / ${sani(entryData?.[id][2] ?? '?')}"` : ''}${date !== undefined ? ` data-date="${sani(date)}"` : ''} data-type="${type}">
+				html: html`<a contenteditable="false" class="entry"${id !== undefined ? ` href="${sani(path)}" id="entry${id}" data-id="${id}" title="${id}번 항목(${sani(time)}) / ${sani(content)}"` : ''}${date !== undefined ? ` data-date="${sani(date)}"` : ''} data-type="${type}">
 					#${id ?? "?"}${date !== undefined ? ` ${sani(date)}` : ''}
 				<wbr></a>`
 			} as const;
@@ -49,8 +58,8 @@ export function cycelogDeseriHook(entryData: Record<number,[number,string,string
 			const id = (data.variant?.id ?? undefined) as number | undefined;
 			const refId = (data.variant?.refId as string | null | undefined) ?? `ref${Math.random().toString(36).substring(2)}`;
 			let refData: WhereData | undefined = undefined;
-			if (id !== undefined && Object.hasOwn(entryData, id)) {
-				refData = {where: postId, type: entryData?.[id][0] ?? 0};
+			if (id !== undefined && entryData.has(id)) {
+				refData = {where: postId, type: entryData.get(id)?.[0] ?? 0};
 			}
 			if (refData === undefined) refData = whereFunc(id, refId);
 			const path = id !== undefined ? `./${refData.where}?ref=${postId}.${refId}#entry${id}` : '';

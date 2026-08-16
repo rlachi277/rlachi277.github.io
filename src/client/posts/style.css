@@ -319,6 +319,7 @@ nav menu {
 	position: fixed;
 	inset-block-start: 0;
 	inset-inline: 0;
+	block-size: calc(1rlh + 4px);
 	z-index: 2;
 }
 
@@ -341,7 +342,6 @@ nav menu {
 	color: inherit;
 	display: block;
 	margin: 0;
-	padding: 0;
 	padding-block: 1.5px;
 	padding-inline: 0.5rem;
 	background: none;

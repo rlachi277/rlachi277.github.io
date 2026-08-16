@@ -40,28 +40,28 @@ type MoveData = {
 
 type WhereRow = Required<Pick<EntryRow, "post"|"type">>;
 
-export function getLog3(db: Database, root: string, path: string, renderHooks: DeseriHook[], nav: string, entryData: Record<number,[number,string,string]>): [boolean, Record<string,string>] {
-	const result = getPost(db, root, path, renderHooks, nav);
+export function getLog3(db: Database, root: string, postId: string, renderHooks: DeseriHook[], nav: string, rawLog1: Log1RowData[]): [boolean, Record<string,string>] {
+	const result = getPost(db, root, postId, renderHooks, nav);
 	return [result[0], {
 		...result[1],
-		entryData: JSON.stringify(entryData)
+		log1: buildLog1Table(rawLog1)
 	}];
 }
 
 export { putPost as putLog3 } from "../posts/posts.js";
 
-export function patchLog3(db: Database, path: string, body: PatchBody) {
+export function patchLog3(db: Database, postId: string, body: PatchBody) {
 	const { pos, data, splice } = body;
-	patchPost(db, path, {
+	patchPost(db, postId, {
 		pos: pos,
 		data: data,
 		splice: splice
 	});
 }
 
-export function deleteLog3(db: Database, path: string) {
-	deletePost(db, path);
-	db.prepare(`DELETE FROM entries WHERE post = ?`).run(path);
+export function deleteLog3(db: Database, postId: string) {
+	deletePost(db, postId);
+	db.prepare(`DELETE FROM entries WHERE post = ?`).run(postId);
 }
 
 const log1Header = (id: string) => {

@@ -3,7 +3,7 @@
 }
 
 body {
-	margin-block-end: 12rem;
+	margin-block-end: 9rem;
 }
 
 main {
@@ -91,6 +91,23 @@ pre ol, pre ol ol, pre ol ol ol {
 	inset-inline-start: -1.25lh;
 }
 
+@media screen and (min-width: 900px) and (min-aspect-ratio: 1/1) {
+	#log1 {
+		position: fixed;
+		inset-block: 0;
+		inset-inline: 50% 0;
+		overflow-inline: clip;
+		overflow-block: auto;
+		overscroll-behavior: contain;
+		border-inline-start: 1px solid currentColor;
+		padding-inline: max(2%, 0.5rem);
+	}
+
+	body:has(#log1:not([hidden])) {
+		padding-inline: max(2%, 0.5rem) calc(50% + max(2%, 0.5rem));
+	}
+}
+
 @media print {
 	@page {
 		@bottom-center {
@@ -121,6 +138,7 @@ pre ol, pre ol ol, pre ol ol ol {
 	}
 	.week:not(:open) { display: none; }
 	.week-collapse { display: none; }
+	#log1 { display: none; }
 }
 
 details.week > summary:is(.editable, .atrocity) > hgroup > *:empty::before {

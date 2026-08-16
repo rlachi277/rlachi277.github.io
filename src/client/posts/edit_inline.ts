@@ -371,11 +371,7 @@ function tabCommand(this: Element, e: KeyboardEvent) {
 	const closeText = closeTextNode.textContent;
 	closeTextNode.textContent = closeText.substring(0, closeIdx) + closeText.substring(cursorIdx);
 
-	const range = document.createRange();
-	range.setStart(openTextNode, openIdx);
-	range.setEnd(closeTextNode, closeIdx);
-	S.removeAllRanges();
-	S.addRange(range);
+	S.setBaseAndExtent(openTextNode, openIdx, closeTextNode, closeIdx);
 
 	runCommand.call(this, e, command);
 	returnToMarker(startMarker, endMarker);

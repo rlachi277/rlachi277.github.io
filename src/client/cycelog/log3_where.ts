@@ -6,7 +6,6 @@ export function clientWhere(root: string): WhereFunc {
 		// it is assumed that the log1 data doesn't change while the client is on the same page.
 		// this assumption is valid, because the whole posts system assumes that there's only one session,
 		// and if it's on log3, it's not on log1.
-		if (typeof document === "undefined") throw "이거 서버에서 쓰지 마세요";
 		let result: WhereData | undefined = (id !== undefined) ? whereCache[id] : undefined;
 		if (result !== undefined) return result;
 		

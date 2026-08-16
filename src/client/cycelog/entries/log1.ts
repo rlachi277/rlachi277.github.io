@@ -2,6 +2,7 @@ import "../../colors.css";
 import "../../posts/style.css";
 import "../colors.css";
 import "../log1.css";
+import "../table.css";
 
 import type { MenubarData } from "../../posts/menubar.js";
 

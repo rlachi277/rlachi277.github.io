@@ -51,7 +51,7 @@ export function buildLog1Table(data: Log1RowData[]): string {
 
 export function buildLog1Row(id: number, data: Log1RowData): string {
 	return html`<tr data-row="${id}"
-	${data?.id != undefined ? ` id="entry${data.id}" data-id="${data.id}"` : ''}
+	${data?.id != undefined ? ` id="l1entry${data.id}" data-id="${data.id}"` : ''}
 	${data?.type != undefined ? ` data-type="${data.type}"` : ''}
 	${data?.time != undefined ? ` data-time="${sani(data.time)}"` : ''}>
 		<td class="log1-td-id">${data?.id != undefined ? data.id : ''}</td>
