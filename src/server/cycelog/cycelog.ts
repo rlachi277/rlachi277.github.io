@@ -13,7 +13,6 @@ import {
 	deletePost,
 	badRequest
 } from "../posts/posts.js";
-import { isHttpError } from "../posts/router.js";
 
 export type EntryRow = {
 	readonly id?: number,
@@ -152,8 +151,8 @@ export function moveLog1(db: Database, postId: string, body: MoveData) {
 					content: e.content
 				});
 			}
-		} catch (e) {
-			if (isHttpError(e) && e.status === 404) throw "oh no"; // ???
+		} catch (e: any) {
+			if (e?.status === 404) throw "oh no"; // ???
 			throw e;
 		}
 	})();

@@ -108,11 +108,11 @@ export function withErrors(res: Response<unknown, Record<string,unknown>, number
 			func();
 			res.sendStatus(204);
 		}
-	} catch (e) {
+	} catch (e: any) {
 		if (typeof e === 'number') {
 			res.setHeader('Content-Type', 'text/plain');
 			res.sendStatus(e);
-		} else if (isHttpError(e)) {
+		} else if (typeof e?.status === "number") {
 			if (e.reason != undefined) {
 				res.setHeader('Content-Type', 'text/plain');
 				res.status(e.status).send(e.reason);
@@ -122,8 +122,4 @@ export function withErrors(res: Response<unknown, Record<string,unknown>, number
 			} else res.sendStatus(e.status);
 		} else throw e;
 	}
-}
-
-export function isHttpError(e: unknown): e is HttpError {
-	return typeof e === "object" && e !== null && typeof (e as {status?: unknown}).status === "number";
 }

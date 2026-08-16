@@ -133,16 +133,12 @@ async function moveEntriesDialog(id: number) {
 			focusOn(curR + delta, curC, true);
 			window.location.reload();
 			return true;
-		} catch (e) {
-			if (!isHttpError(e) || e.status !== 400) throw e;
-			showWarning(e.reason ?? "오류");
+		} catch (e: any) {
+			if (e?.status !== 400) throw e;
+			showWarning(e?.reason ?? "오류");
 			return false;
 		}
 	})();
-}
-
-function isHttpError(e: unknown): e is {status: number, reason?: string, html?: string} {
-	return typeof e === "object" && e !== null && typeof (e as {status?: unknown}).status === "number";
 }
 
 async function onTypeFieldClick(this: HTMLElement) {
