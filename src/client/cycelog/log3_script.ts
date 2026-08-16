@@ -20,6 +20,8 @@ export function setup(menuBar: MenubarData[], defaultMenu: MenuActions, editMenu
 			const url = new URL(href, window.location.href);
 			url.searchParams.set("edit", "t");
 			e.setAttribute("href", url.toString());
+			e.setAttribute("contenteditabe", "false");
+			e.setAttribute("data-edit", "");
 		});
 		$(".week > summary").each((e) => {
 			const atrocity = document.createElement("summary");
@@ -36,6 +38,12 @@ export function setup(menuBar: MenubarData[], defaultMenu: MenuActions, editMenu
 			});
 		})
 		setupLog3Edit();
+	}
+	if (params.get("log1")) {
+		$("#log1-table tr[data-id]").each((e) => {
+			const id = e.id.substring(7);
+			if (!$(`#entry${id}`).exists) e.setAttribute("data-nolink", "");
+		})
 	}
 	postsSetup(menuBar, defaultMenu, editMenu);
 }

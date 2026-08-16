@@ -1,4 +1,4 @@
-import type { EntryData } from '../../shared/cycelog/cycelog_hook.js';
+import type { EntryTypeObject } from '../../shared/cycelog/cycelog_hook.js';
 
 import express from "express";
 import Database from 'better-sqlite3';
@@ -150,16 +150,16 @@ router.get('/log3/index.html', (_, res) => {
 
 router.get('/log3/:id', (req, res) => {
 	const id = req.params.id;
-	const entryData: Record<number,[number,string,string]> = {};
+	const types: Record<number,number> = {};
 	const data = getRawLog1(db, id);
-	for (const e of data) entryData[e.id] = [e.type, e.time, e.content];
-	const entryDataWrapper: EntryData = {
-		has: (id) => Object.hasOwn(entryData, id),
-		get: (id) => entryData[id]
+	for (const e of data) types[e.id] = e.type;
+	const typeObject: EntryTypeObject = {
+		has: (id) => Object.hasOwn(types, id),
+		get: (id) => types[id]
 	};
 
 	const result = getLog3(
-		db, "/cycelog/log3/", id, [cycelogDeseriHook(entryDataWrapper, serverWhere(db), req.query.log1 !== undefined)],
+		db, "/cycelog/log3/", id, [cycelogDeseriHook(typeObject, serverWhere(db), req.query.log1 !== undefined)],
 		renderNav(db, "/cycelog/log3/", id), req.query.log1 !== undefined ? data : undefined
 	);
 	if (result[0]) res.render(log3Template, result[1]);

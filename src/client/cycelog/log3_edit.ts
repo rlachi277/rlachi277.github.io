@@ -1,5 +1,5 @@
 import type { DeseriHook } from '../../shared/posts/seri.js';
-import type { EntryData } from '../../shared/cycelog/cycelog_hook.js';
+import type { EntryTypeObject } from '../../shared/cycelog/cycelog_hook.js';
 
 import { cycelogSeriHook, cycelogDeseriHook } from '../../shared/cycelog/cycelog_hook.js';
 import { $, d$, d$n } from "../query.js";
@@ -7,7 +7,7 @@ import { SERI_HOOKS, DESERI_HOOKS } from "../posts/script.js";
 import { dialog, showWarning } from "../posts/dialog.js";
 import { clientWhere } from './log3_where.js';
 
-const entryData: EntryData = {
+const entryData: EntryTypeObject = {
 	cache: {},
 	has: function (id) {
 		if (Object.hasOwn(this.cache as object, id)) return true;
@@ -15,15 +15,11 @@ const entryData: EntryData = {
 	},
 	get: function (id) {
 		console.log(id);
-		const cache = this.cache as Record<number,readonly [number,string,string]>;
+		const cache = this.cache as Record<number,number>;
 		if (Object.hasOwn(cache, id)) return cache[id];
 		const l1entry = d$(`l1entry${id}`);
 		if (l1entry === null) return undefined;
-		const result = [
-			parseInt(l1entry.getAttribute("data-type") as string),
-			l1entry.getAttribute("data-time") as string,
-			l1entry.lastElementChild?.textContent as string
-		] as const;
+		const result = parseInt(l1entry.getAttribute("data-type") as string);
 		cache[id] = result;
 		return result;
 	}
@@ -141,11 +137,13 @@ function insertAtMarker(marker: HTMLElement, html: string) {
 	S.setPosition(marker);
 	S.anchorNode?.dispatchEvent(new Event("input", {bubbles: true}));
 	marker.remove();
-	$(".entry[href]:not([href*='edit=t'])").each((e) => {
+	$(".entry[href]:not([data-edit])").each((e) => {
 		const href = e.getAttribute("href");
 		if (href === null) return;
 		const url = new URL(href, window.location.href);
 		url.searchParams.set("edit", "t");
 		e.setAttribute("href", url.toString());
+		e.setAttribute("contenteditabe", "false");
+		e.setAttribute("data-edit", "");
 	});
 }

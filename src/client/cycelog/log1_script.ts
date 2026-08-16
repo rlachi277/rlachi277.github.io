@@ -9,7 +9,7 @@ export function setup(menuBar: MenubarData[], defaultMenu: MenuActions, editMenu
 	postsSetup(menuBar, defaultMenu, editMenu, true);
 	if ($(":root.notfound, :root.index").exists) return;
 
-	const stickyY = parseFloat(getComputedStyle(q$n("thead th:first-child")).insetBlockStart); // why
+	const stickyY = parseFloat(window.getComputedStyle(q$n("thead th:first-child")).insetBlockStart); // why
 	const table = d$n("log1-table");
 	const firstRow = q$n("tbody tr:first-child");
 	function onScroll() {

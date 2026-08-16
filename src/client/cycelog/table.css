@@ -35,6 +35,7 @@ tr[data-type="3"] { --bg: var(--c-3-bg); --bgf: var(--c-3-bgh); --c: var(--c-3);
 tr[data-type="4"] { --bg: var(--c-45-bg); --bgf: var(--c-45-bgh); --c: var(--c-45); }
 tr[data-type="5"] { --bg: var(--c-67-bg); --bgf: var(--c-67-bgh); --c: var(--c-67); }
 tr[data-type="6"] { --bg: var(--c-2-bg); --bgf: var(--c-2-bgh); --c: var(--c-2); }
+tr[data-nolink] { --bg: var(--c-0-bg); --bgf: var(--c-0-bgh); --c: var(--c-0); }
 
 tr { scroll-margin-block: 50vb; }
 tr:target { --bg: var(--bgf); position: relative; }
@@ -57,6 +58,7 @@ td:focus { background-color: var(--bgf); }
 	inset: 0;
 	outline: 1px auto var(--c);
 	z-index: 2;
+	pointer-events: none;
 }
 
 .log1-time-wrapper {

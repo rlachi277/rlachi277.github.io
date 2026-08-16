@@ -45,6 +45,7 @@ const menu: MenubarData[] = [{
 	submenu: [
 		{text: "1차 기록으로", action: "toLog1"},
 		{text: "1차 기록 보기/숨기기", action: "toggleLog1"},
+		{text: "강조된 곳으로", action: "toMark", filter: [true, false, false]},
 		{text: "강조 해제", action: "removeMark", filter: [true, false, false]},
 		{text: "모두 접기", action: "collapseAll", filter: [true, false, false]},
 		{text: "모두 펼치기", action: "expandAll", filter: [true, false, false]}

@@ -14,6 +14,8 @@
 	<main id="main"><%%- content %></main>
 	<%%- log1 %>
 	<script>
+		if (sessionStorage.getItem("cycelog.log3Path") !== window.location.pathname) sessionStorage.clear();
+		sessionStorage.setItem("cycelog.log3Path", window.location.pathname);
 		document.querySelectorAll(".week").forEach((e, i) => {
 			e.open = sessionStorage.getItem(`cycelog.week${i}`) === 'true';
 			e.addEventListener('toggle', () => {

@@ -12,6 +12,8 @@
 	<%%- header %>
 	<%%- table %>
 	<script>
+		if (sessionStorage.getItem("cycelog.log1Path") !== window.location.pathname) sessionStorage.clear();
+		sessionStorage.setItem("cycelog.log1Path", window.location.pathname);
 		const scrollY = sessionStorage.getItem('scrollY');
 		if (scrollY !== null) {
 			window.scrollTo(0, parseInt(scrollY));

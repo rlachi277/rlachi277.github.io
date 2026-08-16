@@ -186,7 +186,7 @@ async function onTimeFieldClick(this: HTMLElement) {
 		<label for="dialog-new-time">새 시간: </label>
 		<input id="dialog-new-time" placeholder="${cur}">
 	`, async () => {
-		const time = (d$n("dialog-new-time") as HTMLInputElement).value;
+		const time = (d$n("dialog-new-time") as HTMLInputElement).value.replaceAll(/\s/g, '');
 		if (time == undefined || time === '') {
 			showWarning("값을 입력하세요.");
 			return false;

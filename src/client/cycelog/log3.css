@@ -91,12 +91,15 @@ pre ol, pre ol ol, pre ol ol ol {
 	inset-inline-start: -1.25lh;
 }
 
+#log1 { display: none; }
+
 @media screen and (min-width: 900px) and (min-aspect-ratio: 1/1) {
 	body:has(#log1) {
 		padding-inline: max(2%, 0.5rem) calc(50% + max(2%, 0.5rem));
 	}
 
 	#log1 {
+		display: block;
 		position: fixed;
 		inset-block: 0;
 		inset-inline: 50% 0;

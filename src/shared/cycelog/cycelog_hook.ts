@@ -2,9 +2,9 @@ import type { DeseriHook, SeriHook } from "../posts/seri.js";
 import { sani } from "../posts/seri.js";
 import { html } from "../template.js";
 
-export type EntryData = {
+export type EntryTypeObject = {
 	has: (id: number) => boolean,
-	get: (id: number) => readonly [number,string,string] | undefined,
+	get: (id: number) => number | undefined,
 	[key: string]: unknown
 };
 
@@ -15,7 +15,7 @@ export type WhereData = {
 
 export type WhereFunc = (id: number | undefined, refId: string) => WhereData;
 
-export function cycelogDeseriHook(entryData: EntryData, whereFunc: WhereFunc, withLog1: boolean): DeseriHook {
+export function cycelogDeseriHook(typeObject: EntryTypeObject, whereFunc: WhereFunc, withLog1: boolean): DeseriHook {
 	return function (data, cur) {
 		const postId = cur.split('/').at(-1) as string;
 		if (data.type === 'week') {
@@ -38,19 +38,17 @@ export function cycelogDeseriHook(entryData: EntryData, whereFunc: WhereFunc, wi
 			if (id === 0 || id === -1 || id === -3) {
 				return {
 					type: 'html',
-					html: html`<span contenteditable="false" class="entry semantic" data-type="add" data-id="${id}" title="수첩 기록에 없었으나 ${id === 0 ? "이후" : (id === -1 ? "1차 기록 시" : "3차 기록 시")} 추가한 정보"${date !== undefined ? ` data-date="${sani(date)}"` : ''}>
+					html: html`<span class="entry semantic" data-type="add" data-id="${id}" title="수첩 기록에 없었으나 ${id === 0 ? "이후" : (id === -1 ? "1차 기록 시" : "3차 기록 시")} 추가한 정보"${date !== undefined ? ` data-date="${sani(date)}"` : ''}>
 						${id === 0 ? "Add" : (id === -1 ? "Add1" : "Add3")}${date !== undefined ? ` ${sani(date)}` : ''}
 					<wbr></span>`
 				} as const;
 			}
-			const curData = id !== undefined ? entryData.get(id) : undefined;
-			const type = curData?.[0] ?? 0;
-			const time = curData?.[1] ?? '?';
-			const content = curData?.[2] ?? '?';
+			const curData = id !== undefined ? typeObject.get(id) : undefined;
+			const type = curData ?? 0;
 			const path = id !== undefined ? (withLog1 ? `#l1entry${id}` : `../log1/${postId}#l1entry${id}`) : '';
 			return {
 				type: 'html',
-				html: html`<a contenteditable="false" class="entry"${id !== undefined ? ` href="${sani(path)}" id="entry${id}" data-id="${id}" title="${id}번 항목(${sani(time)}) / ${sani(content)}"` : ''}${date !== undefined ? ` data-date="${sani(date)}"` : ''} data-type="${type}">
+				html: html`<a class="entry"${id !== undefined ? ` href="${sani(path)}" id="entry${id}" data-id="${id}" title="${id}번 항목"` : ''}${date !== undefined ? ` data-date="${sani(date)}"` : ''} data-type="${type}">
 					#${id ?? "?"}${date !== undefined ? ` ${sani(date)}` : ''}
 				<wbr></a>`
 			} as const;
@@ -58,8 +56,8 @@ export function cycelogDeseriHook(entryData: EntryData, whereFunc: WhereFunc, wi
 			const id = (data.variant?.id ?? undefined) as number | undefined;
 			const refId = (data.variant?.refId as string | null | undefined) ?? `ref${Math.random().toString(36).substring(2)}`;
 			let refData: WhereData | undefined = undefined;
-			if (id !== undefined && entryData.has(id)) {
-				refData = {where: postId, type: entryData.get(id)?.[0] ?? 0};
+			if (id !== undefined && typeObject.has(id)) {
+				refData = {where: postId, type: typeObject.get(id) ?? 0};
 			}
 			if (refData === undefined) refData = whereFunc(id, refId);
 			const path = id !== undefined ? (refData.where === postId ?
@@ -68,7 +66,7 @@ export function cycelogDeseriHook(entryData: EntryData, whereFunc: WhereFunc, wi
 			) : '';
 			return {
 				type: 'html',
-				html: html`<a contenteditable="false" class="entry ref" id="${refId}"${id !== undefined ? ` href="${sani(path)}" data-id="${id}" title="${id}번 항목 참조"` : ''} data-type="${refData.type}">
+				html: html`<a class="entry ref" id="${refId}"${id !== undefined ? ` href="${sani(path)}" data-id="${id}" title="${id}번 항목 참조"` : ''} data-type="${refData.type}">
 					ref. #${id ?? "?"}
 				<wbr></a>`
 			} as const;

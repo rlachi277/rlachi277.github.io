@@ -48,18 +48,20 @@ function buildMenubar(data: MenubarData[], isSubmenu: boolean = false): HTMLElem
 			submenu.setAttribute("id", `menu-popover-${popoverCnt}`);
 			submenu.setAttribute("popover", "");
 			button.setAttribute("popovertarget", `menu-popover-${popoverCnt}`);
-			button.addEventListener("click", () => {
-				// sorry people who change the default writing-mode etc. for some reason
-				// i think i can't support that here
-				const rect = button.getBoundingClientRect();
-				submenu.style.left = isSubmenu ? `${rect.right}px` : `${rect.left - 1}px`;
-				submenu.style.top = isSubmenu ? `${rect.top - 1}px` : `${rect.bottom}px`;
-			});
+			button.addEventListener("click", () => positionSubmenu(button, submenu, isSubmenu));
 			li.append(submenu);
 		}
 		wrapper.append(li);
 	}
 	return wrapper;
+}
+
+function positionSubmenu(parent: HTMLElement, child: HTMLElement, isSubmenu: boolean) {
+	// sorry people who change the default writing-mode etc. for some reason
+	// i think i can't support that here
+	const rect = parent.getBoundingClientRect();
+	child.style.left = isSubmenu ? `${rect.right}px` : `${rect.left - 1}px`;
+	child.style.top = isSubmenu ? `${rect.top - 1}px` : `${rect.bottom}px`;
 }
 
 function onMenubarKeydown(this: HTMLElement, e: KeyboardEvent) {
@@ -72,6 +74,7 @@ function onMenubarKeydown(this: HTMLElement, e: KeyboardEvent) {
 		if (li.parentElement === this && target.getAttribute("popovertarget") !== null) {
 			const submenu = d$(target.getAttribute("popovertarget") as string) as HTMLUListElement;
 			submenu.togglePopover({force: true, source: target});
+			positionSubmenu(target, submenu, false);
 			newTarget = submenu.firstElementChild?.firstChild as HTMLButtonElement;
 			break;
 		}
@@ -81,6 +84,7 @@ function onMenubarKeydown(this: HTMLElement, e: KeyboardEvent) {
 		if (li.parentElement === this && target.getAttribute("popovertarget") !== null) {
 			const submenu = d$(target.getAttribute("popovertarget") as string) as HTMLUListElement;
 			submenu.togglePopover({force: true, source: target});
+			positionSubmenu(target, submenu, false);
 			newTarget = submenu.lastElementChild?.firstChild as HTMLButtonElement;
 			break;
 		}
@@ -94,12 +98,14 @@ function onMenubarKeydown(this: HTMLElement, e: KeyboardEvent) {
 				if (submenu.matches(":popover-open") && newTarget.getAttribute("popovertarget") !== null) {
 					const newSubmenu = d$(newTarget.getAttribute("popovertarget") as string) as HTMLUListElement;
 					newSubmenu.togglePopover({force: true, source: newTarget});
+					positionSubmenu(newTarget, newSubmenu, false);
 				}
 				submenu.togglePopover({force: false});
 			}
 		} else if (target.getAttribute("popovertarget") !== null) {
 			const submenu = d$(target.getAttribute("popovertarget") as string) as HTMLUListElement;
 			submenu.togglePopover({force: true, source: target});
+			positionSubmenu(target, submenu, true);
 			newTarget = submenu.firstElementChild?.firstChild as HTMLButtonElement;
 		} else {
 			newTarget = target;
@@ -112,6 +118,7 @@ function onMenubarKeydown(this: HTMLElement, e: KeyboardEvent) {
 			if (newTarget.getAttribute("popovertarget") !== null) {
 				const newSubmenu = d$(newTarget.getAttribute("popovertarget") as string) as HTMLUListElement;
 				newSubmenu.togglePopover({force: true, source: newTarget});
+				positionSubmenu(newTarget, newSubmenu, false);
 			}
 		}
 		break;
@@ -123,6 +130,7 @@ function onMenubarKeydown(this: HTMLElement, e: KeyboardEvent) {
 				if (submenu.matches(":popover-open") && newTarget.getAttribute("popovertarget") !== null) {
 					const newSubmenu = d$(newTarget.getAttribute("popovertarget") as string) as HTMLUListElement;
 					newSubmenu.togglePopover({force: true, source: newTarget});
+					positionSubmenu(newTarget, newSubmenu, false);
 				}
 				submenu.togglePopover({force: false});
 			}
@@ -137,6 +145,7 @@ function onMenubarKeydown(this: HTMLElement, e: KeyboardEvent) {
 			if (newTarget.getAttribute("popovertarget") !== null) {
 				const newSubmenu = d$(newTarget.getAttribute("popovertarget") as string) as HTMLUListElement;
 				newSubmenu.togglePopover({force: true, source: newTarget});
+				positionSubmenu(newTarget, newSubmenu, false);
 			}
 		}
 		break;

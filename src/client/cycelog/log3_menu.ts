@@ -1,4 +1,4 @@
-import { d$n } from "../query.js";
+import { d$n, q$ } from "../query.js";
 import { dialog, showWarning } from "../posts/dialog.js";
 import {
 	menuInsert,
@@ -18,18 +18,31 @@ export const defaultMenu = {
 	},
 	toggleLog1: () => {
 		try {
-			const params = new URLSearchParams(window.location.search);
-			if (params.get("log1") !== null) {
-				sessionStorage.setItem('scrollY', (window.scrollY / 2).toString());
-				params.delete("log1");
+			sessionStorage.clear();
+			const url = new URL(window.location.href);
+			if (url.searchParams.get("log1") !== null) {
+				url.searchParams.delete("log1");
+				if (url.hash.startsWith("#l1entry")) url.hash = "";
+				window.location.href = url.toString();
 			} else {
-				sessionStorage.setItem('scrollY', (window.scrollY * 2).toString());
-				params.set("log1", "t");
+				url.searchParams.set("log1", "t");
+				const href = url.toString();
+				dialog("1차 기록 보기", `
+					3차 기록과 1차 기록을 모두 표시합니다.<br>
+					1차 기록을 편집할 수 없으며, 성능 저하가 일어날 수 있습니다.
+				`, () => {
+					window.location.href = href;
+					return true;
+				})();
 			}
-			window.location.search = params.toString();
 		} catch (e) {
 			alert(`오류: ${e}`);
 		}
+	},
+	toMark: () => {
+		const target = q$(":target");
+		if (target === null) return;
+		target.scrollIntoView();
 	},
 	removeMark: () => {
 		sessionStorage.setItem('scrollY', window.scrollY.toString());

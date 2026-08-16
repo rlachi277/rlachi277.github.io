@@ -9,8 +9,6 @@ let curR: number, curC: number, isFocused: boolean;
 
 export function setupGrid() {
 	$("tbody td, tfoot td").attr("tabindex", "-1");
-	if (sessionStorage.getItem("log1Page") !== window.location.pathname) sessionStorage.clear();
-	sessionStorage.setItem("log1Page", window.location.pathname);
 	const sessionR = sessionStorage.getItem("curR");
 	const sessionC = sessionStorage.getItem("curC");
 	const sessionF = sessionStorage.getItem("isFocused");
@@ -223,6 +221,7 @@ async function advanceNewEntry(e: KeyboardEvent | {key: string}) {
 	case 2:
 		if (e.key !== "Tab") return;
 		d$n("log1-new-time").removeAttribute("contenteditable");
+		d$n("log1-new-time").textContent = d$n("log1-new-time").textContent.replaceAll(/\s/g, '');
 		d$n("log1-new-entry").setAttribute("data-time", d$n("log1-new-time").textContent);
 		d$n("log1-new-content").setAttribute("contenteditable", "plaintext-only");
 		d$n("log1-new-content").focus();
