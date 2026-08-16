@@ -40,11 +40,11 @@ type MoveData = {
 
 type WhereRow = Required<Pick<EntryRow, "post"|"type">>;
 
-export function getLog3(db: Database, root: string, postId: string, renderHooks: DeseriHook[], nav: string, rawLog1: Log1RowData[]): [boolean, Record<string,string>] {
+export function getLog3(db: Database, root: string, postId: string, renderHooks: DeseriHook[], nav: string, rawLog1: Log1RowData[] | undefined): [boolean, Record<string,string>] {
 	const result = getPost(db, root, postId, renderHooks, nav);
 	return [result[0], {
 		...result[1],
-		log1: buildLog1Table(rawLog1)
+		log1: rawLog1 !== undefined ? `<aside id="log1"><h1>1차 기록</h1>${buildLog1Table(rawLog1, postId, true)}</aside>` : ''
 	}];
 }
 
@@ -85,7 +85,7 @@ export function getLog1(db: Database, root: string, postId: string, renderHooks:
 	if (data === undefined) return result;
 	return [result[0],{
 		header: result[1].nav + result[1].content,
-		table: buildLog1Table(getRawLog1(db, postId))
+		table: buildLog1Table(getRawLog1(db, postId), postId, false)
 	}];
 }
 

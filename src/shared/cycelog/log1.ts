@@ -34,14 +34,14 @@ export type Log1RowData = {
 	readonly content: string
 };
 
-export function buildLog1Table(data: Log1RowData[]): string {
+export function buildLog1Table(data: Log1RowData[], postId: string, withLog3: boolean): string {
 	const ids = data.map((e) => e.id);
 	const maxId = Math.max(...ids);
 	const minId = Math.min(...ids);
 	const dataById: Record<number,Log1RowData> = {};
 	for (const e of data) dataById[e.id] = e;
 	let rows = '';
-	for (let i = minId; i <= maxId; i++) rows += buildLog1Row(i, dataById[i]);
+	for (let i = minId; i <= maxId; i++) rows += buildLog1Row(i, dataById[i], postId, withLog3);
 	return html`<table id="log1-table" role="grid">
 		${LOG1_THEAD}
 		<tbody>${rows}</tbody>
@@ -49,12 +49,14 @@ export function buildLog1Table(data: Log1RowData[]): string {
 	</table>`;
 }
 
-export function buildLog1Row(id: number, data: Log1RowData): string {
+export function buildLog1Row(id: number, data: Log1RowData, postId: string, withLog3: boolean): string {
 	return html`<tr data-row="${id}"
 	${data?.id != undefined ? ` id="l1entry${data.id}" data-id="${data.id}"` : ''}
 	${data?.type != undefined ? ` data-type="${data.type}"` : ''}
-	${data?.time != undefined ? ` data-time="${sani(data.time)}"` : ''}>
-		<td class="log1-td-id">${data?.id != undefined ? data.id : ''}</td>
+	${data?.time != undefined ? html` data-time="${sani(data.time)}"` : ''}>
+		<td class="log1-td-id">${data?.id != undefined ? html`<a tabindex="-1" href="${withLog3 ? `#entry${data.id}` : `../log3/${postId}#entry${data.id}`}">
+			${data.id}
+		</a>` : ''}</td>
 		<td class="log1-td-type">${data?.type != undefined ? LOG1_TYPE_NAME[data.type] : ''}</td>
 		<td class="log1-td-time"><div class="log1-time-wrapper">${data?.time != undefined ? sani(data.time) : ''}</div></td>
 		<td class="log1-td-content">${data?.content != undefined ? sani(data.content) : ''}</td>

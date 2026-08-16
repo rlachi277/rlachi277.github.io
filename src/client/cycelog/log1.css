@@ -17,8 +17,9 @@ table::before {
 	inset-block-start: 0;
 	block-size: calc(1rlh + 20px);
 	inset-inline: 0;
+	z-index: 3;
 }
-table.unfixed-before::before { position: absolute; inset-block-start: var(--unfixed-top); }
+table.hide-before::before { content: none; }
 
 table::after {
 	content: '';
@@ -27,8 +28,8 @@ table::after {
 	inset-block-end: 0;
 	block-size: 20px;
 	inset-inline: 0;
+	z-index: 3;
 }
-table.unfixed-after::after { position: absolute; inset-block-end: 0; }
 
 #dialog-main input[type="number"] {
 	width: 6ch;
@@ -82,9 +83,6 @@ table.unfixed-after::after { position: absolute; inset-block-end: 0; }
 		counter-reset: page 0;
 		@bottom-center { content: none; }
 	}
-	table {
-		font-size: 0.9rem;
-	}
 	h1 {
 		break-after: page;
 		block-size: 100vb;
@@ -99,35 +97,4 @@ table.unfixed-after::after { position: absolute; inset-block-end: 0; }
 		block-size: 25rem;
 		inline-size: 25rem;
 	}
-	tr { --nc: currentColor; }
-	tr:has(+ tr[data-type="1"]) { --nc: var(--c-1); }
-	tr:has(+ tr[data-type="2"]) { --nc: var(--c-8); }
-	tr:has(+ tr[data-type="3"]) { --nc: var(--c-3); }
-	tr:has(+ tr[data-type="4"]) { --nc: var(--c-45); }
-	tr:has(+ tr[data-type="5"]) { --nc: var(--c-67); }
-	tr:has(+ tr[data-type="6"]) { --nc: var(--c-2); }
-	th, td {
-		border: 1px solid currentColor !important;
-		border-block-end-color: color-mix(in oklab, currentColor 50%, var(--nc)) !important;
-		padding-block: 0.3ic !important;
-		vertical-align: middle;
-	}
-	:is(th, td):first-child { border-inline-start: none !important; font-family: 'Menlo' !important; padding-inline: 0.4ic !important; }
-	:is(th, td):nth-child(3) { font-family: 'Menlo' !important; padding-inline: 0.4ic !important; }
-	:is(th, td):last-child { border-inline-end: none !important; }
-	.log1-time-wrapper {
-		overflow: visible !important;
-		overflow-wrap: anywhere !important;
-		inline-size: 100% !important;
-	}
-	table {
-		border-collapse: collapse !important;
-		box-sizing: border-box !important;
-		width: 100% !important;
-		border: none !important;
-	}
-	table::before, table::after { content: none !important; }
-	thead th, tfoot td { background-color: transparent !important; position: static !important; }
-	tfoot { display: none; }
-	tr { break-inside: avoid; }
 }

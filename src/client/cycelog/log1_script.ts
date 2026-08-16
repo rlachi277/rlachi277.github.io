@@ -2,23 +2,27 @@ import type { MenuActions } from "../posts/script.js";
 import type { MenubarData } from "../posts/menubar.js";
 
 import { setup as postsSetup } from "../posts/script.js";
-import { $ } from "../query.js";
+import { $, d$n, q$n } from "../query.js";
 import { setupLog1Edit } from "./log1_edit.js";
 
 export function setup(menuBar: MenubarData[], defaultMenu: MenuActions, editMenu: MenuActions) {
 	postsSetup(menuBar, defaultMenu, editMenu, true);
 	if ($(":root.notfound, :root.index").exists) return;
+
+	const stickyY = parseFloat(getComputedStyle(q$n("thead th:first-child")).insetBlockStart); // why
+	const table = d$n("log1-table");
+	const firstRow = q$n("tbody tr:first-child");
+	function onScroll() {
+		// sorry people who change the default writing-mode etc. for some reason
+		// i think i can't support that here
+		const tableY = firstRow.getBoundingClientRect().top;
+		table.classList.toggle("hide-before", tableY > stickyY);
+	}
+	$("thead").on("click", () => window.scrollTo(0, 0));
+	window.addEventListener("scroll", onScroll);
+	window.addEventListener("resize", onScroll);
+	onScroll();
+
 	const params = new URLSearchParams(window.location.search);
 	if (params.get("edit")) setupLog1Edit();
-	else {
-		for (const td of document.getElementsByClassName("log1-td-id")) {
-			const id = parseInt((td.parentElement as HTMLElement).getAttribute("data-id") as string);
-			(td as HTMLElement).addEventListener("click", (e: PointerEvent) => {
-				const path = `../log3/${window.location.pathname.split("/").at(-1)}#entry${id}`;
-				if (e.ctrlKey || e.metaKey) window.open(path, "_blank", "noopener");
-				else window.open(path, "_self", "noopener"); // this *will* work on iOS Safari. only _blank doesn't work.
-				e.preventDefault();
-			});
-		}
-	}
 }

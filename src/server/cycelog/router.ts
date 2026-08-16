@@ -158,7 +158,10 @@ router.get('/log3/:id', (req, res) => {
 		get: (id) => entryData[id]
 	};
 
-	const result = getLog3(db, "/cycelog/log3/", id, [cycelogDeseriHook(entryDataWrapper, serverWhere(db))], renderNav(db, "/cycelog/log3/", id), data);
+	const result = getLog3(
+		db, "/cycelog/log3/", id, [cycelogDeseriHook(entryDataWrapper, serverWhere(db), req.query.log1 !== undefined)],
+		renderNav(db, "/cycelog/log3/", id), req.query.log1 !== undefined ? data : undefined
+	);
 	if (result[0]) res.render(log3Template, result[1]);
 	else res.status(404).render(log3NotFoundTemplate, result[1]);
 });

@@ -16,15 +16,20 @@ export const defaultMenu = {
 		const path = `../log1/${window.location.pathname.split('/').at(-1)}${window.location.search}`;
 		window.location.href = path;
 	},
-	returnToRef: () => {
-		const url = new URL(window.location.href);
-		const ref = url.searchParams.get("ref");
-		if (ref === null) return;
-		const [postId, refId] = ref.split('.');
-		const target = new URL(`./${postId}`, url);
-		if (url.searchParams.get("edit") !== null) target.searchParams.set("edit", "t");
-		target.hash = `#${refId}`;
-		window.location.href = target.toString();
+	toggleLog1: () => {
+		try {
+			const params = new URLSearchParams(window.location.search);
+			if (params.get("log1") !== null) {
+				sessionStorage.setItem('scrollY', (window.scrollY / 2).toString());
+				params.delete("log1");
+			} else {
+				sessionStorage.setItem('scrollY', (window.scrollY * 2).toString());
+				params.set("log1", "t");
+			}
+			window.location.search = params.toString();
+		} catch (e) {
+			alert(`오류: ${e}`);
+		}
 	},
 	removeMark: () => {
 		sessionStorage.setItem('scrollY', window.scrollY.toString());

@@ -31,13 +31,8 @@ export async function onIdFieldClick(this: HTMLElement, e: PointerEvent | Record
 	focusOn(parseInt(row.getAttribute("data-row") as string), 0, true);
 	if (e.altKey) deleteEntryDialog.call(this, id);
 	else if (e.shiftKey && !(e.ctrlKey || e.metaKey)) moveEntriesDialog(id);
-	else {
-		const path = `../log3/${window.location.pathname.split("/").at(-1)}?edit=t#entry${id}`;
-		// this *will* work on iOS Safari. only _blank doesn't work.
-		if (e.ctrlKey || e.metaKey) window.open(path, "_blank", "noopener");
-		else window.open(path, "_self", "noopener");
-		(e as PointerEvent).preventDefault?.();
-	}
+	else return;
+	(e as PointerEvent).preventDefault?.();
 }
 
 async function deleteEntryDialog(this: HTMLElement, id: number) {

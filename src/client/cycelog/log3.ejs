@@ -12,7 +12,7 @@
 <body>
 	<%%- nav %>
 	<main id="main"><%%- content %></main>
-	<div id="log1"><h1>1차 기록</h1><%%- log1 %></div>
+	<%%- log1 %>
 	<script>
 		document.querySelectorAll(".week").forEach((e, i) => {
 			e.open = sessionStorage.getItem(`cycelog.week${i}`) === 'true';

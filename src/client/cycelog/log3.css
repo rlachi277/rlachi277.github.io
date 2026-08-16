@@ -92,6 +92,10 @@ pre ol, pre ol ol, pre ol ol ol {
 }
 
 @media screen and (min-width: 900px) and (min-aspect-ratio: 1/1) {
+	body:has(#log1) {
+		padding-inline: max(2%, 0.5rem) calc(50% + max(2%, 0.5rem));
+	}
+
 	#log1 {
 		position: fixed;
 		inset-block: 0;
@@ -101,10 +105,6 @@ pre ol, pre ol ol, pre ol ol ol {
 		overscroll-behavior: contain;
 		border-inline-start: 1px solid currentColor;
 		padding-inline: max(2%, 0.5rem);
-	}
-
-	body:has(#log1:not([hidden])) {
-		padding-inline: max(2%, 0.5rem) calc(50% + max(2%, 0.5rem));
 	}
 }
 

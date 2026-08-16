@@ -8,11 +8,6 @@ import { onIdFieldClick, setupRow } from "./log1_edit.js";
 let curR: number, curC: number, isFocused: boolean;
 
 export function setupGrid() {
-	$("thead").on("click", () => window.scrollTo(0, 0));
-	window.addEventListener("scroll", onScroll);
-	window.addEventListener("resize", onScroll);
-	onScroll();
-
 	$("tbody td, tfoot td").attr("tabindex", "-1");
 	if (sessionStorage.getItem("log1Page") !== window.location.pathname) sessionStorage.clear();
 	sessionStorage.setItem("log1Page", window.location.pathname);
@@ -35,17 +30,6 @@ export function setupGrid() {
 	document.body.addEventListener("keydown", onBodyKeydown);
 	$("#log1-new-type, #log1-new-time, #log1-new-content").on("blur", onNewEntryBlur);
 	d$("log1-new-content")?.addEventListener("input", onNewContentInput);
-}
-
-function onScroll() {
-	// sorry people who change the default writing-mode etc. for some reason
-	// i think i can't support that here
-	const atTop = window.scrollY < 1;
-	const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-	const atBottom = window.scrollY - maxScroll > -1;
-	d$n("log1-table").classList.toggle("unfixed-after", atTop);
-	d$n("log1-table").classList.toggle("unfixed-before", atBottom);
-	d$n("log1-table").style.setProperty("--unfixed-top", `${maxScroll}px`);
 }
 
 export function getFocusState(): {row: number, col: number, focus: boolean} {
@@ -256,7 +240,7 @@ async function advanceNewEntry(e: KeyboardEvent | {key: string}) {
 			};
 			await sendPatch(newData);
 
-			q$n("tbody").insertAdjacentHTML("beforeend", buildLog1Row(newData.id, newData));
+			q$n("tbody").insertAdjacentHTML("beforeend", buildLog1Row(newData.id, newData, window.location.pathname.split("/").at(-1) as string, false));
 			const newRow = q$n(`tbody tr[data-id="${newData.id}"]`);
 			setupRow(newRow);
 

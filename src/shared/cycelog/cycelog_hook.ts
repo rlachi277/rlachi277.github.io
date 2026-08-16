@@ -15,7 +15,7 @@ export type WhereData = {
 
 export type WhereFunc = (id: number | undefined, refId: string) => WhereData;
 
-export function cycelogDeseriHook(entryData: EntryData, whereFunc: WhereFunc): DeseriHook {
+export function cycelogDeseriHook(entryData: EntryData, whereFunc: WhereFunc, withLog1: boolean): DeseriHook {
 	return function (data, cur) {
 		const postId = cur.split('/').at(-1) as string;
 		if (data.type === 'week') {
@@ -47,7 +47,7 @@ export function cycelogDeseriHook(entryData: EntryData, whereFunc: WhereFunc): D
 			const type = curData?.[0] ?? 0;
 			const time = curData?.[1] ?? '?';
 			const content = curData?.[2] ?? '?';
-			const path = id !== undefined ? `../log1/${postId}#l1entry${id}` : '';
+			const path = id !== undefined ? (withLog1 ? `#l1entry${id}` : `../log1/${postId}#l1entry${id}`) : '';
 			return {
 				type: 'html',
 				html: html`<a contenteditable="false" class="entry"${id !== undefined ? ` href="${sani(path)}" id="entry${id}" data-id="${id}" title="${id}번 항목(${sani(time)}) / ${sani(content)}"` : ''}${date !== undefined ? ` data-date="${sani(date)}"` : ''} data-type="${type}">
@@ -62,7 +62,10 @@ export function cycelogDeseriHook(entryData: EntryData, whereFunc: WhereFunc): D
 				refData = {where: postId, type: entryData.get(id)?.[0] ?? 0};
 			}
 			if (refData === undefined) refData = whereFunc(id, refId);
-			const path = id !== undefined ? `./${refData.where}?ref=${postId}.${refId}#entry${id}` : '';
+			const path = id !== undefined ? (refData.where === postId ?
+				`#entry${id}` :
+				`./${refData.where}#entry${id}`
+			) : '';
 			return {
 				type: 'html',
 				html: html`<a contenteditable="false" class="entry ref" id="${refId}"${id !== undefined ? ` href="${sani(path)}" data-id="${id}" title="${id}번 항목 참조"` : ''} data-type="${refData.type}">

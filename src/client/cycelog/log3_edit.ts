@@ -31,7 +31,7 @@ const entryData: EntryData = {
 let deseriHook: DeseriHook;
 
 export function setupLog3Edit() {
-	deseriHook = cycelogDeseriHook(entryData, clientWhere("/cycelog/"));
+	deseriHook = cycelogDeseriHook(entryData, clientWhere("/cycelog/"), (new URLSearchParams(window.location.search)).has("log1"));
 	SERI_HOOKS.push(cycelogSeriHook);
 	DESERI_HOOKS.push(deseriHook);
 	document.body.addEventListener("keydown", onKeydown);

@@ -32,7 +32,9 @@ export const defaultMenu: MenuActions = {
 	startEdit: () => {
 		try {
 			sessionStorage.setItem('scrollY', window.scrollY.toString());
-			window.location.search = "edit=t";
+			const params = new URLSearchParams(window.location.search);
+			params.set("edit", "t");
+			window.location.search = params.toString();
 		} catch (e) {
 			alert(`오류: ${e}`);
 		}
@@ -92,7 +94,9 @@ export const editMenu: MenuActions = {
 	stopEdit: () => {
 		try {
 			sessionStorage.setItem('scrollY', window.scrollY.toString());
-			window.location.search = "";
+			const params = new URLSearchParams(window.location.search);
+			params.delete("edit");
+			window.location.search = params.toString();
 		} catch (e) {
 			alert(`오류: ${e}`);
 		}

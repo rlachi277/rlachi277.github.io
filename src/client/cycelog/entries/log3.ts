@@ -1,8 +1,8 @@
 import "../../colors.css";
 import "../../posts/style.css";
 import "../colors.css";
-import "../log3.css";
 import "../table.css";
+import "../log3.css";
 
 import type { MenubarData } from "../../posts/menubar.js";
 
@@ -43,8 +43,8 @@ const menu: MenubarData[] = [{
 }, {
 	text: "기록",
 	submenu: [
-		{text: "1차 기록 보기", action: "toLog1"},
-		{text: "참조로 돌아가기", action: "returnToRef", filter: [true, false, false]},
+		{text: "1차 기록으로", action: "toLog1"},
+		{text: "1차 기록 보기/숨기기", action: "toggleLog1"},
 		{text: "강조 해제", action: "removeMark", filter: [true, false, false]},
 		{text: "모두 접기", action: "collapseAll", filter: [true, false, false]},
 		{text: "모두 펼치기", action: "expandAll", filter: [true, false, false]}
