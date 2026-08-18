@@ -91,6 +91,13 @@ function insertEntry() {
 			return false;
 		}
 		insertAtMarker(marker, newEl);
+		if ((new URLSearchParams(window.location.search)).get("log1")) {
+			$("#log1-table tr[data-id]").each((e) => {
+				const id = e.id.substring(7);
+				if (!$(`#entry${id}`).exists) e.setAttribute("data-nolink", "");
+				else e.removeAttribute("data-nolink");
+			});
+		}
 		return true;
 	})();
 }
@@ -137,13 +144,14 @@ function insertAtMarker(marker: HTMLElement, html: string) {
 	S.setPosition(marker);
 	S.anchorNode?.dispatchEvent(new Event("input", {bubbles: true}));
 	marker.remove();
-	$(".entry[href]:not([data-edit])").each((e) => {
+	$(".entry:not([data-edit])").each((e) => {
 		const href = e.getAttribute("href");
-		if (href === null) return;
-		const url = new URL(href, window.location.href);
-		url.searchParams.set("edit", "t");
-		e.setAttribute("href", url.toString());
-		e.setAttribute("contenteditabe", "false");
+		if (href !== null) {
+			const url = new URL(href, window.location.href);
+			url.searchParams.set("edit", "t");
+			e.setAttribute("href", url.toString());
+		}
+		e.setAttribute("contenteditable", "false");
 		e.setAttribute("data-edit", "");
 	});
 }

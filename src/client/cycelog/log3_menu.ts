@@ -29,7 +29,8 @@ export const defaultMenu = {
 				const href = url.toString();
 				dialog("1차 기록 보기", `
 					3차 기록과 1차 기록을 모두 표시합니다.<br>
-					1차 기록을 편집할 수 없으며, 성능 저하가 일어날 수 있습니다.
+					1차 기록은 편집할 수 없습니다.<br>
+					성능 저하나 예상치 못한 동작이 일어날 수 있습니다.
 				`, () => {
 					window.location.href = href;
 					return true;

@@ -16,11 +16,12 @@ export function setup(menuBar: MenubarData[], defaultMenu: MenuActions, editMenu
 	if (params.get("edit") && !$(":root.notfound, :root.index").exists) {
 		$(".entry").each((e) => {
 			const href = e.getAttribute("href");
-			if (href === null) return;
-			const url = new URL(href, window.location.href);
-			url.searchParams.set("edit", "t");
-			e.setAttribute("href", url.toString());
-			e.setAttribute("contenteditabe", "false");
+			if (href !== null) {
+				const url = new URL(href, window.location.href);
+				url.searchParams.set("edit", "t");
+				e.setAttribute("href", url.toString());	
+			}
+			e.setAttribute("contenteditable", "false");
 			e.setAttribute("data-edit", "");
 		});
 		$(".week > summary").each((e) => {
@@ -43,7 +44,8 @@ export function setup(menuBar: MenubarData[], defaultMenu: MenuActions, editMenu
 		$("#log1-table tr[data-id]").each((e) => {
 			const id = e.id.substring(7);
 			if (!$(`#entry${id}`).exists) e.setAttribute("data-nolink", "");
-		})
+			else e.removeAttribute("data-nolink");
+		});
 	}
 	postsSetup(menuBar, defaultMenu, editMenu);
 }
