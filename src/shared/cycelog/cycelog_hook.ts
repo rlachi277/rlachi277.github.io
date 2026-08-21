@@ -66,8 +66,8 @@ export function cycelogDeseriHook(typeObject: EntryTypeObject, whereFunc: WhereF
 			) : '';
 			return {
 				type: 'html',
-				html: html`<a class="entry ref" id="${refId}"${id !== undefined ? ` href="${sani(path)}" data-id="${id}" title="${id}번 항목 참조"` : ''} data-type="${refData.type}">
-					ref. #${id ?? "?"}
+				html: html`<a class="entry ref" id="${refId}"${id !== undefined ? ` href="${sani(path)}" data-id="${id}" title="${id}번 항목 언급"` : ''} data-type="${refData.type}">
+					@${id ?? "?"}
 				<wbr></a>`
 			} as const;
 		}

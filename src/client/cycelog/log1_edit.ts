@@ -39,7 +39,7 @@ async function deleteEntryDialog(this: HTMLElement, id: number) {
 	dialog(`${id}번 항목 삭제`, `
 		정말로 이 항목을 삭제하시겠습니까?<br>
 		이 작업은 되돌릴 수 없습니다.<br>
-		3차 기록에서의 반영 및 참조는 깨진 링크로 남습니다.
+		3차 기록에서의 반영 및 언급은 깨진 링크로 남습니다.
 	`, async () => {
 		try {
 			await sendDelete(id);
@@ -104,7 +104,7 @@ async function moveEntriesDialog(id: number) {
 			<input id="dialog-delta" type="number" value="1">
 			만큼 변경합니다.
 		</label><br>
-		<strong>3차 기록의 반영 및 참조는 수동으로 바꿔야 합니다.</strong>
+		<strong>3차 기록의 반영 및 언급은 수동으로 바꿔야 합니다.</strong>
 	`, async () => {
 		const endIdStr = (d$n("dialog-end-id") as HTMLInputElement).value;
 		const deltaStr = (d$n("dialog-delta") as HTMLInputElement).value;

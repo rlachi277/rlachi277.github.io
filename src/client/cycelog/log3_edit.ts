@@ -107,7 +107,7 @@ function insertReference() {
 	const marker = document.createElement("span");
 	marker.classList.add("select-marker", "dialog-marker");
 	range.insertNode(marker);
-	dialog("항목 참조", `
+	dialog("항목 언급", `
 		<label for="dialog-entry-id">번호: </label>
 		<input id="dialog-entry-id" type="number" placeholder="항목 번호 입력">
 	`, () => {
