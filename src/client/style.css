@@ -64,7 +64,7 @@ a.self:active { color: var(--c-linksa); }
 
 img.icon {
 	width: 1em; height: 1em;
-	vertical-align: middle;
+	vertical-align: top;
 	image-rendering: pixelated;
 }
 
