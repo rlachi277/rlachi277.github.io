@@ -1,4 +1,4 @@
-import { d$n } from "../query.js";
+import { $, d$n } from "../query.js";
 import { dialog, showWarning } from "../posts/dialog.js";
 import { defaultMenu as superDefaultMenu, editMenu as superEditMenu } from "../posts/menu.js";
 
@@ -31,7 +31,43 @@ export const defaultMenu = {
 		url.searchParams.delete("ref");
 		url.hash = "";
 		window.location.href = url.toString();
-	}
+	},
+	restrictWithId: dialog("번호 필터 설정", `
+		<label>
+			<input id="restrict-start-id" type="number" min="1">번부터 
+		</label>
+		<label>
+			<input id="restrict-end-id" type="number" min="1">번까지의 항목만을 표시합니다.
+		</label>
+		<br>
+		<strong>되돌리려면 새로고침해야 합니다.</strong>
+	`, async () => {
+		const startId = parseInt((d$n(`restrict-start-id`) as HTMLInputElement).value);
+		const endId = parseInt((d$n(`restrict-end-id`) as HTMLInputElement).value);
+		if (startId > endId) {
+			showWarning("잘못된 입력입니다.");
+			return false;
+		}
+		$("tbody tr").each((e) => {
+			const curId = parseInt(e.getAttribute("data-row") as string);
+			if (!(startId <= curId && curId <= endId)) e.remove();
+		});
+		return true;
+	}),
+	restrictWithWeek: dialog("주차 필터 설정", `
+		<label>
+			주차 번호 <input id="restrict-week-id" type="number" min="0" max="999">의 항목만을 표시합니다.
+		</label>
+		<br>
+		<strong>되돌리려면 새로고침해야 합니다.</strong>
+	`, async () => {
+		const weekId = parseInt((d$n(`restrict-week-id`) as HTMLInputElement).value);
+		$("tbody tr").each((e) => {
+			const curWeekId = parseInt((e.getAttribute("data-time") as string).substring(0, 3)); // 0*_도 0으로 해석
+			if (curWeekId !== weekId) e.remove();
+		});
+		return true;
+	})
 };
 
 export const editMenu = {
