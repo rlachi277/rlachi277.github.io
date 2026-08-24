@@ -64,8 +64,15 @@ a.self:active { color: var(--c-linksa); }
 
 img.icon {
 	width: 1em; height: 1em;
-	vertical-align: top;
+	vertical-align: middle;
 	image-rendering: pixelated;
+}
+
+img.h1icon {
+	width: 1lh; height: 1lh;
+	vertical-align: top;
+	position: relative;
+	inset-block-start: -0.05em;
 }
 
 img.icon.icon-dark { display: none; }
