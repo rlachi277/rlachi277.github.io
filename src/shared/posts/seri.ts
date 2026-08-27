@@ -46,6 +46,7 @@ export function seri(el: Node, init: boolean = false, hooks: SeriHook[] = []): S
 		const child = seri(e, false, hooks);
 		if (child !== null) children.push(child);
 	});
+	if (el.nodeName === "BR") return "\n";
 
 	for (const e of hooks) {
 		const hookResult = e(el, init);
@@ -215,7 +216,10 @@ export function getColor(el: Element): string {
 }
 
 export function deseri(data: SeriData, cur: string, init: boolean = false, hooks: DeseriHook[] = []): string | null {
-	if (typeof data === 'string') return sani(data);
+	if (typeof data === 'string') {
+		if (data === "\n") return `<br>`;
+		return sani(data);
+	}
 
 	let children = "";
 	data.children?.forEach((e) => {

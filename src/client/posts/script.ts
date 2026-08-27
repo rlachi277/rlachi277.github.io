@@ -90,11 +90,11 @@ export function setup(menuBar: MenubarData[], defaultMenu: MenuActions, editMenu
 	}
 
 	// DEBUG
-	/* import("../../shared/posts/seri.js").then((seri) => {
+	import("../../shared/posts/seri.js").then((seri) => {
 		(window as any)._refresh_data = () => {
 			let s = seri.seri(d$n("main"), true, SERI_HOOKS);
 			console.log(s);
 			fetch(window.location.pathname, { method: "PUT", body: JSON.stringify(s) });
 		}
-	}); */
+	});
 }
