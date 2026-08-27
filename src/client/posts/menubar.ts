@@ -1,4 +1,4 @@
-import { $, d$ } from "../query";
+import { $, d$, d$n } from "../query";
 
 export type MenubarData = {
 	text: string,
@@ -12,10 +12,9 @@ const params = new URLSearchParams(window.location.search);
 const edit = params.get("edit");
 
 export function setupMenubar(data: MenubarData[]) {
-	document.body.insertAdjacentHTML("afterbegin", `<div id="menubar"></div>`);
 	popoverCnt = 0; first = true;
-	d$("menubar")?.append(buildMenubar(data));
-	$("#menubar menu").on("keydown", onMenubarKeydown);
+	d$n("menubar").replaceWith(buildMenubar(data));
+	d$n("menubar").addEventListener("keydown", onMenubarKeydown);
 }
 
 const filterIndex = $(":root.index").exists ? 1 :
@@ -25,6 +24,7 @@ let popoverCnt = 0;
 let first = true;
 function buildMenubar(data: MenubarData[], isSubmenu: boolean = false): HTMLElement {
 	const wrapper = document.createElement(isSubmenu ? "ul" : "menu");
+	if (!isSubmenu) wrapper.setAttribute("id", "menubar");
 	wrapper.setAttribute("role", isSubmenu ? "menu" : "menubar");
 	for (const e of data) {
 		if (e.filter !== undefined && !e.filter[filterIndex]) continue;

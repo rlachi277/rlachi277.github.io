@@ -311,32 +311,35 @@ nav menu {
 	#nav-skip { display: none; }
 }
 
-:where(body.targeting) #menubar * {
+:where(body.targeting) :is(#menubar, #menubar *) {
 	color: var(--c-6);
+}
+
+div#menubar::after {
+	content: '로딩 증...';
+	font-style: italic;
+	opacity: 0.5;
 }
 
 #menubar {
 	position: fixed;
 	inset-block-start: 0;
 	inset-inline: 0;
-	block-size: calc(1rlh + 4px);
-	z-index: 10;
-}
-
-#menubar menu {
+	block-size: calc(1rlh + 3px);
 	margin: 0;
+	padding: 0;
 	border-block-end: 1px solid currentColor;
 	background-color: var(--c-bg);
-	padding: 0;
+	z-index: 10;
 	display: flex;
 	list-style: none;
 }
 
-#menubar menu > li {
+#menubar > li {
 	margin: 0;
 	border-inline-end: 1px solid currentColor;
 }
-#menubar menu > li > button {
+#menubar > li > button {
 	font-family: inherit;
 	font-size: 1em;
 	color: inherit;
@@ -347,10 +350,10 @@ nav menu {
 	background: none;
 	border: none;
 }
-#menubar menu button:is(:hover, :focus-visible) { background-color: var(--c-0-bgh); }
-#menubar menu button:active { background-color: var(--c-0-bga); }
+#menubar button:is(:hover, :focus-visible) { background-color: var(--c-0-bgh); }
+#menubar button:active { background-color: var(--c-0-bga); }
 
-#menubar menu ul {
+#menubar ul {
 	position: fixed;
 	margin: 0;
 	padding: 0;
@@ -359,9 +362,9 @@ nav menu {
 	list-style: none;
 }
 
-#menubar menu ul > li { margin: 0; }
-#menubar menu ul > li:not(:first-child) { border-block-start: 1px solid currentColor; }
-#menubar menu ul > li > button {
+#menubar ul > li { margin: 0; }
+#menubar ul > li:not(:first-child) { border-block-start: 1px solid currentColor; }
+#menubar ul > li > button {
 	font-family: inherit;
 	font-size: 1em;
 	color: inherit;
