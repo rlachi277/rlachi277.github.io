@@ -1,0 +1,37 @@
+#auth {
+	margin-block-end: 0.4lh;
+	margin-inline-start: 0.4lh;
+	padding: 0.625em;
+	border: 1px solid currentColor;
+	float: inline-end;
+	position: relative;
+	z-index: 1;
+	text-align: center;
+}
+
+#auth h6 { margin: 0; margin-block-end: 0.4lh; font-size: 1em; }
+#auth input {
+	border: none;
+	border-block-end: 1px solid currentColor;
+	background: none;
+	font-family: inherit;
+	font-size: 1em;
+	inline-size: 4ic;
+}
+#auth button {
+	border: 1px solid currentColor;
+	background: var(--c-bg);
+	margin-inline: 4px;
+}
+#auth button:is(:hover, :focus-visible) { background-color: var(--c-0-bgh); }
+#auth button:active { background-color: var(--c-0-bga); }
+#auth p { margin-block-end: 0; text-align: center; margin: 0; margin-block-start: 0.4lh; }
+
+#auth-cur { opacity: 0; }
+#auth-cur[data-cur="0"] { opacity: 1; color: var(--c-1); }
+#auth-cur[data-cur="1"] { opacity: 1; color: var(--c-4); }
+#auth-cur[data-cur="2"] { opacity: 1; color: var(--c-8); }
+
+@media screen and (max-width: 480px) {
+	#auth { float: none; margin-inline-start: 0; }
+}

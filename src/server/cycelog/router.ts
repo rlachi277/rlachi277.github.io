@@ -20,6 +20,7 @@ import {
 import { withErrors } from "../posts/router.js";
 import { renderNav } from '../posts/render_nav.js';
 import { cycelogDeseriHook } from '../../shared/cycelog/cycelog_hook.js';
+import { role } from '../auth.js';
 
 const db = new Database('db/cycelog.db');
 db.pragma('journal_mode = WAL');
@@ -67,65 +68,65 @@ const log1Template = "cycelog/log1.ejs";
 const log1NotFoundTemplate = "cycelog/log1_404.ejs";
 const log1IndexTemplate = "cycelog/log1_index.ejs";
 
-router.get('/log1/', (_, res) => {
+router.get('/log1/', role("admin", true), (_, res) => {
 	res.render(log1IndexTemplate, {
 		nav: renderNav(db, "/cycelog/log1/", "index.html")
 	});
 });
 
-router.get('/log1/index.html', (_, res) => {
+router.get('/log1/index.html', role("admin", true), (_, res) => {
 	res.render(log1IndexTemplate, {
 		nav: renderNav(db, "/cycelog/log1/", "index.html")
 	});
 });
 
-router.get('/log1/:id', (req, res) => {
+router.get('/log1/:id', role("admin", true), (req, res) => {
 	const id = req.params.id;
 	const result = getLog1(db, "/cycelog/log1/", id, [], renderNav(db, "/cycelog/log1/", id));
 	if (result[0]) res.render(log1Template, result[1]);
 	else res.status(404).render(log1NotFoundTemplate, result[1]);
 });
 
-router.post('/log1/:id', (req, res) => {
+router.post('/log1/:id', role("admin"), (req, res) => {
 	const id = req.params.id;
 	withErrors(res, () => {
 		postLog1(db, id, req.body);
 	});
 });
 
-router.patch('/log1/:id', (req, res) => {
+router.patch('/log1/:id', role("admin"), (req, res) => {
 	const id = req.params.id;
 	withErrors(res, () => {
 		return patchLog1(db, id, req.body);
 	}, true);
 });
 
-router.delete('/log1/:id', (req, res) => {
+router.delete('/log1/:id', role("admin"), (req, res) => {
 	const id = req.params.id;
 	withErrors(res, () => {
 		deleteLog1(db, id, req.body);
 	});
 });
 
-router.post('/log1/:id/move', (req, res) => {
+router.post('/log1/:id/move', role("admin"), (req, res) => {
 	withErrors(res, () => {
 		moveLog1(db, req.params.id, req.body);
 	});
 });
 
-router.get('/log1/:id/raw', (req, res) => {
+router.get('/log1/:id/raw', role("admin"), (req, res) => {
 	withErrors(res, () => {
 		return getRawLog1(db, req.params.id);
 	}, true);
 });
 
-router.get('/log1/exists/:id', (req, res) => {
+router.get('/log1/exists/:id', role("admin"), (req, res) => {
 	withErrors(res, () => {
 		return log1Exists(db, parseInt(req.params.id));
 	}, true);
 });
 
-router.get('/log1/where/:id', (req, res) => {
+router.get('/log1/where/:id', role("admin"), (req, res) => {
 	withErrors(res, () => {
 		return log1Where(db, parseInt(req.params.id));
 	}, true);
@@ -136,19 +137,19 @@ const log3Template = "cycelog/log3.ejs";
 const log3NotFoundTemplate = "cycelog/log3_404.ejs";
 const log3IndexTemplate = "cycelog/log3_index.ejs";
 
-router.get('/log3/', (_, res) => {
+router.get('/log3/', role("admin", true), (_, res) => {
 	res.render(log3IndexTemplate, {
 		nav: renderNav(db, "/cycelog/log3/", "index.html")
 	});
 });
 
-router.get('/log3/index.html', (_, res) => {
+router.get('/log3/index.html', role("admin", true), (_, res) => {
 	res.render(log3IndexTemplate, {
 		nav: renderNav(db, "/cycelog/log3/", "index.html")
 	});
 });
 
-router.get('/log3/:id', (req, res) => {
+router.get('/log3/:id', role("admin", true), (req, res) => {
 	const id = req.params.id;
 	const types: Record<number,number> = {};
 	const data = getRawLog1(db, id);
@@ -166,21 +167,21 @@ router.get('/log3/:id', (req, res) => {
 	else res.status(404).render(log3NotFoundTemplate, result[1]);
 });
 
-router.put('/log3/:id', (req, res) => {
+router.put('/log3/:id', role("admin"), (req, res) => {
 	const id = req.params.id;
 	withErrors(res, () => {
 		putLog3(db, id, req.body);
 	}, false);
 });
 
-router.patch('/log3/:id', (req, res) => {
+router.patch('/log3/:id', role("admin"), (req, res) => {
 	const id = req.params.id;
 	withErrors(res, () => {
 		patchLog3(db, id, req.body);
 	}, false);
 });
 
-router.delete('/log3/:id', (req, res) => {
+router.delete('/log3/:id', role("admin"), (req, res) => {
 	const id = req.params.id;
 	withErrors(res, () => {
 		deleteLog3(db, id);

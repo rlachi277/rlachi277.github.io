@@ -10,6 +10,7 @@ import {
 	deletePost
 } from "./posts.js";
 import { renderNav } from './render_nav.js';
+import { role } from "../auth.js";
 
 const db = new Database('db/posts.db');
 db.pragma('journal_mode = WAL');
@@ -53,7 +54,7 @@ router.get('/index.html', (_, res) => {
 	});
 });
 
-router.get('/raw/*path', (req, res) => {
+router.get('/raw/*path', role("admin"), (req, res) => {
 	const path = getPath(req.params.path);
 	withErrors(res, () => {
 		return getRawPost(db, path);
@@ -67,21 +68,21 @@ router.get('/*path', (req, res) => {
 	else res.status(404).render(notFoundTemplate, result[1]);
 });
 
-router.put('/*path', (req, res) => {
+router.put('/*path', role("user"), (req, res) => {
 	const path = getPath(req.params.path);
 	withErrors(res, () => {
 		putPost(db, path, req.body);
 	}, false);
 });
 
-router.patch('/*path', (req, res) => {
+router.patch('/*path', role("user"), (req, res) => {
 	const path = getPath(req.params.path);
 	withErrors(res, () => {
 		patchPost(db, path, req.body);
 	}, false);
 });
 
-router.delete('/*path', (req, res) => {
+router.delete('/*path', role("user"), (req, res) => {
 	const path = getPath(req.params.path);
 	withErrors(res, () => {
 		deletePost(db, path);

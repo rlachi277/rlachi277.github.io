@@ -15,6 +15,7 @@ const __dirname = path.dirname(__filename);
 
 const entries = {
   "index": "index",
+  "401": "401",
 
   "posts/post": "posts/entries/post",
   "cycelog/root": "cycelog/entries/root",
@@ -37,6 +38,8 @@ type HtmlTemplate = true | {
 
 const html: Record<string, HtmlTemplate> = {
   "index": {chunks: ["index"]},
+  "401": {chunks: ["401"]},
+  "403": {chunks: ["401"]},
   "404": true,
 
   "posts/index": {template: "posts/index.ejs", chunks: ["posts/post"]},

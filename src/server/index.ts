@@ -2,6 +2,7 @@ import express from 'express';
 import path from 'path';
 import compression from 'compression';
 import root from './root.js';
+import auth from './auth.js';
 
 import posts from './posts/router.js';
 import cycelog from './cycelog/router.js';
@@ -26,6 +27,7 @@ app.use('/assets', express.static(path.join(root, '..', 'assets')));
 app.use(express.text({limit: '50mb'}));
 app.use(express.json({limit: '50mb'}));
 app.use(compression());
+app.use('/auth', auth);
 
 app.use('/posts', posts);
 app.use('/cycelog', cycelog);

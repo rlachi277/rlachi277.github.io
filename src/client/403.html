@@ -7,13 +7,6 @@
 	<link rel="icon" href="/assets/favicon.ico">
 	<style>
 		:root {
-			color-scheme: light dark;
-			--c-bg: light-dark(#f8f9fa, #202122);
-			--c-text: light-dark(#202122, #eaecf0);
-			--c-link: light-dark(#36c,#88a3e8);
-			--c-linkh: light-dark(#3056a9,#a6bbf5);
-			--c-linka: light-dark(#233566,#b6d4fb);
-
 			background-color: var(--c-bg);
 			color: var(--c-text);
 			font-family: "Pretendard GOV Variable", "Pretendard GOV", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
@@ -36,7 +29,7 @@
 			font-weight: 900;
 			background-clip: text;
 			color: transparent;
-			background-image: url('/assets/void/voidloop.webp');
+			background-image: url('/assets/void/archiveloop.webp');
 			background-size: 1000px 1000px;
 			animation: infinite linear 5s forwards bgscroll;
 		}
@@ -53,16 +46,12 @@
                 background-position: -1000px -1000px;
             }
         }
-
-		@media (prefers-color-scheme: dark) {
-			h1 {
-				filter: invert(100%);
-			}
-		}
 	</style>
 </head>
 <body>
-	<h1>404</h1>
-	<a href="/">루트로 돌아가기</a>
+	<h1>403</h1>
+	<p>이 페이지를 볼 권한이 없습니다.<br>
+	인증을 완료하였다면 새로고침하세요.</p>
+	<span><a href="../">상위 폴더로 돌아가기</a> · <a href="/">루트로 돌아가기</a></span>
 </body>
 </html>
