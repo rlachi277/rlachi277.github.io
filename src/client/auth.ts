@@ -1,3 +1,5 @@
+import "./auth.css";
+
 import { html } from "../shared/template.js";
 import { d$n } from "./query.js";
 

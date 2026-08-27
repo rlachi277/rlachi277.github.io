@@ -1,6 +1,5 @@
 import "./colors.css";
 import "./style.css";
-import "./auth.css";
 
 import { setupAuth } from "./auth.js";
 

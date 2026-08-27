@@ -3,10 +3,12 @@
 	margin-inline-start: 0.4lh;
 	padding: 0.625em;
 	border: 1px solid currentColor;
-	float: inline-end;
-	position: relative;
+	position: absolute;
+	inset-block-start: max(2vi, 1rem);
+	inset-inline-end: max(2vi, 1rem);
 	z-index: 1;
 	text-align: center;
+	font-family: system-ui, sans-serif;
 }
 
 #auth h6 { margin: 0; margin-block-end: 0.4lh; font-size: 1em; }
@@ -33,5 +35,5 @@
 #auth-cur[data-cur="2"] { opacity: 1; color: var(--c-8); }
 
 @media screen and (max-width: 480px) {
-	#auth { float: none; margin-inline-start: 0; }
+	#auth { position: relative; margin-inline-start: 0; }
 }
