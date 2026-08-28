@@ -27,7 +27,7 @@
 }
 #auth button:is(:hover, :focus-visible) { background-color: var(--c-0-bgh); }
 #auth button:active { background-color: var(--c-0-bga); }
-#auth p { margin-block-end: 0; text-align: center; margin: 0; margin-block-start: 0.4lh; }
+#auth p { text-align: center; margin: 0; margin-block-start: 0.4lh; }
 
 #auth-cur { opacity: 0; }
 #auth-cur[data-cur="0"] { opacity: 1; color: var(--c-1); }

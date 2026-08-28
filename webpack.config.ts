@@ -14,8 +14,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const entries = {
-  "index": "index",
-  "401": "401",
+  "index": "root/entries/index",
+  "error": "root/entries/error",
 
   "posts/post": "posts/entries/post",
   "cycelog/root": "cycelog/entries/root",
@@ -37,10 +37,10 @@ type HtmlTemplate = true | {
 };
 
 const html: Record<string, HtmlTemplate> = {
-  "index": {chunks: ["index"]},
-  "401": {chunks: ["401"]},
-  "403": {chunks: ["401"]},
-  "404": true,
+  "index": {template: "root/index.html", chunks: ["index"]},
+  "401": {template: "root/401.html", chunks: ["error"]},
+  "403": {template: "root/403.html", chunks: ["error"]},
+  "404": {template: "root/404.html", chunks: ["error"]},
 
   "posts/index": {template: "posts/index.ejs", chunks: ["posts/post"]},
   "posts/post": {

@@ -1,0 +1,39 @@
+:root {
+	background-color: var(--c-bg);
+	color: var(--c-text);
+}
+
+body {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	margin: 0;
+	padding: 0;
+	width: 100vw;
+	height: 100vh;
+}
+
+h1 {
+	margin-block: 0;
+	font-size: 15em;
+	font-weight: 900;
+	background-clip: text;
+	color: transparent;
+	background-size: 1000px 1000px;
+	animation: infinite linear 5s forwards bgscroll;
+	font-family: "Pretendard GOV Variable", "Pretendard GOV", sans-serif;
+}
+
+@keyframes bgscroll {
+	from {
+		background-position: 0px 0px;
+	}
+	to {
+		background-position: -1000px -1000px;
+	}
+}
+
+a { color: var(--c-link); text-decoration: none; }
+a:hover, a:focus-visible { color: var(--c-linkh); text-decoration: underline; }
+a:active { color: var(--c-linka); text-decoration: underline; }
