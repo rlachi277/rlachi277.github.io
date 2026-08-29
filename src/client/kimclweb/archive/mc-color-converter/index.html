@@ -253,10 +253,6 @@
 
 		function randomForFun(e) {
 			var random=Math.floor(Math.random()*16777216);
-			if (random==16777216) {
-				console.log("와 이게 뜨네"); // 와 이게 뜨네
-				random=16777215;
-			}
 			document.getElementById("code").value=random;
 			decodeColorCode();
 		}
