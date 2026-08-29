@@ -14,7 +14,6 @@ const entryData: EntryTypeObject = {
 		return d$(`l1entry${id}`) !== null;
 	},
 	get: function (id) {
-		console.log(id);
 		const cache = this.cache as Record<number,number>;
 		if (Object.hasOwn(cache, id)) return cache[id];
 		const l1entry = d$(`l1entry${id}`);

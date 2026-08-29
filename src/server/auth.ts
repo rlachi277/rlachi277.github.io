@@ -1,6 +1,8 @@
 import crypto from "node:crypto";
 import express, { Request, Response, NextFunction } from "express";
 
+import log from "./log.js";
+
 function adminKeyLetter() {
 	const first = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]; // 전부
 	const mid = [0, 1, 20]; // ㅏㅐㅣ
@@ -14,7 +16,7 @@ function adminKeyLetter() {
 export const ADMIN_KEY = `${adminKeyLetter()}${adminKeyLetter()}${adminKeyLetter()}${adminKeyLetter()}`
 export const USER_KEY = crypto.randomInt(0, 10000).toString().padStart(4, "0");
 
-console.log(`관리자 인증 키는 ${ADMIN_KEY}, 일반 사용자 인증 키는 ${USER_KEY}입니다.`);
+log(`관리자 인증 키는 ${ADMIN_KEY}, 일반 사용자 인증 키는 ${USER_KEY}입니다.`);
 
 const router = express.Router();
 export default router;

@@ -1,5 +1,7 @@
 import net from "node:net";
 
+import { replaceLog } from "./log.js";
+
 function sendNotification(message: string) {
 	return new Promise((resolve, reject) => {
 		const socket = net.createConnection("/tmp/cycweb.sock");
@@ -10,6 +12,7 @@ function sendNotification(message: string) {
 		socket.on("close", resolve);
 	})
 }
+replaceLog(sendNotification);
 
 import "./index.js";
 import { ADMIN_KEY, USER_KEY } from "./auth.js";
