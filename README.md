@@ -1,20 +1,27 @@
 # cycweb
 
-hello
+ecyc e
 
 ## dev
 
 ```shell
-npm install # install
-npm run build # build
-npm run test # run
+pnpm install # install
+pnpm build # build
+pnpm test # run
 ```
-
-아 참고로 저는 pnpm 씀
 
 ## prod
 
 ```shell
-npm install --omit=dev
-npm run test
+pnpm install --prod
+pnpm test
+```
+
+## app(macOS)
+
+가끔씩 소켓으로 알림을 보냅니다
+
+```shell
+pnpm install --prod
+pnpm start:app
 ```
