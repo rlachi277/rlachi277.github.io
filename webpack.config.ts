@@ -177,7 +177,9 @@ const config: webpack.Configuration = {
     splitChunks: {chunks: "all"},
     minimizer: [
       new EsbuildPlugin({
-        css: true
+        css: true,
+        minify: true,
+        target: ["es2022"]
       })
     ]
   },
