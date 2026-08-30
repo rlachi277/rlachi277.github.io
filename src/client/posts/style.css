@@ -158,8 +158,6 @@ figure.float-left { float: inline-start; }
 .align.align-center { text-align-last: center; }
 .align.align-right { text-align-last: end; }
 
-.overline { text-decoration: overline; }
-
 a { color: var(--c-link); text-decoration: none; }
 a:hover, a:focus-visible { color: var(--c-linkh); text-decoration: underline; }
 a:active { color: var(--c-linka); text-decoration: underline; }
@@ -247,6 +245,11 @@ a.self:active { color: var(--c-linksa); }
 	--bga: var(--c-10-bga); --bda: var(--c-10-bda); --ca: var(--c-10-bca); }
 
 em { text-decoration: underline; font-style: inherit; }
+em.dots { text-decoration: none; text-emphasis: dot; }
+
+u { text-decoration: underline; font-style: inherit; }
+u.overline { text-decoration: overline; }
+u.dots { text-decoration: none; text-emphasis: dot; }
 
 sup {
 	vertical-align: text-top;

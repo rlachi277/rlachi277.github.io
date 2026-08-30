@@ -32,7 +32,8 @@ export function inlineCommands(this: Element, shortcut: boolean, e: KeyboardEven
 		if (e.key === "z" && e.shiftKey) command = "redo";
 		else if (e.key === "z") command = "undo";
 		else if (e.key === "b") command = "strong";
-		else if (e.key === "u") command = "em";
+		else if (e.key === "u" && e.shiftKey) command = "u-underline"; // 비강조 밑줄
+		else if (e.key === "u") command = "em-underline"; // 강조 밑줄
 		else if (e.key === ".") command = "sup";
 		else if (e.key === ",") command = "sub";
 		else if (e.key === "d") command = "del";
@@ -336,7 +337,11 @@ function tabCommand(this: Element, e: KeyboardEvent) {
 
 	let command = null;
 	if (cmd === "b") command = "strong";
-	else if (cmd === "u") command = "em";
+	else if (cmd === "u") command = "em-underline"; // 강조 밑줄
+	else if (cmd === "dots") command = "em-dots"; // CSS에 이런 게 있다는 걸 아셨나요?
+	else if (cmd === "uu") command = "u-underline"; // 비강조 밑줄
+	else if (cmd === "udots") command = "u-dots"; // 비강조 점(e.g. 순환소수 표기)
+	else if (cmd === "o" || cmd === "overline") command = "u-overline";
 	else if (cmd === "^" || cmd === "sup") command = "sup";
 	else if (cmd === "_" || cmd === "sub") command = "sub";
 	else if (cmd === "d" || cmd === "del") command = "del";
@@ -350,7 +355,6 @@ function tabCommand(this: Element, e: KeyboardEvent) {
 	else if (cmd === "a" || cmd === "k") command = "a";
 	else if (cmd === ";" || cmd === "center") command = "align-center";
 	else if (cmd === "'" || cmd === "right") command = "align-right";
-	else if (cmd === "o" || cmd === "overline") command = "overline";
 	if (command === null) {
 		showWarning("올바르지 않은 탭 명령어입니다.");
 		throw -1;
@@ -539,12 +543,15 @@ function toCommand(node: Node): string {
 		} else if (node.classList.contains('align')) {
 			if (!node.classList.contains("align-center") && !node.classList.contains("align-right")) return "keep";
 			return `align-${node.classList.contains("align-center") ? "center" : "right"}`;
-		} else if (node.classList.contains('overline')) {
-			return 'overline';
 		}
 		return 'keep';
+	} else if (node.tagName === "EM") {
+		return (node.classList.contains('dots')) ? 'em-dots' : 'em-underline';
+	} else if (node.tagName === "U") {
+		if (node.classList.contains('dots')) return 'u-dots';
+		return (node.classList.contains('overline')) ? 'u-overline' : 'u-underline';
 	}
-	const commands = ['STRONG', 'EM', 'SUP', 'SUB', 'INS', 'DEL', 'S'];
+	const commands = ['STRONG', 'SUP', 'SUB', 'INS', 'DEL', 'S'];
 	if (!commands.includes(node.tagName)) return 'keep';
 	return node.tagName.toLowerCase();
 }
@@ -553,30 +560,30 @@ function toElement(cmd: string): Element {
 	if (cmd === 'keep') {
 		showWarning("부분적 서식 적용이 불가합니다.");
 		throw -1;
-	}
-	if (cmd.startsWith('c:')) {
+	} else if (cmd.startsWith('c:')) {
 		const el = document.createElement('span');
 		el.classList.add("color");
 		el.setAttribute("data-color", cmd.substring(2));
 		return el;
-	}
-	if (cmd.startsWith('cb:')) {
+	} else if (cmd.startsWith('cb:')) {
 		const el = document.createElement('span');
 		el.classList.add("colorbox");
 		el.setAttribute("data-color", cmd.substring(3));
 		return el;
-	}
-	if (cmd.startsWith('align')) {
+	} else if (cmd.startsWith('align')) {
 		const el = document.createElement('span');
 		el.classList.add("align", cmd);
 		return el;
-	}
-	if (cmd === 'overline') {
-		const el = document.createElement('span');
-		el.classList.add("overline");
+	} else if (cmd.startsWith('em-')) {
+		const el = document.createElement('em');
+		if (cmd === "em-dots") el.classList.add('dots');
 		return el;
-	}
-	return document.createElement(cmd);
+	} else if (cmd.startsWith('u-')) {
+		const el = document.createElement('u');
+		if (cmd === "u-dots") el.classList.add('dots');
+		else if (cmd === "u-overline") el.classList.add('overline');
+		return el;
+	} else return document.createElement(cmd);
 }
 
 export function inlineCleanup(target: Element) {

@@ -29,7 +29,7 @@ const SIMPLE_TYPES = new Set([
 	"h1", "h2", "h3", "h4", "h5", "h6",
 	"figcaption", "legend",
 	"li", "summary",
-	"strong", "em", "b", "i", "u", "s",
+	"strong", "b", "i", "s",
 	"ruby", "rt", "rp",
 	"sub", "sup", "ins", "del"
 ]);
@@ -90,6 +90,17 @@ export function seri(el: Node, init: boolean = false, hooks: SeriHook[] = []): S
 	case 'P':
 		result.type = "p";
 		result.variant = getAttributes(el, ["lang"]);
+		break;
+	case 'EM':
+		result.type = "em";
+		result.variant = {dots: null};
+		if (el.classList.contains('dots')) result.variant.dots = true;
+		break;
+	case 'U':
+		result.type = "u";
+		result.variant = {annotation: "underline"};
+		if (el.classList.contains('dots')) result.variant.annotation = "dots";
+		else if (el.classList.contains('overline')) result.variant.annotation = "overline";
 		break;
 	case 'PRE':
 		result.type = "pre";
@@ -272,6 +283,15 @@ export function deseri(data: SeriData, cur: string, init: boolean = false, hooks
 		tagName = "p";
 		attrs += setAttributes(data.variant, ["lang"]);
 		break;
+	case 'em':
+		tagName = "em";
+		if (data.variant?.dots) attrs = ` class="dots"`;
+		break;
+	case 'u':
+		tagName = "u";
+		if (data.variant?.annotation === "dots") attrs = ` class="dots"`;
+		else if (data.variant?.annotation === "overline") attrs = ` class="overline"`;
+		break;
 	case 'pre':
 		tagName = "pre";
 		if (data.variant?.wrap) attrs = ` class="wrap"`;
@@ -372,10 +392,11 @@ export function deseri(data: SeriData, cur: string, init: boolean = false, hooks
 			case 'right': attrs = ` class="align align-right"`; break;
 		}
 		break;
-	case 'overline':
-		tagName = "span";
+	/* case 'overline':
+		// legacy
+		tagName = "u";
 		attrs = ` class="overline"`;
-		break;
+		break; */
 	default:
 		return null;
 	}
