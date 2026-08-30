@@ -19,7 +19,7 @@ pnpm test
 
 ## app(macOS)
 
-console.log를 할 때 알림도 보냅니다.
+가끔씩 소켓으로 알림을 보냅니다.
 
 ```shell
 pnpm install --prod
