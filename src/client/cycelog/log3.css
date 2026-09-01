@@ -11,59 +11,63 @@ main {
 	overflow-wrap: anywhere;
 }
 
-details.week > summary { display: block; cursor: pointer; }
-details.week > section { color: var(--c-0); }
-
-details.week > summary > hgroup > h2::first-line { /* I really didn't want to make another element */
-	background-color: light-dark(yellow, transparent);
-	color: light-dark(currentColor, yellow);
-}
-
-details.week > summary > hgroup > p::first-line {
-	background-color: light-dark(#00ff00dd, transparent);
-	color: light-dark(currentColor, #00ff44);
+details.week {
+	> summary {
+		display: block;
+		cursor: pointer;
+		> hgroup {
+			> h2::first-line { /* I really didn't want to make another element */
+				background-color: light-dark(yellow, transparent);
+				color: light-dark(currentColor, yellow);
+			}
+			> p::first-line {
+				background-color: light-dark(#00ff00dd, transparent);
+				color: light-dark(currentColor, #00ff44);
+			}
+		}
+	}
+	> section { color: var(--c-0); }
 }
 
 p:not(hgroup p) {
 	text-indent: 1ch each-line;
 }
 
-.entry { color: var(--c); outline-offset: 2px; scroll-margin-block: 50vb; }
-.entry:hover, .entry:focus-visible { color: var(--ch); }
-.entry:active { color: var(--ca); }
+.entry {
+	color: var(--c); outline-offset: 2px; scroll-margin-block: 50vb;
+	&:is(:hover, :focus-visible) { color: var(--ch); }
+	&:active { color: var(--ca); }
 
-.entry:not([data-type]), .entry[data-type="0"] {
-	background-color: var(--c-1-3);
-	--c: var(--c-linke); --ch: var(--c-linkeh); --ca: var(--c-linkea);
-}
-.entry[data-type="1"] { --c: var(--c-1); --ch: var(--c-1h); --ca: var(--c-1a); }
-.entry[data-type="2"] { --c: var(--c-8); --ch: var(--c-8h); --ca: var(--c-8a); }
-.entry[data-type="3"] { --c: var(--c-3); --ch: var(--c-3h); --ca: var(--c-3a); }
-.entry[data-type="4"] { --c: var(--c-45); --ch: var(--c-45h); --ca: var(--c-45a); }
-.entry[data-type="5"] { --c: var(--c-67); --ch: var(--c-67h); --ca: var(--c-67a); }
-.entry[data-type="6"] { --c: var(--c-2); --ch: var(--c-2h); --ca: var(--c-2a); }
-.entry[data-type="add"] { --c: light-dark(var(--c-0-d1),var(--c-0-0)); --ch: light-dark(var(--c-0-d2),var(--c-0-l1)); --ca: light-dark(var(--c-0-d2),var(--c-0-l1)); }
+	&:not([data-type]), &[data-type="0"] { --c: var(--c-linke); --ch: var(--c-linkeh); --ca: var(--c-linkea); background-color: var(--c-1-3); }
+	&[data-type="1"] { --c: var(--c-1); --ch: var(--c-1h); --ca: var(--c-1a); }
+	&[data-type="2"] { --c: var(--c-8); --ch: var(--c-8h); --ca: var(--c-8a); }
+	&[data-type="3"] { --c: var(--c-3); --ch: var(--c-3h); --ca: var(--c-3a); }
+	&[data-type="4"] { --c: var(--c-45); --ch: var(--c-45h); --ca: var(--c-45a); }
+	&[data-type="5"] { --c: var(--c-67); --ch: var(--c-67h); --ca: var(--c-67a); }
+	&[data-type="6"] { --c: var(--c-2); --ch: var(--c-2h); --ca: var(--c-2a); }
+	&[data-type="add"] { --c: light-dark(var(--c-0-d1),var(--c-0-0)); --ch: light-dark(var(--c-0-d2),var(--c-0-l1)); --ca: light-dark(var(--c-0-d2),var(--c-0-l1)); }
 
-.entry:target {
-	background-color: Mark;
-	color: MarkText;
-	outline: 1px auto var(--c);
+	&:target { background-color: Mark; color: MarkText; outline: 1px auto var(--c); }
 }
 
-.color[data-color="45"] { --c: var(--c-45); --ch: var(--c-45h); --ca: var(--c-45a); }
-.color[data-color="67"] { --c: var(--c-67); --ch: var(--c-67h); --ca: var(--c-67a); }
-.color[data-color="sr"] { --c: #D16D6A; --ch: #D16D6A; --ca: #D16D6A; }
-.color[data-color="sp"] { --c: #8D7DB3; --ch: #8D7DB3; --ca: #8D7DB3; }
-.color[data-color="sy"] { --c: #F9DA78; --ch: #F9DA78; --ca: #F9DA78; }
-.color[data-color="sg"] { --c: #9DC384; --ch: #9DC384; --ca: #9DC384; }
-.color[data-color="sb"] { --c: #789DE5; --ch: #789DE5; --ca: #789DE5; }
+.color {
+	&[data-color="45"] { --c: var(--c-45); --ch: var(--c-45h); --ca: var(--c-45a); }
+	&[data-color="67"] { --c: var(--c-67); --ch: var(--c-67h); --ca: var(--c-67a); }
+	&[data-color="sr"] { --c: #D16D6A; --ch: #D16D6A; --ca: #D16D6A; }
+	&[data-color="sp"] { --c: #8D7DB3; --ch: #8D7DB3; --ca: #8D7DB3; }
+	&[data-color="sy"] { --c: #F9DA78; --ch: #F9DA78; --ca: #F9DA78; }
+	&[data-color="sg"] { --c: #9DC384; --ch: #9DC384; --ca: #9DC384; }
+	&[data-color="sb"] { --c: #789DE5; --ch: #789DE5; --ca: #789DE5; }
+}
 
-.colorbox[data-color="45"] { --bg: var(--c-45-bg); --bd: var(--c-45-bd); --c: var(--c-45-bc);
-	--bgh: var(--c-45-bgh); --bdh: var(--c-45-bdh); --ch: var(--c-45-bch);
-	--bga: var(--c-45-bga); --bda: var(--c-45-bda); --ca: var(--c-45-bca); }
-.colorbox[data-color="67"] { --bg: var(--c-67-bg); --bd: var(--c-67-bd); --c: var(--c-67-bc);
-	--bgh: var(--c-67-bgh); --bdh: var(--c-67-bdh); --ch: var(--c-67-bch);
-	--bga: var(--c-67-bga); --bda: var(--c-67-bda); --ca: var(--c-67-bca); }
+.colorbox {
+	&[data-color="45"] { --bg: var(--c-45-bg); --bd: var(--c-45-bd); --c: var(--c-45-bc);
+		--bgh: var(--c-45-bgh); --bdh: var(--c-45-bdh); --ch: var(--c-45-bch);
+		--bga: var(--c-45-bga); --bda: var(--c-45-bda); --ca: var(--c-45-bca); }
+	&[data-color="67"] { --bg: var(--c-67-bg); --bd: var(--c-67-bd); --c: var(--c-67-bc);
+		--bgh: var(--c-67-bgh); --bdh: var(--c-67-bdh); --ch: var(--c-67-bch);
+		--bga: var(--c-67-bga); --bda: var(--c-67-bda); --ca: var(--c-67-bca); }
+}
 
 pre {
 	font-family: 'Nanum Gothic Coding', monospace;

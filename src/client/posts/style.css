@@ -88,12 +88,17 @@ fieldset {
 	padding-block: 0.35em calc(0.625em - 0.4lh);
 	border: 1px solid currentColor;
 }
-article:is(.float-right, .float-left) > fieldset { margin-block: 0; }
 fieldset:not(:has( > legend)) { padding-block-start: 0.625em; }
+article:is(.float-right, .float-left) > fieldset { margin-block: 0; }
 
-fieldset > :is(h1, h2, h3, h4, h5, h6, p, .columns):first-child, fieldset > legend + :is(h1, h2, h3, h4, h5, h6, p, .columns),
-fieldset > .first-bar + :is(h1, h2, h3, h4, h5, h6, p, .columns) { margin-block-start: 0; }
+fieldset > :is(h1, h2, h3, h4, h5, h6, p, .columns) {
+	&:first-child, legend + &, .first-bar + & {
+		margin-block-start: 0;
+	}
+}
+
 fieldset .columns { column-rule: thin solid; }
+
 :is(fieldset hr, hr.rule)::before {
 	content: '';
 	border-block-start: 1px solid currentColor;
@@ -105,15 +110,16 @@ fieldset .columns { column-rule: thin solid; }
 ol, ul { margin-block: 0.4lh; }
 ul { padding-inline-start: 2ch; }
 ol { padding-inline-start: 2ch; }
-:is(dir, menu, ol, ul) ol {
-	list-style-type: lower-alpha;
-}
-:is(dir, menu, ol, ul) :is(dir, menu, ol, ul) ol {
-	list-style-type: lower-roman;
+:is(dir, menu, ol, ul) {
+	& ol { list-style-type: lower-alpha; }
+	& & ol { list-style-type: lower-roman; }
 }
 
-li { margin-block: 0.4lh; }
-li:has( > details) { list-style: none; }
+li {
+	margin-block: 0.4lh;
+	&:has( > details) { list-style: none; }
+}
+
 li > details > summary { list-style-position: outside; }
 
 :is(img, video) {
@@ -122,11 +128,11 @@ li > details > summary { list-style-position: outside; }
 	max-block-size: 320px;
 	display: block;
 	margin-block: 0.4lh;
+	&.small { max-block-size: 160px; }
+	&.large { max-block-size: 480px; }
+	&.full { inline-size: 100%; max-block-size: none; }
+	&:not(.full).loading { block-size: 480px; }
 }
-:is(img, video).small { max-block-size: 160px; }
-:is(img, video).large { max-block-size: 480px; }
-:is(img, video).full { inline-size: 100%; max-block-size: none; }
-:is(img, video):not(.full).loading { block-size: 480px; }
 
 svg {
 	max-inline-size: 100%;
@@ -158,33 +164,37 @@ figure.float-left { float: inline-start; }
 .align.align-center { text-align-last: center; }
 .align.align-right { text-align-last: end; }
 
-a { color: var(--c-link); text-decoration: none; }
-a:hover, a:focus-visible { color: var(--c-linkh); text-decoration: underline; }
-a:active { color: var(--c-linka); text-decoration: underline; }
-a.broken { color: var(--c-linke); }
-a.broken:hover, a.broken:focus-visible { color: var(--c-linkeh); }
-a.broken:active { color: var(--c-linkea); }
-a.self { color: var(--c-links); }
-a.self:hover, a.self:focus-visible { color: var(--c-linksh); }
-a.self:active { color: var(--c-linksa); }
+a {
+	color: var(--c-link);
+	text-decoration: none;
+	&:hover, a:focus-visible { color: var(--c-linkh); text-decoration: underline; }
+	&:active { color: var(--c-linka); text-decoration: underline; }
+	&.broken { color: var(--c-linke); }
+	&.broken:hover, a.broken:focus-visible { color: var(--c-linkeh); }
+	&.broken:active { color: var(--c-linkea); }
+	&.self { color: var(--c-links); }
+	&.self:hover, a.self:focus-visible { color: var(--c-linksh); }
+	&.self:active { color: var(--c-linksa); }
+}
 
 .color {
 	--c: currentColor; --ch: currentColor; --ca: currentColor;
 	color: var(--c);
+	&[data-color="0"] { --c: var(--c-0); --ch: var(--c-0h); --ca: var(--c-0a); }
+	&[data-color="1"] { --c: var(--c-1); --ch: var(--c-1h); --ca: var(--c-1a); }
+	&[data-color="2"] { --c: var(--c-2); --ch: var(--c-2h); --ca: var(--c-2a); }
+	&[data-color="3"] { --c: var(--c-3); --ch: var(--c-3h); --ca: var(--c-3a); }
+	&[data-color="4"] { --c: var(--c-4); --ch: var(--c-4h); --ca: var(--c-4a); }
+	&[data-color="5"] { --c: var(--c-5); --ch: var(--c-5h); --ca: var(--c-5a); }
+	&[data-color="6"] { --c: var(--c-6); --ch: var(--c-6h); --ca: var(--c-6a); }
+	&[data-color="7"] { --c: var(--c-7); --ch: var(--c-7h); --ca: var(--c-7a); }
+	&[data-color="8"] { --c: var(--c-8); --ch: var(--c-8h); --ca: var(--c-8a); }
+	&[data-color="9"] { --c: var(--c-9); --ch: var(--c-9h); --ca: var(--c-9a); }
+	&[data-color="10"] { --c: var(--c-10); --ch: var(--c-10h); --ca: var(--c-10a); }
+
+	&:is(a, .click):is(:hover, :focus-visible) { color: var(--ch); }
+	&:is(a, .click):active { color: var(--ca); }
 }
-:is(a, .click).color:hover, :is(a, .click).color:focus-visible { color: var(--ch); }
-:is(a, .click).color:active { color: var(--ca); }
-.color[data-color="0"] { --c: var(--c-0); --ch: var(--c-0h); --ca: var(--c-0a); }
-.color[data-color="1"] { --c: var(--c-1); --ch: var(--c-1h); --ca: var(--c-1a); }
-.color[data-color="2"] { --c: var(--c-2); --ch: var(--c-2h); --ca: var(--c-2a); }
-.color[data-color="3"] { --c: var(--c-3); --ch: var(--c-3h); --ca: var(--c-3a); }
-.color[data-color="4"] { --c: var(--c-4); --ch: var(--c-4h); --ca: var(--c-4a); }
-.color[data-color="5"] { --c: var(--c-5); --ch: var(--c-5h); --ca: var(--c-5a); }
-.color[data-color="6"] { --c: var(--c-6); --ch: var(--c-6h); --ca: var(--c-6a); }
-.color[data-color="7"] { --c: var(--c-7); --ch: var(--c-7h); --ca: var(--c-7a); }
-.color[data-color="8"] { --c: var(--c-8); --ch: var(--c-8h); --ca: var(--c-8a); }
-.color[data-color="9"] { --c: var(--c-9); --ch: var(--c-9h); --ca: var(--c-9a); }
-.color[data-color="10"] { --c: var(--c-10); --ch: var(--c-10h); --ca: var(--c-10a); }
 
 .colorbox {
 	--bg: transparent; --bgh: var(--c-0-5); --bga: var(--c-0-4);
@@ -203,46 +213,47 @@ a.self:active { color: var(--c-linksa); }
 	padding-inline: 0.25em;
 	text-indent: 0;
 	text-decoration-color: var(--c);
+	&[data-color="0"] { --bg: var(--c-0-bg); --bd: var(--c-0-bd); --c: var(--c-0-bc);
+		--bgh: var(--c-0-bgh); --bdh: var(--c-0-bdh); --ch: var(--c-0-bch);
+		--bga: var(--c-0-bga); --bda: var(--c-0-bda); --ca: var(--c-0-bca); }
+	&[data-color="1"] { --bg: var(--c-1-bg); --bd: var(--c-1-bd); --c: var(--c-1-bc);
+		--bgh: var(--c-1-bgh); --bdh: var(--c-1-bdh); --ch: var(--c-1-bch);
+		--bga: var(--c-1-bga); --bda: var(--c-1-bda); --ca: var(--c-1-bca); }
+	&[data-color="2"] { --bg: var(--c-2-bg); --bd: var(--c-2-bd); --c: var(--c-2-bc);
+		--bgh: var(--c-2-bgh); --bdh: var(--c-2-bdh); --ch: var(--c-2-bch);
+		--bga: var(--c-2-bga); --bda: var(--c-2-bda); --ca: var(--c-2-bca); }
+	&[data-color="3"] { --bg: var(--c-3-bg); --bd: var(--c-3-bd); --c: var(--c-3-bc);
+		--bgh: var(--c-3-bgh); --bdh: var(--c-3-bdh); --ch: var(--c-3-bch);
+		--bga: var(--c-3-bga); --bda: var(--c-3-bda); --ca: var(--c-3-bca); }
+	&[data-color="4"] { --bg: var(--c-4-bg); --bd: var(--c-4-bd); --c: var(--c-4-bc);
+		--bgh: var(--c-4-bgh); --bdh: var(--c-4-bdh); --ch: var(--c-4-bch);
+		--bga: var(--c-4-bga); --bda: var(--c-4-bda); --ca: var(--c-4-bca); }
+	&[data-color="5"] { --bg: var(--c-5-bg); --bd: var(--c-5-bd); --c: var(--c-5-bc);
+		--bgh: var(--c-5-bgh); --bdh: var(--c-5-bdh); --ch: var(--c-5-bch);
+		--bga: var(--c-5-bga); --bda: var(--c-5-bda); --ca: var(--c-5-bca); }
+	&[data-color="6"] { --bg: var(--c-6-bg); --bd: var(--c-6-bd); --c: var(--c-6-bc);
+		--bgh: var(--c-6-bgh); --bdh: var(--c-6-bdh); --ch: var(--c-6-bch);
+		--bga: var(--c-6-bga); --bda: var(--c-6-bda); --ca: var(--c-6-bca); }
+	&[data-color="7"] { --bg: var(--c-7-bg); --bd: var(--c-7-bd); --c: var(--c-7-bc);
+		--bgh: var(--c-7-bgh); --bdh: var(--c-7-bdh); --ch: var(--c-7-bch);
+		--bga: var(--c-7-bga); --bda: var(--c-7-bda); --ca: var(--c-7-bca); }
+	&[data-color="8"] { --bg: var(--c-8-bg); --bd: var(--c-8-bd); --c: var(--c-8-bc);
+		--bgh: var(--c-8-bgh); --bdh: var(--c-8-bdh); --ch: var(--c-8-bch);
+		--bga: var(--c-8-bga); --bda: var(--c-8-bda); --ca: var(--c-8-bca); }
+	&[data-color="9"] { --bg: var(--c-9-bg); --bd: var(--c-9-bd); --c: var(--c-9-bc);
+		--bgh: var(--c-9-bgh); --bdh: var(--c-9-bdh); --ch: var(--c-9-bch);
+		--bga: var(--c-9-bga); --bda: var(--c-9-bda); --ca: var(--c-9-bca); }
+	&[data-color="10"] { --bg: var(--c-10-bg); --bd: var(--c-10-bd); --c: var(--c-10-bc);
+		--bgh: var(--c-10-bgh); --bdh: var(--c-10-bdh); --ch: var(--c-10-bch);
+		--bga: var(--c-10-bga); --bda: var(--c-10-bda); --ca: var(--c-10-bca); }
+
+	&:is(a, button):is(:hover, :focus-visible) {
+		background-color: var(--bgh); --cbd: var(--bdh); color: var(--ch);
+		text-decoration: none;
+		cursor: pointer;
+	}
+	&:is(a, button):active { background-color: var(--bga); --cbd: var(--bda); color: var(--ca); text-decoration: none; }
 }
-:is(a, button).colorbox:hover, :is(a, button).colorbox:focus-visible {
-	background-color: var(--bgh); --cbd: var(--bdh); color: var(--ch);
-	text-decoration: none;
-	cursor: pointer;
-}
-:is(a, button).colorbox:active { background-color: var(--bga); --cbd: var(--bda); color: var(--ca); text-decoration: none; }
-.colorbox[data-color="0"] { --bg: var(--c-0-bg); --bd: var(--c-0-bd); --c: var(--c-0-bc);
-	--bgh: var(--c-0-bgh); --bdh: var(--c-0-bdh); --ch: var(--c-0-bch);
-	--bga: var(--c-0-bga); --bda: var(--c-0-bda); --ca: var(--c-0-bca); }
-.colorbox[data-color="1"] { --bg: var(--c-1-bg); --bd: var(--c-1-bd); --c: var(--c-1-bc);
-	--bgh: var(--c-1-bgh); --bdh: var(--c-1-bdh); --ch: var(--c-1-bch);
-	--bga: var(--c-1-bga); --bda: var(--c-1-bda); --ca: var(--c-1-bca); }
-.colorbox[data-color="2"] { --bg: var(--c-2-bg); --bd: var(--c-2-bd); --c: var(--c-2-bc);
-	--bgh: var(--c-2-bgh); --bdh: var(--c-2-bdh); --ch: var(--c-2-bch);
-	--bga: var(--c-2-bga); --bda: var(--c-2-bda); --ca: var(--c-2-bca); }
-.colorbox[data-color="3"] { --bg: var(--c-3-bg); --bd: var(--c-3-bd); --c: var(--c-3-bc);
-	--bgh: var(--c-3-bgh); --bdh: var(--c-3-bdh); --ch: var(--c-3-bch);
-	--bga: var(--c-3-bga); --bda: var(--c-3-bda); --ca: var(--c-3-bca); }
-.colorbox[data-color="4"] { --bg: var(--c-4-bg); --bd: var(--c-4-bd); --c: var(--c-4-bc);
-	--bgh: var(--c-4-bgh); --bdh: var(--c-4-bdh); --ch: var(--c-4-bch);
-	--bga: var(--c-4-bga); --bda: var(--c-4-bda); --ca: var(--c-4-bca); }
-.colorbox[data-color="5"] { --bg: var(--c-5-bg); --bd: var(--c-5-bd); --c: var(--c-5-bc);
-	--bgh: var(--c-5-bgh); --bdh: var(--c-5-bdh); --ch: var(--c-5-bch);
-	--bga: var(--c-5-bga); --bda: var(--c-5-bda); --ca: var(--c-5-bca); }
-.colorbox[data-color="6"] { --bg: var(--c-6-bg); --bd: var(--c-6-bd); --c: var(--c-6-bc);
-	--bgh: var(--c-6-bgh); --bdh: var(--c-6-bdh); --ch: var(--c-6-bch);
-	--bga: var(--c-6-bga); --bda: var(--c-6-bda); --ca: var(--c-6-bca); }
-.colorbox[data-color="7"] { --bg: var(--c-7-bg); --bd: var(--c-7-bd); --c: var(--c-7-bc);
-	--bgh: var(--c-7-bgh); --bdh: var(--c-7-bdh); --ch: var(--c-7-bch);
-	--bga: var(--c-7-bga); --bda: var(--c-7-bda); --ca: var(--c-7-bca); }
-.colorbox[data-color="8"] { --bg: var(--c-8-bg); --bd: var(--c-8-bd); --c: var(--c-8-bc);
-	--bgh: var(--c-8-bgh); --bdh: var(--c-8-bdh); --ch: var(--c-8-bch);
-	--bga: var(--c-8-bga); --bda: var(--c-8-bda); --ca: var(--c-8-bca); }
-.colorbox[data-color="9"] { --bg: var(--c-9-bg); --bd: var(--c-9-bd); --c: var(--c-9-bc);
-	--bgh: var(--c-9-bgh); --bdh: var(--c-9-bdh); --ch: var(--c-9-bch);
-	--bga: var(--c-9-bga); --bda: var(--c-9-bda); --ca: var(--c-9-bca); }
-.colorbox[data-color="10"] { --bg: var(--c-10-bg); --bd: var(--c-10-bd); --c: var(--c-10-bc);
-	--bgh: var(--c-10-bgh); --bdh: var(--c-10-bdh); --ch: var(--c-10-bch);
-	--bga: var(--c-10-bga); --bda: var(--c-10-bda); --ca: var(--c-10-bca); }
 
 em { text-decoration: underline; font-style: inherit; }
 em.dots { text-decoration: none; text-emphasis: dot; }
@@ -304,18 +315,14 @@ nav menu {
 	font-size: 1.2em;
 	padding-block: 4px;
 	padding-inline: 8px;
+	&:focus { inset-block-start: 3rem; z-index: 2; }
 }
-#nav-skip:focus { inset-block-start: 3rem; z-index: 2; }
 
 @media screen and (max-width: 480px) {
 	nav { float: none; margin-inline-start: 0; }
 	nav summary { display: revert; }
 	nav menu > li:first-child { margin-block-start: 0; }
 	#nav-skip { display: none; }
-}
-
-:where(body.targeting) :is(#menubar, #menubar *) {
-	color: var(--c-6);
 }
 
 div#menubar::after {
@@ -336,105 +343,111 @@ div#menubar::after {
 	z-index: 10;
 	display: flex;
 	list-style: none;
+
+	> li {
+		margin: 0;
+		border-inline-end: 1px solid currentColor;
+	}
+	> li > button {
+		font-family: inherit;
+		font-size: 1em;
+		color: inherit;
+		display: block;
+		margin: 0;
+		padding-block: 1.5px;
+		padding-inline: 0.5rem;
+		background: none;
+		border: none;
+	}
+	button:is(:hover, :focus-visible) { background-color: var(--c-0-bgh); }
+	button:active { background-color: var(--c-0-bga); }
+
+	ul {
+		position: fixed;
+		margin: 0;
+		padding: 0;
+		border: 1px solid currentColor;
+		background-color: var(--c-bg);
+		list-style: none;
+	}
+
+	ul > li { margin: 0; }
+	ul > li:not(:first-child) { border-block-start: 1px solid currentColor; }
+	ul > li > button {
+		font-family: inherit;
+		font-size: 1em;
+		color: inherit;
+		display: block;
+		margin: 0;
+		padding: 0;
+		padding-block: 1.5px;
+		padding-inline: 0.5rem;
+		background: none;
+		border: none;
+		width: 100%;
+		text-align: start;
+	}
 }
 
-#menubar > li {
-	margin: 0;
-	border-inline-end: 1px solid currentColor;
-}
-#menubar > li > button {
-	font-family: inherit;
-	font-size: 1em;
-	color: inherit;
-	display: block;
-	margin: 0;
-	padding-block: 1.5px;
-	padding-inline: 0.5rem;
-	background: none;
-	border: none;
-}
-#menubar button:is(:hover, :focus-visible) { background-color: var(--c-0-bgh); }
-#menubar button:active { background-color: var(--c-0-bga); }
-
-#menubar ul {
-	position: fixed;
-	margin: 0;
-	padding: 0;
-	border: 1px solid currentColor;
-	background-color: var(--c-bg);
-	list-style: none;
-}
-
-#menubar ul > li { margin: 0; }
-#menubar ul > li:not(:first-child) { border-block-start: 1px solid currentColor; }
-#menubar ul > li > button {
-	font-family: inherit;
-	font-size: 1em;
-	color: inherit;
-	display: block;
-	margin: 0;
-	padding: 0;
-	padding-block: 1.5px;
-	padding-inline: 0.5rem;
-	background: none;
-	border: none;
-	width: 100%;
-	text-align: start;
-}
-
-dialog {
+#dialog {
 	border: 2px solid currentColor;
 	background: var(--c-bg);
-}
 
-#dialog-title { margin: 0; margin-block-end: -2px; text-align: center; }
+	#dialog-title { margin: 0; margin-block-end: -2px; text-align: center; }
 
-#dialog-main { margin-block: 16px; }
-#dialog-main input {
-	border: none;
-	border-block-end: 1px solid currentColor;
-	background: none;
-	font-family: inherit;
-	font-size: 1em;
-}
-#dialog-main input[type="checkbox"] {
-	appearance: none;
-	inline-size: 0.85lh;
-	block-size: 0.85lh;
-	vertical-align: top;
-	box-sizing: border-box;
-	border: 1.5px solid currentColor;
-	background: transparent;
-	margin-inline: 0;
-	margin-block: 0.075lh;
-	position: relative;
-}
-#dialog-main input[type="checkbox"]:checked::before {
-	content: '';
-	position: absolute;
-	inset: 2.5px;
-	background-color: currentColor;
-}
-#dialog-main input[type="checkbox"]:hover { background-color: var(--c-bgh); }
-#dialog-main input::file-selector-button {
-	border: 1px solid currentColor;
-	border-block-end: none;
-	background: var(--c-bg);
-}
-#dialog-main input::file-selector-button:is(:hover, :focus-visible) { background-color: var(--c-0-bgh); }
-#dialog-main input::file-selector-button:active { background-color: var(--c-0-bga); }
+	#dialog-main {
+		margin-block: 16px;
 
-#dialog-buttons { text-align: center; }
-#dialog-buttons button {
-	border: 1px solid currentColor;
-	background: var(--c-bg);
-	margin-inline: 4px;
+		input {
+			border: none;
+			border-block-end: 1px solid currentColor;
+			background: none;
+			font-family: inherit;
+			font-size: 1em;
+			&[type="checkbox"] {
+				appearance: none;
+				inline-size: 0.85lh;
+				block-size: 0.85lh;
+				vertical-align: top;
+				box-sizing: border-box;
+				border: 1.5px solid currentColor;
+				background: transparent;
+				margin-inline: 0;
+				margin-block: 0.075lh;
+				position: relative;
+			}
+			&[type="checkbox"]:checked::before {
+				content: '';
+				position: absolute;
+				inset: 2.5px;
+				background-color: currentColor;
+			}
+			&[type="checkbox"]:hover { background-color: var(--c-bgh); }
+			&::file-selector-button {
+				border: 1px solid currentColor;
+				border-block-end: none;
+				background: var(--c-bg);
+			}
+			&::file-selector-button:is(:hover, :focus-visible) { background-color: var(--c-0-bgh); }
+			&::file-selector-button:active { background-color: var(--c-0-bga); }
+		}
+	}
+
+	#dialog-buttons {
+		text-align: center;
+
+		button {
+			border: 1px solid currentColor;
+			background: var(--c-bg);
+			margin-inline: 4px;
+			&:is(:hover, :focus-visible) { background-color: var(--c-0-bgh); }
+			&.danger { border: 1px solid var(--c-1); color: var(--c-1); }
+			&.danger:is(:hover, :focus, :focus-visible) { background-color: var(--c-1-bgh); }
+			&:active { background-color: var(--c-0-bga); }
+			&.danger:active { background-color: var(--c-1-bga); }
+		}
+	}
 }
-#dialog-buttons button:is(:hover, :focus-visible) { background-color: var(--c-0-bgh); }
-#dialog-buttons button.danger { border: 1px solid var(--c-1); color: var(--c-1); }
-#dialog-buttons button.danger:is(:hover, :focus, :focus-visible) { background-color: var(--c-1-bgh); }
-#dialog-buttons button:active { background-color: var(--c-0-bga); }
-#dialog-buttons button.danger:active { background-color: var(--c-1-bga); }
 
 #warning {
 	position: fixed;
@@ -442,12 +455,15 @@ dialog {
 	inset-block-start: 16px;
 	padding: 8px;
 	z-index: 11;
-
 	border: 2px solid var(--c-1-bd);
 	background-color: var(--c-1-bg);
 	color: var(--c-1);
-
 	display: none;
+	&.show {
+		display: block;
+		opacity: 0%;
+		animation: 1s warning-fade;
+	}
 }
 
 @keyframes warning-fade {
@@ -456,12 +472,6 @@ dialog {
 	25% { background-color: var(--c-1-bg); }
 	50% { opacity: 100%; }
 	to { opacity: 0%; }
-}
-
-#warning.show {
-	display: block;
-	opacity: 0%;
-	animation: 1s warning-fade;
 }
 
 @media print {
@@ -506,7 +516,7 @@ del:is(.unit, .editable) {
 	--barbg: var(--c-0-3); --barbgh: var(--c-0-2); --barbga: var(--c-0-1);
 	--midbg: var(--c-0-5);
 }
-:where(body:not(.targeting)) .container-bar { display: none; }
+
 .container-bar {
 	content: '';
 	position: absolute;
@@ -520,41 +530,40 @@ del:is(.unit, .editable) {
 	padding: 0;
 	margin: 0;
 	font: inherit;
+	display: none;
+	&.middle-bar { background-color: var(--midbg); z-index: -1; }
+	&.first-bar { inset-block-end: max(50% + 1px, 100% - 3lh); }
+	&.last-bar { inset-block-start: max(50% + 1px, 100% - 3lh); }
+	&:is(:hover, :focus-visible) { background-color: var(--barbgh); }
+	&:active { background-color: var(--barbga); }
 }
-.container-bar.middle-bar { background-color: var(--midbg); z-index: -1; }
-.container-bar.first-bar { inset-block-end: max(50% + 1px, 100% - 3lh); }
-.container-bar.last-bar { inset-block-start: max(50% + 1px, 100% - 3lh); }
-.container-bar:is(:hover, :focus-visible) { background-color: var(--barbgh); }
-.container-bar:active { background-color: var(--barbga); }
 
 section.container { --barbg: var(--c-7-3); --barbgh: var(--c-7-2); --barbga: var(--c-7-1); --midbg: var(--c-7-5); }
 article.container { --barbg: var(--c-6-3); --barbgh: var(--c-6-2); --barbga: var(--c-6-1); --midbg: var(--c-6-5); }
-:is(section, article).container > .container-bar {
-	inset-inline-end: calc(100% + 0.45lh);
-	inset-inline-start: -0.85lh;
+:is(section, article) {
+	&.container > .container-bar {
+		inset-inline-end: calc(100% + 0.45lh);
+		inset-inline-start: -0.85lh;
+	}
+	&.container:has(&) > .container-bar {
+		inset-inline-end: calc(100% + 0.85lh);
+		inset-inline-start: -1.25lh;
+	}
+	&.container:has(& &) > .container-bar {
+		inset-inline-end: calc(100% + 1.25lh);
+		inset-inline-start: -1.65lh;
+	}
+	&.container:has(& & &) > .container-bar {
+		inset-inline-end: calc(100% + 1.65lh);
+		inset-inline-start: -2.05lh;
+	} /* please do not nest things 4+ times */
 }
-:is(section, article).container:has(:is(section, article)) > .container-bar {
-	inset-inline-end: calc(100% + 0.85lh);
-	inset-inline-start: -1.25lh;
-}
-:is(section, article).container:has(:is(section, article) :is(section, article)) > .container-bar {
-	inset-inline-end: calc(100% + 1.25lh);
-	inset-inline-start: -1.65lh;
-}
-:is(section, article).container:has(:is(section, article) :is(section, article) :is(section, article)) > .container-bar {
-	inset-inline-end: calc(100% + 1.65lh);
-	inset-inline-start: -2.05lh;
-} /* please do not nest things 4+ times */
 fieldset.container > .container-bar {
 	inset-inline-end: calc(100% + 0.05lh + 1px);
 	inset-inline-start: calc(-0.45lh - 1px);
 }
 
-:where(body.targeting) .unit:is(:hover, :focus-visible):where(:not(:has(:is(.container, .unit):is(:hover, :focus-visible)))),
-:where(body.targeting) .container:has(> :where(.last-bar):is(:hover, :focus-visible)) { --editbg: var(--c-6-bg); }
-:where(body.targeting) .container:has(> :where(.first-bar):is(:hover, :focus-visible)) { --editbg: var(--c-7-bg); }
-
-:where(body:not(.targeting)) .editable:is(:hover, :focus-visible) { --editbg: var(--c-3-bg); }
+.editable:is(:hover, :focus-visible) { --editbg: var(--c-3-bg); }
 .editable:empty:before {
 	content: '### 비어 있음 :O ###';
 	opacity: 0.8;
@@ -567,3 +576,15 @@ fieldset.container > .container-bar {
 .edited.will-cancel { --editbg: var(--c-2-bg); color: var(--c-2); text-decoration-color: var(--c-2); }
 .deleted.deleted { --editbg: var(--c-1-bg); text-decoration: var(--c-1) dotted underline; color: var(--c-1); }
 .new.new { --editbg: var(--c-4-bg); text-decoration: var(--c-4) dotted underline; color: var(--c-4); }
+
+:where(body.targeting) {
+	:is(#menubar, #menubar *) {
+		color: var(--c-6);
+	}
+
+	.editable:is(:hover, :focus-visible) { --editbg: transparent; }
+	.unit:is(:hover, :focus-visible):where(:not(:has(:is(.container, .unit):is(:hover, :focus-visible)))),
+	.container:has(> :where(.last-bar):is(:hover, :focus-visible)) { --editbg: var(--c-6-bg); }
+	.container:has(> :where(.first-bar):is(:hover, :focus-visible)) { --editbg: var(--c-7-bg); }
+	.container-bar { display: block; }	
+}

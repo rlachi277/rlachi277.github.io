@@ -31,43 +31,48 @@ table::after {
 	z-index: 3;
 }
 
-#dialog-main input[type="number"] {
-	width: 6ch;
-}
-#dialog-main label:has( > input[type="radio"]) {
-	display: inline-flex;
-	align-items: flex-start;
-	line-height: inherit;
-	gap: 0.25em;
-	margin-inline: 0.25em;
-}
-#dialog-main input[type="radio"] {
-	appearance: none;
-	inline-size: 0.85lh;
-	block-size: 0.85lh;
-	box-sizing: border-box;
-	border: 1.5px solid var(--bd);
-	background: var(--bg);
-	margin: 0;
-	position: relative;
-}
-#dialog-main input[type="radio"]:checked::before {
-	content: '';
-	position: absolute;
-	inset: 2.5px;
-	background-color: var(--bd);
-}
-#dialog-main input[type="radio"]:hover { border-color: var(--bdh); background-color: var(--bgh); }
-#dialog-main input[type="radio"]:hover:checked::before { background-color: var(--bdh); }
-#dialog-main input[type="radio"]:active { border-color: var(--bda); background-color: var(--bga); }
-#dialog-main input[type="radio"]:active:checked::before { background-color: var(--bda); }
+#dialog-main {
+	input[type="number"] {
+		width: 6ch;
+	}
+	input[type="radio"] {
+		label:has( > &) {
+			display: inline-flex;
+			align-items: flex-start;
+			line-height: inherit;
+			gap: 0.25em;
+			margin-inline: 0.25em;
+		}
 
-#dialog-main input[type="radio"][name="log1-type"][value="1"] { --bd: var(--c-1-bd); --bdh: var(--c-1-bdh); --bda: var(--c-1-bda); --bg: var(--c-1-bg); --bgh: var(--c-1-bgh); --bga: var(--c-1-bga); }
-#dialog-main input[type="radio"][name="log1-type"][value="2"] { --bd: var(--c-8-bd); --bdh: var(--c-8-bdh); --bda: var(--c-8-bda); --bg: var(--c-8-bg); --bgh: var(--c-8-bgh); --bga: var(--c-8-bga); }
-#dialog-main input[type="radio"][name="log1-type"][value="3"] { --bd: var(--c-3-bd); --bdh: var(--c-3-bdh); --bda: var(--c-3-bda); --bg: var(--c-3-bg); --bgh: var(--c-3-bgh); --bga: var(--c-3-bga); }
-#dialog-main input[type="radio"][name="log1-type"][value="4"] { --bd: var(--c-45-bd); --bdh: var(--c-45-bdh); --bda: var(--c-45-bda); --bg: var(--c-45-bg); --bgh: var(--c-45-bgh); --bga: var(--c-45-bga); }
-#dialog-main input[type="radio"][name="log1-type"][value="5"] { --bd: var(--c-67-bd); --bdh: var(--c-67-bdh); --bda: var(--c-67-bda); --bg: var(--c-67-bg); --bgh: var(--c-67-bgh); --bga: var(--c-67-bga); }
-#dialog-main input[type="radio"][name="log1-type"][value="6"] { --bd: var(--c-2-bd); --bdh: var(--c-2-bdh); --bda: var(--c-2-bda); --bg: var(--c-2-bg); --bgh: var(--c-2-bgh); --bga: var(--c-2-bga); }
+		appearance: none;
+		inline-size: 0.85lh;
+		block-size: 0.85lh;
+		box-sizing: border-box;
+		border: 1.5px solid var(--bd);
+		background: var(--bg);
+		margin: 0;
+		position: relative;
+		&:checked::before {
+			content: '';
+			position: absolute;
+			inset: 2.5px;
+			background-color: var(--bd);
+		}
+		&:hover { border-color: var(--bdh); background-color: var(--bgh); }
+		&:hover:checked::before { background-color: var(--bdh); }
+		&:active { border-color: var(--bda); background-color: var(--bga); }
+		&:active:checked::before { background-color: var(--bda); }
+
+		&[name="log1-type"] {
+			&[value="1"] { --bd: var(--c-1-bd); --bdh: var(--c-1-bdh); --bda: var(--c-1-bda); --bg: var(--c-1-bg); --bgh: var(--c-1-bgh); --bga: var(--c-1-bga); }
+			&[value="2"] { --bd: var(--c-8-bd); --bdh: var(--c-8-bdh); --bda: var(--c-8-bda); --bg: var(--c-8-bg); --bgh: var(--c-8-bgh); --bga: var(--c-8-bga); }
+			&[value="3"] { --bd: var(--c-3-bd); --bdh: var(--c-3-bdh); --bda: var(--c-3-bda); --bg: var(--c-3-bg); --bgh: var(--c-3-bgh); --bga: var(--c-3-bga); }
+			&[value="4"] { --bd: var(--c-45-bd); --bdh: var(--c-45-bdh); --bda: var(--c-45-bda); --bg: var(--c-45-bg); --bgh: var(--c-45-bgh); --bga: var(--c-45-bga); }
+			&[value="5"] { --bd: var(--c-67-bd); --bdh: var(--c-67-bdh); --bda: var(--c-67-bda); --bg: var(--c-67-bg); --bgh: var(--c-67-bgh); --bga: var(--c-67-bga); }
+			&[value="6"] { --bd: var(--c-2-bd); --bdh: var(--c-2-bdh); --bda: var(--c-2-bda); --bg: var(--c-2-bg); --bgh: var(--c-2-bgh); --bga: var(--c-2-bga); }
+		}
+	}
+}
 
 @media print {
 	@page {

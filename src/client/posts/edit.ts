@@ -482,7 +482,15 @@ function insertElement(after: Element, isFirst: boolean) {
 		pos: pos,
 		data: newData,
 		splice: 0
-	})});
+	})}).then((res) => {
+		if (!res.ok) {
+			showWarning("오류 발생. 편집 내용을 별도로 저장하고 새로고침하세요.");
+			stopEdit();
+		}
+	}).catch((_) => {
+		showWarning("오류 발생. 편집 내용을 별도로 저장하고 새로고침하세요.");
+		stopEdit();
+	});
 	return true;
 }
 
