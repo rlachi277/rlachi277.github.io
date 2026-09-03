@@ -44,7 +44,7 @@ const rootTemplate = "cycelog/root.ejs";
 
 router.use(cache(60));
 
-router.get('/', (_, res) => {
+router.get(['/', '/index.html'], (_, res) => {
 	res.render(rootTemplate);
 });
 router.use('/log1', log1);
