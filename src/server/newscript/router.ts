@@ -1,13 +1,12 @@
 import express from "express";
+import { cache } from "../cache.js";
 
 const router = express.Router();
 export default router;
 
-router.get('/', (_, res) => {
-	res.render("newscript/index");
-});
+router.use(cache(31536000));
 
-router.get('/index.html', (_, res) => {
+router.get(['/', '/index.html'], (_, res) => {
 	res.render("newscript/index");
 });
 

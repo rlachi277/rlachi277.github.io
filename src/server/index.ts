@@ -18,8 +18,7 @@ const port = 8080;
 app.set('view engine', 'ejs');
 app.set('views', path.join(root, 'template'));
 
-app.get('/', (_, res) => { res.render('index'); });
-app.get('/index.html', (_, res) => { res.render('index'); });
+app.get(['/', '/index.html'], (_, res) => { res.render('index'); });
 app.get('/README.md', (_, res) => { res.sendFile(path.join(root, '..', 'README.md')); });
 app.use('/public', express.static(path.join(root, 'public')));
 app.use('/assets', express.static(path.join(root, '..', 'assets')));

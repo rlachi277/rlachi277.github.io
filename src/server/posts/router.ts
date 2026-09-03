@@ -11,6 +11,7 @@ import {
 } from "./posts.js";
 import { renderNav } from './render_nav.js';
 import { role } from "../auth.js";
+import { cache } from "../cache.js";
 
 const db = new Database('db/posts.db');
 db.pragma('journal_mode = WAL');
@@ -42,13 +43,9 @@ const indexTemplate = "posts/index.ejs";
 const router = express.Router();
 export default router;
 
-router.get('/', (_, res) => {
-	res.render(indexTemplate, {
-		nav: renderNav(db, "/posts/", "index.html")
-	});
-});
+router.use(cache(60));
 
-router.get('/index.html', (_, res) => {
+router.get(['/', '/index.html'], (_, res) => {
 	res.render(indexTemplate, {
 		nav: renderNav(db, "/posts/", "index.html")
 	});

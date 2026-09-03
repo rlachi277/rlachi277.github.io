@@ -13,5 +13,4 @@ router.use('/pdfds', pdfds);
 router.use('/2048', game2048);
 router.use(express.static(path.join(root, 'vibing')));
 
-router.get('/', (_, res) => { res.sendFile(path.join(root, 'vibing', 'index.html')); });
-router.get('/index.html', (_, res) => { res.sendFile(path.join(root, 'vibing', 'index.html')); });
+router.get(['/', '/index.html'], (_, res) => { res.sendFile(path.join(root, 'vibing', 'index.html')); });

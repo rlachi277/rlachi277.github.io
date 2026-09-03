@@ -1,4 +1,5 @@
 import express from "express";
+import { cache } from '../cache.js';
 
 import notfont from './notfont.js';
 import gallery from './gallery.js';
@@ -9,7 +10,9 @@ import archive from './archive.js';
 const router = express.Router();
 export default router;
 
-router.get('/', (_, res) => {
+router.use(cache(31536000));
+
+router.get(['/', '/index.html'], (_, res) => {
 	res.render("kimclweb/index");
 });
 
