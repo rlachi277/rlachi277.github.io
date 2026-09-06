@@ -1,0 +1,64 @@
+#forms {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4lh;
+}
+
+form {
+	display: inline-block;
+	margin: 0;
+	padding: 0.625em;
+	border: 1px solid currentColor;
+	max-inline-size: 17.5em;
+
+	h6 { margin: 0; margin-block-end: 4px; text-align: center; }
+
+	input {
+		display: block;
+		inline-size: 100%;
+		border: none;
+		border-block-end: 1px solid currentColor;
+		background: none;
+		font-family: inherit;
+		font-size: 1em;
+		margin-block-end: 4px;
+		&[type="checkbox"] {
+			appearance: none;
+			inline-size: 0.85lh;
+			block-size: 0.85lh;
+			vertical-align: top;
+			box-sizing: border-box;
+			border: 1.5px solid currentColor;
+			background: transparent;
+			margin-inline: 0;
+			margin-block: 0.075lh;
+			position: relative;
+		}
+		&[type="checkbox"]:checked::before {
+			content: '';
+			position: absolute;
+			inset: 2.5px;
+			background-color: currentColor;
+		}
+		&[type="checkbox"]:hover { background-color: var(--c-bgh); }
+		&::file-selector-button {
+			border: 1px solid currentColor;
+			border-block-end: none;
+			background: var(--c-bg);
+		}
+		&::file-selector-button:is(:hover, :focus-visible) { background-color: var(--c-0-bgh); }
+		&::file-selector-button:active { background-color: var(--c-0-bga); }
+	}
+
+	button {
+		font-size: 1em;
+		border: 1px solid currentColor;
+		background: var(--c-bg);
+		margin-inline: 0;
+		&:is(:hover, :focus-visible) { background-color: var(--c-0-bgh); }
+		&.danger { border: 1px solid var(--c-1); color: var(--c-1); }
+		&.danger:is(:hover, :focus, :focus-visible) { background-color: var(--c-1-bgh); }
+		&:active { background-color: var(--c-0-bga); }
+		&.danger:active { background-color: var(--c-1-bga); }
+	}
+}

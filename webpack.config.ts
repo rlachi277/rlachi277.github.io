@@ -19,6 +19,7 @@ const entries = {
 
   "posts/post": "posts/entries/post",
   "cycelog/root": "cycelog/entries/root",
+  "cycelog/assets": "cycelog/entries/assets",
   "cycelog/log1": "cycelog/entries/log1",
   "cycelog/log3": "cycelog/entries/log3",
 
@@ -54,6 +55,7 @@ const html: Record<string, HtmlTemplate> = {
     chunks: ["posts/post"]
   },
   "cycelog/root": {chunks: ["cycelog/root"]},
+  "cycelog/assets": {template: "cycelog/assets.ejs", chunks: ["cycelog/assets"]},
   "cycelog/log1_index": {template: "cycelog/log1_index.ejs", chunks: ["cycelog/log1"]},
   "cycelog/log1": {template: "cycelog/log1.ejs", chunks: ["cycelog/log1"]},
   "cycelog/log1_404": {

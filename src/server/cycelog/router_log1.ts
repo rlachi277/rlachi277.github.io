@@ -17,12 +17,8 @@ import { db } from './router.js';
 const router = express.Router();
 export default router;
 
-const log1Template = "cycelog/log1.ejs";
-const log1NotFoundTemplate = "cycelog/log1_404.ejs";
-const log1IndexTemplate = "cycelog/log1_index.ejs";
-
 router.get(['/', '/index.html'], role("admin", true), (_, res) => {
-	res.render(log1IndexTemplate, {
+	res.render("cycelog/log1_index.ejs", {
 		nav: renderNav(db, "/cycelog/log1/", "index.html")
 	});
 });
@@ -30,8 +26,8 @@ router.get(['/', '/index.html'], role("admin", true), (_, res) => {
 router.get('/:id', role("admin", true), (req, res) => {
 	const id = req.params.id;
 	const result = getLog1(db, "/cycelog/log1/", id, [], renderNav(db, "/cycelog/log1/", id));
-	if (result[0]) res.render(log1Template, result[1]);
-	else res.status(404).render(log1NotFoundTemplate, result[1]);
+	if (result[0]) res.render("cycelog/log1.ejs", result[1]);
+	else res.status(404).render("cycelog/log1_404.ejs", result[1]);
 });
 
 router.post('/:id', role("admin"), (req, res) => {

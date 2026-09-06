@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<title>끾기록</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="icon" type="image/png" href="/assets/cycelog/favicon.png">
+	<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-gov.min.css" media="screen and (min-width: 480px)">
+</head>
+<body>
+	<h1>끾기록 자료</h1>
+	<a href="/">루트로 돌아가기</a>
+	<hr class="rule">
+	<div id="forms">
+		<form id="image-form" action="./image/" method="post" enctype="multipart/form-data">
+			<h6>이미지 업로드</h6>
+			<input name="asset" title="업로드할 이미지 선택" type="file" accept="image/png,image/jpeg,image/webp" required>
+			<button>업로드</button>
+		</form>
+		<form id="image-delete-form" action="./image/delete/" method="post" enctype="multipart/form-data">
+			<h6>이미지 삭제</h6>
+			<input name="asset" title="삭제할 이미지 선택" type="file" accept="image/png,image/jpeg,image/webp" required>
+			<button>업로드</button>
+		</form>
+	</div>
+	<hr class="rule">
+	<p>todo: assets list</p>
+</body>
+</html>

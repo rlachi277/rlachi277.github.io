@@ -18,12 +18,8 @@ import { db } from './router.js';
 const router = express.Router();
 export default router;
 
-const log3Template = "cycelog/log3.ejs";
-const log3NotFoundTemplate = "cycelog/log3_404.ejs";
-const log3IndexTemplate = "cycelog/log3_index.ejs";
-
 router.get(['/', '/index.html'], role("admin", true), (_, res) => {
-	res.render(log3IndexTemplate, {
+	res.render("cycelog/log3_index.ejs", {
 		nav: renderNav(db, "/cycelog/log3/", "index.html")
 	});
 });
@@ -42,8 +38,8 @@ router.get('/:id', role("admin", true), (req, res) => {
 		db, "/cycelog/log3/", id, [cycelogDeseriHook(typeObject, serverWhere(db), req.query.log1 !== undefined)],
 		renderNav(db, "/cycelog/log3/", id), req.query.log1 !== undefined ? data : undefined
 	);
-	if (result[0]) res.render(log3Template, result[1]);
-	else res.status(404).render(log3NotFoundTemplate, result[1]);
+	if (result[0]) res.render("cycelog/log3.ejs", result[1]);
+	else res.status(404).render("cycelog/log3_404.ejs", result[1]);
 });
 
 router.put('/:id', role("admin"), (req, res) => {

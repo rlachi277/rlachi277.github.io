@@ -4,6 +4,7 @@ import { cache } from "../cache.js";
 
 import log1 from './router_log1.js';
 import log3 from './router_log3.js';
+import assets from './router_assets.js';
 
 export const db = new Database('db/cycelog.db');
 db.pragma('journal_mode = WAL');
@@ -32,6 +33,15 @@ db.prepare(`
 	)`
 ).run();
 db.prepare(`
+	CREATE TABLE IF NOT EXISTS assets (
+		id INTEGER PRIMARY KEY,
+		asset_type TEXT NOT NULL,
+		asset_name TEXT NOT NULL,
+		mime_type TEXT NOT NULL,
+		content BLOB NOT NULL
+	)`
+).run();
+db.prepare(`
 	INSERT INTO posts (path, data)
 	VALUES (?, ?)
 	ON CONFLICT DO NOTHING
@@ -40,12 +50,11 @@ db.prepare(`
 const router = express.Router();
 export default router;
 
-const rootTemplate = "cycelog/root.ejs";
-
 router.use(cache(60));
 
 router.get(['/', '/index.html'], (_, res) => {
-	res.render(rootTemplate);
+	res.render("cycelog/root.ejs");
 });
 router.use('/log1', log1);
 router.use('/log3', log3);
+router.use('/assets', assets);
