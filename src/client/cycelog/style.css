@@ -1,4 +1,6 @@
 :root {
+	font-family: "Pretendard GOV Variable", "Pretendard GOV", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+	
 	--c-45-l5: color-mix(in oklch, var(--c-5-l5) 50%, var(--c-4-l5));
 	--c-45-l4: color-mix(in oklch, var(--c-5-l4) 50%, var(--c-4-l4));
 	--c-45-l3: color-mix(in oklch, var(--c-5-l3) 50%, var(--c-4-l3));

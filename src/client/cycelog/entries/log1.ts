@@ -1,6 +1,6 @@
 import "../../colors.css";
 import "../../posts/style.css";
-import "../colors.css";
+import "../style.css";
 import "../table.css";
 import "../log1.css";
 
