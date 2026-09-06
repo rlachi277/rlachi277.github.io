@@ -1,8 +1,8 @@
 import "../../colors.css";
 import "../../posts/style.css";
 import "../style.css";
-import "../assets.css";
+import "../log2.css";
 
-import { setup } from "../assets.js";
+import { setup } from "../log2.js";
 
 setup();

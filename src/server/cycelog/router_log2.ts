@@ -2,17 +2,19 @@ import express from "express";
 import { cache } from "../cache.js";
 import { role } from "../auth.js";
 import { db } from "./router.js";
-import { accessImage, asset, deleteImage, deleteImageFromFile, storeImage } from "./assets.js";
+import { getImage, asset, deleteImage, deleteImageFromFile, listImages, postImage } from "./assets.js";
 
 const router = express.Router();
 export default router;
 
 router.get(["/", "/index.html"], role("admin", true), (_, res) => {
-	res.render("cycelog/assets.ejs");
+	res.render("cycelog/log2.ejs", {
+		images: listImages(db)
+	});
 });
 
 router.post("/image", role("admin"), asset, (req, res) => {
-	storeImage(db, req.file, res);
+	postImage(db, req.file, res);
 });
 
 router.post("/image/delete/", role("admin"), asset, (req, res) => {
@@ -20,7 +22,7 @@ router.post("/image/delete/", role("admin"), asset, (req, res) => {
 });
 
 router.get("/image/:name", role("admin"), cache(31536000, false, true), (req, res) => {
-	accessImage(db, req.params.name, res);
+	getImage(db, req.params.name, res);
 });
 
 router.delete("/image/:name", role("admin"), (req, res) => {

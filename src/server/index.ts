@@ -20,7 +20,7 @@ app.set('views', path.join(root, 'template'));
 
 app.get(['/', '/index.html'], (_, res) => { res.render('index'); });
 app.get('/README.md', (_, res) => { res.sendFile(path.join(root, '..', 'README.md')); });
-app.use('/public', express.static(path.join(root, 'public'), {maxAge: 60000}));
+app.use('/public', express.static(path.join(root, 'public'), {maxAge: 0}));
 app.use('/assets', express.static(path.join(root, '..', 'assets'), {maxAge: '1y'}));
 
 app.use(express.text({limit: '50mb'}));

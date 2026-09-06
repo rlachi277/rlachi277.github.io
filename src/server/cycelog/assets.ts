@@ -3,6 +3,7 @@ import type { Response } from "express";
 
 import multer from "multer";
 import crypto from "crypto";
+import { html } from "../../shared/template.js";
 
 const upload = multer({
 	storage: multer.memoryStorage(),
@@ -11,7 +12,7 @@ const upload = multer({
 
 export const asset = upload.single("asset");
 
-export function storeImage(db: Database, file: Express.Multer.File | undefined, res: Response) {
+export function postImage(db: Database, file: Express.Multer.File | undefined, res: Response) {
 	if (file === undefined) {
 		res.status(400).send("파일이 첨부되지 않았습니다.");
 		return;
@@ -37,7 +38,7 @@ export function deleteImageFromFile(db: Database, file: Express.Multer.File | un
 		res.status(400).send("파일이 첨부되지 않았습니다.");
 		return;
 	}
-	const hash = crypto.createHash('sha256').update(file.buffer).digest('hex').substring(0, 16);
+	const hash = crypto.createHash('sha256').update(file.buffer).digest('hex').substring(0, 12);
 	deleteImage(db, hash, res);
 }
 
@@ -57,7 +58,7 @@ export function deleteImage(db: Database, name: string, res: Response) {
 	res.sendStatus(204);
 }
 
-export function accessImage(db: Database, name: string, res: Response) {
+export function getImage(db: Database, name: string, res: Response) {
 	const result = db.prepare(`
 		SELECT mime_type, content FROM assets
 		WHERE asset_type = 'image' AND asset_name = ?
@@ -69,4 +70,22 @@ export function accessImage(db: Database, name: string, res: Response) {
 	res.type(result.mime_type);
 	res.setHeader("Content-Disposition", "inline");
 	res.send(result.content);
+}
+
+export function listImages(db: Database) {
+	const images = db.prepare(`
+		SELECT asset_name FROM assets
+		WHERE asset_type = 'image'
+	`).all() as {asset_name: string}[];
+	let result = ``;
+	for (const e of images) {
+		result += html`<article class="image">
+			<h6>${e.asset_name}</h6>
+			<img src="./image/${e.asset_name}">
+			<div>
+				<span class="image-size">(크기 확인 중)</span> <button type="button" class="image-delete-button" data-link="./image/${e.asset_name}">삭제</button>
+			</div>
+		</article>`;
+	}
+	return result;
 }
