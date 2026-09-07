@@ -39,7 +39,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: pnpm build:vibetest
+        run: pnpm build:vibetemp
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
