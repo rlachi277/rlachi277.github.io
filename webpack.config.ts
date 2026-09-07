@@ -20,8 +20,8 @@ const entries = {
   "posts/post": "posts/entries/post",
   "cycelog/root": "cycelog/entries/root",
   "cycelog/log1": "cycelog/entries/log1",
-  "cycelog/log2": "cycelog/entries/log2",
   "cycelog/log3": "cycelog/entries/log3",
+  "cycelog/assets": "cycelog/entries/assets",
 
   "kimclweb/notfont/entry": "kimclweb/notfont/entries/entry",
   "kimclweb/gallery/entry": "kimclweb/gallery/entries/entry",
@@ -62,7 +62,6 @@ const html: Record<string, HtmlTemplate> = {
     templateParameters: {title: "끾기록: 1차 기록(404)", rootclass: "notfound"},
     chunks: ["cycelog/log1"]
   },
-  "cycelog/log2": {template: "cycelog/log2.ejs", chunks: ["cycelog/log2"]},
   "cycelog/log3_index": {template: "cycelog/log3_index.ejs", chunks: ["cycelog/log3"]},
   "cycelog/log3": {template: "cycelog/log3.ejs", chunks: ["cycelog/log3"]},
   "cycelog/log3_404": {
@@ -70,6 +69,7 @@ const html: Record<string, HtmlTemplate> = {
     templateParameters: {title: "끾기록: 3차 기록(404)", rootclass: "notfound"},
     chunks: ["cycelog/log3"]
   },
+  "cycelog/assets": {template: "cycelog/assets.ejs", chunks: ["cycelog/assets"]},
 
   "kimclweb/index": true,
   "kimclweb/notfont/index": {chunks: ["kimclweb/notfont/entry"]},

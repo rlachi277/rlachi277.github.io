@@ -3,8 +3,8 @@ import Database from 'better-sqlite3';
 import { cache } from "../cache.js";
 
 import log1 from './router_log1.js';
-import log2 from './router_log2.js';
 import log3 from './router_log3.js';
+import assets from './router_assets.js';
 
 export const db = new Database('db/cycelog.db');
 db.pragma('journal_mode = WAL');
@@ -56,5 +56,5 @@ router.get(['/', '/index.html'], (_, res) => {
 	res.render("cycelog/root.ejs");
 });
 router.use('/log1', log1);
-router.use('/log2', log2);
 router.use('/log3', log3);
+router.use('/assets', assets);

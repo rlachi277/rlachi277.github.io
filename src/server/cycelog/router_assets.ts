@@ -8,7 +8,7 @@ const router = express.Router();
 export default router;
 
 router.get(["/", "/index.html"], role("admin", true), (_, res) => {
-	res.render("cycelog/log2.ejs", {
+	res.render("cycelog/assets.ejs", {
 		images: listImages(db)
 	});
 });
