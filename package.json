@@ -13,6 +13,7 @@
     "clean": "rimraf dist",
     "build:mine": "tsc -p tsconfig.server.json && webpack --config webpack.config.ts",
     "build:vibing": "cpx \"src/vibing/**/*\" dist/vibing --ignore \"src/vibing/**/*.ts\" && tsc -p tsconfig.vibing.json",
+    "build:vibetemp": "pnpm clean && pnpm build:vibing && cp src/vibetemp.html dist/index.html",
     "build": "pnpm clean && pnpm build:mine && pnpm build:vibing",
     "start": "node dist/server/index.js",
     "start:app": "node dist/server/app.js",
