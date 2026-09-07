@@ -227,6 +227,7 @@ button { color: inherit; }
 
 .relic::before {
   inset: 2%;
+  border: 1px solid var(--line);
   background: radial-gradient(circle, rgba(255, 208, 70, 0.16), transparent 66%);
   box-shadow: 0 0 100px rgba(255, 196, 34, 0.1);
 }
@@ -260,9 +261,9 @@ button { color: inherit; }
     radial-gradient(circle at 50% 47%, transparent 30%, rgba(16, 8, 0, 0.7) 100%);
 }
 
-.relic-orbit { position: absolute; border: 1px solid var(--line); border-radius: 50%; }
-.orbit-outer { inset: 2%; animation: slow-spin 48s linear infinite; }
-.orbit-outer::before, .orbit-outer::after {
+.relic-orbit { position: absolute; z-index: 3; border: 1px solid transparent; border-radius: 50%; }
+.orbit-outer { inset: 2%; animation: slow-spin 30s linear infinite; }
+.orbit-outer::before, .orbit-inner::before {
   position: absolute;
   content: "";
   width: 9px;
@@ -271,9 +272,9 @@ button { color: inherit; }
   background: var(--bright-gold);
   box-shadow: 0 0 25px var(--bright-gold);
 }
-.orbit-outer::before { top: 15%; left: 15%; }
-.orbit-outer::after { right: 15%; bottom: 15%; }
-.orbit-inner { inset: 17%; border-style: dashed; opacity: 0.55; animation: slow-spin 30s linear infinite reverse; }
+.orbit-outer::before { top: 50%; right: 0; transform: translate(50%, -50%); }
+.orbit-inner { inset: 11%; border-color: transparent; animation: slow-spin 18s linear infinite; }
+.orbit-inner::before { top: 50%; left: 0; transform: translate(-50%, -50%); }
 
 .relic-label {
   position: absolute;
