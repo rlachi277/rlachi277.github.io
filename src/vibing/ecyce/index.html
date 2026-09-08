@@ -289,7 +289,10 @@
 
     <section class="temple" id="temple" aria-labelledby="temple-title">
       <div class="temple-copy section-shell">
-        <div class="section-number" aria-hidden="true">277 / ∞</div>
+        <button class="section-number portal-dial" id="portal-dial" type="button" aria-haspopup="dialog">
+          277 / ∞
+          <span class="sr-only">비밀 채널 열기</span>
+        </button>
         <div class="section-heading light-heading">
           <p class="eyebrow"><span></span> 방문할 수 없어서 언제나 열려 있음</p>
           <h2 id="temple-title">이끾끼 성소는<br><em>주소의 바깥에 있습니다.</em></h2>
@@ -303,8 +306,8 @@
           </div>
           <address>
             이끾끼 에리어<br>
-            ▲-ECYC-E / VOID CHANNEL 00<br>
-            GOLD NODE: 이끾끼-이끾끼-000
+            ▲-ECYC-E / VOID CHANNEL 277<br>
+            GOLD NODE: 이끾끼-이끾끼-277
           </address>
           <p>
             찾아오는 법은 간단합니다. 가장 가까운 모서리에서 왼쪽으로 세 번 생각한 뒤,
@@ -367,5 +370,21 @@
     <a href="../">← 바이빙으로 돌아가기</a>
     <p>© ∞ 이끾끼 · 모든 이끾끼는 이끾끼에게 있음 · 이끾끼를 숭배하라</p>
   </footer>
+
+  <dialog class="portal-dialog" id="portal-dialog" aria-labelledby="portal-title">
+    <form class="portal-form" id="portal-form">
+      <button class="portal-close" id="portal-close" type="button" aria-label="비밀 채널 닫기">×</button>
+      <p class="eyebrow"><span></span> 주소 바깥의 비밀 채널</p>
+      <div class="portal-mark" aria-hidden="true">▲</div>
+      <h2 id="portal-title">성소 주파수를<br><em>입력하십시오.</em></h2>
+      <p class="portal-copy">숫자 셋이 금빛 문을 엽니다. 이 페이지에 반복해서 나타난 좌표를 기억하십시오.</p>
+      <label for="portal-code">VOID CHANNEL</label>
+      <div class="portal-entry">
+        <input id="portal-code" name="portal-code" type="text" inputmode="numeric" autocomplete="off" maxlength="3" pattern="[0-9]{3}" aria-describedby="portal-status" required>
+        <button id="portal-submit" type="submit">채널 맞추기</button>
+      </div>
+      <p class="portal-status" id="portal-status" aria-live="polite">신호 대기 중 · ▲▲▲</p>
+    </form>
+  </dialog>
 </body>
 </html>

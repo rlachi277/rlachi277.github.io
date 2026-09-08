@@ -4,6 +4,13 @@ const transmitButton = document.querySelector<HTMLButtonElement>("#transmit-butt
 const transmission = document.querySelector<HTMLElement>("#transmission");
 const mantraTrack = document.querySelector<HTMLElement>(".mantra-track");
 const mantraTemplate = mantraTrack?.querySelector<HTMLElement>(".mantra-group") ?? null;
+const portalDial = document.querySelector<HTMLButtonElement>("#portal-dial");
+const portalDialog = document.querySelector<HTMLDialogElement>("#portal-dialog");
+const portalForm = document.querySelector<HTMLFormElement>("#portal-form");
+const portalCode = document.querySelector<HTMLInputElement>("#portal-code");
+const portalClose = document.querySelector<HTMLButtonElement>("#portal-close");
+const portalSubmit = document.querySelector<HTMLButtonElement>("#portal-submit");
+const portalStatus = document.querySelector<HTMLElement>("#portal-status");
 
 let praises = 0;
 let mantraResizeFrame = 0;
@@ -225,6 +232,42 @@ transmitButton?.addEventListener("click", () => {
   if (!transmission || responses.length === 0) return;
   const responseIndex = Math.floor(Math.random() * responses.length);
   transmission.textContent = responses[responseIndex];
+});
+
+portalDial?.addEventListener("click", () => {
+  if (!portalDialog) return;
+  portalDialog.showModal();
+  portalDialog.classList.remove("portal-unlocked");
+  if (portalCode) {
+    portalCode.disabled = false;
+    portalCode.value = "";
+    window.requestAnimationFrame(() => portalCode.focus());
+  }
+  if (portalSubmit) portalSubmit.disabled = false;
+  if (portalStatus) portalStatus.textContent = "신호 대기 중 · ▲▲▲";
+});
+
+portalClose?.addEventListener("click", () => portalDialog?.close());
+
+portalDialog?.addEventListener("click", (event) => {
+  if (event.target === portalDialog) portalDialog.close();
+});
+
+portalForm?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  if (!portalCode || !portalStatus) return;
+
+  if (portalCode.value !== "277") {
+    portalStatus.textContent = "채널 불일치 · 이끾끼가 아직 문을 닫고 있음";
+    portalCode.select();
+    return;
+  }
+
+  portalDialog?.classList.add("portal-unlocked");
+  portalStatus.textContent = "CHANNEL 277 · 문이 열림 · 경계를 이동합니다";
+  portalCode.disabled = true;
+  if (portalSubmit) portalSubmit.disabled = true;
+  window.setTimeout(() => window.location.assign("./leaving/"), 650);
 });
 
 function fillMantra(): void {

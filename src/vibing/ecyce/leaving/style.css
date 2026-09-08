@@ -1,0 +1,156 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css");
+
+:root {
+  color-scheme: dark;
+  --black: #0b0906;
+  --ink: #171006;
+  --gold: #d8a933;
+  --bright-gold: #ffd866;
+  --pale-gold: #fff0b5;
+  --cream: #fff9e9;
+  --line: rgba(255, 224, 129, 0.28);
+  --sans: "Pretendard GOV", Pretendard, "Apple SD Gothic Neo", sans-serif;
+  --serif: "Pretendard GOV", Pretendard, "Apple SD Gothic Neo", sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  min-width: 300px;
+  min-height: 100svh;
+  margin: 0;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 72% 48%, rgba(216, 169, 51, 0.18), transparent 30rem),
+    repeating-linear-gradient(90deg, transparent 0 calc(8.333% - 1px), rgba(255, 220, 116, 0.045) calc(8.333% - 1px) 8.333%),
+    var(--black);
+  color: var(--cream);
+  font-family: var(--sans);
+  word-break: keep-all;
+}
+
+body::before {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  content: "";
+  opacity: 0.17;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+}
+
+.ambient-word {
+  position: fixed;
+  right: -0.08em;
+  bottom: -0.2em;
+  z-index: -1;
+  color: transparent;
+  font-family: var(--serif);
+  font-size: min(48vw, 40rem);
+  font-weight: 900;
+  line-height: 0.8;
+  -webkit-text-stroke: 1px rgba(216, 169, 51, 0.07);
+  user-select: none;
+}
+
+header {
+  height: 86px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 0 clamp(20px, 4.5vw, 80px);
+  border-bottom: 1px solid rgba(255, 224, 129, 0.15);
+  color: var(--pale-gold);
+}
+
+header a { display: flex; align-items: center; gap: 12px; color: inherit; text-decoration: none; }
+header a span { width: 36px; aspect-ratio: 1; display: grid; place-items: center; border: 1px solid var(--gold); border-radius: 50%; color: var(--bright-gold); }
+header a strong { font-size: 0.82rem; letter-spacing: 0.08em; }
+header p { margin: 0; color: var(--gold); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.14em; }
+
+main { min-height: calc(100svh - 86px); }
+
+.departure {
+  min-height: calc(100svh - 86px);
+  display: grid;
+  grid-template-columns: minmax(340px, 0.9fr) minmax(0, 1.1fr);
+  align-items: center;
+  gap: clamp(40px, 8vw, 130px);
+  padding: clamp(50px, 8vw, 110px) clamp(24px, 8vw, 145px);
+}
+
+.gate {
+  position: relative;
+  width: min(38vw, 530px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  justify-self: center;
+}
+
+.gate::before,
+.gate::after {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  content: "";
+  background: rgba(216, 169, 51, 0.42);
+  transform: translate(-50%, -50%);
+}
+
+.gate::before { width: 118%; height: 1px; }
+.gate::after { width: 1px; height: 118%; }
+
+.gate-ring { position: absolute; border: 1px solid var(--gold); border-radius: 50%; }
+.gate-ring-outer { inset: 0; animation: rotate 16s linear infinite; }
+.gate-ring-outer::before { position: absolute; top: 8%; left: 18%; width: 12px; aspect-ratio: 1; border-radius: 50%; background: var(--bright-gold); box-shadow: 0 0 24px var(--bright-gold); content: ""; }
+.gate-ring-inner { inset: 19%; border-style: dashed; animation: rotate 11s linear infinite reverse; }
+.gate strong { z-index: 1; color: var(--bright-gold); font-family: var(--serif); font-size: clamp(4rem, 8vw, 8rem); letter-spacing: -0.08em; text-shadow: 0 0 45px rgba(216, 169, 51, 0.45); }
+
+.departure-copy { max-width: 760px; }
+
+.eyebrow { display: flex; align-items: center; gap: 10px; margin: 0 0 26px; color: var(--gold); font-size: 0.7rem; font-weight: 900; letter-spacing: 0.14em; }
+.eyebrow span { width: 28px; height: 1px; background: currentColor; }
+
+h1 { margin: 0; font-family: var(--serif); font-size: clamp(4rem, 8vw, 8.5rem); line-height: 0.88; letter-spacing: -0.085em; }
+h1 em { color: var(--bright-gold); font-style: normal; }
+
+.lede { max-width: 620px; margin: clamp(34px, 5vw, 58px) 0 0; color: rgba(255, 249, 233, 0.68); font-family: var(--serif); font-size: clamp(1rem, 1.5vw, 1.2rem); line-height: 1.9; }
+.lede strong { color: var(--pale-gold); }
+
+.progress { margin-top: 44px; }
+.progress-meta { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 12px; color: var(--gold); font-size: 0.72rem; font-weight: 900; letter-spacing: 0.1em; }
+.progress-track { height: 2px; overflow: hidden; background: rgba(255, 224, 129, 0.16); }
+.progress-track span { width: 100%; height: 100%; display: block; background: var(--bright-gold); box-shadow: 0 0 12px var(--gold); transform-origin: left; }
+
+.actions { display: flex; align-items: center; flex-wrap: wrap; gap: 22px; margin-top: 30px; }
+.actions a { font-size: 0.8rem; font-weight: 900; text-underline-offset: 6px; }
+.continue { padding: 15px 20px; border: 1px solid var(--gold); background: var(--gold); color: var(--ink); text-decoration: none; }
+.continue:hover, .continue:focus-visible { background: var(--bright-gold); }
+.return { color: rgba(255, 249, 233, 0.62); }
+.return:hover, .return:focus-visible { color: var(--bright-gold); }
+
+.cookie-note { margin: 24px 0 0; color: rgba(255, 249, 233, 0.4); font-family: var(--serif); font-size: 0.72rem; }
+
+@keyframes rotate { to { transform: rotate(360deg); } }
+
+@media (max-width: 860px) {
+  .departure { grid-template-columns: 1fr; }
+  .gate { width: min(76vw, 440px); }
+  .departure-copy { max-width: 100%; }
+}
+
+@media (max-width: 520px) {
+  header { height: 72px; }
+  header p { display: none; }
+  main, .departure { min-height: calc(100svh - 72px); }
+  .departure { padding-right: 22px; padding-left: 22px; }
+  .gate { width: min(72vw, 330px); }
+  h1 { font-size: clamp(3.3rem, 17vw, 5.2rem); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gate-ring { animation: none; }
+  *, *::before, *::after { transition-duration: 0.01ms !important; }
+}
