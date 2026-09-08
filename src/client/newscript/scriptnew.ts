@@ -141,10 +141,8 @@ async function exportSVG() {
 let kill: NodeJS.Timeout | null = null;
 function toggleAnimate() {
 	if (kill === null) {
-		let curr = 0;
 		kill = setInterval(() => {
-			rand.cur = curr;
-			curr = (curr+1) % 256;
+			rand.next();
 			update();
 		}, 100);
 	} else {
