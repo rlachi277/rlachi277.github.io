@@ -163,6 +163,7 @@ const config: webpack.Configuration = {
         chunks: v.chunks ?? []
       };
       const template = path.resolve(__dirname, "src/client", v2.template);
+      if (!fs.existsSync(template)) return acc;
       acc.push(new HTMLWebpackPlugin({
         templateContent: v2.template.endsWith(".ejs") ?
           () => ejs.render(fs.readFileSync(template, "utf8"), v2.templateParameters ?? {}) :
