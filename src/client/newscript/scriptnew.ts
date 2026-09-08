@@ -63,7 +63,7 @@ function to_code(str: string) {
 }
 
 function update() {
-	rand.reset();
+	if (!kill) rand.reset();
 	const txt = to_code((d$n("code") as HTMLInputElement).value) + "\n";
 	let cury = 0, curx = 0;
 	let maxx = 0, maxy = 0;
@@ -138,7 +138,20 @@ async function exportSVG() {
 	URL.revokeObjectURL(url);
 }
 
+let kill: NodeJS.Timeout | null = null;
+function toggleAnimate() {
+	if (kill === null) {
+		let curr = 0;
+		kill = setInterval(() => {
+			rand.cur = curr;
+			curr = (curr+1) % 256;
+		}, 100);
+	} else {
+		clearInterval(kill);
+	}
+}
 export function setup() {
 	$("#code").on("input", update);
+	$("#animate").on("click", toggleAnimate);
 	$("#export").on("click", exportSVG);
 }
