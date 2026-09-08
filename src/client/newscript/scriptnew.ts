@@ -63,7 +63,7 @@ function to_code(str: string) {
 }
 
 function update() {
-	if (!kill) rand.reset();
+	if (kill === null) rand.reset();
 	const txt = to_code((d$n("code") as HTMLInputElement).value) + "\n";
 	let cury = 0, curx = 0;
 	let maxx = 0, maxy = 0;
@@ -147,6 +147,7 @@ function toggleAnimate() {
 		}, 100);
 	} else {
 		clearInterval(kill);
+		kill = null;
 	}
 }
 export function setup() {
