@@ -28,7 +28,8 @@ const entries = {
   "kimclweb/dobby-timer/entry": "kimclweb/dobby-timer/entries/entry",
 
   "newscript/normal": "newscript/entries/normal",
-  "newscript/base64": "newscript/entries/base64"
+  "newscript/base64": "newscript/entries/base64",
+  "newscript/newer": "newscript/entries/newer"
 } satisfies Record<string, string>;
 
 type HtmlTemplate = true | {
@@ -119,7 +120,8 @@ const html: Record<string, HtmlTemplate> = {
   }, {}),
 
   "newscript/index": {chunks: ["newscript/normal"]},
-  "newscript/index64": {chunks: ["newscript/base64"]}
+  "newscript/index64": {chunks: ["newscript/base64"]},
+  "newscript/indexnew": {chunks: ["newscript/newer"]}
 };
 
 const config: webpack.Configuration = {

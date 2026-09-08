@@ -90,7 +90,7 @@ function base64ToBytes(base64: string) {
 }
 */
 
-let rand = {cur: 0, reset: function () {this.cur = 0}, next: function () {let ocur = this.cur; this.cur = (this.cur*3+7)%255; return ocur;}}
+let rand = {cur: 0, reset: function () {this.cur = 0}, next: function () {let ocur = this.cur; this.cur = (this.cur*3+7)%255; return ocur;}};
 
 function bytesToBase64(str: string) {
 	const bytes = TE.encode(str);

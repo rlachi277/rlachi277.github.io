@@ -13,3 +13,7 @@ router.get(['/', '/index.html'], (_, res) => {
 router.get('/index64.html', (_, res) => {
 	res.render("newscript/index64");
 });
+
+router.get('/indexnew.html', (_, res) => {
+	res.render("newscript/indexnew");
+});
