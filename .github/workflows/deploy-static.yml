@@ -1,4 +1,5 @@
-# vibetemp니 역시 설정도 ChatGPT한테 맡겨야겠지
+# 원래 AI가 짜 준 건 다 vibing/에 넣는데(몇몇 예외 제외)
+# 이건 vibing/에 못 넣을 거 같음
 
 name: Build and Deploy
 
@@ -39,7 +40,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: pnpm build:vibetemp
+        run: pnpm build:static
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
