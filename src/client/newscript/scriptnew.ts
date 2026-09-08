@@ -145,6 +145,7 @@ function toggleAnimate() {
 		kill = setInterval(() => {
 			rand.cur = curr;
 			curr = (curr+1) % 256;
+			update();
 		}, 100);
 	} else {
 		clearInterval(kill);
