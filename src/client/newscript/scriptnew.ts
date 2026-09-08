@@ -102,8 +102,8 @@ function update() {
 		}
 		const curcode = code[e];
 		if (e === "," || e === "." || e === "?" || e === "!" || e === ";") sep = true;
-		if (curcode === undefined) continue;
 		else sep = false;
+		if (curcode === undefined) continue;
 		let wcx = curcode[0];
 		let wcy = curcode[1];
 		curword.push([wcx, wcy]);
