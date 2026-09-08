@@ -68,12 +68,12 @@ function update() {
 	let cury = 0, curx = 0;
 	let maxx = 0, maxy = 0;
 	let wminy = 60, wmaxy = 0;
-	let lines = [], curline = "", curword = [], ignore = false, sep = false;
+	let lines = [], curline = "", curword = [], sep = false;
 	console.log(txt);
 	for (const e of txt) {
 		if (e === "\n") sep = true;
 		if (e === " " || e === "\n") {
-			if (ignore && e === " ") continue;
+			if (e === " " && (wminy === 60 && wmaxy === 0)) continue;
 			if (wminy === wmaxy) {
 				if (wminy === 0) wmaxy = 60;
 				else if (wminy === 20) wmaxy = 40;
@@ -98,10 +98,8 @@ function update() {
 				lines.push(curline.trim());
 				curline = "";
 			}
-			ignore = true;
 			continue;
 		}
-		ignore = false;
 		const curcode = code[e];
 		if (e === "," || e === "." || e === "?" || e === "!" || e === ";") sep = true;
 		if (curcode === undefined) continue;
