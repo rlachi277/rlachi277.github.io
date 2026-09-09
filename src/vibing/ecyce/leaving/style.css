@@ -103,9 +103,11 @@ main { min-height: calc(100svh - 86px); }
 .gate::after { width: 1px; height: 118%; }
 
 .gate-ring { position: absolute; border: 1px solid var(--gold); border-radius: 50%; }
-.gate-ring-outer { inset: 0; animation: rotate 16s linear infinite; }
-.gate-ring-outer::before { position: absolute; top: 8%; left: 18%; width: 12px; aspect-ratio: 1; border-radius: 50%; background: var(--bright-gold); box-shadow: 0 0 24px var(--bright-gold); content: ""; }
+.gate-ring-outer { inset: 0; }
 .gate-ring-inner { inset: 19%; border-style: dashed; animation: rotate 11s linear infinite reverse; }
+.gate-escape { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.escape-path { fill: none; stroke: rgba(255, 216, 102, 0.56); stroke-width: 1.5; stroke-dasharray: 5 9; vector-effect: non-scaling-stroke; }
+.gate-orbiter { fill: var(--bright-gold); filter: drop-shadow(0 0 9px var(--bright-gold)); }
 .gate strong { z-index: 1; color: var(--bright-gold); font-family: var(--serif); font-size: clamp(4rem, 8vw, 8rem); letter-spacing: -0.08em; text-shadow: 0 0 45px rgba(216, 169, 51, 0.45); }
 
 .departure-copy { max-width: 760px; }
@@ -152,5 +154,6 @@ h1 em { color: var(--bright-gold); font-style: normal; }
 
 @media (prefers-reduced-motion: reduce) {
   .gate-ring { animation: none; }
+  .gate-orbiter { display: none; }
   *, *::before, *::after { transition-duration: 0.01ms !important; }
 }
