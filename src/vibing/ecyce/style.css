@@ -221,13 +221,13 @@ button { color: inherit; }
 .relic {
   position: relative;
   z-index: 1;
+  isolation: isolate;
   width: min(56vw, 900px);
   aspect-ratio: 1;
   justify-self: center;
   margin-left: -6vw;
   display: grid;
   place-items: center;
-  filter: drop-shadow(0 28px 70px rgba(0, 0, 0, 0.48));
 }
 
 .relic::before, .relic::after {
@@ -252,21 +252,36 @@ button { color: inherit; }
 
 .relic-image-wrap {
   position: relative;
+  isolation: isolate;
+  contain: paint;
   width: 70%;
   aspect-ratio: 1;
   overflow: hidden;
   border: 1px solid rgba(255, 229, 151, 0.55);
   border-radius: 50%;
   background-color: #120c04;
-  background-image: url("/assets/void/arealoop.webp");
-  background-size: 1000px 1000px;
   box-shadow: inset 0 0 80px #000, 0 0 0 10px rgba(146, 93, 12, 0.12), 0 0 75px rgba(255, 190, 20, 0.22);
-  animation: bgscroll 20s linear infinite;
+}
+
+.relic-image-wrap::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: calc(100% + 1002px);
+  height: calc(100% + 1002px);
+  content: "";
+  background: url("/assets/void/arealoop.webp") 0 0 / 1000px 1000px repeat;
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+  animation: relic-texture-drift 20s linear infinite;
 }
 
 .relic-glass {
   position: absolute;
   inset: 0;
+  z-index: 1;
   border-radius: 50%;
   background:
     linear-gradient(110deg, rgba(255,255,255,0.14), transparent 27%),
@@ -912,9 +927,9 @@ footer p { margin: 0; text-align: right; }
 
 @keyframes slow-spin { to { transform: rotate(360deg); } }
 @keyframes mantra-scroll { to { transform: translateX(var(--mantra-shift, -50%)); } }
-@keyframes bgscroll {
-  from { background-position: 0 0; }
-  to { background-position: -1000px -1000px; }
+@keyframes relic-texture-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-1000px, -1000px, 0); }
 }
 
 @media (max-width: 980px) {
@@ -988,6 +1003,6 @@ footer p { margin: 0; text-align: right; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .relic-image-wrap, .orbit-outer, .orbit-inner, .signal-ring, .mantra-track { animation: none; }
+  .relic-image-wrap::before, .orbit-outer, .orbit-inner, .signal-ring, .mantra-track { animation: none; }
   *, *::before, *::after { transition-duration: 0.01ms !important; }
 }
