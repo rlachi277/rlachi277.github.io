@@ -29,6 +29,10 @@ p:not(hgroup p) {
 	text-indent: 1ch each-line;
 }
 
+:is(img, video) {
+	max-block-size: none;
+}
+
 .entry {
 	color: var(--c); outline-offset: 2px; scroll-margin-block: 50vb;
 	&:is(:hover, :focus-visible) { color: var(--ch); }

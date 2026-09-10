@@ -7,7 +7,7 @@ export function cache(duration: number, isPrivate: boolean = false, isImmutable:
 ) => void {
 	return (req, res, next) => {
 		if (req.method === 'GET' || req.method === 'HEAD') {
-        	res.setHeader('Cache-Control', `${isPrivate ? 'private' : 'public'}; max-age=${duration};${isImmutable ? ' immutable;' : ''}`);
+        	res.setHeader('Cache-Control', `${isPrivate ? 'private' : 'public'}, max-age=${duration}${isImmutable ? ', immutable' : ''}`);
     	}
     	next();
 	};

@@ -64,7 +64,7 @@ hr { color: inherit; border: none; height: 1lh; margin-block: 0.4lh; }
 
 pre { overflow-x: auto; margin-block: 0.4lh; }
 pre.wrap { white-space: pre-wrap; overflow-x: visible; }
-pre:not(.wrap) svg {
+pre:not(.wrap) :is(img, video, svg) {
 	max-inline-size: none;
 }
 pre :is(ul, ol) { padding-inline-start: 3ch; margin-block: 0; }
