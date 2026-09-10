@@ -117,7 +117,7 @@ export function seri(el: Node, init: boolean = false, hooks: SeriHook[] = []): S
 		result.type = "img";
 		result.variant = {
 			size: seriSize(el),
-			...getAttributes(el, ["src", "alt"])
+			...getAttributes(el, ["src", "alt", "width", "height"])
 		};
 		result.children = null;
 		break;
@@ -300,7 +300,7 @@ export function deseri(data: SeriData, cur: string, init: boolean = false, hooks
 		tagName = "img";
 		isVoid = true;
 		if (data.variant?.src != null) attrs += ` src="${sani(assets(data.variant?.src as string, cur))}"`;
-		attrs += setAttributes(data.variant, ["alt"]);
+		attrs += setAttributes(data.variant, ["alt", "width", "height"]);
 		attrs += deseriSize(data.variant?.size as string);
 		break;
 	case 'ol':

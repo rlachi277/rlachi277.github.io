@@ -6,6 +6,7 @@ import {
 	deleteElement
 } from "../posts/edit.js";
 import { defaultMenu as superDefaultMenu, editMenu as superEditMenu } from "../posts/menu.js";
+import { sani } from "../../shared/posts/seri.js";
 
 export const defaultMenu = {
 	export: superDefaultMenu.export,
@@ -178,6 +179,35 @@ export const editMenu = {
 		if (!isFirst && after.parentElement === d$n("main")) return null;
 		return document.createElement("ins");
 	}, false),
+	insertImage: dialog("이미지 삽입", `
+		파일 저장소의 이미지를 삽입합니다.<br>
+		<label>
+			이미지 ID: <input id="dialog-image-id" type="text">
+		</label><br>
+		<label>
+			너비: <input id="dialog-image-width" type="number" min="1" style="width: 6ch;">px, 
+		</label>
+		<label>
+			높이: <input id="dialog-image-height" type="number" min="1" style="width: 6ch;">px
+		</label>
+	`, async () => {
+		const imageId = (d$n(`dialog-image-id`) as HTMLInputElement).value;
+		if (imageId.includes(".") || imageId.includes("/")) {
+			showWarning("잘못된 입력입니다.");
+			return false;
+		}
+		const imageWidth = parseInt((d$n(`dialog-image-width`) as HTMLInputElement).value);
+		const imageHeight = parseInt((d$n(`dialog-image-height`) as HTMLInputElement).value);
+		menuInsert((after, isFirst) => {
+			if (!isFirst && after.parentElement === d$n("main")) return null;
+			const el = document.createElement("img");
+			el.setAttribute("src", `../assets/image/${sani(imageId)}`);
+			el.setAttribute("width", imageWidth.toString());
+			el.setAttribute("height", imageHeight.toString());
+			return el;
+		}, false)();
+		return true;
+	}),
 	deleteElement: () => {
 		startTargeting((target) => {
 			if (target.tagName === "HGROUP" || /^H[1-6]$/.test(target.tagName)) {

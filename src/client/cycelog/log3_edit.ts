@@ -1,4 +1,4 @@
-import type { DeseriHook } from '../../shared/posts/seri.js';
+import { sani, type DeseriHook } from '../../shared/posts/seri.js';
 import type { EntryTypeObject } from '../../shared/cycelog/cycelog_hook.js';
 
 import { cycelogSeriHook, cycelogDeseriHook } from '../../shared/cycelog/cycelog_hook.js';
@@ -48,6 +48,8 @@ function onKeydown(e: KeyboardEvent) {
 		insertReference();
 	} else if (shortcut && e.key === ".") {
 		insertEndOfWeek();
+	} else if (shortcut && e.key === "i") {
+		insertImage();
 	}
 }
 
@@ -153,4 +155,33 @@ function insertAtMarker(marker: HTMLElement, html: string) {
 		e.setAttribute("contenteditable", "false");
 		e.setAttribute("data-edit", "");
 	});
+}
+
+function insertImage() {
+	const range = S.getRangeAt(0);
+	const marker = document.createElement("span");
+	marker.classList.add("select-marker", "dialog-marker");
+	range.insertNode(marker);
+	dialog("이미지 삽입", `
+		파일 저장소의 이미지를 삽입합니다.<br>
+		<label>
+			이미지 ID: <input id="dialog-image-id" type="text">
+		</label><br>
+		<label>
+			너비: <input id="dialog-image-width" type="number" min="1" style="width: 6ch;">px, 
+		</label>
+		<label>
+			높이: <input id="dialog-image-height" type="number" min="1" style="width: 6ch;">px
+		</label>
+	`, () => {
+		const imageId = (d$n(`dialog-image-id`) as HTMLInputElement).value;
+		if (imageId.includes(".") || imageId.includes("/")) {
+			showWarning("잘못된 입력입니다.");
+			return false;
+		}
+		const imageWidth = parseInt((d$n(`dialog-image-width`) as HTMLInputElement).value);
+		const imageHeight = parseInt((d$n(`dialog-image-height`) as HTMLInputElement).value);
+		insertAtMarker(marker, `<img src="../assets/image/${sani(imageId)}" width="${imageWidth}" height="${imageHeight}">`);
+		return true;
+	})();
 }

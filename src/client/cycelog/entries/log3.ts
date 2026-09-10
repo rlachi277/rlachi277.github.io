@@ -37,6 +37,7 @@ const menu: MenubarData[] = [{
 		{text: "다단 레이아웃 삽입", action: "insertColumns"},
 		{text: "블록 주석 삽입", action: "insertBlockComment"},
 		{text: "<pre> 삽입", action: "insertPre"},
+		{text: "이미지 삽입", action: "insertImage"},
 		{text: "요소 삭제", action: "deleteElement"},
 		{text: "삽입/삭제 중단", action: "stopTargeting"}
 	]
