@@ -22,6 +22,7 @@ app.get(['/', '/index.html'], (_, res) => { res.render('index'); });
 app.get('/README.md', (_, res) => { res.sendFile(path.join(root, '..', 'README.md')); });
 app.use('/public', express.static(path.join(root, 'public'), {maxAge: 0}));
 app.use('/assets', express.static(path.join(root, '..', 'assets'), {maxAge: '1y'}));
+app.get(['/about/', '/about/index.html', '/about.html'], (_, res) => { res.render('about/index'); });
 
 app.use(express.text({limit: '50mb'}));
 app.use(express.json({limit: '50mb'}));

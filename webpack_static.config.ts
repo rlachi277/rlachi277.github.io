@@ -15,13 +15,7 @@ const __dirname = path.dirname(__filename);
 
 const entries = {
   "index": "root/entries/index",
-  /* "error": "root/entries/error", */
-
-  /* "posts/post": "posts/entries/post",
-  "cycelog/root": "cycelog/entries/root",
-  "cycelog/log1": "cycelog/entries/log1",
-  "cycelog/log3": "cycelog/entries/log3",
-  "cycelog/assets": "cycelog/entries/assets", */
+  "about/index": "about/entries/index",
 
   "kimclweb/notfont/entry": "kimclweb/notfont/entries/entry",
   "kimclweb/gallery/entry": "kimclweb/gallery/entries/entry",
@@ -40,37 +34,7 @@ type HtmlTemplate = true | {
 
 const html: Record<string, HtmlTemplate> = {
   "index": {template: "../static.html", chunks: ["index"]},
-  /* "401": {template: "root/401.html", chunks: ["error"]},
-  "403": {template: "root/403.html", chunks: ["error"]},
-  "404": {template: "root/404.html", chunks: ["error"]}, */
-
-  /* "posts/index": {template: "posts/index.ejs", chunks: ["posts/post"]},
-  "posts/post": {
-    template: "posts/post.ejs",
-    templateParameters: {title: "끾웹 글쓰기", rootclass: ""},
-    chunks: ["posts/post"]
-  },
-  "posts/404": {
-    template: "posts/post.ejs",
-    templateParameters: {title: "끾웹 글쓰기(404)", rootclass: "notfound"},
-    chunks: ["posts/post"]
-  },
-  "cycelog/root": {chunks: ["cycelog/root"]},
-  "cycelog/log1_index": {template: "cycelog/log1_index.ejs", chunks: ["cycelog/log1"]},
-  "cycelog/log1": {template: "cycelog/log1.ejs", chunks: ["cycelog/log1"]},
-  "cycelog/log1_404": {
-    template: "posts/post.ejs",
-    templateParameters: {title: "끾기록: 1차 기록(404)", rootclass: "notfound"},
-    chunks: ["cycelog/log1"]
-  },
-  "cycelog/log3_index": {template: "cycelog/log3_index.ejs", chunks: ["cycelog/log3"]},
-  "cycelog/log3": {template: "cycelog/log3.ejs", chunks: ["cycelog/log3"]},
-  "cycelog/log3_404": {
-    template: "posts/post.ejs",
-    templateParameters: {title: "끾기록: 3차 기록(404)", rootclass: "notfound"},
-    chunks: ["cycelog/log3"]
-  },
-  "cycelog/assets": {template: "cycelog/assets.ejs", chunks: ["cycelog/assets"]}, */
+  "about/index": {template: "about/index.html", chunks: ["about/index"]},
 
   "kimclweb/index": true,
   "kimclweb/notfont/index": {chunks: ["kimclweb/notfont/entry"]},

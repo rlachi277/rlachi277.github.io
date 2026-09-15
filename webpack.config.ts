@@ -16,6 +16,7 @@ const __dirname = path.dirname(__filename);
 const entries = {
   "index": "root/entries/index",
   "error": "root/entries/error",
+  "about/index": "about/entries/index",
 
   "posts/post": "posts/entries/post",
   "cycelog/root": "cycelog/entries/root",
@@ -43,6 +44,7 @@ const html: Record<string, HtmlTemplate> = {
   "401": {template: "root/401.html", chunks: ["error"]},
   "403": {template: "root/403.html", chunks: ["error"]},
   "404": {template: "root/404.html", chunks: ["error"]},
+  "about/index": {template: "about/index.html", chunks: ["about/index"]},
 
   "posts/index": {template: "posts/index.ejs", chunks: ["posts/post"]},
   "posts/post": {

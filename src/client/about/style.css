@@ -1,0 +1,9 @@
+ins {
+	background-color: var(--c-1-bg);
+	color: var(--c-1);
+}
+
+del {
+	background-color: light-dark(var(--c-0-l3), var(--c-0-d5));
+	color: light-dark(var(--c-0-d2), var(--c-0-d1));
+}
