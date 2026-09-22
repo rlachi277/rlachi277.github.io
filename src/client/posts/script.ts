@@ -1,8 +1,9 @@
+import DOMPurify from "dompurify";
+
 import type { DeseriHook, SeriHook } from "../../shared/posts/seri.js";
 import type { MenubarData } from "./menubar.js";
 
 import { $, d$n } from "../query.js";
-import DOMPurify from "../purify.es.mjs";
 import { setupDialog } from "./dialog.js";
 import { startEdit } from "./edit.js";
 import { setupMenubar } from "./menubar.js";
