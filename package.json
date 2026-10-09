@@ -27,6 +27,7 @@
     "multer": "^2.2.0"
   },
   "devDependencies": {
+    "@huggingface/transformers": "^4.3.0",
     "@types/better-sqlite3": "^9.6.0",
     "@types/compression": "^1.8.1",
     "@types/ejs": "^3.1.5",

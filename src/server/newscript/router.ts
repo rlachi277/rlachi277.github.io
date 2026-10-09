@@ -17,3 +17,7 @@ router.get('/index64.html', (_, res) => {
 router.get('/indexnew.html', (_, res) => {
 	res.render("newscript/indexnew");
 });
+
+router.get('/indexai.html', (_, res) => {
+	res.render("newscript/indexai");
+});
