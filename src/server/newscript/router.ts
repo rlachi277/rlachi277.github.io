@@ -21,3 +21,7 @@ router.get('/indexnew.html', (_, res) => {
 router.get('/indexai.html', (_, res) => {
 	res.render("newscript/indexai");
 });
+
+router.get('/indexmash.html', (_, res) => {
+	res.render("newscript/indexmash");
+});

@@ -24,7 +24,8 @@ const entries = {
   "newscript/normal": "newscript/entries/normal",
   "newscript/base64": "newscript/entries/base64",
   "newscript/newer": "newscript/entries/newer",
-  "newscript/aitest": "newscript/entries/aitest"
+  "newscript/aitest": "newscript/entries/aitest",
+  "newscript/mash": "newscript/entries/mash"
 } satisfies Record<string, string>;
 
 type HtmlTemplate = true | {
@@ -87,7 +88,8 @@ const html: Record<string, HtmlTemplate> = {
   "newscript/index": {chunks: ["newscript/normal"]},
   "newscript/index64": {chunks: ["newscript/base64"]},
   "newscript/indexnew": {chunks: ["newscript/newer"]},
-  "newscript/indexai": {chunks: ["newscript/aitest"]}
+  "newscript/indexai": {chunks: ["newscript/aitest"]},
+  "newscript/indexmash": {chunks: ["newscript/mash"]}
 };
 
 const config: webpack.Configuration = {
